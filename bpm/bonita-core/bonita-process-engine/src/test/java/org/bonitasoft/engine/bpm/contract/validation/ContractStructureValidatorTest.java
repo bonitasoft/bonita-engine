@@ -22,7 +22,6 @@ import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInput
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
 import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
-import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -38,10 +37,10 @@ import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -51,10 +50,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ContractStructureValidatorTest {
 
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     @Mock
     ContractTypeValidator typeValidator;
-    @Mock
-    private TechnicalLoggerService logger;
     @InjectMocks
     private ContractStructureValidator validator;
 
@@ -63,7 +62,6 @@ public class ContractStructureValidatorTest {
 
     @Before
     public void setUp() {
-        when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
         doReturn(true).when(typeValidator).validate(any(SInputDefinition.class), any(), any(ErrorReporter.class));
     }
 
@@ -75,12 +73,10 @@ public class ContractStructureValidatorTest {
                 .put("someFieldNotDefinedInContract", true)
                 .put("someOtherFieldNotDefinedInContract", "42").build();
 
+        systemOutRule.clearLog();
         validator.validate(contract, taskInputs);
 
-        verify(logger).log(ContractStructureValidator.class, DEBUG,
-                "Unexpected input [someFieldNotDefinedInContract] provided");
-        verify(logger).log(ContractStructureValidator.class, DEBUG,
-                "Unexpected input [someOtherFieldNotDefinedInContract] provided");
+        assertThat(systemOutRule.getLog()).contains("Unexpected input [someFieldNotDefinedInContract] provided");
     }
 
     @Test

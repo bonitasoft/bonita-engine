@@ -26,7 +26,6 @@ import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -54,9 +53,6 @@ public class IdentityServiceImplForGroupTest {
 
     @Mock
     private EventService eventService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @InjectMocks
     private IdentityServiceImpl identityServiceImpl;

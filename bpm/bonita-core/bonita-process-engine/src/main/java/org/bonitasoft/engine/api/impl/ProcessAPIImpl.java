@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonMap;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance.EXECUTION_DATE;
@@ -22,12 +23,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -44,8 +55,25 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstances;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetNumberOfActivityInstance;
-import org.bonitasoft.engine.api.impl.transaction.actor.*;
-import org.bonitasoft.engine.api.impl.transaction.category.*;
+import org.bonitasoft.engine.api.impl.transaction.actor.ExportActorMapping;
+import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
+import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsByActorIds;
+import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfActorMembers;
+import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfActors;
+import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfGroupsOfActor;
+import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfMembershipsOfActor;
+import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfRolesOfActor;
+import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfUsersOfActor;
+import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
+import org.bonitasoft.engine.api.impl.transaction.actor.RemoveActorMember;
+import org.bonitasoft.engine.api.impl.transaction.category.CreateCategory;
+import org.bonitasoft.engine.api.impl.transaction.category.DeleteSCategory;
+import org.bonitasoft.engine.api.impl.transaction.category.GetCategories;
+import org.bonitasoft.engine.api.impl.transaction.category.GetCategory;
+import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategories;
+import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategoriesOfProcess;
+import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromProcessDefinition;
+import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
 import org.bonitasoft.engine.api.impl.transaction.event.GetEventInstances;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
@@ -53,11 +81,36 @@ import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressions
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.flownode.SetExpectedEndDate;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
-import org.bonitasoft.engine.api.impl.transaction.process.*;
-import org.bonitasoft.engine.api.impl.transaction.task.*;
+import org.bonitasoft.engine.api.impl.transaction.process.AddProcessDefinitionToCategory;
+import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
+import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
+import org.bonitasoft.engine.api.impl.transaction.process.GetLatestProcessDefinitionId;
+import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessDeploymentInfos;
+import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessDeploymentInfosUnrelatedToCategory;
+import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessInstance;
+import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfos;
+import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForGroup;
+import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForGroups;
+import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForRole;
+import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForRoles;
+import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForUser;
+import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForUsers;
+import org.bonitasoft.engine.api.impl.transaction.process.SetProcessInstanceState;
+import org.bonitasoft.engine.api.impl.transaction.process.UpdateProcessDeploymentInfo;
+import org.bonitasoft.engine.api.impl.transaction.task.AssignOrUnassignUserTask;
+import org.bonitasoft.engine.api.impl.transaction.task.AssignUserTaskIfNotAssigned;
+import org.bonitasoft.engine.api.impl.transaction.task.GetAssignedTasks;
+import org.bonitasoft.engine.api.impl.transaction.task.GetHumanTaskInstance;
+import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOpenTasksForUsers;
+import org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.bar.BusinessArchiveService;
-import org.bonitasoft.engine.bpm.actor.*;
+import org.bonitasoft.engine.bpm.actor.ActorCriterion;
+import org.bonitasoft.engine.bpm.actor.ActorInstance;
+import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
+import org.bonitasoft.engine.bpm.actor.ActorMappingImportException;
+import org.bonitasoft.engine.bpm.actor.ActorMember;
+import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
+import org.bonitasoft.engine.bpm.actor.ActorUpdater;
 import org.bonitasoft.engine.bpm.actor.ActorUpdater.ActorField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -70,17 +123,78 @@ import org.bonitasoft.engine.bpm.category.CategoryUpdater;
 import org.bonitasoft.engine.bpm.category.CategoryUpdater.CategoryField;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
-import org.bonitasoft.engine.bpm.connector.*;
+import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
+import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
+import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
+import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
+import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidatorFactory;
-import org.bonitasoft.engine.bpm.data.*;
-import org.bonitasoft.engine.bpm.document.*;
-import org.bonitasoft.engine.bpm.flownode.*;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
+import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
+import org.bonitasoft.engine.bpm.data.DataDefinition;
+import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.data.DataNotFoundException;
+import org.bonitasoft.engine.bpm.document.ArchivedDocument;
+import org.bonitasoft.engine.bpm.document.ArchivedDocumentNotFoundException;
+import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.bpm.document.DocumentAttachmentException;
+import org.bonitasoft.engine.bpm.document.DocumentCriterion;
+import org.bonitasoft.engine.bpm.document.DocumentException;
+import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
+import org.bonitasoft.engine.bpm.document.DocumentValue;
+import org.bonitasoft.engine.bpm.flownode.ActivityDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.ActivityStates;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.EventCriterion;
+import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.SendEventException;
+import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
-import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.Index;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessActivationException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDeployException;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
+import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
+import org.bonitasoft.engine.bpm.process.ProcessExportException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
@@ -88,7 +202,9 @@ import org.bonitasoft.engine.bpm.supervisor.SupervisorNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.commons.exceptions.*;
+import org.bonitasoft.engine.commons.ExceptionUtils;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.category.CategoryService;
@@ -122,7 +238,19 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.*;
+import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowSignalEventTriggerDefinitionBuilderFactory;
@@ -135,10 +263,29 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowS
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.*;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.*;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
@@ -156,7 +303,20 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.ContractDataNotFoundException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.FormMappingNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.NotSerializableException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
@@ -164,7 +324,12 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.expression.*;
+import org.bonitasoft.engine.expression.ContainerState;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.ExpressionType;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -182,23 +347,32 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.lock.SLockTimeoutException;
 import org.bonitasoft.engine.log.LogMessageBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.persistence.*;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderAndField;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.search.*;
+import org.bonitasoft.engine.search.AbstractHumanTaskInstanceSearchEntity;
+import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.Sort;
 import org.bonitasoft.engine.search.activity.SearchActivityInstances;
 import org.bonitasoft.engine.search.activity.SearchArchivedActivityInstances;
 import org.bonitasoft.engine.search.comment.SearchArchivedComments;
@@ -206,7 +380,12 @@ import org.bonitasoft.engine.search.comment.SearchComments;
 import org.bonitasoft.engine.search.comment.SearchCommentsInvolvingUser;
 import org.bonitasoft.engine.search.comment.SearchCommentsManagedBy;
 import org.bonitasoft.engine.search.connector.SearchArchivedConnectorInstance;
-import org.bonitasoft.engine.search.descriptor.*;
+import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchProcessSupervisorDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchUserDescriptor;
 import org.bonitasoft.engine.search.events.trigger.SearchTimerEventTriggerInstances;
 import org.bonitasoft.engine.search.flownode.SearchArchivedFlowNodeInstances;
 import org.bonitasoft.engine.search.flownode.SearchFlowNodeInstances;
@@ -214,7 +393,26 @@ import org.bonitasoft.engine.search.identity.SearchUsersWhoCanExecutePendingHuma
 import org.bonitasoft.engine.search.identity.SearchUsersWhoCanStartProcessDeploymentInfo;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
-import org.bonitasoft.engine.search.process.*;
+import org.bonitasoft.engine.search.process.SearchArchivedProcessInstances;
+import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesInvolvingUser;
+import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesSupervisedBy;
+import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesWithoutSubProcess;
+import org.bonitasoft.engine.search.process.SearchFailedProcessInstances;
+import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
+import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUser;
+import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUsersManagedBy;
+import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesSupervisedBy;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfos;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosCanBeStartedBy;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosStartedBy;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy;
+import org.bonitasoft.engine.search.process.SearchProcessInstances;
+import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfos;
+import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosCanBeStartedBy;
+import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchArchivedHumanTasksSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchProcessDeploymentInfosSupervised;
 import org.bonitasoft.engine.search.supervisor.SearchSupervisors;
@@ -230,8 +428,6 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
-import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -245,6 +441,7 @@ import org.bonitasoft.platform.setup.PlatformSetupAccessor;
  * @author Arthur Freycon
  * @author Haroun EL ALAMI
  */
+@Slf4j
 public class ProcessAPIImpl implements ProcessAPI {
 
     private static final int BATCH_SIZE = 500;
@@ -262,11 +459,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     private final DocumentAPI documentAPI;
     private final TaskInvolvementDelegate taskInvolvementDelegate;
     private final ProcessInvolvementDelegate processInvolvementDelegate;
+    private final ProcessDeploymentAPIDelegate processDeploymentAPIDelegate;
 
     public ProcessAPIImpl() {
         this(new ProcessManagementAPIImplDelegate(), new DocumentAPIImpl(), new ProcessConfigurationAPIImpl(),
-                new TaskInvolvementDelegate(),
-                new ProcessInvolvementDelegate());
+                new TaskInvolvementDelegate(), new ProcessInvolvementDelegate());
     }
 
     public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate,
@@ -278,6 +475,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         this.processConfigurationAPI = processConfigurationAPI;
         this.taskInvolvementDelegate = taskInvolvementDelegate;
         this.processInvolvementDelegate = processInvolvementDelegate;
+        this.processDeploymentAPIDelegate = ProcessDeploymentAPIDelegate.getInstance();
     }
 
     @Override
@@ -365,15 +563,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDefinition deployAndEnableProcess(final BusinessArchive businessArchive)
-            throws ProcessDeployException, ProcessEnablementException,
-            AlreadyExistsException {
-        final ProcessDefinition processDefinition = deploy(businessArchive);
-        try {
-            enableProcess(processDefinition.getId());
-        } catch (final ProcessDefinitionNotFoundException e) {
-            throw new ProcessEnablementException(e.getMessage());
-        }
-        return processDefinition;
+            throws ProcessDeployException, ProcessEnablementException, AlreadyExistsException {
+        return processDeploymentAPIDelegate.deployAndEnableProcess(businessArchive);
     }
 
     @Override
@@ -392,37 +583,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessDefinition deploy(final BusinessArchive businessArchive)
             throws ProcessDeployException, AlreadyExistsException {
-        validateBusinessArchive(businessArchive);
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final BusinessArchiveService businessArchiveService = tenantAccessor.getBusinessArchiveService();
-        try {
-            return ModelConvertor.toProcessDefinition(businessArchiveService.deploy(businessArchive));
-        } catch (SV6FormsDeployException e) {
-            throw new V6FormDeployException(e);
-        } catch (SObjectCreationException e) {
-            throw new ProcessDeployException(e);
-        } catch (SAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
-        }
-    }
-
-    void validateBusinessArchive(BusinessArchive businessArchive) throws ProcessDeployException {
-        for (Map.Entry<String, byte[]> resource : businessArchive.getResources().entrySet()) {
-            final byte[] resourceContent = resource.getValue();
-            if (resourceContent == null || resourceContent.length == 0) {
-                throw new ProcessDeployException(
-                        "The BAR file you are trying to deploy contains an empty file: " + resource.getKey()
-                                + ". The process cannot be deployed. Fix it or remove it from the BAR.");
-            }
-        }
+        return processDeploymentAPIDelegate.deploy(businessArchive);
     }
 
     @Override
     public void importActorMapping(final long pDefinitionId, final byte[] actorMappingXML)
             throws ActorMappingImportException {
         if (actorMappingXML != null) {
-            final String actorMapping = new String(actorMappingXML, Charset.forName("UTF-8"));
-            importActorMapping(pDefinitionId, actorMapping);
+            importActorMapping(pDefinitionId, new String(actorMappingXML, UTF_8));
         }
     }
 
@@ -467,22 +635,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void enableProcess(final long processDefinitionId)
             throws ProcessDefinitionNotFoundException, ProcessEnablementException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
-        final ProcessResourcesService processResourcesService = tenantAccessor.getProcessResourcesService();
-        try {
-            final ConfigurationService configurationService = PlatformSetupAccessor.getConfigurationService();
-            final EnableProcess enableProcess = new EnableProcess(processDefinitionService,
-                    processDefinitionId,
-                    eventsHandler,
-                    tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession());
-            enableProcess.execute();
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final Exception e) {
-            throw new ProcessEnablementException(e);
-        }
+        processDeploymentAPIDelegate.enableProcess(processDefinitionId);
     }
 
     SSession getSession() {
@@ -497,21 +650,19 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         try {
-            TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
             ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
             SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-            logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    String.format(
-                            "executeFlowNode was called: <%s> is forcing the execution of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s>. "
-                                    +
-                                    "Executing a flow node directly through that API method is not recommended and can affect the normal behavior of the platform. "
-                                    +
-                                    "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore. "
-                                    +
-                                    "If you are trying to execute a user task, please use executeUserTask method instead.",
-                            getLoggedUsername(logger), flowNodeInstance.getName(), flowNodeInstance.getId(),
-                            flowNodeInstance.getType().name(),
-                            flowNodeInstance.getStateId(), flowNodeInstance.getStateName()));
+            log.warn(String.format(
+                    "executeFlowNode was called: <%s> is forcing the execution of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s>. "
+                            +
+                            "Executing a flow node directly through that API method is not recommended and can affect the normal behavior of the platform. "
+                            +
+                            "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore. "
+                            +
+                            "If you are trying to execute a user task, please use executeUserTask method instead.",
+                    getLoggedUsername(), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getType().name(),
+                    flowNodeInstance.getStateId(), flowNodeInstance.getStateName()));
             executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Serializable>(), false);
         } catch (final ContractViolationException | SBonitaException e) {
             throw new FlowNodeExecutionException(e);
@@ -576,29 +727,18 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessDeploymentInfo getProcessDeploymentInfo(final long processDefinitionId)
             throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            return ModelConvertor
-                    .toProcessDeploymentInfo(processDefinitionService.getProcessDeploymentInfo(processDefinitionId));
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        }
+        return processDeploymentAPIDelegate.getProcessDeploymentInfo(processDefinitionId);
     }
 
     private void logError(final TenantServiceAccessor tenantAccessor, final Exception e) {
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
-            logger.log(getClass(), TechnicalLogSeverity.ERROR, e);
+        if (log.isErrorEnabled()) {
+            log.error("", e);
         }
     }
 
     private void logInstanceNotFound(final TenantServiceAccessor tenantAccessor, final SBonitaException e) {
-        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It may have been completed.");
+        if (log.isDebugEnabled()) {
+            log.debug(e.getMessage() + ". It may have been completed.");
         }
     }
 
@@ -1970,11 +2110,10 @@ public class ProcessAPIImpl implements ProcessAPI {
                     createPendingMappingsAndAssignHumanTask(humanTaskInstanceId, result);
                 }
             }
-            tenantAccessor.getTechnicalLoggerService().log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO,
-                    "User '" + getUserNameFromSession() + "' has re-executed assignation on activity "
-                            + humanTaskInstanceId +
-                            " of process instance " + humanTaskInstance.getLogicalGroup(1) + " of process named '" +
-                            processDefinition.getName() + "' in version " + processDefinition.getVersion());
+            log.info("User '" + getUserNameFromSession() + "' has re-executed assignation on activity "
+                    + humanTaskInstanceId +
+                    " of process instance " + humanTaskInstance.getLogicalGroup(1) + " of process named '" +
+                    processDefinition.getName() + "' in version " + processDefinition.getVersion());
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
         }
@@ -2817,15 +2956,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public long getProcessDefinitionId(final String name, final String version)
             throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            return processDefinitionService.getProcessDefinitionId(name, version);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        }
+        return processDeploymentAPIDelegate.getProcessDefinitionId(name, version);
     }
 
     @Override
@@ -3310,26 +3441,24 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
             SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(activityInstanceId);
-            TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
             FlowNodeState state = getTenantAccessor().getFlowNodeStateManager().getState(stateId);
-            logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    String.format(
-                            "setActivityStateById was called: <%s> is forcing state of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s> to the state <%s: %s>. "
-                                    +
-                                    "Setting the state of a flow node through the API is not recommended and can affect the normal behavior of the platform. "
-                                    +
-                                    "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore.",
-                            getLoggedUsername(logger), flowNodeInstance.getName(), flowNodeInstance.getId(),
-                            flowNodeInstance.getType().name(),
-                            flowNodeInstance.getStateId(), flowNodeInstance.getStateName(),
-                            stateId, state.getName()));
+            log.warn(String.format(
+                    "setActivityStateById was called: <%s> is forcing state of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s> to the state <%s: %s>. "
+                            +
+                            "Setting the state of a flow node through the API is not recommended and can affect the normal behavior of the platform. "
+                            +
+                            "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore.",
+                    getLoggedUsername(), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getType().name(),
+                    flowNodeInstance.getStateId(), flowNodeInstance.getStateName(),
+                    stateId, state.getName()));
             getTenantAccessor().getFlowNodeExecutor().setStateByStateId(activityInstanceId, stateId);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
     }
 
-    private String getLoggedUsername(TechnicalLoggerService logger) {
+    private String getLoggedUsername() {
         SSession session = getSession();
         if (session == null || session.getUserId() <= 0) {
             return "SYSTEM";
@@ -3338,7 +3467,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             return getTenantAccessor().getIdentityService().getUser(userId).getUserName();
         } catch (Exception ignored) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Unable to retrieve user with id " + userId
+            log.warn("Unable to retrieve user with id " + userId
                     + " exception: " + ignored.getClass().getName() + " " + ignored.getMessage());
         }
         return String.valueOf(userId);
@@ -3479,7 +3608,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SSubProcessDefinition sSubProcessDefinition,
             final List<? extends SCatchEventDefinition> sCatchEventDefinitions) {
         final SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
-        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
 
         for (final SCatchEventDefinition sCatchEventDefinition : sCatchEventDefinitions) {
             try {
@@ -3489,20 +3617,17 @@ public class ProcessAPIImpl implements ProcessAPI {
                             sSubProcessDefinition.getId());
                     final boolean delete = schedulerService.delete(jobName);
                     if (!delete && schedulerService.isExistingJob(jobName)) {
-                        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                            logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                                    "No job found with name '" + jobName
-                                            + "' when interrupting timer catch event named '"
-                                            + sCatchEventDefinition.getName()
-                                            + "' on event sub process with the id '" + sSubProcessDefinition.getId()
-                                            + "'. It was probably already triggered.");
+                        if (log.isWarnEnabled()) {
+                            log.warn("No job found with name '" + jobName
+                                    + "' when interrupting timer catch event named '"
+                                    + sCatchEventDefinition.getName()
+                                    + "' on event sub process with the id '" + sSubProcessDefinition.getId()
+                                    + "'. It was probably already triggered.");
                         }
                     }
                 }
             } catch (final Exception e) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-                }
+                log.warn(ExceptionUtils.printLightWeightStacktrace(e));
             }
         }
     }
@@ -3548,7 +3673,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         List<ActivityInstance> flowNodeInstances;
         int index = 0;
         final ProcessInstanceService processInstanceService = getTenantAccessor().getProcessInstanceService();
-        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
         do {
             try {
                 flowNodeInstances = searchActivities(new SearchOptionsBuilder(index, index + BATCH_SIZE)
@@ -3564,9 +3688,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                     deleteJobsOnProcessInstance(
                             processInstanceService.getChildOfActivity(callActivityInstance.getId()));
                 } catch (SBonitaException e) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO,
-                            "Can't find the process instance called by the activity. This process may be already finished.",
-                            e);
+                    log.info(
+                            "Can't find the process instance called by the activity. This process may be already finished. {}",
+                            ExceptionUtils.printLightWeightStacktrace(e));
 
                 }
             }
@@ -3612,7 +3736,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SCatchEventDefinition sCatchEventDefinition,
             final SCatchEventInstance sCatchEventInstance) {
         final SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
-        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
         EventInstanceService eventInstanceService = getTenantAccessor().getEventInstanceService();
         try {
             if (!sCatchEventDefinition.getTimerEventTriggerDefinitions().isEmpty()) {
@@ -3622,24 +3745,21 @@ public class ProcessAPIImpl implements ProcessAPI {
                 try {
                     eventInstanceService.deleteEventTriggerInstanceOfFlowNode(sCatchEventInstance.getId());
                 } catch (SEventTriggerInstanceDeletionException e) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                    log.warn(
                             "Unable to delete event trigger of flow node instance " + sCatchEventInstance + " because: "
                                     + e.getMessage());
                 }
                 if (!delete && schedulerService.isExistingJob(jobName)) {
-                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                                "No job found with name '" + jobName + "' when interrupting timer catch event named '"
-                                        + sCatchEventDefinition.getName()
-                                        + "' and id '" + sCatchEventInstance.getId()
-                                        + "'. It was probably already triggered.");
+                    if (log.isWarnEnabled()) {
+                        log.warn("No job found with name '" + jobName + "' when interrupting timer catch event named '"
+                                + sCatchEventDefinition.getName()
+                                + "' and id '" + sCatchEventInstance.getId()
+                                + "'. It was probably already triggered.");
                     }
                 }
             }
         } catch (final Exception e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-            }
+            log.warn(ExceptionUtils.printLightWeightStacktrace(e));
         }
     }
 
@@ -4166,13 +4286,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void deleteSupervisor(final long supervisorId) throws DeletionException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
-        final TechnicalLoggerService technicalLoggerService = serviceAccessor.getTechnicalLoggerService();
         try {
             supervisorService.deleteProcessSupervisor(supervisorId);
-            if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
-                        "The process manager has been deleted with id = <" + supervisorId + ">.");
-            }
+            log.info("The process manager has been deleted with id = <" + supervisorId + ">.");
+
         } catch (final SSupervisorNotFoundException spsnfe) {
             throw new DeletionException(new SupervisorNotFoundException(
                     "The process manager was not found with id = <" + supervisorId + ">"));
@@ -4186,7 +4303,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Long groupId) throws DeletionException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
-        final TechnicalLoggerService technicalLoggerService = serviceAccessor.getTechnicalLoggerService();
 
         try {
             final List<SProcessSupervisor> sProcessSupervisors = searchSProcessSupervisors(processDefinitionId, userId,
@@ -4195,12 +4311,9 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (!sProcessSupervisors.isEmpty()) {
                 // Then, delete it
                 supervisorService.deleteProcessSupervisor(sProcessSupervisors.get(0));
-                if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
-                            "The process manager has been deleted with process definition id = <"
-                                    + processDefinitionId + ">, user id = <" + userId + ">, group id = <" + groupId
-                                    + ">, and role id = <" + roleId + ">.");
-                }
+                log.info("The process manager has been deleted with process definition id = <"
+                        + processDefinitionId + ">, user id = <" + userId + ">, group id = <" + groupId
+                        + ">, and role id = <" + roleId + ">.");
             } else {
                 throw new DeletionException(new SupervisorNotFoundException(
                         "The process manager was not found with process definition id = <"
@@ -4260,7 +4373,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException {
         final TenantServiceAccessor tenantServiceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = tenantServiceAccessor.getSupervisorService();
-        final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
 
         try {
             checkIfProcessSupervisorAlreadyExists(sProcessSupervisor.getProcessDefId(), sProcessSupervisor.getUserId(),
@@ -4268,14 +4380,11 @@ public class ProcessAPIImpl implements ProcessAPI {
                     sProcessSupervisor.getRoleId());
 
             final SProcessSupervisor supervisor = supervisorService.createProcessSupervisor(sProcessSupervisor);
-            if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
-                        "The process manager has been created with process definition id = <"
-                                + sProcessSupervisor.getProcessDefId() + ">, user id = <"
-                                + sProcessSupervisor.getUserId() + ">, group id = <"
-                                + sProcessSupervisor.getGroupId() + ">, and role id = <"
-                                + sProcessSupervisor.getRoleId() + ">");
-            }
+            log.info("The process manager has been created with process definition id = <"
+                    + sProcessSupervisor.getProcessDefId() + ">, user id = <"
+                    + sProcessSupervisor.getUserId() + ">, group id = <"
+                    + sProcessSupervisor.getGroupId() + ">, and role id = <"
+                    + sProcessSupervisor.getRoleId() + ">");
             return ModelConvertor.toProcessSupervisor(supervisor);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
@@ -4825,22 +4934,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromIds(final List<Long> processDefinitionIds) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
-        try {
-            final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService
-                    .getProcessDeploymentInfos(processDefinitionIds);
-            final List<ProcessDeploymentInfo> processDeploymentInfos = ModelConvertor
-                    .toProcessDeploymentInfo(processDefinitionDeployInfos);
-            final Map<Long, ProcessDeploymentInfo> mProcessDefinitions = new HashMap<>();
-            for (final ProcessDeploymentInfo p : processDeploymentInfos) {
-                mProcessDefinitions.put(p.getProcessId(), p);
-            }
-            return mProcessDefinitions;
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
+        return ProcessDeploymentAPIDelegate.getInstance().getProcessDeploymentInfosFromIds(processDefinitionIds);
     }
 
     @Override
@@ -5005,7 +5099,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final GetConnectorImplementation transactionContent = new GetConnectorImplementation(connectorService,
                 processDefinitionId, connectorId,
-                connectorVersion, tenantAccessor.getTenantId());
+                connectorVersion);
         try {
             transactionContent.execute();
             final SConnectorImplementationDescriptor sConnectorImplementationDescriptor = transactionContent
@@ -5403,14 +5497,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Problem> getProcessResolutionProblems(final long processDefinitionId)
             throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            return tenantAccessor.getBusinessArchiveArtifactsManager().getProcessResolutionProblems(processDefinition);
-        } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        }
+        return processDeploymentAPIDelegate.getProcessResolutionProblems(processDefinitionId);
     }
 
     @Override
@@ -6312,7 +6399,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         ContractDataService contractDataService = tenantAccessor.getContractDataService();
-        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         IdentityService identityService = tenantAccessor.getIdentityService();
         SCommentService commentService = tenantAccessor.getCommentService();
         FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
@@ -6368,18 +6454,17 @@ public class ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
             WorkDescriptor work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
             workService.registerWork(work);
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /*
-                                                                                           * don't log when create
-                                                                                           * subtask
-                                                                                           */) {
+            if (log.isInfoEnabled() && !isFirstState /*
+                                                      * don't log when create
+                                                      * subtask
+                                                      */) {
                 final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance,
                         session.getUserName(), executerUserId,
                         executerSubstituteUserId, inputs);
-                logger.log(getClass(), TechnicalLogSeverity.INFO, message);
-            } else if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                        "Executing state " + flowNodeInstance.getStateName() + " (" + flowNodeInstance.getStateId()
-                                + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
+                log.info(message);
+            } else if (log.isDebugEnabled()) {
+                log.debug("Executing state " + flowNodeInstance.getStateName() + " (" + flowNodeInstance.getStateId()
+                        + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
             }
             if (executerUserId != executerSubstituteUserId) {
                 try {
@@ -6389,7 +6474,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                             + "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
                     commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb);
                 } catch (final SBonitaException e) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
+                    log.error(
                             "Error when adding a comment on the process instance.", e);
                 }
             }
@@ -6405,9 +6490,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 .getFlowNode(
                         flowNodeInstance.getFlowNodeDefinitionId());
         final SContractDefinition contractDefinition = userTaskDefinition.getContract();
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(
-                tenantAccessor.getTechnicalLoggerService(),
-                tenantAccessor.getExpressionService());
+        final ContractValidator validator = new ContractValidatorFactory()
+                .createContractValidator(tenantAccessor.getExpressionService());
         validator.validate(flowNodeInstance.getProcessDefinitionId(), contractDefinition, inputs);
 
     }

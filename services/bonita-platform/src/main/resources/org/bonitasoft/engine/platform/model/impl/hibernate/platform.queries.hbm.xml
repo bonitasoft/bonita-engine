@@ -8,40 +8,13 @@
     FROM org.bonitasoft.engine.platform.model.SPlatform AS platform
   </query>
 
-  <query name="getTenantById">
-    SELECT tenant
-    FROM org.bonitasoft.engine.platform.model.STenant AS tenant
-    WHERE tenant.id = :id
-  </query>
 
-  <query name="getTenantByName">
-    SELECT tenant
-    FROM org.bonitasoft.engine.platform.model.STenant AS tenant
-    WHERE tenant.name = :name
-  </query>
-  
   <query name="getDefaultTenant">
     SELECT tenant
     FROM org.bonitasoft.engine.platform.model.STenant AS tenant
     WHERE tenant.defaultTenant = true
-  </query>  
-  
-  <query name="getTenants">
-    SELECT tenant
-    FROM org.bonitasoft.engine.platform.model.STenant AS tenant
-  </query>
-  
-  <query name="getTenantsByIds">
-    SELECT tenant
-    FROM org.bonitasoft.engine.platform.model.STenant AS tenant
-    WHERE tenant.id IN (:ids)
   </query>
 
-  <query name="getNumberOfTenants">
-    SELECT COUNT(tenant.id)
-    FROM org.bonitasoft.engine.platform.model.STenant AS tenant
-  </query>
-  
   <query name="searchSTenant">
 		SELECT tenant
 		FROM org.bonitasoft.engine.platform.model.STenant AS tenant

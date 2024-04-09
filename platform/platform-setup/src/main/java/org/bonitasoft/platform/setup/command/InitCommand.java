@@ -53,6 +53,7 @@ public class InitCommand extends PlatformSetupCommand {
                     && H2_DB_VENDOR.equals(propertyReader.getPropertyAndFailIfNull("bdm.db.vendor"))
                     && System.getProperty("h2.noconfirm") == null) {
                 warn("Default H2 configuration detected. This is not recommended for production. If this is not the required configuration, change file 'database.properties' and run again.");
+                warn("To skip this warning message, add '-Dh2.noconfirm' to your command line.");
                 System.out.print("Are you sure you want to continue? (y/n): ");
                 final String answer = readAnswer();
                 if (!"y".equalsIgnoreCase(answer)) {

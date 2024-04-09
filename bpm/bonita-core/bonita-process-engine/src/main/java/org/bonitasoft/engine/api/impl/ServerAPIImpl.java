@@ -241,7 +241,7 @@ public class ServerAPIImpl implements ServerAPI {
             PlatformServiceAccessor platformServiceAccessor, Session session) throws SBonitaException {
         checkTenantSession(platformServiceAccessor, session);
         long tenantId = ((APISession) session).getTenantId();
-        SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
+        SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor().getSessionService();
         sessionService.renewSession(session.getId());
         sessionAccessor.setSessionInfo(session.getId(), tenantId);
         return getTenantClassLoader(platformServiceAccessor, session);
@@ -312,7 +312,7 @@ public class ServerAPIImpl implements ServerAPI {
         if (lockKey.isPresent()) {
             // try and acquire a lock with this scope
             final long tenantId = (session instanceof APISession) ? ((APISession) session).getTenantId() : 1L;
-            LockService lockService = getServiceAccessorFactoryInstance().createTenantServiceAccessor(tenantId)
+            LockService lockService = getServiceAccessorFactoryInstance().createTenantServiceAccessor()
                     .getLockService();
             BonitaLock lock = lockService.tryLock(1L, lockKey.get(), 1L, TimeUnit.MILLISECONDS, tenantId);
             if (lock == null) {
@@ -473,7 +473,7 @@ public class ServerAPIImpl implements ServerAPI {
                 break;
             case API:
                 final TenantServiceAccessor tenantAccessor = platformServiceAccessor
-                        .getTenantServiceAccessor(((APISession) session).getTenantId());
+                        .getTenantServiceAccessor();
                 transactionService = tenantAccessor.getUserTransactionService();
                 break;
             default:
@@ -521,7 +521,7 @@ public class ServerAPIImpl implements ServerAPI {
         }
         final APISession apiSession = (APISession) session;
         final TenantServiceAccessor tenantAccessor = platformAccessor
-                .getTenantServiceAccessor(apiSession.getTenantId());
+                .getTenantServiceAccessor();
         final LoginService tenantLoginService = tenantAccessor.getLoginService();
         if (!tenantLoginService.isValid(apiSession.getId())) {
             throw new InvalidSessionException("Invalid session");
@@ -532,7 +532,7 @@ public class ServerAPIImpl implements ServerAPI {
             final Session session) throws SClassLoaderException {
         final APISession apiSession = (APISession) session;
         final TenantServiceAccessor tenantAccessor = platformServiceAccessor
-                .getTenantServiceAccessor(apiSession.getTenantId());
+                .getTenantServiceAccessor();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         return classLoaderService.getClassLoader(identifier(ScopeType.TENANT, apiSession.getTenantId()));
     }

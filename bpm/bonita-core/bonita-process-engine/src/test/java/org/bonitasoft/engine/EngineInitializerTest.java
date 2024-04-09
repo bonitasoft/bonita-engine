@@ -19,9 +19,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
@@ -47,6 +49,8 @@ public class EngineInitializerTest {
     @Mock
     private ServiceAccessorFactory serviceAccessorFactory;
     @Mock
+    private PlatformServiceAccessor platformService;
+    @Mock
     private PlatformSessionService platformSessionService;
     @Mock
     private SPlatformSession sPlatformSession;
@@ -58,27 +62,27 @@ public class EngineInitializerTest {
     public void before() throws Exception {
         doReturn(platformAPI).when(engineInitializer).getPlatformAPI();
         doReturn(sessionAccessor).when(engineInitializer).getSessionAccessor();
-        doReturn(platformSessionService).when(engineInitializer).getPlatformSessionService();
         doReturn(serviceAccessorFactory).when(engineInitializer).getServiceAccessorFactory();
+        doReturn(platformService).when(engineInitializer).getPlatformService();
+        doReturn(platformSessionService).when(platformService).getPlatformSessionService();
         doReturn(sPlatformSession).when(platformSessionService).createSession(anyString());
     }
 
     @Test
-    public void initializeEngine_should_initialize_platform_and_start_node() throws Exception {
+    public void initializeEngine_should_start_node() throws Exception {
         // given
         doReturn(true).when(platformAPI).isPlatformCreated();
+        doReturn(true).when(platformAPI).isPlatformInitialized();
         systemOutRule.clearLog();
+        final PlatformStartedEvent platformStartEvent = new PlatformStartedEvent();
 
         // when
         engineInitializer.initializeEngine();
 
         //then
-        verify(platformAPI).initializePlatform();
         verify(platformAPI).startNode();
-        // This message below is a line of the "Bonita Community" message:
-        assertThat(systemOutRule.getLog()).contains(
-                "|____/ \\___/|_| |_|_|\\__\\__,_|  \\_____\\___/|_| |_| |_|_| |_| |_|\\__,_|_| |_|_|\\__|\\__, |");
-
+        assertThat(systemOutRule.getLog()).contains("Initialization of Bonita Engine done!");
+        verify(platformService).publishEvent(platformStartEvent);
     }
 
     @Test
@@ -93,25 +97,15 @@ public class EngineInitializerTest {
     }
 
     @Test
-    public void should_not_initialize_platform_when_platform_is_not_created() throws Exception {
+    public void should_not_start_node_when_platform_is_not_initialized() throws Exception {
         //given
-        doReturn(false).when(platformAPI).isPlatformCreated();
+        doReturn(true).when(platformAPI).isPlatformCreated();
+        doReturn(false).when(platformAPI).isPlatformInitialized();
         //when
         final Throwable throwable = catchThrowable(() -> engineInitializer.initializeEngine());
         //then
         assertThat(throwable).isInstanceOf(PlatformNotFoundException.class);
-        verify(platformAPI, never()).initializePlatform();
-    }
-
-    @Test
-    public void should_not_initialize_platform_when_platform_is_already_initialized() throws Exception {
-        //given
-        doReturn(true).when(platformAPI).isPlatformCreated();
-        doReturn(true).when(platformAPI).isPlatformInitialized();
-        //when
-        engineInitializer.initializeEngine();
-        //then
-        verify(platformAPI, never()).initializePlatform();
+        verify(platformAPI, never()).startNode();
     }
 
     @Test
@@ -121,7 +115,7 @@ public class EngineInitializerTest {
         engineInitializer.unloadEngine();
 
         verify(platformAPI).stopNode();
-        verify(serviceAccessorFactory, times(1)).destroyAccessors();
+        verify(serviceAccessorFactory).destroyAccessors();
     }
 
     @Test
@@ -138,7 +132,7 @@ public class EngineInitializerTest {
     public void should_destroy_accessor_if_exception() throws Exception {
         engineInitializer.unloadEngine();
 
-        verify(serviceAccessorFactory, times(1)).destroyAccessors();
+        verify(serviceAccessorFactory).destroyAccessors();
     }
 
 }

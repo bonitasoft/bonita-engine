@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 
 public class FlushThreadTest {
@@ -31,12 +30,10 @@ public class FlushThreadTest {
     @Test
     public void should_flush_thread_flush_until_interruption() throws Exception {
         final TimeTracker timeTracker = mock(TimeTracker.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final Clock clock = mock(Clock.class);
         final FlushResult flushResult = new FlushResult(System.currentTimeMillis(), new ArrayList<>());
 
         when(timeTracker.getClock()).thenReturn(clock);
-        when(timeTracker.getLogger()).thenReturn(logger);
         when(timeTracker.getFlushIntervalInMS()).thenReturn(0L);
         when(timeTracker.flush()).thenReturn(flushResult);
         when(clock.sleep(anyLong())).thenReturn(true).thenReturn(true).thenReturn(true)
@@ -53,8 +50,6 @@ public class FlushThreadTest {
     @Test
     public void should_flush_thread_flush_on_latest_flush_interval() throws Exception {
         final TimeTracker timeTracker = mock(TimeTracker.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        when(timeTracker.getLogger()).thenReturn(logger);
         final FlushThread flushThread = new FlushThread(timeTracker);
         final long now = 10;
         final long lastFlushTimestamp = 9;
@@ -69,8 +64,6 @@ public class FlushThreadTest {
     @Test
     public void should_last_flush_timestamp_move_to_now() {
         final TimeTracker timeTracker = mock(TimeTracker.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        when(timeTracker.getLogger()).thenReturn(logger);
         final FlushThread flushThread = new FlushThread(timeTracker);
         final long now = 10;
 

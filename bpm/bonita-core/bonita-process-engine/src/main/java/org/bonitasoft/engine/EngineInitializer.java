@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
+import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -54,22 +55,15 @@ public class EngineInitializer {
         LOGGER.info("Initializing Bonita Engine...");
         final long before = System.currentTimeMillis();
         // create a session to call the engine
-        final PlatformSessionService platformSessionService = getPlatformSessionService();
+        final PlatformServiceAccessor platformService = getPlatformService();
+        final PlatformSessionService platformSessionService = platformService.getPlatformSessionService();
         final SessionAccessor sessionAccessor = getSessionAccessor();
         final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
         final PlatformAPI platformAPI = getPlatformAPI();
 
         try {
-            if (!platformAPI.isPlatformCreated()) {
+            if (!platformAPI.isPlatformCreated() || !platformAPI.isPlatformInitialized()) {
                 throw new PlatformNotFoundException("Can't start or stop platform if it is not created.");
-            }
-            // initialization of the platform
-            if (!platformAPI.isPlatformInitialized()) {
-                LOGGER.info("First run on this platform, initializing it...");
-                platformAPI.initializePlatform();
-                LOGGER.info("Platform initialized successfully.");
-            } else {
-                LOGGER.info("Platform is already initialized.");
             }
             LOGGER.info("Starting node...");
 
@@ -77,7 +71,10 @@ public class EngineInitializer {
             platformAPI.startNode();
             LOGGER.info("Node started successfully.");
             final long after = System.currentTimeMillis();
-            LOGGER.info("Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
+            LOGGER.info("Initialization of Bonita Engine done! (took " + (after - before) + "ms)");
+
+            LOGGER.debug("Publishing platform started event");
+            platformService.publishEvent(new PlatformStartedEvent());
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
@@ -100,14 +97,12 @@ public class EngineInitializer {
         return getServiceAccessorFactory().createSessionAccessor();
     }
 
-    PlatformSessionService getPlatformSessionService() {
-        PlatformServiceAccessor result;
+    PlatformServiceAccessor getPlatformService() {
         try {
-            result = getServiceAccessorFactory().createPlatformServiceAccessor();
+            return getServiceAccessorFactory().createPlatformServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
-        return result.getPlatformSessionService();
     }
 
     // Visible for testing
@@ -142,7 +137,7 @@ public class EngineInitializer {
         LOGGER.info("Stopping Bonita Engine...");
         // create a session to call the engine
         final SessionAccessor sessionAccessor = getSessionAccessor();
-        PlatformSessionService platformSessionService = getPlatformSessionService();
+        final PlatformSessionService platformSessionService = getPlatformService().getPlatformSessionService();
         final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
         final PlatformAPI platformAPI = getPlatformAPI();
         try {

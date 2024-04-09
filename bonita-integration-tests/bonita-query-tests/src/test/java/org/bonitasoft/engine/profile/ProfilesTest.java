@@ -55,7 +55,7 @@ public class ProfilesTest {
     private UserMembershipRepository userMembershipRepository;
 
     @Test
-    public void profile_with_user_mapped_and_profile_entry_should_be_retrieved() {
+    public void profile_with_user_mapped_should_be_retrieved() {
         // given:
         final SUser user = aUser().build();
         repository.add(user);
@@ -72,7 +72,7 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_with_role_mapped_and_profile_entry_should_be_retrieved() {
+    public void profile_with_role_mapped_should_be_retrieved() {
         // given:
         final SRole role = aRole().build();
         final SUser user = aUser().build();
@@ -108,7 +108,7 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_with_group_mapped_and_profile_entry_should_be_retrieved() {
+    public void profile_with_group_mapped_should_be_retrieved() {
         // given:
         final SGroup group = aGroup().build();
         final SUser user = aUser().build();
@@ -128,7 +128,7 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_with_membership_mapped_and_profile_entry_should_be_retrieved() {
+    public void profile_with_membership_mapped_should_be_retrieved() {
         // given:
         final SGroup group = aGroup().build();
         final SRole role = aRole().build();

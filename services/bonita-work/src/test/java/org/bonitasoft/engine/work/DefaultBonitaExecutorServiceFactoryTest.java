@@ -20,7 +20,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.time.DefaultEngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.junit.Test;
@@ -40,7 +39,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
     public void threadNameInExecutorService_should_contain_tenantId() {
         long tenantId = 999;
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
-                new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
+                workFactory, tenantId, 1,
                 20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), new SimpleMeterRegistry(),
                 new DefaultExecutorServiceMetricsProvider());
 
@@ -59,7 +58,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         long tenantId = 97L;
         final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
-                new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
+                workFactory, tenantId, 1,
                 20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), meterRegistry,
                 new DefaultExecutorServiceMetricsProvider());
 
@@ -80,7 +79,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         long tenantId = 97L;
         final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
-                new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
+                workFactory, tenantId, 1,
                 20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), meterRegistry,
                 new DefaultExecutorServiceMetricsProvider());
 

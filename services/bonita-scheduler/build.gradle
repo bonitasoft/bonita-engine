@@ -1,21 +1,22 @@
 dependencies {
-    compile project(':services:bonita-session')
-    compile project(':services:bonita-log')
-    compile project(':services:bonita-builder')
-    compile project(':services:bonita-events')
-    compile project(':services:bonita-persistence')
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-transaction')
-    compile project(':services:bonita-incident')
-    compile("org.quartz-scheduler:quartz:${Deps.quartzVersion}") {
+    api project(':services:bonita-session')
+    api project(':services:bonita-log')
+    api project(':services:bonita-builder')
+    api project(':services:bonita-events')
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-transaction')
+    api project(':services:bonita-incident')
+    api("org.quartz-scheduler:quartz:${Deps.quartzVersion}") {
         exclude(group: "com.mchange") // c3p0 + transitive dep mchange-commons-java, because we do not use
         // default Quartz connection provider, as we have our own
         exclude(module: "HikariCP-java7") // Same reason
     }
-    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

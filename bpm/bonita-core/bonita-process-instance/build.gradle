@@ -1,29 +1,29 @@
 configurations { schemagen }
 dependencies {
-    compile project(':bpm:bonita-common')
-    compile project(':bpm:bonita-core:bonita-process-definition')
-    compile project(':services:bonita-identity')
-    compile project(':services:bonita-persistence')
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-log')
-    compile project(':services:bonita-events')
-    compile project(':services:bonita-archive')
-    compile project(':services:bonita-data-instance')
-    compile project(':services:bonita-classloader')
-    compile project(':bpm:bonita-core:bonita-process-comment')
-    compile project(':services:bonita-builder')
-    compile project(':bpm:bonita-core:bonita-home-server')
-    compile project(':services:bonita-session')
-    compile project(':services:bonita-connector-executor')
-    compile project(':services:bonita-resources')
-    compile project(':services:bonita-time-tracker')
-    compile project(':services:bonita-expression')
-    compile project(':services:bonita-cache')
-    compile project(':bpm:bonita-core:bonita-contract-data')
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    api project(':bpm:bonita-common')
+    api project(':bpm:bonita-core:bonita-process-definition')
+    api project(':services:bonita-identity')
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-log')
+    api project(':services:bonita-events')
+    api project(':services:bonita-archive')
+    api project(':services:bonita-data-instance')
+    api project(':services:bonita-classloader')
+    api project(':bpm:bonita-core:bonita-process-comment')
+    api project(':services:bonita-builder')
+    api project(':bpm:bonita-core:bonita-home-server')
+    api project(':services:bonita-session')
+    api project(':services:bonita-connector-executor')
+    api project(':services:bonita-resources')
+    api project(':services:bonita-time-tracker')
+    api project(':services:bonita-expression')
+    api project(':services:bonita-cache')
+    api project(':bpm:bonita-core:bonita-contract-data')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
@@ -37,7 +37,7 @@ dependencies {
             "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
 }
 
-task('schemagen') {
+tasks.register('schemagen') {
     def destDir = file("$buildDir/schemas")
     doLast {
         destDir.mkdirs()

@@ -56,7 +56,7 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
 
     protected APISession getAPISession() {
         if (apiSession == null) {
-            final TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance(tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance();
             final SessionAccessor sessionAccessor = tenantServiceAccessor.getSessionAccessor();
             final SessionService sessionService = tenantServiceAccessor.getSessionService();
             try {

@@ -20,10 +20,11 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
 
 /**
  * @author Baptiste Mesta
@@ -31,24 +32,28 @@ import org.hibernate.SessionFactory;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public class PlatformHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
     protected PlatformHibernatePersistenceService(final SessionFactory sessionFactory,
             final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings,
-            final TechnicalLoggerService logger) throws Exception {
-        super(sessionFactory, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings, logger);
+            final Set<String> wordSearchExclusionMappings) throws Exception {
+        super(sessionFactory, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings);
     }
 
     public PlatformHibernatePersistenceService(final String name,
             final HibernateConfigurationProvider hbmConfigurationProvider,
-            final Properties extraHibernateProperties,
-            final TechnicalLoggerService logger, final SequenceManager sequenceManager,
+            final Properties extraHibernateProperties, final SequenceManager sequenceManager,
             final DataSource datasource, QueryBuilderFactory queryBuilderFactory)
             throws Exception {
-        super(name, hbmConfigurationProvider, extraHibernateProperties, logger,
-                sequenceManager, datasource, queryBuilderFactory);
+        super(name, hbmConfigurationProvider, extraHibernateProperties, sequenceManager, datasource,
+                queryBuilderFactory);
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return log;
     }
 
     @Override

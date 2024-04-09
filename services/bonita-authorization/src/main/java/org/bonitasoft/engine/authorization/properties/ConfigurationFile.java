@@ -39,21 +39,30 @@ public abstract class ConfigurationFile {
 
     private final String cacheKey;
 
+    protected boolean setKeysToLowerCase;
+
     CacheService cacheService;
 
     ConfigurationFilesManager configurationFilesManager;
 
     public ConfigurationFile(long tenantId, CacheService cacheService,
             ConfigurationFilesManager configurationFilesManager) {
+        this(tenantId, cacheService, configurationFilesManager, false);
+    }
+
+    public ConfigurationFile(long tenantId, CacheService cacheService,
+            ConfigurationFilesManager configurationFilesManager, boolean setKeysToLowerCase) {
         this.tenantId = tenantId;
         this.propertiesFilename = getPropertiesFileName();
-        this.cacheKey = tenantId + "_" + propertiesFilename;
+        this.cacheKey = propertiesFilename;
         this.cacheService = cacheService;
         this.configurationFilesManager = configurationFilesManager;
+        this.setKeysToLowerCase = setKeysToLowerCase;
     }
 
     private Properties readPropertiesFromDatabaseAndStoreThemInCache() {
-        Properties tenantProperties = configurationFilesManager.getTenantProperties(propertiesFilename, tenantId);
+        Properties tenantProperties = configurationFilesManager.getTenantProperties(propertiesFilename, tenantId,
+                setKeysToLowerCase);
         storePropertiesInCache(tenantProperties);
         return tenantProperties;
     }

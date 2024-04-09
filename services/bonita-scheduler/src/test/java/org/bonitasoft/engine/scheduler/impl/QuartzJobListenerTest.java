@@ -21,7 +21,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -56,9 +55,6 @@ public class QuartzJobListenerTest {
     @Mock
     private SessionAccessor sessionAccessor;
 
-    @Mock
-    private TechnicalLoggerService logger;
-
     private QuartzJobListener quartzJobListener;
 
     @Mock
@@ -70,7 +66,7 @@ public class QuartzJobListenerTest {
 
     @Before
     public void setUp() {
-        quartzJobListener = new QuartzJobListener(singletonList(bonitaJobListener), sessionAccessor, logger);
+        quartzJobListener = new QuartzJobListener(singletonList(bonitaJobListener), sessionAccessor);
 
         final Scheduler scheduler = new RemoteScheduler("schedId", "host", 1589);
         final JobDataMap jobDataMap = new JobDataMap();

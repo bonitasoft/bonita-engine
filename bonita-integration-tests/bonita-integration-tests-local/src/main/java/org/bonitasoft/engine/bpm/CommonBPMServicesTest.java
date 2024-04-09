@@ -16,9 +16,7 @@ package org.bonitasoft.engine.bpm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.actor.mapping.SActorCreationException;
@@ -72,7 +70,6 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.junit.BonitaEngineRule;
-import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
@@ -99,7 +96,7 @@ public class CommonBPMServicesTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
     protected static SessionAccessor sessionAccessor;
     protected static PlatformServiceAccessor platformServiceAccessor;
-    protected static Map<Long, TenantServiceAccessor> tenantServiceAccessors;
+    protected static TenantServiceAccessor tenantServiceAccessor;
     private static long tenantId;
     @Rule
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
@@ -130,10 +127,10 @@ public class CommonBPMServicesTest {
     }
 
     protected TenantServiceAccessor getAccessor(final long tenantId) throws Exception {
-        if (!tenantServiceAccessors.containsKey(tenantId)) {
-            tenantServiceAccessors.put(tenantId, getServiceAccessorFactory().createTenantServiceAccessor(tenantId));
+        if (tenantServiceAccessor == null) {
+            tenantServiceAccessor = getServiceAccessorFactory().createTenantServiceAccessor();
         }
-        return tenantServiceAccessors.get(tenantId);
+        return tenantServiceAccessor;
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -154,7 +151,6 @@ public class CommonBPMServicesTest {
 
     @Before
     public void commonSetup() throws Exception {
-        tenantServiceAccessors = new HashMap<>();
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         tenantId = apiSession.getTenantId();
         if (sessionAccessor == null) {
@@ -655,18 +651,6 @@ public class CommonBPMServicesTest {
 
     private void closeTx() throws STransactionCommitException, STransactionRollbackException {
         platformServiceAccessor.getTransactionService().complete();
-    }
-
-    protected long createTenant(String tenantName) throws Exception {
-        return PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(),
-                tenantName,
-                PlatformUtil.DEFAULT_CREATED_BY, PlatformUtil.TENANT_STATUS_ACTIVATED);
-    }
-
-    protected void changeTenant(final long tenantId) throws Exception {
-        getTransactionService().begin();
-        TestUtil.createSessionOn(getSessionAccessor(), getTenantAccessor().getSessionService(), tenantId);
-        getTransactionService().complete();
     }
 
 }

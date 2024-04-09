@@ -19,7 +19,6 @@ import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -31,12 +30,11 @@ public class ArchiveServiceImplTest {
     @Test
     public void should_recordInserts_register_beforeCommitCallable_v2() throws Exception {
         final PersistenceService definitiveArchivePersistenceService = null;
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final ArchivingStrategy archivingStrategy = null;
         final UserTransactionService transactionService = mock(UserTransactionService.class);
 
-        ArchiveServiceImpl archiveService = spy(new ArchiveServiceImpl(definitiveArchivePersistenceService, logger,
-                archivingStrategy, transactionService));
+        ArchiveServiceImpl archiveService = spy(
+                new ArchiveServiceImpl(definitiveArchivePersistenceService, archivingStrategy, transactionService));
 
         final ArchivedPersistentObjectWithSetter mockArchivedPersistentObject = mock(
                 ArchivedPersistentObjectWithSetter.class);

@@ -20,6 +20,8 @@ import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,6 +31,7 @@ import java.util.Set;
 import javax.lang.model.SourceVersion;
 
 import com.sun.codemodel.ClassType;
+import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JBlock;
@@ -45,6 +48,8 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
+import com.sun.codemodel.writer.FileCodeWriter;
+import com.sun.codemodel.writer.ProgressCodeWriter;
 import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
@@ -64,8 +69,13 @@ public class CodeGenerator {
     }
 
     public void generate(final File destDir) throws IOException {
-        try (PrintStream stream = new PrintStream(new NullStream())) {
-            model.build(destDir, stream);
+        Charset encoding = StandardCharsets.UTF_8;
+        try (PrintStream statusStream = new PrintStream(new NullStream(), false, encoding)) {
+            CodeWriter src = new ProgressCodeWriter(new FileCodeWriter(destDir, encoding.name()),
+                    statusStream);
+            CodeWriter res = new ProgressCodeWriter(new FileCodeWriter(destDir, encoding.name()),
+                    statusStream);
+            model.build(src, res);
         }
     }
 

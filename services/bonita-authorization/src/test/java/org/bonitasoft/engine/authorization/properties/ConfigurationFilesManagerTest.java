@@ -86,7 +86,7 @@ public class ConfigurationFilesManagerTest {
     }
 
     @Test
-    public void getAlsoCustomAndInternalPropertiesFromFilename_should_merge_custom_properties_if_exist()
+    public void getTenantProperties_should_merge_custom_properties_if_exist()
             throws IOException {
         //given
         final Properties defaultProps = new Properties();
@@ -100,14 +100,14 @@ public class ConfigurationFilesManagerTest {
 
         //when
         final Properties properties = configurationFilesManager
-                .getAlsoCustomAndInternalPropertiesFromFilename(TENANT_ID, "toto.properties");
+                .getTenantProperties("toto.properties", TENANT_ID);
 
         //then
         assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("customKey", "customValue");
     }
 
     @Test
-    public void getAlsoCustomAndInternalPropertiesFromFilename_should_merge_internal_properties_if_exist()
+    public void getTenantProperties_should_merge_internal_properties_if_exist()
             throws IOException {
         //given
         final Properties defaultProps = new Properties();
@@ -121,7 +121,7 @@ public class ConfigurationFilesManagerTest {
 
         //when
         final Properties properties = configurationFilesManager
-                .getAlsoCustomAndInternalPropertiesFromFilename(TENANT_ID, "toto.properties");
+                .getTenantProperties("toto.properties", TENANT_ID);
 
         //then
         assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("internalKey",
@@ -129,7 +129,7 @@ public class ConfigurationFilesManagerTest {
     }
 
     @Test
-    public void getAlsoCustomAndInternalPropertiesFromFilename_should_not_fail_if_base_file_does_not_exist()
+    public void getTenantProperties_should_not_fail_if_base_file_does_not_exist()
             throws IOException {
         //given
         final Properties defaultProps = new Properties();
@@ -140,7 +140,7 @@ public class ConfigurationFilesManagerTest {
 
         //when
         final Properties properties = configurationFilesManager
-                .getAlsoCustomAndInternalPropertiesFromFilename(TENANT_ID, "non-existing.properties");
+                .getTenantProperties("non-existing.properties", TENANT_ID);
 
         //then
         assertThat(properties).isEmpty();
@@ -167,11 +167,10 @@ public class ConfigurationFilesManagerTest {
 
         //when
         final Properties properties = configurationFilesManager
-                .getAlsoCustomAndInternalPropertiesFromFilename(TENANT_ID, "overwrite.properties");
+                .getTenantProperties("overwrite.properties", TENANT_ID);
 
         //then
         assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("otherKey",
                 expectedOverwrittenValue);
     }
-
 }

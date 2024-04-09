@@ -16,16 +16,11 @@ package org.bonitasoft.engine.events;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.events.impl.EventServiceImpl;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SFireEventException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,14 +30,7 @@ import org.junit.Test;
 public class EventServiceImplTest {
 
     protected EventService instantiateEventServiceImplementation() {
-        final TechnicalLoggerService logger = mockTechnicalLoggerService();
-        return new EventServiceImpl(logger);
-    }
-
-    protected TechnicalLoggerService mockTechnicalLoggerService() {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        when(logger.isLoggable(any(Class.class), any(TechnicalLogSeverity.class))).thenReturn(false);
-        return logger;
+        return new EventServiceImpl();
     }
 
     private EventService eventSvc;

@@ -22,6 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
@@ -35,13 +36,10 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
 
     private static final long serialVersionUID = 1L;
 
-    private final long tenantId;
-
     private final Map<Class<?>, Method> getIdMethods = Collections.synchronizedMap(new HashMap<Class<?>, Method>());
 
-    public AbstractUpdateHandler(final long tenantId) {
+    public AbstractUpdateHandler() {
         super();
-        this.tenantId = tenantId;
     }
 
     protected abstract Map<String, Serializable> getEvent(final SEvent sEvent);
@@ -50,7 +48,6 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
     public void execute(final SEvent sEvent) throws SHandlerExecutionException {
         try {
             final Map<String, Serializable> event = getEvent(sEvent);
-            event.put("tenantId", tenantId);
             final Long id = getObjectId(sEvent);
 
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
@@ -96,7 +93,9 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
 
     private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
         try {
-            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
+            PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance()
+                    .createPlatformServiceAccessor();
+            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor();
         } catch (final Exception e) {
             throw new SHandlerExecutionException(e.getMessage(), null);
         }

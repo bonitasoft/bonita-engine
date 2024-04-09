@@ -31,7 +31,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
@@ -59,8 +58,6 @@ public class ExecuteMessageCoupleWorkTest {
     private DataInstanceService dataInstanceService;
     @Mock
     private UserTransactionService userTransactionService;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     @Captor
     private ArgumentCaptor<Callable<?>> callableArgumentCaptor;
     private Map<String, Object> context = new HashMap<>();
@@ -81,7 +78,6 @@ public class ExecuteMessageCoupleWorkTest {
         doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
         doReturn(dataInstanceService).when(tenantServiceAccessor).getDataInstanceService();
         doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
-        doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
     }
 
     @Test

@@ -32,7 +32,6 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -70,8 +69,7 @@ public class IdentityServiceImplForUserTest {
     private IconService iconService;
     @Mock
     private EventService eventService;
-    @Mock
-    private TechnicalLoggerService logger;
+
     @Spy
     @InjectMocks
     private IdentityServiceImpl identityServiceImpl;

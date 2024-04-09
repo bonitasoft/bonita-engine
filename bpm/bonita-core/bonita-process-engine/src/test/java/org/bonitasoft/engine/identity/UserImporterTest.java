@@ -74,8 +74,7 @@ public class UserImporterTest {
 
     @Before
     public void setUp() throws SUserCreationException {
-        given(serviceAccessor.getIdentityService()).willReturn(identityService);
-        importer = new UserImporter(serviceAccessor, strategy, 5, userInfoValueImporter);
+        importer = new UserImporter(identityService, strategy, 5, userInfoValueImporter);
 
         given(persistedUser.getId()).willReturn(USER_ID);
 

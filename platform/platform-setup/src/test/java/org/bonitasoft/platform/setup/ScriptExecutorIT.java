@@ -89,13 +89,17 @@ public class ScriptExecutorIT {
     public void should_be_able_to_create_platform_tables() throws Exception {
         scriptExecutor.createAndInitializePlatformIfNecessary();
         final Integer sequences = jdbcTemplate.queryForObject("select count(*) from sequence", Integer.class);
-        assertThat(sequences).isEqualTo(6);
+        assertThat(sequences).isEqualTo(66);
 
         final int platformRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "platform");
         assertThat(platformRows).isEqualTo(1);
-        final Map<String, Object> row = jdbcTemplate.queryForMap("select * from platform");
-        assertThat("" + row.get("id")).isEqualTo("1"); // convert to String as not all RDBMS convert the same way (long, int, bigDecimal...)
-        assertThat(row.get("created_by")).isEqualTo("platformAdmin");
+        final Map<String, Object> rowPlatform = jdbcTemplate.queryForMap("select * from platform");
+        assertThat("" + rowPlatform.get("id")).isEqualTo("1"); // convert to String as not all RDBMS convert the same way (long, int, bigDecimal...)
+        assertThat(rowPlatform.get("created_by")).isEqualTo("platformAdmin");
+
+        final Map<String, Object> rowTenant = jdbcTemplate.queryForMap("select * from tenant");
+        assertThat("" + rowTenant.get("id")).isEqualTo("1"); // convert to String as not all RDBMS convert the same way (long, int, bigDecimal...)
+        assertThat(rowTenant.get("createdBy")).isEqualTo("defaultUser");
     }
 
     @Test

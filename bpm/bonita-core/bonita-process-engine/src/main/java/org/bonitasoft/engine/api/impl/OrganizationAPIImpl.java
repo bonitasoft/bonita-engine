@@ -115,8 +115,7 @@ public class OrganizationAPIImpl {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
         final ActorBusinessArchiveArtifactManager dependencyResolver = new ActorBusinessArchiveArtifactManager(
-                tenantAccessor.getActorMappingService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService());
+                tenantAccessor.getActorMappingService(), tenantAccessor.getIdentityService());
         do {
             processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, 100);
             for (final Long processDefinitionId : processDefinitionIds) {

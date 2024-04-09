@@ -31,7 +31,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
@@ -54,13 +53,10 @@ public class PlatformIT extends CommonAPIIT {
 
     private static PlatformSession session;
 
-    private static PlatformTestUtil platformTestUtil = new PlatformTestUtil();
+    private static final PlatformTestUtil platformTestUtil = new PlatformTestUtil();
 
     @After
     public void after() throws BonitaException {
-        if (!platformAPI.isPlatformInitialized()) {
-            platformAPI.initializePlatform();
-        }
         if (!platformAPI.isNodeStarted()) {
             platformAPI.startNode();
         }
@@ -76,9 +72,6 @@ public class PlatformIT extends CommonAPIIT {
     public void before() throws BonitaException {
         session = platformTestUtil.loginOnPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        if (!platformAPI.isPlatformCreated()) {
-            platformAPI.createAndInitializePlatform();
-        }
         if (!platformAPI.isNodeStarted()) {
             platformAPI.startNode();
         }
@@ -88,7 +81,7 @@ public class PlatformIT extends CommonAPIIT {
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
 
         @Override
-        public void clean() throws Exception {
+        public void clean() {
         }
     };
 
@@ -103,18 +96,6 @@ public class PlatformIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_cleanPlatform_remove_tenant() throws BonitaException {
-        platformAPI.cleanPlatform();
-        assertFalse(platformAPI.isPlatformInitialized());
-    }
-
-    @Test(expected = CreationException.class)
-    public void createPlatformException() throws BonitaException {
-        assertTrue(platformAPI.isPlatformInitialized());
-        platformAPI.initializePlatform();
-    }
-
-    @Test
     public void getPlatformState() throws Exception {
         // test started state
         PlatformState state = platformAPI.getPlatformState();
@@ -124,9 +105,6 @@ public class PlatformIT extends CommonAPIIT {
         state = platformAPI.getPlatformState();
         assertEquals(PlatformState.STOPPED, state);
         // test exception:PlatformNotFoundException
-        platformAPI.cleanPlatform();
-        // when platform does not exists it return STOPPED now
-        assertEquals(PlatformState.STOPPED, platformAPI.getPlatformState());
     }
 
     @Test

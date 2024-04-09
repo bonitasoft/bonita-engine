@@ -38,8 +38,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
@@ -62,8 +60,6 @@ public class MessagesHandlingServiceTest {
     @Mock
     private WorkService workService;
     @Mock
-    private TechnicalLoggerService loggerService;
-    @Mock
     private LockService lockService;
     @Mock
     private UserTransactionService userTransactionService;
@@ -78,14 +74,13 @@ public class MessagesHandlingServiceTest {
     @Before
     public void setup() throws Exception {
         when(userTransactionService.executeInTransaction(any())).thenAnswer(a -> ((Callable) a.getArgument(0)).call());
-        when(loggerService.asLogger(any())).thenReturn(mock(TechnicalLogger.class));
 
         meterRegistry = new SimpleMeterRegistry(
                 // So that micrometer updates its counters every 1 ms:
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
                 Clock.SYSTEM);
-        messagesHandlingService = spy(new MessagesHandlingService(eventInstanceService, workService, loggerService,
-                lockService, TENANT_ID, userTransactionService, sessionAccessor, workFactory, meterRegistry));
+        messagesHandlingService = spy(new MessagesHandlingService(eventInstanceService, workService, lockService,
+                TENANT_ID, userTransactionService, sessionAccessor, workFactory, meterRegistry));
     }
 
     @Test

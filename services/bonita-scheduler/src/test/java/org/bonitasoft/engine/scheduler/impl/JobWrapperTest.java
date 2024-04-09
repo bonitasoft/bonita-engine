@@ -20,7 +20,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
@@ -43,8 +42,6 @@ public class JobWrapperTest {
 
     private JobWrapper jobWrapper;
     @Mock
-    private TechnicalLoggerService logger;
-    @Mock
     private EventService eventService;
     @Mock
     private SessionAccessor sessionAccessor;
@@ -59,7 +56,7 @@ public class JobWrapperTest {
 
     @Before
     public void before() {
-        jobWrapper = new JobWrapper(new JobIdentifier(145, 2, "MyJob"), job, logger, 2, eventService, sessionAccessor,
+        jobWrapper = new JobWrapper(new JobIdentifier(145, 2, "MyJob"), job, 2, eventService, sessionAccessor,
                 transactionService, persistenceService, jobService);
     }
 

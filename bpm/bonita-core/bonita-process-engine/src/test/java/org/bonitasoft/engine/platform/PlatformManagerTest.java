@@ -46,8 +46,7 @@ import org.mockito.junit.MockitoRule;
 
 public class PlatformManagerTest {
 
-    private final Long TENANT_1 = 1L;
-    private final Long TENANT_2 = 2L;
+    private final Long TENANT_ID = 1L;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -63,9 +62,7 @@ public class PlatformManagerTest {
     @Mock
     private PlatformService platformService;
     @Mock
-    private TenantStateManager tenant1Manager;
-    @Mock
-    private TenantStateManager tenant2Manager;
+    private TenantStateManager tenantManager;
     @Mock
     private PlatformLifecycleService platformLifecycleService1;
     @Mock
@@ -78,8 +75,7 @@ public class PlatformManagerTest {
     private PlatformVersionChecker platformVersionChecker;
 
     private PlatformManager platformManager;
-    private STenant tenant1;
-    private STenant tenant2;
+    private STenant tenant;
     @Mock
     private PlatformRestartHandler platformRestartHandler1;
     @Mock
@@ -99,15 +95,12 @@ public class PlatformManagerTest {
                     ((RunnableWithException) invocationOnMock.getArgument(0)).run();
                     return null;
                 });
-        doReturn(tenant1Manager).when(platformManager).getTenantStateManager(argThat(t -> t.getId() == TENANT_1));
-        doReturn(tenant2Manager).when(platformManager).getTenantStateManager(argThat(t -> t.getId() == TENANT_2));
+        doReturn(tenantManager).when(platformManager).getDefaultTenantStateManager();
         doReturn(new SPlatform("1.3", "1.1.0", "someUser", 123455)).when(platformService).getPlatform();
         doReturn(new SPlatformPropertiesImpl("1.3.0")).when(platformService).getSPlatformProperties();
-        tenant1 = new STenant();
-        tenant1.setId(TENANT_1);
-        tenant2 = new STenant();
-        tenant2.setId(TENANT_2);
-        doReturn(asList(tenant1, tenant2)).when(platformService).getTenants(any());
+        tenant = new STenant();
+        tenant.setId(TENANT_ID);
+        doReturn(tenant).when(platformService).getDefaultTenant();
         doReturn(true).when(platformVersionChecker).verifyPlatformVersion();
     }
 
@@ -172,52 +165,52 @@ public class PlatformManagerTest {
 
     @Test
     public void should_activate_tenant_using_tenantManager() throws Exception {
-        doReturn(deactivated(tenant1)).when(platformService).getTenant(TENANT_1);
+        doReturn(deactivated(tenant)).when(platformService).getTenant(TENANT_ID);
 
-        platformManager.activateTenant(TENANT_1);
+        platformManager.activateTenant(TENANT_ID);
 
-        verify(tenant1Manager).activate();
+        verify(tenantManager).activate();
     }
 
     @Test
     public void should_throw_exception_when_activating_already_activated_Tenant() throws Exception {
-        doReturn(activated(new STenant())).when(platformService).getTenant(TENANT_1);
+        doReturn(activated(new STenant())).when(platformService).getTenant(TENANT_ID);
 
-        assertThatThrownBy(() -> platformManager.activateTenant(TENANT_1))
+        assertThatThrownBy(() -> platformManager.activateTenant(TENANT_ID))
                 .isInstanceOf(STenantActivationException.class);
     }
 
     @Test
     public void should_throw_exception_when_deactivating_already_deactivated_Tenant() throws Exception {
-        doReturn(deactivated(new STenant())).when(platformService).getTenant(TENANT_1);
+        doReturn(deactivated(new STenant())).when(platformService).getTenant(TENANT_ID);
 
-        assertThatThrownBy(() -> platformManager.deactivateTenant(TENANT_1))
+        assertThatThrownBy(() -> platformManager.deactivateTenant(TENANT_ID))
                 .isInstanceOf(STenantDeactivationException.class);
     }
 
     @Test
     public void should_throw_not_found_when_deactivating_non_existing_tenant() throws Exception {
-        doThrow(STenantNotFoundException.class).when(platformService).getTenant(TENANT_1);
+        doThrow(STenantNotFoundException.class).when(platformService).getTenant(TENANT_ID);
 
-        assertThatThrownBy(() -> platformManager.deactivateTenant(TENANT_1))
+        assertThatThrownBy(() -> platformManager.deactivateTenant(TENANT_ID))
                 .isInstanceOf(STenantNotFoundException.class);
     }
 
     @Test
     public void should_throw_not_found_when_activating_non_existing_tenant() throws Exception {
-        doThrow(STenantNotFoundException.class).when(platformService).getTenant(TENANT_1);
+        doThrow(STenantNotFoundException.class).when(platformService).getTenant(TENANT_ID);
 
-        assertThatThrownBy(() -> platformManager.activateTenant(TENANT_1))
+        assertThatThrownBy(() -> platformManager.activateTenant(TENANT_ID))
                 .isInstanceOf(STenantNotFoundException.class);
     }
 
     @Test
     public void should_deactivate_tenant_using_tenantManager() throws Exception {
-        doReturn(activated(tenant1)).when(platformService).getTenant(TENANT_1);
+        doReturn(activated(tenant)).when(platformService).getTenant(TENANT_ID);
 
-        platformManager.deactivateTenant(TENANT_1);
+        platformManager.deactivateTenant(TENANT_ID);
 
-        verify(tenant1Manager).deactivate();
+        verify(tenantManager).deactivate();
     }
 
     @Test
@@ -229,14 +222,13 @@ public class PlatformManagerTest {
         platformManager.start();
 
         // then:
-        InOrder inOrder = inOrder(platformStateProvider, tenant1Manager, tenant2Manager, platformLifecycleService1,
+        InOrder inOrder = inOrder(platformStateProvider, tenantManager, platformLifecycleService1,
                 platformLifecycleService2, platformRestartHandler1, platformRestartHandler2);
         inOrder.verify(platformStateProvider).initializeStart();
         inOrder.verify(platformLifecycleService1).start();
         inOrder.verify(platformLifecycleService2).start();
         inOrder.verify(platformStateProvider).setStarted();
-        inOrder.verify(tenant1Manager).start();
-        inOrder.verify(tenant2Manager).start();
+        inOrder.verify(tenantManager).start();
         inOrder.verify(platformRestartHandler1).execute();
         inOrder.verify(platformRestartHandler2).execute();
     }

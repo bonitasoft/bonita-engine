@@ -16,6 +16,7 @@ package org.bonitasoft.engine.operation;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
@@ -23,29 +24,25 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+
+@Slf4j
 @Component
 public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
     private static final String TRANSIENT_DATA = "%TRANSIENT_DATA%_";
 
     private final TransientDataService transientDataService;
-    private final TechnicalLoggerService logger;
 
-    public TransientDataLeftOperandHandler(TransientDataService transientDataService,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger) {
+    public TransientDataLeftOperandHandler(TransientDataService transientDataService) {
         this.transientDataService = transientDataService;
-        this.logger = logger;
     }
 
     @Override
@@ -66,9 +63,7 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
             }
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
             descriptor.addField("value", newValue);
-            logger.log(
-                    getClass(),
-                    TechnicalLogSeverity.WARNING,
+            log.warn(
                     "The value of the transient data "
                             + sLeftOperand.getName()
                             + " of "

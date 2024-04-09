@@ -1,15 +1,16 @@
 dependencies {
-    compile project(':services:bonita-cache')
-    compile project(':services:bonita-business-application')
-    compile project(':services:bonita-persistence')
-    compile project(':services:bonita-session')
-    compile project(':services:bonita-commons')
-    compile project(':bpm:bonita-core:bonita-home-server')
-    compile project(':bpm:bonita-common')
+    api project(':services:bonita-cache')
+    api project(':services:bonita-business-application')
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-session')
+    api project(':services:bonita-commons')
+    api project(':bpm:bonita-core:bonita-home-server')
+    api project(':bpm:bonita-common')
 
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

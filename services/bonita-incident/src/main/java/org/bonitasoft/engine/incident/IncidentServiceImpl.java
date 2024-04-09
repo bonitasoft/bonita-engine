@@ -15,22 +15,21 @@ package org.bonitasoft.engine.incident;
 
 import java.util.List;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptsite Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+
 public class IncidentServiceImpl implements IncidentService {
 
+    private Logger logger = LoggerFactory.getLogger(IncidentServiceImpl.class);
     private final List<IncidentHandler> handlers;
 
-    private final TechnicalLoggerService logger;
-
-    public IncidentServiceImpl(final TechnicalLoggerService logger, final List<IncidentHandler> handlers) {
-        this.logger = logger;
+    public IncidentServiceImpl(final List<IncidentHandler> handlers) {
         this.handlers = handlers;
     }
 
@@ -40,8 +39,7 @@ public class IncidentServiceImpl implements IncidentService {
             try {
                 handler.handle(tenantId, incident);
             } catch (final Exception t) {
-                logger.log(getClass(), TechnicalLogSeverity.ERROR,
-                        "Unable to report an incident using the handler " + handler + " incident was " + incident);
+                logger.error("Unable to report an incident using the handler " + handler + " incident was " + incident);
             }
         }
     }

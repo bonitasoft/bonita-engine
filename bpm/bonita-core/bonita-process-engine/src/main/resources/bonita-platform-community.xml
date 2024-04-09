@@ -11,7 +11,6 @@
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
         <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="quartzProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -45,8 +44,6 @@
     </bean>
 
     <bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor" autowire="byType">
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="useOptimization" value="true" />
     </bean>
@@ -55,16 +52,13 @@
         <constructor-arg name="eventService" ref="platformEventService" />
         <constructor-arg name="recorder" ref="tenantRecorderSyncForPlatform" />
         <constructor-arg name="readPersistenceService" ref="persistenceService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerServiceImpl">
         <constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
         <constructor-arg name="jobService" ref="jobService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
         <constructor-arg name="transactionService" ref="transactionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="servicesResolver" ref="servicesResolver" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
     </bean>
@@ -81,25 +75,9 @@
 
     <bean id="platformCommandService" class="org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl">
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="platformAuthenticationService" class="org.bonitasoft.engine.service.impl.PlatformAuthenticationChecker" />
-
-    <bean id="sqlFolders" parent="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
-        <property name="sourceList">
-            <list merge="true">
-            </list>
-        </property>
-    </bean>
-
-    <bean id="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
-        <property name="sourceList">
-            <list merge="true">
-                <value>/sql/${db.vendor}</value>
-            </list>
-        </property>
-    </bean>
 
 
     <bean id="platformRetriever" class="org.bonitasoft.engine.platform.impl.PlatformRetrieverImpl">
@@ -109,19 +87,14 @@
     <bean id="platformService" class="org.bonitasoft.engine.platform.impl.PlatformServiceImpl">
         <constructor-arg ref="platformPersistenceService" />
         <constructor-arg name="platformRetriever" ref="platformRetriever" />
-        <constructor-arg ref="platformTechnicalLoggerService" />
         <constructor-arg ref="platformProperties" />
         <constructor-arg name="recorder" ref="platformRecorderSync" />
-        <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
-        <!-- read SQL files from within bonita-server.jar -->
-        <constructor-arg name="sqlFolders" ref="sqlFolders" />
     </bean>
 
     <bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />
 
     <bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
         <constructor-arg name="jobService" ref="jobService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="schedulerService" ref="scheduler" />
     </bean>
 
@@ -131,11 +104,8 @@
 
     <bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">
         <constructor-arg name="schedulerService" ref="scheduler" />
-        <constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
-
-    <bean id="platformTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" />
 
     <bean id="incidentService" class="org.bonitasoft.engine.incident.IncidentServiceImpl">
         <constructor-arg name="handlers">
@@ -143,7 +113,6 @@
                 <bean class="org.bonitasoft.engine.incident.FileLoggerIncidentHandler" />
             </list>
         </constructor-arg>
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="bonitaDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
@@ -162,7 +131,7 @@
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
     </bean>
 
-    <bean id="defaultPlatformCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
+    <bean id="defaultCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="DEFAULT_PLATFORM" />
         <property name="maxElementsInMemory" value="${bonita.platform.cache.default.maxElementsInMemory}" />
         <property name="inMemoryOnly" value="${bonita.platform.cache.default.inMemoryOnly}" />
@@ -201,17 +170,28 @@
         <property name="readIntensive" value="${bonita.platform.cache.platform.readIntensive}" />
     </bean>
 
+    <bean id="configFilesCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="CONFIGURATION_FILES_CACHE" />
+        <property name="maxElementsInMemory" value="${bonita.platform.cache.configfiles.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.platform.cache.configfiles.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.platform.cache.configfiles.eternal}" />
+        <property name="evictionPolicy" value="${bonita.platform.cache.configfiles.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.platform.cache.configfiles.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.platform.cache.configfiles.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.platform.cache.configfiles.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.platform.cache.configfiles.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.platform.cache.configfiles.readIntensive}" />
+    </bean>
+
     <bean id="bonitaTaskExecutor" class="org.bonitasoft.engine.service.BonitaTaskExecutor" />
 
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="platformPersistenceService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
 
     <bean id="tenantRecorderSyncForPlatform" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
 
@@ -676,7 +656,6 @@
 
 
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="txManager" ref="transactionManager" />
     </bean>
 
@@ -1049,7 +1028,6 @@
         <constructor-arg name="name" value="platform" />
         <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
         <constructor-arg name="extraHibernateProperties" ref="extraPlatformHibernateProperties" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory" />
@@ -1079,10 +1057,8 @@
 
     <bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" destroy-method="destroy">
         <constructor-arg name="name" value="journal" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
         <constructor-arg name="extraHibernateProperties" ref="extraTenantHibernateProperties" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory" />
@@ -1164,7 +1140,5 @@
     </bean>
 
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
-
-    <bean class="org.bonitasoft.engine.platform.configuration.EnginePlatformConfiguration" />
 
 </beans>

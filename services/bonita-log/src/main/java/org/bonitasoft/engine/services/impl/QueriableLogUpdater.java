@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.services.impl;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
@@ -22,29 +21,28 @@ import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 /**
  * @author Elias Ricken de Medeiros
  */
+@Slf4j
 public class QueriableLogUpdater {
 
     private static final int MAX_MESSAGE_LENGTH = 255;
     private final QueriableLogSessionProvider sessionProvider;
     private final PlatformService platformService;
-    private final TechnicalLoggerService logger;
 
-    public QueriableLogUpdater(final QueriableLogSessionProvider sessionProvider, final PlatformService platformService,
-            final TechnicalLoggerService logger) {
+    public QueriableLogUpdater(final QueriableLogSessionProvider sessionProvider,
+            final PlatformService platformService) {
         this.sessionProvider = sessionProvider;
         this.platformService = platformService;
-        this.logger = logger;
     }
 
     public SQueriableLog buildFinalLog(final String callerClassName, final String callerMethodName,
-            final SQueriableLog log) {
-        final SQueriableLog.SQueriableLogBuilder builder = log.toBuilder();
+            final SQueriableLog sQueriableLog) {
+        final SQueriableLog.SQueriableLogBuilder builder = sQueriableLog.toBuilder();
 
-        final String rawMessage = log.getRawMessage();
+        final String rawMessage = sQueriableLog.getRawMessage();
         if (rawMessage.length() > MAX_MESSAGE_LENGTH) {
             final String truncatedMessage = rawMessage.substring(0, MAX_MESSAGE_LENGTH);
             builder.rawMessage(truncatedMessage);
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            if (log.isInfoEnabled()) {
                 final StringBuilder stb = new StringBuilder();
                 stb.append("The queriable log message is too long and will be truncated to ");
                 stb.append(MAX_MESSAGE_LENGTH);
@@ -53,7 +51,7 @@ public class QueriableLogUpdater {
                 stb.append("'. It will be truncated to '");
                 stb.append(truncatedMessage);
                 stb.append("'");
-                logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
+                log.info(stb.toString());
             }
         }
         return builder.callerClassName(callerClassName).callerMethodName(callerMethodName)

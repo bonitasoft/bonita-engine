@@ -37,18 +37,7 @@ public class SpringServiceAccessors implements ServiceAccessors {
     }
 
     protected SpringBeanAccessor createPlatformBeanAccessor() {
-        return new PlatformBeanAccessor();
-    }
-
-    protected synchronized SpringBeanAccessor getTenantBeanAccessor(final long tenantId) {
-        if (!tenants.containsKey(tenantId)) {
-            tenants.put(tenantId, createTenantBeanAccessor(tenantId));
-        }
-        return tenants.get(tenantId);
-    }
-
-    protected TenantBeanAccessor createTenantBeanAccessor(long tenantId) {
-        return new TenantBeanAccessor(getPlatformBeanAccessor().getContext(), tenantId);
+        return new SpringBeanAccessor();
     }
 
     //---- Wrap context with service accessors
@@ -64,8 +53,8 @@ public class SpringServiceAccessors implements ServiceAccessors {
     }
 
     @Override
-    public TenantServiceAccessor getTenantServiceAccessor(Long tenantId) {
-        return new SpringTenantServiceAccessor(getTenantBeanAccessor(tenantId), tenantId);
+    public TenantServiceAccessor getTenantServiceAccessor() {
+        return new SpringTenantServiceAccessor(getPlatformBeanAccessor());
     }
 
     @Override

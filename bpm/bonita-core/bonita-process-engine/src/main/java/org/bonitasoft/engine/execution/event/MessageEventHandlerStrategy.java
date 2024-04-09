@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -58,8 +59,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 
@@ -68,6 +67,7 @@ import org.bonitasoft.engine.transaction.STransactionNotFoundException;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Slf4j
 public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private static final String CORRELATION_NO_VALUE = "NONE";
@@ -215,19 +215,14 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
             bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(),
                     DataInstanceContainer.MESSAGE_INSTANCE,
                     expressionContext);
-            final TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(
-                        this.getClass(),
-                        TechnicalLogSeverity.DEBUG,
-                        "Initialized variables for message instance [name: <" + messageInstance.getMessageName()
-                                + ">, id: <" + messageInstance.getId()
-                                + ">, flow node: <" + messageInstance.getFlowNodeName() + ">, target flow node: <"
-                                + messageInstance.getTargetFlowNode()
-                                + ">, target process: <" + messageInstance.getTargetProcess()
-                                + ">, process definition: <"
-                                + messageInstance.getProcessDefinitionId() + ">]");
+            if (log.isDebugEnabled()) {
+                log.debug("Initialized variables for message instance [name: <{}>, id: <{}>, flow node: <{}>," +
+                        " target flow node: <{}>, target process: <{}>, process definition: <{}>]",
+                        messageInstance.getMessageName(), messageInstance.getId(), messageInstance.getFlowNodeName(),
+                        messageInstance.getTargetFlowNode(), messageInstance.getTargetProcess(),
+                        messageInstance.getProcessDefinitionId());
             }
+
         }
     }
 

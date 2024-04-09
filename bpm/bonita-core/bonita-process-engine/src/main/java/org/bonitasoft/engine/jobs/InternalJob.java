@@ -17,7 +17,6 @@ import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
  * @author Baptiste Mesta
@@ -27,10 +26,8 @@ public abstract class InternalJob implements StatelessJob {
     private static final long serialVersionUID = 5627886991070497312L;
 
     protected TenantServiceAccessor getTenantServiceAccessor() throws SJobConfigurationException {
-        long tenantId;
         try {
-            tenantId = ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
+            return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new SJobConfigurationException(e);
         }

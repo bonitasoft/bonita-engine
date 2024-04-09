@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -38,8 +39,6 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -55,9 +54,9 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
-    public static final Class<GatewayInstanceServiceImpl> TAG = GatewayInstanceServiceImpl.class;
     private final Recorder recorder;
 
     private final EventService eventService;
@@ -68,15 +67,11 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private FlowNodeInstanceService flowNodeInstanceService;
 
-    private final TechnicalLoggerService logger;
-
     public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService,
-            final ReadPersistenceService persistenceRead,
-            final TechnicalLoggerService logger, FlowNodeInstanceService flowNodeInstanceService) {
+            final ReadPersistenceService persistenceRead, FlowNodeInstanceService flowNodeInstanceService) {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;
-        this.logger = logger;
         this.flowNodeInstanceService = flowNodeInstanceService;
         sGatewayInstanceBuilderFactory = BuilderFactory.get(SGatewayInstanceBuilderFactory.class);
     }
@@ -88,7 +83,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         } catch (final SRecorderException e) {
             throw new SGatewayCreationException(e);
         }
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+        if (log.isDebugEnabled()) {
             final StringBuilder stb = new StringBuilder();
             stb.append("Created gateway instance [name = <" + gatewayInstance.getName());
             stb.append(">, id = <" + gatewayInstance.getId());
@@ -96,8 +91,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             stb.append(">, root process instance id = <" + gatewayInstance.getRootProcessInstanceId());
             stb.append(">, process definition id = <" + gatewayInstance.getRootProcessInstanceId());
             stb.append(">]");
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                    stb.toString());
+            log.debug(stb.toString());
         }
     }
 
@@ -134,11 +128,10 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     boolean isInclusiveGatewayActivated(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance)
             throws SBonitaReadException {
-        logger.log(TAG, TechnicalLogSeverity.DEBUG,
-                "Evaluate if gateway " + gatewayInstance.getName() + " of instance "
-                        + gatewayInstance.getRootProcessInstanceId() + " of definition "
-                        + sDefinition.getName() + " must be activated ");
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "HitBys = " + gatewayInstance.getHitBys());
+        log.debug("Evaluate if gateway " + gatewayInstance.getName() + " of instance "
+                + gatewayInstance.getRootProcessInstanceId() + " of definition "
+                + sDefinition.getName() + " must be activated ");
+        log.debug("HitBys = " + gatewayInstance.getHitBys());
         if (gatewayInstance.isFinished()) {
             return false;
         }
@@ -186,7 +179,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>();
         List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>();
 
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "Check if there is a token on " + transitions);
+        log.debug("Check if there is a token on " + transitions);
         for (STransitionDefinition sTransitionDefinition : transitions) {
             SFlowNodeDefinition source = processContainer.getFlowNode(sTransitionDefinition.getSource());
             if (!source.equals(gatewayDefinition) && !sourceElements.contains(source)) {
@@ -205,7 +198,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             return true;
         if (containsToken(processInstanceId, targetElements, false))
             return true;
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "No token to wait, gateway will fire");
+        log.debug("No token to wait, gateway will fire");
         return false;
     }
 
@@ -249,8 +242,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
                     .getFlowNodeInstancesByNameAndParentContainerId(element.getName(), processInstanceId);
             for (SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
                 if (shouldBeTerminal == null || (shouldBeTerminal ^ !sFlowNodeInstance.isTerminal())) {
-                    logger.log(TAG, TechnicalLogSeverity.DEBUG,
-                            "flow node " + sFlowNodeInstance.getName() + " contain a token, gateway not merged");
+                    log.debug("flow node " + sFlowNodeInstance.getName() + " contain a token, gateway not merged");
                     return true;
                 }
             }
@@ -312,10 +304,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     @Override
     public void hitTransition(final SGatewayInstance gatewayInstance, final long transitionIndex)
             throws SGatewayModificationException {
-        logger.log(TAG, TechnicalLogSeverity.DEBUG,
-                "Hit gateway " + gatewayInstance.getName() + " (" + gatewayInstance.getId() + ")" + " of instance "
-                        + gatewayInstance.getRootProcessInstanceId()
-                        + " with transition index " + transitionIndex);
+        log.debug("Hit gateway " + gatewayInstance.getName() + " (" + gatewayInstance.getId() + ")" + " of instance "
+                + gatewayInstance.getRootProcessInstanceId()
+                + " with transition index " + transitionIndex);
         final String hitBys = gatewayInstance.getHitBys();
         String columnValue;
         if (hitBys == null || hitBys.isEmpty()) {
@@ -369,8 +360,8 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<String> merged = getMergedTokens(gatewayInstance, hitBys);
         setFinished(gatewayInstance, merged.size());
         List<String> remaining = getRemainingTokens(hitBys, merged);
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "There is " + remaining + " remaining token to merge on gateway "
-                + gatewayInstance.getName() + " will create a new if there is");
+        log.debug("There is {} remaining token to merge on gateway {} will create a new if there is", remaining,
+                gatewayInstance.getName());
         if (remaining.isEmpty()) {
             return Collections.emptyList();
         }
@@ -442,8 +433,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     void setFinished(SGatewayInstance gatewayInstance, int numberOfTokenToMerge) throws SGatewayModificationException {
         final String columnValue = FINISH + numberOfTokenToMerge;
-        logger.log(TAG, TechnicalLogSeverity.TRACE,
-                "set finish on gateway " + gatewayInstance.getName() + " " + columnValue);
+        log.trace("set finish on gateway {} {}", gatewayInstance.getName(), columnValue);
         updateOneColumnAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue,
                 GATEWAYINSTANCE_HITBYS);
     }

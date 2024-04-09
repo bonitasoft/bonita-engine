@@ -13,24 +13,19 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
-import org.bonitasoft.engine.platform.cache.PlatformCacheService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.service.BroadcastService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.ServicesResolver;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.*;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
@@ -51,11 +46,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public TechnicalLoggerService getTechnicalLoggerService() {
-        return beanAccessor.getService("platformTechnicalLoggerService", TechnicalLoggerService.class);
-    }
-
-    @Override
     public PlatformLoginService getPlatformLoginService() {
         return beanAccessor.getService(PlatformLoginService.class);
     }
@@ -71,8 +61,8 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
-        return TenantServiceSingleton.getInstance(tenantId);
+    public TenantServiceAccessor getTenantServiceAccessor() {
+        return TenantServiceSingleton.getInstance();
     }
 
     @Override
@@ -106,8 +96,8 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public PlatformCacheService getPlatformCacheService() {
-        return beanAccessor.getService(PlatformCacheService.class);
+    public CacheService getPlatformCacheService() {
+        return beanAccessor.getService(CacheService.class);
 
     }
 
@@ -139,5 +129,10 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public ServicesResolver getServicesResolver() {
         return beanAccessor.getService(ServicesResolver.class);
+    }
+
+    @Override
+    public void publishEvent(final Object event) {
+        beanAccessor.getContext().publishEvent(event);
     }
 }

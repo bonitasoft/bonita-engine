@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorDeletionException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -37,8 +38,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -48,17 +47,17 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtifactManager {
 
     private final ActorMappingService actorMappingService;
     private final IdentityService identityService;
-    private final TechnicalLoggerService technicalLoggerService;
 
-    public ActorBusinessArchiveArtifactManager(ActorMappingService actorMappingService, IdentityService identityService,
-            TechnicalLoggerService technicalLoggerService) {
+    public ActorBusinessArchiveArtifactManager(ActorMappingService actorMappingService,
+            IdentityService identityService) {
         this.actorMappingService = actorMappingService;
         this.identityService = identityService;
-        this.technicalLoggerService = technicalLoggerService;
+
     }
 
     @Override
@@ -89,8 +88,7 @@ public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtif
             }
             // ignored
         } catch (SBonitaException e) {
-            technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                    "Error in importing the actor-mapping: " + e.getMessage());
+            log.warn("Error in importing the actor-mapping: {}", e.getMessage());
         }
         return checkResolution(actorMappingService, processDefinition.getId()).isEmpty();
     }

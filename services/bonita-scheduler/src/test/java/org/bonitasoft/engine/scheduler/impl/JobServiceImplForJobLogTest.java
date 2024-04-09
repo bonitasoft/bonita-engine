@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -68,8 +67,6 @@ public class JobServiceImplForJobLogTest {
     private ReadPersistenceService readPersistenceService;
     @Mock
     private Recorder recorder;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     @Spy
     @InjectMocks
     private JobServiceImpl jobServiceImpl;

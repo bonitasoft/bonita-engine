@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
@@ -23,35 +20,25 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
  */
 public final class TenantServiceSingleton {
 
-    private static final Map<Long, TenantServiceAccessor> instances = new HashMap<Long, TenantServiceAccessor>();
+    private static TenantServiceAccessor instance = null;
 
     private TenantServiceSingleton() {
         super();
     }
 
-    private static TenantServiceAccessor getTenant(final long tenantId) {
+    private static TenantServiceAccessor getTenant() {
         try {
-            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
+            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public static TenantServiceAccessor getInstance() {
-        long tenantId;
-        try {
-            tenantId = ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
+        if (instance == null) {
+            instance = getTenant();
         }
-        return getInstance(tenantId);
-    }
-
-    public static TenantServiceAccessor getInstance(final long tenantId) {
-        if (!instances.containsKey(tenantId)) {
-            instances.put(tenantId, getTenant(tenantId));
-        }
-        return instances.get(tenantId);
+        return instance;
     }
 
 }

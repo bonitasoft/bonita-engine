@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.page.impl;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.engine.commons.Pair.pair;
@@ -26,16 +25,13 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -105,9 +101,6 @@ public class PageServiceImplTest {
     public static final long PROCESS_DEFINITION_ID = 846L;
 
     public static final long USER_ID = 98989L;
-
-    public static final String DEFAULT_THEME_NAME = "custompage_themeBonita";
-    public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
 
     @Mock
     private Recorder recorder;
@@ -315,298 +308,6 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void init_should_import_all_provided_page_if_is_the_first_run() throws SBonitaException {
-        // given
-        // resource in the classpath bonita-groovy-example-page.zip
-        final Map<String, String> map = new HashMap<>();
-        map.put("custompage_htmlexample_editonly", "page");
-        map.put("custompage_htmlexample_final", "page");
-        map.put(DEFAULT_LAYOUT_NAME, "layout");
-        map.put("custompage_htmlexample", "page");
-        map.put("custompage_groovyexample", "page");
-        map.put("custompage_home", "page");
-        map.put("custompage_tenantStatusBonita", "page");
-        map.put(DEFAULT_THEME_NAME, "theme");
-        doAnswer(invocation -> invocation.getArguments()[0]).when(pageServiceImpl)
-                .insertPage(pageArgumentCaptor.capture(), any());
-
-        // when
-        pageServiceImpl.init();
-
-        // then
-        List<SPage> insertedPages = pageArgumentCaptor.getAllValues();
-        assertThat(insertedPages)
-                .hasSize(8)
-                .allSatisfy(insertedPage -> {
-                    String name = insertedPage.getName();
-                    assertThat(name).isIn(map.keySet());
-                    assertThat(insertedPage.getContentType()).isEqualTo(map.get(name));
-                    assertThat(insertedPage.getPageHash()).isEqualTo(getHashOfContent(name));
-                    if (insertedPage.getName().equals("custompage_htmlexample_editonly")) {
-                        assertThat(insertedPage.isEditable()).isTrue();
-                        assertThat(insertedPage.isProvided()).isTrue();
-                        assertThat(insertedPage.isRemovable()).isFalse();
-                    } else if (insertedPage.getName().equals("custompage_htmlexample_final")) {
-                        assertThat(insertedPage.isEditable()).isFalse();
-                        assertThat(insertedPage.isProvided()).isTrue();
-                        assertThat(insertedPage.isRemovable()).isFalse();
-                    } else {
-                        assertThat(insertedPage.isProvided()).isTrue();
-                        assertThat(insertedPage.isEditable()).isTrue();
-                        assertThat(insertedPage.isRemovable()).isTrue();
-                        assertThat(insertedPage.getContentType()).isEqualTo(map.get(name));
-                        assertThat(insertedPage.getPageHash()).isEqualTo(getHashOfContent(name));
-                    }
-                });
-
-        verify(pageServiceImpl, never()).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
-        verify(pageServiceImpl, never()).updatePageContent(anyLong(), any(byte[].class), anyString());
-    }
-
-    @Test
-    public void import_provided_page_should_return_import_status_added_if_page_is_missing_equal_true()
-            throws Exception {
-        // given: a zip without properties
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
-                getPagePropertiesContentPair());
-
-        doReturn(null).when(pageServiceImpl).getPageByName("custompage_mypage");
-
-        ImportStatus importStatus = pageServiceImpl.importProvidedPage("custompage_mypage", content, true, true, true);
-
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        verify(pageServiceImpl, never()).updatePageContent(anyLong(), any(byte[].class), any());
-    }
-
-    @Test
-    public void should_return_skipped_when_page_does_not_exist_and_addIfMissing_equals_false() throws Exception {
-        // given: a zip without properties
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
-                getPagePropertiesContentPair());
-
-        doReturn(null).when(pageServiceImpl).getPageByName("custompage_mypage");
-
-        ImportStatus importStatus = pageServiceImpl.importProvidedPage("custompage_mypage", content, true, true, false);
-
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.SKIPPED);
-        verify(pageServiceImpl, never()).insertPage(any(), any(byte[].class));
-        verify(pageServiceImpl, never()).updatePageContent(anyLong(), any(byte[].class), any());
-    }
-
-    @Test
-    public void should_replaced_an_existing_provided_page_when_content_is_different_and_still_provided()
-            throws Exception {
-
-        final SPage pageInDb = new SPage();
-        pageInDb.setName("custompage_mypage");
-        pageInDb.setDescription("mypage description");
-        pageInDb.setDisplayName("mypage display name");
-        pageInDb.setId(12);
-        pageInDb.setProvided(true);
-        pageInDb.setPageHash(DigestUtils.md5DigestAsHex("some hash".getBytes(UTF_8)));
-
-        doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
-
-        doReturn(pageInDb).when(pageServiceImpl).getPageByName("custompage_mypage");
-
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
-                getPagePropertiesContentPair());
-
-        // final page
-        ImportStatus importStatus = pageServiceImpl.importProvidedPage("custompage_mypage", content, false, false,
-                true);
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
-        importStatus = pageServiceImpl.importProvidedPage("custompage_mypage", content, false, true, true);
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
-        importStatus = pageServiceImpl.importProvidedPage("custompage_mypage", content, true, true, true);
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
-
-        verify(pageServiceImpl, times(3)).updatePageContent(eq(12L), eq(content), any());
-
-    }
-
-    @Test
-    public void should_not_replaced_an_existing_page_when_content_is_different_and_no_more_provided()
-            throws Exception {
-
-        final SPage page = new SPage();
-        page.setName("custompage_mypage");
-        page.setDescription("mypage description");
-        page.setDisplayName("mypage display name");
-        page.setId(12);
-        page.setProvided(false);
-
-        page.setPageHash(DigestUtils.md5DigestAsHex("some hash".getBytes(UTF_8)));
-
-        doReturn(page).when(pageServiceImpl).getPageByName("custompage_mypage");
-
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
-                getPagePropertiesContentPair());
-
-        // final page
-        ImportStatus importStatus = pageServiceImpl.importProvidedPage("custompage_mypage", content, false, false,
-                true);
-
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.SKIPPED);
-
-        // edit only page
-        importStatus = pageServiceImpl.importProvidedPage("custompage_mypage", content, false, true, true);
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.SKIPPED);
-
-        // removable page
-        importStatus = pageServiceImpl.importProvidedPage("custompage_mypage", content, true, true, true);
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.SKIPPED);
-
-        verify(pageServiceImpl, never()).updatePageContent(anyLong(), any(byte[].class), any());
-        verify(pageServiceImpl, never()).insertPage(any(), any(byte[].class));
-    }
-
-    @Test
-    public void import_provided_page_should_do_nothing_and_throw_exception_when_exception_happened_on_get_page_by_name()
-            throws Exception {
-
-        final SPage page = new SPage();
-        page.setName("custompage_mypage");
-        page.setDescription("mypage description");
-        page.setDisplayName("mypage display name");
-        page.setId(12);
-        page.setEditable(true);
-        page.setRemovable(true);
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
-                getPagePropertiesContentPair());
-        page.setPageHash(DigestUtils.md5DigestAsHex(content));
-
-        doThrow(SBonitaReadException.class).when(pageServiceImpl).getPageByName("custompage_mypage");
-
-        Throwable expected = catchThrowable(
-                () -> pageServiceImpl.importProvidedPage("custompage_mypage", content, true, true, true));
-
-        assertThat(expected).isInstanceOf(SBonitaException.class);
-        verify(pageServiceImpl, never()).updatePageContent(anyLong(), any(byte[].class), any());
-        verify(pageServiceImpl, never()).insertPage(any(), any(byte[].class));
-    }
-
-    @Test
-    public void init_should_not_insert_not_removable_provided_page_if_is_not_first_run() throws Exception {
-        ImportStatus importStatus = new ImportStatus("custompage_htmlexample_final");
-        importStatus.setStatus(ImportStatus.Status.SKIPPED);
-        doReturn(importStatus).when(pageServiceImpl).importProvidedPage(eq("bonita-html-page-example-final.zip"),
-                any(byte[].class), eq(false), eq(false), eq(true));
-        doReturn(importStatus).when(pageServiceImpl).importProvidedPage(eq("bonita-html-page-example-editonly.zip"),
-                any(byte[].class), eq(false), eq(true), eq(true));
-
-        final Map<String, String> removablePage = new HashMap<>();
-        removablePage.put(DEFAULT_LAYOUT_NAME, "layout");
-        removablePage.put("custompage_htmlexample", "page");
-        removablePage.put("custompage_groovyexample", "page");
-        removablePage.put("custompage_home", "page");
-        removablePage.put("custompage_tenantStatusBonita", "page");
-        removablePage.put(DEFAULT_THEME_NAME, "theme");
-
-        // when
-        pageServiceImpl.init();
-        // then
-        verify(pageServiceImpl, times(6)).importProvidedPage(any(), any(byte[].class), eq(true), eq(true), eq(false));
-        verify(pageServiceImpl, never()).insertPage(argThat(page -> !removablePage.containsKey(page.getName())),
-                any(byte[].class));
-    }
-
-    @Test
-    public void init_should_not_insert_anything_if_exception_happened_on_import_final_page() throws Exception {
-        final Map<String, String> notImportedPages = new HashMap<>();
-        notImportedPages.put("bonita-default-layout.zip", "layout");
-        notImportedPages.put("bonita-html-page-example.zip", "page");
-        notImportedPages.put("bonita-groovy-page-example.zip", "page");
-        notImportedPages.put("bonita-home-page.zip", "page");
-        notImportedPages.put("page-tenant-status.zip", "page");
-        notImportedPages.put("bonita-html-page-example-editonly.zip", "theme");
-        notImportedPages.put("bonita-theme.zip", "theme");
-
-        doThrow(new SBonitaReadException("ouch")).when(pageServiceImpl)
-                .importProvidedPage(eq("bonita-html-page-example-final.zip"), any(byte[].class), eq(false), eq(false),
-                        eq(true));
-
-        pageServiceImpl.init();
-
-        verify(pageServiceImpl, never()).importProvidedPage(
-                argThat(pageZipName -> notImportedPages.keySet().contains(pageZipName)),
-                any(byte[].class), eq(true), eq(true), anyBoolean());
-        verify(pageServiceImpl, never()).importProvidedPage(
-                argThat(pageZipName -> notImportedPages.keySet().contains(pageZipName)),
-                any(byte[].class), eq(false), eq(true), anyBoolean());
-    }
-
-    private String getHashOfContent(String name) {
-        final Map<String, String> map = new HashMap<>();
-        map.put(DEFAULT_LAYOUT_NAME, "/org/bonitasoft/web/page/bonita-default-layout.zip");
-        map.put("custompage_htmlexample", "/org/bonitasoft/web/page/bonita-html-page-example.zip");
-        map.put("custompage_htmlexample_editonly",
-                "/org/bonitasoft/web/page/editonly/bonita-html-page-example-editonly.zip");
-        map.put("custompage_htmlexample_final", "/org/bonitasoft/web/page/final/bonita-html-page-example-final.zip");
-        map.put("custompage_groovyexample", "/org/bonitasoft/web/page/bonita-groovy-page-example.zip");
-        map.put("custompage_home", "/org/bonitasoft/web/page/bonita-home-page.zip");
-        map.put("custompage_tenantStatusBonita", "/org/bonitasoft/web/page/page-tenant-status.zip");
-        map.put(DEFAULT_THEME_NAME, "/org/bonitasoft/web/page/bonita-theme.zip");
-        try {
-            InputStream resourceAsStream = this.getClass().getResourceAsStream(map.get(name));
-            if (resourceAsStream == null) {
-                throw new AssertionError("No content found for page " + name + " in classpath: " + map.get(name));
-            }
-            return DigestUtils.md5DigestAsHex(resourceAsStream.readAllBytes());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    public void init_should_update_final_page_if_is_different() throws SBonitaException {
-        // given
-        // resource in the classpath provided-page.properties and provided-page.zip
-        final SPage currentGroovyPage = new SPage("custompage_htmlexample_final", "example", "example",
-                System.currentTimeMillis(), -1, true,
-                System.currentTimeMillis(),
-                -1,
-                CONTENT_NAME);
-        currentGroovyPage.setId(12L);
-        currentGroovyPage.setRemovable(false);
-        currentGroovyPage.setEditable(false);
-
-        doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_htmlexample_final");
-        doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
-
-        // when
-        pageServiceImpl.init();
-
-        // then
-        verify(pageServiceImpl).updatePageContent(eq(12L), any(byte[].class),
-                eq("bonita-html-page-example-final.zip"));
-    }
-
-    @Test
-    public void init_should_update_edit_only_page_if_is_different() throws SBonitaException {
-        // given
-        // resource in the classpath provided-page.properties and provided-page.zip
-        final SPage currentGroovyPage = new SPage("custompage_htmlexample_editonly", "example", "example",
-                System.currentTimeMillis(), -1, true,
-                System.currentTimeMillis(),
-                -1,
-                CONTENT_NAME);
-        currentGroovyPage.setId(12L);
-        currentGroovyPage.setRemovable(false);
-        currentGroovyPage.setEditable(true);
-
-        doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_htmlexample_editonly");
-        doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
-
-        // when
-        pageServiceImpl.init();
-
-        // then
-        verify(pageServiceImpl).updatePageContent(eq(12L), any(byte[].class),
-                eq("bonita-html-page-example-editonly.zip"));
-    }
-
-    @Test
     public void getPageContent_should_add_properties_in_the_zip() throws SBonitaException, IOException {
         // given: a zip without properties
         final SPageWithContent page = new SPageWithContent();
@@ -695,31 +396,6 @@ public class PageServiceImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void should_getPageContent_throw_not_found() throws SBonitaException {
         pageServiceImpl.getPageContent(12);
-    }
-
-    @Test
-    public void init_should_do_nothing_if_non_editable_non_removable_already_here_and_the_same()
-            throws SBonitaException {
-        final SPage currentHomePage = new SPage("custompage_htmlexample_editonly", "example", "example",
-                System.currentTimeMillis(), -1,
-                true,
-                System.currentTimeMillis(),
-                -1,
-                CONTENT_NAME);
-        currentHomePage.setId(14);
-        currentHomePage.setEditable(false);
-        currentHomePage.setRemovable(false);
-        currentHomePage.setPageHash(getHashOfContent("custompage_htmlexample_editonly"));
-        doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_htmlexample_editonly");
-
-        // when
-        pageServiceImpl.init();
-        // then
-        verify(pageServiceImpl, never()).insertPage(
-                argThat(sPage -> sPage.getName().equals("custompage_htmlexample_editonly")),
-                any(byte[].class));
-        verify(pageServiceImpl, never()).updatePage(eq(14), any(EntityUpdateDescriptor.class));
-        verify(pageServiceImpl, never()).updatePageContent(eq(14), any(byte[].class), anyString());
     }
 
     @Test
@@ -1165,7 +841,7 @@ public class PageServiceImplTest {
         SPageAssert.assertThat(insertedPage).hasContentType(SContentType.API_EXTENSION);
     }
 
-    protected Pair<String, byte[]> getPagePropertiesContentPair(final String... otherProperties)
+    private Pair<String, byte[]> getPagePropertiesContentPair(final String... otherProperties)
             throws UnsupportedEncodingException {
         final StringBuilder stringBuilder = new StringBuilder()
                 .append("name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n");
@@ -1176,7 +852,7 @@ public class PageServiceImplTest {
         return pair(PAGE_PROPERTIES, stringBuilder.toString().getBytes("UTF-8"));
     }
 
-    protected Pair<String, byte[]> getIndexGroovyContentPair() {
+    private Pair<String, byte[]> getIndexGroovyContentPair() {
         return pair(INDEX_GROOVY, "content of the groovy".getBytes());
     }
 

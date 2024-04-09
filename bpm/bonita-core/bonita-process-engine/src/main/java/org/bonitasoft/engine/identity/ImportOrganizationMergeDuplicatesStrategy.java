@@ -37,7 +37,6 @@ import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedGroup;
 import org.bonitasoft.engine.identity.xml.ExportedRole;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -49,13 +48,11 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     private final IdentityService identityService;
 
     private final SCustomUserInfoValueAPI userInfoValueAPI;
-    private TechnicalLoggerService logger;
 
     public ImportOrganizationMergeDuplicatesStrategy(final IdentityService identityService,
-            final SCustomUserInfoValueAPI userInfoValueAPI, TechnicalLoggerService logger) {
+            final SCustomUserInfoValueAPI userInfoValueAPI) {
         this.identityService = identityService;
         this.userInfoValueAPI = userInfoValueAPI;
-        this.logger = logger;
     }
 
     @Override

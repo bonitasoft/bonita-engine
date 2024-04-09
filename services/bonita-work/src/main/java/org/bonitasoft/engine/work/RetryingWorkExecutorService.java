@@ -28,9 +28,9 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
@@ -39,12 +39,12 @@ import org.springframework.stereotype.Component;
  * @author Baptiste Mesta.
  */
 @Component
+
 @ConditionalOnSingleCandidate(WorkExecutorService.class)
 public class RetryingWorkExecutorService implements WorkExecutorService, WorkExecutionCallback {
 
+    Logger logger = LoggerFactory.getLogger(RetryingWorkExecutorService.class);
     public static final String NUMBER_OF_WORKS_RETRIED = "bonita.bpmengine.work.retried";
-
-    private final TechnicalLogger logger;
     private final EngineClock engineClock;
     private final int maxRetry;
     private final WorkExecutionAuditor workExecutionAuditor;
@@ -61,7 +61,6 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
     private Random random = new Random();
 
     public RetryingWorkExecutorService(BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
-            TechnicalLoggerService loggerService,
             EngineClock engineClock,
             @Value("${bonita.tenant.work.terminationTimeout}") long workTerminationTimeout,
             @Value("${bonita.tenant.work.maxRetry}") int maxRetry,
@@ -73,7 +72,6 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
             IncidentService incidentService,
             @Value("${tenantId}") long tenantId) {
         this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
-        this.logger = loggerService.asLogger(RetryingWorkExecutorService.class);
         this.engineClock = engineClock;
         this.workTerminationTimeout = workTerminationTimeout;
         this.maxRetry = maxRetry;

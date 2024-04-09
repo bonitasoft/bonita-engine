@@ -35,21 +35,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConfigurationFilesManager {
 
-    protected Properties getAlsoCustomAndInternalPropertiesFromFilename(long tenantId, String propertiesFileName) {
+    protected Properties getAlsoCustomAndInternalPropertiesFromFilename(long tenantId, String propertiesFileName,
+            boolean setKeysToLowerCase) {
         Properties properties = new Properties();
         try {
             final Map<String, Properties> propertiesByFilename = getTenantConfigurations(tenantId);
             if (propertiesByFilename.containsKey(propertiesFileName)) {
-                properties.putAll(propertiesByFilename.get(propertiesFileName));
+                properties.putAll(propertiesKeysToLowerCaseIfNeeded(propertiesByFilename.get(propertiesFileName),
+                        setKeysToLowerCase));
                 // if -internal properties also exists, merge key/value pairs:
                 final String internalSuffixedVersion = getInternalPropertiesFilename(propertiesFileName);
                 if (propertiesByFilename.containsKey(internalSuffixedVersion)) {
-                    properties.putAll(propertiesByFilename.get(internalSuffixedVersion));
+                    properties.putAll(propertiesKeysToLowerCaseIfNeeded(
+                            propertiesByFilename.get(internalSuffixedVersion), setKeysToLowerCase));
                 }
                 // if -custom properties also exists, merge key/value pairs (and overwrite previous values if same key name):
                 final String customSuffixedVersion = getCustomPropertiesFilename(propertiesFileName);
                 if (propertiesByFilename.containsKey(customSuffixedVersion)) {
-                    properties.putAll(propertiesByFilename.get(customSuffixedVersion));
+                    properties.putAll(propertiesKeysToLowerCaseIfNeeded(propertiesByFilename.get(customSuffixedVersion),
+                            setKeysToLowerCase));
                 }
             } else {
                 if (log.isTraceEnabled()) {
@@ -62,8 +66,24 @@ public class ConfigurationFilesManager {
         return properties;
     }
 
+    protected Properties propertiesKeysToLowerCaseIfNeeded(Properties properties, boolean setKeysToLowerCase) {
+        if (setKeysToLowerCase) {
+            Properties reworkedProperties = new Properties();
+            properties.forEach((k, v) -> {
+                reworkedProperties.put(k.toString().toLowerCase(), v);
+            });
+            return reworkedProperties;
+        } else {
+            return properties;
+        }
+    }
+
     public Properties getTenantProperties(String propertiesFileName, long tenantId) {
-        return getAlsoCustomAndInternalPropertiesFromFilename(tenantId, propertiesFileName);
+        return getTenantProperties(propertiesFileName, tenantId, false);
+    }
+
+    public Properties getTenantProperties(String propertiesFileName, long tenantId, boolean setKeysToLowerCase) {
+        return getAlsoCustomAndInternalPropertiesFromFilename(tenantId, propertiesFileName, setKeysToLowerCase);
     }
 
     /**
@@ -124,7 +144,8 @@ public class ConfigurationFilesManager {
                 .getProperties(getConfigurationFilesUtils().getTenantPortalConfiguration(tenantId, propertiesFilename));
     }
 
-    protected Map<String, Properties> getTenantConfigurations(long tenantId) throws IOException {
+    protected Map<String, Properties> getTenantConfigurations(long tenantId)
+            throws IOException {
         Map<String, byte[]> clientTenantConfigurations = getConfigurationFilesUtils()
                 .getTenantPortalConfigurations(tenantId);
         return clientTenantConfigurations.entrySet().stream().collect(Collectors.toMap(

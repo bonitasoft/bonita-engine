@@ -14,23 +14,21 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.scheduler.JobIdentifier;
-import org.bonitasoft.engine.scheduler.JobService;
-import org.bonitasoft.engine.scheduler.SchedulerExecutor;
-import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.scheduler.*;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -49,9 +47,8 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Yanyan Liu
  * @author Celine Souchet
  */
+@Slf4j
 public class SchedulerServiceImpl implements SchedulerService {
-
-    private final TechnicalLoggerService logger;
 
     private final SchedulerExecutor schedulerExecutor;
 
@@ -76,13 +73,11 @@ public class SchedulerServiceImpl implements SchedulerService {
      * Create a new instance of scheduler service.
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService,
-            final TechnicalLoggerService logger,
             final EventService eventService, final TransactionService transactionService,
             final SessionAccessor sessionAccessor,
             final ServicesResolver servicesResolver, final PersistenceService persistenceService) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
-        this.logger = logger;
         this.servicesResolver = servicesResolver;
         this.persistenceService = persistenceService;
         schedulerStarted = new SEvent(SCHEDULER_STARTED);
@@ -162,11 +157,11 @@ public class SchedulerServiceImpl implements SchedulerService {
             schedulerExecutor.schedule(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), trigger,
                     false);
         } catch (final Throwable e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            log.error("", e);
             try {
                 eventService.fireEvent(jobFailed);
             } catch (final SFireEventException e1) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
+                log.error("", e1);
             }
             throw new SSchedulerException(e);
         }
@@ -198,7 +193,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Override
     public void start() throws SSchedulerException, SFireEventException {
-        logger.log(getClass(), TechnicalLogSeverity.INFO, "Start scheduler");
+        log.info("Start scheduler");
         schedulerExecutor.start();
         eventService.fireEvent(schedulerStarted);
     }
@@ -286,7 +281,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             if (servicesResolver != null) {
                 servicesResolver.injectServices(jobIdentifier.getTenantId(), statelessJob);
             }
-            return new JobWrapper(jobIdentifier, statelessJob, logger, jobIdentifier.getTenantId(), eventService,
+            return new JobWrapper(jobIdentifier, statelessJob, jobIdentifier.getTenantId(), eventService,
                     sessionAccessor, transactionService, persistenceService, jobService);
         }
     }

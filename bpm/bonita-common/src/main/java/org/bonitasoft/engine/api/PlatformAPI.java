@@ -23,7 +23,6 @@ import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <b>Manage the platform.</b>
@@ -43,25 +42,6 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 public interface PlatformAPI {
 
     /**
-     * <b>Create the platform.</b>
-     * <p>
-     * The platform creation is done in 3 steps:
-     * <ul>
-     * <li>Creation of the persistence structure: tables are created</li>
-     * <li>Initialization of persistence structure: index are added, default values and so on</li>
-     * <li>The platform state is persisted</li>
-     * </ul>
-     *
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         occurs if the API session is invalid, e.g session has expired.
-     * @throws CreationException
-     *         occurs when an exception is thrown during platform creation
-     * @deprecated since 7.3.0. Use {@link #initializePlatform()} instead.
-     */
-    @Deprecated
-    void createPlatform() throws CreationException;
-
-    /**
      * <b>Initialize the platform.</b>
      * The running environment of Bonita Engine is initialized and marked as activated.<br>
      * Business elements linked to the execution are initialized, after this step the technical user will be able to
@@ -71,22 +51,10 @@ public interface PlatformAPI {
      *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
      *         occurs when an exception is thrown during platform creation
+     * @deprecated Not usefull anymore, initialization is done by the setup tool
      */
+    @Deprecated(forRemoval = true, since = "7.16.0")
     void initializePlatform() throws CreationException;
-
-    /**
-     * Utility method that call {@link #createPlatform()} and {@link #initializePlatform()}
-     *
-     * @see #createPlatform()
-     * @see #initializePlatform()
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         occurs if the API session is invalid, e.g session has expired.
-     * @throws CreationException
-     *         occurs when an exception is thrown during platform creation
-     * @deprecated since 7.3.0. Use {@link #initializePlatform()} instead.
-     */
-    @Deprecated
-    void createAndInitializePlatform() throws CreationException;
 
     /**
      * <b>Starts the node.</b>
@@ -137,49 +105,6 @@ public interface PlatformAPI {
      */
     @Deprecated(forRemoval = true, since = "7.15.0")
     void cleanPlatform() throws DeletionException;
-
-    /**
-     * <b>Delete the platform</b>
-     * <p>
-     * This method delete the platform, i.e. all the database tables.
-     *
-     * @see #createPlatform()
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws DeletionException
-     *         occurs when an exception is thrown during platform deletion
-     * @deprecated since 7.3.0. Use {@link #cleanPlatform()} instead.
-     */
-    @Deprecated
-    void deletePlatform() throws DeletionException;
-
-    /**
-     * Clean and delete a platform.
-     *
-     * @see #cleanPlatform()
-     * @see #deletePlatform()
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws DeletionException
-     *         occurs when an exception is thrown during platform deletion
-     * @deprecated since 6.5.0 (typo in method name). Use {@link #cleanPlatform()} instead.
-     */
-    @Deprecated
-    void cleanAndDeletePlaftorm() throws DeletionException;
-
-    /**
-     * Clean and delete a platform.
-     *
-     * @see #cleanPlatform()
-     * @see #deletePlatform()
-     * @throws InvalidSessionException
-     *         Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws DeletionException
-     *         occurs when an exception is thrown during platform deletion
-     * @deprecated since 7.3.0. Use {@link #cleanPlatform()} instead.
-     */
-    @Deprecated
-    void cleanAndDeletePlatform() throws DeletionException;
 
     /**
      * Get the platform.
@@ -253,7 +178,8 @@ public interface PlatformAPI {
 
     /**
      * INTERNAL USE ONLY
-     * get client configuration files of the tenants
+     * get client configuration files of the tenants. Since 7.16, as there is only 1 tenant, the map only contains
+     * 1 element.
      *
      * @return the client tenants configuration files as a map containing for each tenant id a map with file name and
      *         file content

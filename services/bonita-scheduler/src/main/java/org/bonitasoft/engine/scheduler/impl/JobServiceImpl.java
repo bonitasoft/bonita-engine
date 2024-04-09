@@ -21,10 +21,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -61,6 +60,7 @@ import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class JobServiceImpl implements JobService {
 
     private final EventService eventService;
@@ -69,15 +69,11 @@ public class JobServiceImpl implements JobService {
 
     private final ReadPersistenceService readPersistenceService;
 
-    private final TechnicalLoggerService logger;
-
     public JobServiceImpl(final EventService eventService, final Recorder recorder,
-            final ReadPersistenceService readPersistenceService,
-            final TechnicalLoggerService logger) {
+            final ReadPersistenceService readPersistenceService) {
         this.readPersistenceService = readPersistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
-        this.logger = logger;
     }
 
     @Override
@@ -107,12 +103,12 @@ public class JobServiceImpl implements JobService {
     public void deleteJobDescriptor(final long id) throws SJobDescriptorReadException, SJobDescriptorDeletionException {
         final SJobDescriptor sJobDescriptor = getJobDescriptor(id);
         if (sJobDescriptor == null) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            if (log.isTraceEnabled()) {
                 final StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("jobDescriptor with id");
                 stringBuilder.append(id);
                 stringBuilder.append(" already deleted, ignore it");
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, stringBuilder.toString());
+                log.trace(stringBuilder.toString());
             }
         } else {
             deleteJobDescriptor(sJobDescriptor);
@@ -401,11 +397,9 @@ public class JobServiceImpl implements JobService {
             jobLog.setLastUpdateDate(System.currentTimeMillis());
             createJobLog(jobLog);
         } else {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Impossible to mark the job with id '"
-                        + jobDescriptorId
-                        + "' as failed because no job was found for this identifier. It was probably removed just after its failure and before this action.");
-            }
+            log.warn("Impossible to mark the job with id '"
+                    + jobDescriptorId
+                    + "' as failed because no job was found for this identifier. It was probably removed just after its failure and before this action.");
         }
     }
 

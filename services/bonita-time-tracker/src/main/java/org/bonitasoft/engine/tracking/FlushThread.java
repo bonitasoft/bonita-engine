@@ -13,30 +13,28 @@
  **/
 package org.bonitasoft.engine.tracking;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FlushThread extends Thread {
 
+    private static final Logger log = LoggerFactory.getLogger(FlushThread.class);
     private final TimeTracker timeTracker;
-
-    private final TechnicalLoggerService logger;
 
     public FlushThread(final TimeTracker timeTracker) {
         super("Bonita-TimeTracker-FlushThread");
-        this.logger = timeTracker.getLogger();
         this.timeTracker = timeTracker;
     }
 
     @Override
     public void run() {
-        log(TechnicalLogSeverity.INFO, "Starting " + getName() + "...");
+        log.info("Starting " + getName() + "...");
         long lastFlushTimestamp = System.currentTimeMillis();
         while (true) {
             final long now = System.currentTimeMillis();
             try {
                 final long sleepTime = getSleepTime(now, lastFlushTimestamp);
-                log(TechnicalLogSeverity.DEBUG, "FlushThread: sleeping for: " + sleepTime + "ms");
+                log.debug("FlushThread: sleeping for: " + sleepTime + "ms");
                 this.timeTracker.getClock().sleep(sleepTime);
             } catch (final InterruptedException e) {
                 // Make sure to propagate the interruption to cleanly stop the current thread.
@@ -45,7 +43,7 @@ public class FlushThread extends Thread {
             }
             lastFlushTimestamp = flush(now);
         }
-        log(TechnicalLogSeverity.INFO, getName() + " stopped.");
+        log.info(getName() + " stopped.");
     }
 
     long getSleepTime(final long now, final long lastFlushTimestamp) throws InterruptedException {
@@ -58,21 +56,9 @@ public class FlushThread extends Thread {
             final FlushResult flushResult = this.timeTracker.flush();
             return flushResult.getFlushTime();
         } catch (final Exception e) {
-            log(TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
+            log.warn("Exception caught while flushing: " + e.getMessage(), e);
         }
         return now;
-    }
-
-    void log(final TechnicalLogSeverity severity, final String message) {
-        if (this.logger.isLoggable(getClass(), severity)) {
-            this.logger.log(getClass(), severity, message);
-        }
-    }
-
-    void log(final TechnicalLogSeverity severity, final String message, final Exception e) {
-        if (this.logger.isLoggable(getClass(), severity)) {
-            this.logger.log(getClass(), severity, message, e);
-        }
     }
 
     public boolean isStarted() {

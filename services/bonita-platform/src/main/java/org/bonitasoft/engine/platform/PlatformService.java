@@ -13,19 +13,10 @@
  **/
 package org.bonitasoft.engine.platform;
 
-import java.util.Collection;
-import java.util.List;
-
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
-import org.bonitasoft.engine.platform.exception.STenantAlreadyExistException;
-import org.bonitasoft.engine.platform.exception.STenantCreationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeletionException;
-import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
@@ -54,52 +45,6 @@ public interface PlatformService {
     SPlatform getPlatform() throws SPlatformNotFoundException;
 
     /**
-     * insert a new row in the Tenant table
-     * case 1 - create tenants tables if not already exists + insert rows where necessary (sequences for example) +
-     * insert default users (defined in
-     * configuration)
-     * case 2 - create tenants tables + insert rows where necessary (sequences for example) + insert default users
-     * (defined in configuration)
-     *
-     * @param tenant
-     *        sTenant
-     * @return id of new created tenant
-     * @throws STenantCreationException
-     *         occurs when an exception is thrown during sTenant creation
-     * @throws STenantAlreadyExistException
-     *         occurs when the sTenant has already been taken
-     * @since 6.0
-     */
-    long createTenant(STenant tenant) throws STenantCreationException, STenantAlreadyExistException;
-
-    /**
-     * case 1 - Remove tenant specific tenant tables if no mor etenant in the db
-     * case 2 - Remove tenant specific tables
-     *
-     * @param tenantId
-     * @throws STenantDeletionException
-     *         occurs when an exception is thrown during sTenant deletion
-     * @throws STenantNotFoundException
-     *         occurs when the identifier does not refer to an existing sTenant
-     * @throws SDeletingActivatedTenantException
-     *         occurs when an exception is thrown during deleting an activated sTenant
-     * @since 6.0
-     */
-    void deleteTenant(long tenantId)
-            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
-
-    /**
-     * Remove all rows from all tables where the tenantId matches
-     *
-     * @param tenantId
-     * @throws STenantDeletionException
-     * @throws STenantNotFoundException
-     * @throws SDeletingActivatedTenantException
-     */
-    void deleteTenantObjects(long tenantId)
-            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
-
-    /**
      * Update a sTenant from given sTenant and new content.
      *
      * @param tenant
@@ -125,18 +70,6 @@ public interface PlatformService {
     STenant getTenant(long id) throws STenantNotFoundException;
 
     /**
-     * Get tenant by its name
-     *
-     * @param name
-     *        tenant's name
-     * @return sTenant
-     * @throws STenantNotFoundException
-     *         occurs when the identifier does not refer to an existing sTenant
-     * @since 6.0
-     */
-    STenant getTenantByName(String name) throws STenantNotFoundException;
-
-    /**
      * Get default tenant
      *
      * @return sTenant
@@ -154,22 +87,6 @@ public interface PlatformService {
      * @since 7.3
      */
     boolean isDefaultTenantCreated() throws SBonitaReadException;
-
-    /**
-     * Get tenants which ids belong to given collection
-     *
-     * @param ids
-     *        a collection of ids
-     * @param queryOptions
-     *        The criterion used to search tenants
-     * @return a list of sTenant
-     * @throws STenantNotFoundException
-     *         occurs when the identifier does not refer to an existing sTenant
-     * @throws STenantException
-     * @since 6.0
-     */
-    List<STenant> getTenants(Collection<Long> ids, QueryOptions queryOptions)
-            throws STenantNotFoundException, STenantException;
 
     /**
      * Set status of the tenant into activated
@@ -203,52 +120,12 @@ public interface PlatformService {
     void pauseTenant(long tenantId) throws STenantUpdateException, STenantNotFoundException;
 
     /**
-     * Get the total number of sTenants
-     *
-     * @return the total number of sTenants
-     * @throws STenantException
-     * @since 6.0
-     */
-    int getNumberOfTenants() throws STenantException;
-
-    /**
      * Return true if the platform is created, else return false.
      *
      * @return true or false
      * @since 6.0
      */
     boolean isPlatformCreated();
-
-    /**
-     * Return a list of tenants by the given conditions, as one part of SearchResult that is search method's return
-     * value in platformApi
-     *
-     * @param options
-     * @return a list of tenants by the given conditions
-     * @throws SBonitaReadException
-     */
-    List<STenant> searchTenants(QueryOptions options) throws SBonitaReadException;
-
-    /**
-     * Get all tenants
-     *
-     * @param queryOptions
-     *        The criterion used to search tenants
-     * @return a list of sTenant
-     * @throws STenantException
-     * @since 6.0
-     */
-    List<STenant> getTenants(QueryOptions queryOptions) throws STenantException;
-
-    /**
-     * Return a number of tenants by the given conditions, as one part of SearchResult that is search method's return
-     * value in platformApi
-     *
-     * @param options
-     * @return a number of tenants by the given conditions
-     * @throws SBonitaReadException
-     */
-    long getNumberOfTenants(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Return the platform properties

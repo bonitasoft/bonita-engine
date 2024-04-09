@@ -63,7 +63,7 @@ public class FlowNodeSelectorTest {
         doReturn(subProcessDefinition).when(rootContainer).getFlowNode(SUB_PROCESS_DEFINITION_ID);
         doReturn(subProcessContainer).when(subProcessDefinition).getSubProcessContainer();
 
-        Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>(
+        Set<SFlowNodeDefinition> flowNodes = new HashSet<>(
                 Arrays.asList(creatFlowNode("step1"), creatFlowNode("step2"),
                         creatFlowNode("step3")));
         doReturn(flowNodes).when(rootContainer).getFlowNodes();
@@ -91,11 +91,11 @@ public class FlowNodeSelectorTest {
     public void getStartNodes_return_all_selected_elements() {
         FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition,
                 new FlowNodeNameFilter(Arrays.asList("step1", "step3")));
-        assertEquals("[step1, step3]", stringfy(flowNodeSelector.getFilteredElements()));
+        assertEquals("[step1, step3]", stringify(flowNodeSelector.getFilteredElements()));
     }
 
-    private String stringfy(List<SFlowNodeDefinition> elements) {
-        List<String> elementNames = new ArrayList<String>();
+    private String stringify(List<SFlowNodeDefinition> elements) {
+        List<String> elementNames = new ArrayList<>();
         for (SFlowNodeDefinition sFlowNodeDefinition : elements) {
             elementNames.add(sFlowNodeDefinition.getName());
         }

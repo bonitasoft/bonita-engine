@@ -7,7 +7,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.bonitasoft" level="INFO" />
+    <logger name="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" level="TRACE" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

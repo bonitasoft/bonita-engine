@@ -46,6 +46,8 @@ public class BonitaHomeServer {
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
 
+    private long DEFAULT_TENANT_ID = -1;
+
     /**
      * property name of the server api implementation class name
      */
@@ -70,6 +72,13 @@ public class BonitaHomeServer {
             }
         }
         return configurationService;
+    }
+
+    public long getDefaultTenantId() {
+        if (DEFAULT_TENANT_ID == -1) {
+            DEFAULT_TENANT_ID = getConfigurationService().getDefaultTenantId();
+        }
+        return DEFAULT_TENANT_ID;
     }
 
     /**
@@ -123,15 +132,11 @@ public class BonitaHomeServer {
         return properties;
     }
 
-    public List<BonitaConfiguration> getPlatformInitConfiguration() throws IOException {
-        return getAllXmlConfiguration(getConfigurationService().getPlatformInitEngineConf());
-    }
-
-    public List<BonitaConfiguration> getPlatformConfiguration() throws IOException {
+    public List<BonitaConfiguration> getPlatformConfiguration() {
         return getAllXmlConfiguration(getConfigurationService().getPlatformEngineConf());
     }
 
-    public List<BonitaConfiguration> getTenantConfiguration(long tenantId) throws IOException {
+    public List<BonitaConfiguration> getTenantConfiguration(long tenantId) {
         return getAllXmlConfiguration(getConfigurationService().getTenantEngineConf(tenantId));
     }
 
@@ -147,8 +152,7 @@ public class BonitaHomeServer {
         return mergeInto;
     }
 
-    private List<BonitaConfiguration> getAllXmlConfiguration(List<BonitaConfiguration> configurationFiles)
-            throws IOException {
+    private List<BonitaConfiguration> getAllXmlConfiguration(List<BonitaConfiguration> configurationFiles) {
         List<BonitaConfiguration> configurations = new ArrayList<>();
         for (BonitaConfiguration bonitaConfiguration : configurationFiles) {
             if (bonitaConfiguration.getResourceName().endsWith(".xml")) {
@@ -206,18 +210,10 @@ public class BonitaHomeServer {
         return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType, artifactId).toURI();
     }
 
-    public void createTenant(final long tenantId) {
-        getConfigurationService().storeTenantEngineConf(getConfigurationService().getTenantTemplateEngineConf(),
-                tenantId);
-        getConfigurationService()
-                .storeTenantSecurityScripts(getConfigurationService().getTenantTemplateSecurityScripts(), tenantId);
-        getConfigurationService().storeTenantPortalConf(getConfigurationService().getTenantTemplatePortalConf(),
-                tenantId);
-
-    }
-
     public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
         getConfigurationService().deleteTenantConfiguration(tenantId);
+        //allow re-import of profiles, need to be deleted when we remove the ability to delete tenant
+        getTenantStorage().getProfileMD5(tenantId).delete();
     }
 
     public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException {

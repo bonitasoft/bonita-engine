@@ -40,7 +40,6 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,9 +57,6 @@ public class TransientDataServiceImplTest {
 
     @Mock
     private CacheService cacheService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @Mock
     private ExpressionResolverService expressionResolverService;

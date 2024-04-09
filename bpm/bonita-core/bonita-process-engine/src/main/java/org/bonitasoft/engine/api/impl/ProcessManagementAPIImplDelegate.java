@@ -21,8 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.naming.NamingException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
@@ -33,7 +32,6 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDisablementException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -43,8 +41,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
@@ -53,13 +49,12 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 
 /**
  * @author Matthieu Chaffotte
  */
 // Uncomment the "implements" when this delegate implements all the methods.
+@Slf4j
 public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */ {
 
     private static PlatformServiceAccessor getPlatformServiceAccessor() {
@@ -83,14 +78,10 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     public void deleteProcessDefinition(final long processDefinitionId)
             throws SBonitaException, BonitaHomeNotSetException, IOException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         tenantAccessor.getBusinessArchiveService().delete(processDefinitionId);
 
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
-                    "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
-                            + processDefinitionId + ">");
-        }
+        log.info("The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
+                + processDefinitionId + ">");
     }
 
     public void disableProcess(final long processId) throws SBonitaException {
@@ -99,22 +90,11 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
 
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId,
                 eventInstanceService,
-                schedulerService,
-                logger, SessionInfos.getUserNameFromSession());
+                schedulerService, SessionInfos.getUserNameFromSession());
         disableProcess.execute();
-    }
-
-    public ConfigurationService getConfigurationService() throws SProcessDisablementException {
-        try {
-            return PlatformSetupAccessor.getConfigurationService();
-        } catch (NamingException e) {
-            throw new SProcessDisablementException(e);
-        }
-
     }
 
     public void purgeClassLoader(final long processDefinitionId)
@@ -144,8 +124,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex,
-            final int maxResults,
-            final ParameterCriterion sort) {
+            final int maxResults, final ParameterCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -167,7 +146,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             }
             final List<SParameter> parameters = parameterService.get(processDefinitionId, startIndex, maxResults,
                     order);
-            final List<ParameterInstance> paramterInstances = new ArrayList<>();
+            final List<ParameterInstance> parameterInstances = new ArrayList<>();
             for (int i = 0; i < parameters.size(); i++) {
                 final SParameter parameter = parameters.get(i);
                 final String name = parameter.getName();
@@ -175,9 +154,9 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
                 final SParameterDefinition parameterDefinition = sProcessDefinition.getParameter(name);
                 final String description = parameterDefinition.getDescription();
                 final String type = parameterDefinition.getType();
-                paramterInstances.add(new ParameterImpl(name, description, value, type));
+                parameterInstances.add(new ParameterImpl(name, description, value, type));
             }
-            return paramterInstances;
+            return parameterInstances;
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }

@@ -79,7 +79,7 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
             throws SBonitaException {
         final AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(
                 serviceAccessor.getProcessDefinitionService(), processDefinitionId,
-                serviceAccessor.getTechnicalLoggerService(), serviceAccessor.getExpressionService());
+                serviceAccessor.getExpressionService());
         final List<String> problems = validator.validate(activityNames, processContractInputs);
         handleProblems(problems);
     }

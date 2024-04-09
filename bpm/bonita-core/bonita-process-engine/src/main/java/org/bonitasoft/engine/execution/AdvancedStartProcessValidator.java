@@ -30,7 +30,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -39,14 +38,13 @@ public class AdvancedStartProcessValidator {
 
     private final ProcessDefinitionService processDefinitionService;
     private final long processDefinitionId;
-    private TechnicalLoggerService technicalLoggerService;
+
     private ExpressionService expressionService;
 
     public AdvancedStartProcessValidator(ProcessDefinitionService processDefinitionService, long processDefinitionId,
-            TechnicalLoggerService technicalLoggerService, ExpressionService expressionService) {
+            ExpressionService expressionService) {
         this.processDefinitionService = processDefinitionService;
         this.processDefinitionId = processDefinitionId;
-        this.technicalLoggerService = technicalLoggerService;
         this.expressionService = expressionService;
     }
 
@@ -78,9 +76,7 @@ public class AdvancedStartProcessValidator {
         if (contract == null) {
             return Collections.emptyList();
         }
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(
-                technicalLoggerService,
-                expressionService);
+        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(expressionService);
         try {
             validator.validate(processDefinitionId, contract, inputs);
         } catch (SContractViolationException e) {

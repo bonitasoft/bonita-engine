@@ -25,7 +25,7 @@ class ShadePlugin implements Plugin<Project> {
         project.afterEvaluate {
 
             project.shadowJar {
-                classifier = "" // we replace the original jar by the shadow jar
+                classifier = "" // we replace the original jar by the shadow jar	
                 dependencies {
                     include({
                         if (!project.ext.has("shadedDependencies")) {
@@ -38,7 +38,6 @@ class ShadePlugin implements Plugin<Project> {
                             return true
                         }
                         return false
-
                     })
                 }
                 doFirst {
@@ -188,12 +187,12 @@ class ShadePlugin implements Plugin<Project> {
     }
 
     private boolean isAShadeProject(Project it) {
-        it.buildFile.text.contains("bonita-shade")
+		 it.plugins.find { it instanceof ShadePlugin }
     }
 
     private Set<Project> getAllProjectsToShade(Project project, ShadeExtension extension, Set<Project> allProjectsAlreadyShaded) {
         Set allProjects = []
-        project.configurations.compile.resolvedConfiguration.firstLevelModuleDependencies.forEach {
+        project.configurations.runtimeClasspath.resolvedConfiguration.firstLevelModuleDependencies.forEach {
             def projectDependency = getAssociatedProjectFromDependency(project, it)
             if (projectDependency) { // is an engine project (service)
                 if (!isAShadeProject(projectDependency) && !extension.excludes.contains(projectDependency) && !allProjectsAlreadyShaded.contains(projectDependency)) {
@@ -208,7 +207,7 @@ class ShadePlugin implements Plugin<Project> {
     private Set<Project> getAllProjectsAlreadyShaded(Project project, ShadeExtension extension) {
         Set allProjects = []
         // Take all declared compilation dependencies:
-        project.configurations.compile.resolvedConfiguration.firstLevelModuleDependencies.forEach {
+        project.configurations.runtimeClasspath.resolvedConfiguration.firstLevelModuleDependencies.forEach {
             def projectDependency = getAssociatedProjectFromDependency(project, it)
             if (projectDependency) {
                 if (isAShadeProject(projectDependency)) { // this dependency is a shade project
@@ -224,8 +223,7 @@ class ShadePlugin implements Plugin<Project> {
 
     private Set<ResolvedDependency> getPomDependencies(Project project, ShadeExtension extension, Set<Project> allProjectsAlreadyShaded, boolean isRootProject) {
         Set<ResolvedDependency> allDependencies = []
-        // We include compile + runtime dependencies (like hazelcast-aws), to be complete:
-        def allScopes = project.configurations.compile.resolvedConfiguration.firstLevelModuleDependencies + project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies
+        def allScopes = project.configurations.runtimeClasspath.resolvedConfiguration.firstLevelModuleDependencies
         allScopes.forEach {
             Project projectDependency = getAssociatedProjectFromDependency(project, it)
             if (projectDependency) {

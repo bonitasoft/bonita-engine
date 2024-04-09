@@ -1,12 +1,43 @@
+import org.bonitasoft.engine.gradle.PomUtils
 
+plugins {
+    id 'maven-publish'
+}
 
 dependencies {
-    compile project(':bpm:bonita-common')
-    compile "org.javassist:javassist:${Deps.javassistVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) { exclude(module: 'jboss-transaction-api_1.2_spec') }
+    api project(':bpm:bonita-common')
+    api "org.javassist:javassist:${Deps.javassistVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) { exclude(module: 'jboss-transaction-api_1.2_spec') }
     compileOnly project(':bpm:bonita-client')
-    testCompile project(':bpm:bonita-client')
+    testImplementation project(':bpm:bonita-client')
+}
+
+group = 'org.bonitasoft.engine.data'
+
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+tasks.register("javadocJar", Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { 
+            from project.components.java 
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            pom { pom ->
+                name = "Bonita Business Data Client Resources"
+                description = "Bonita Business Data Client Resources is a library used in BDM client DAO implementation"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
 }

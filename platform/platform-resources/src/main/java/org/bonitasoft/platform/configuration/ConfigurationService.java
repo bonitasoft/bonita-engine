@@ -39,13 +39,6 @@ public interface ConfigurationService {
     List<BonitaConfiguration> getPlatformPortalConf();
 
     /**
-     * Retrieves the platform configuration at platform-init level.
-     *
-     * @return a list of BonitaConfiguration that represents each file
-     */
-    List<BonitaConfiguration> getPlatformInitEngineConf();
-
-    /**
      * Retrieves the platform configuration at platform level.
      *
      * @return a list of BonitaConfiguration that represents each file
@@ -83,13 +76,6 @@ public interface ConfigurationService {
      */
 
     List<BonitaConfiguration> getTenantSecurityScripts(long tenantId);
-
-    /**
-     * store platform init configuration file in database
-     *
-     * @param bonitaConfigurations list of files
-     */
-    void storePlatformInitEngineConf(List<BonitaConfiguration> bonitaConfigurations);
 
     /**
      * store platform configuration file in database
@@ -214,15 +200,10 @@ public interface ConfigurationService {
      * directory structure :
      * .
      * ├── platform_engine
-     * ├── platform_init_engine
      * ├── platform_portal
      * ├── tenant_template_engine
      * ├── tenant_template_portal
      * └── tenant_template_security_scripts
-     *
-     * @param configurationFolder
-     * @param licenseFolder
-     * @throws PlatformException
      */
     List<File> writeAllConfigurationToFolder(File configurationFolder, File licenseFolder) throws PlatformException;
 
@@ -265,4 +246,6 @@ public interface ConfigurationService {
     List<Long> getAllTenants();
 
     void storeConfigurationsIfNotExist(List<FullBonitaConfiguration> configurations);
+
+    long getDefaultTenantId();
 }

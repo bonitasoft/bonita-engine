@@ -30,15 +30,14 @@ import org.bonitasoft.engine.connector.AbstractSConnector;
 import org.bonitasoft.engine.connector.ConnectorExecutionResult;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -47,8 +46,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ConnectorExecutorImplTest {
 
     public static final long TENANT_ID = 12L;
-    @Mock
-    private TechnicalLoggerService loggerService;
 
     @Mock
     private SessionAccessor sessionAccessor;
@@ -66,18 +63,20 @@ public class ConnectorExecutorImplTest {
 
     private SimpleMeterRegistry meterRegistry;
 
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+
     @Before
     public void before() {
         meterRegistry = new SimpleMeterRegistry(
                 // So that micrometer updates its counters every 1 ms:
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
                 Clock.SYSTEM);
-        connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, loggerService, 1, 1, sessionAccessor, sessionService,
+        connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, 1, 1, sessionAccessor, sessionService,
                 timeTracker,
                 meterRegistry, TENANT_ID, new DefaultExecutorServiceMetricsProvider());
 
         connectorExecutorImpl.start();
-        doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
     }
 
     @Test
@@ -109,7 +108,6 @@ public class ConnectorExecutorImplTest {
 
             }
         };
-        when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
         final ConnectorExecutionResult result = connectorExecutorImpl.execute(connector,
                 Collections.singletonMap("key", "value"), Thread.currentThread().getContextClassLoader())
                 .get(100, TimeUnit.MILLISECONDS);
@@ -156,10 +154,11 @@ public class ConnectorExecutorImplTest {
         final SConnectorException exception = new SConnectorException("myException");
         doThrow(exception).when(connector).disconnect();
         // when
+        systemOutRule.clearLog();
         connectorExecutorImpl.disconnectSilently(connector);
         // then
-        verify(loggerService).log(ConnectorExecutorImpl.class, TechnicalLogSeverity.WARNING,
-                "An error occurred while disconnecting the connector: " + connector, exception);
+        assertThat(systemOutRule.getLog())
+                .contains("An error occurred while disconnecting the connector: " + connector);
     }
 
     @Test
@@ -202,7 +201,6 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_update_connectors_counters_when_adding_a_connector_with_immediate_execution() throws Exception {
         //when:
-        when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
         executeAConnector();
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
 
@@ -218,7 +216,6 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_reset_and_have_counters_after_pause_and_resume() throws Exception {
         //when:
-        when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
         executeAConnector();
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
         assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED).counter().count())
@@ -250,7 +247,6 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_update_connectors_counters_when_enqueuing_connectors_with_long_processing_time()
             throws Exception {
-        when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
         connectorExecutorImpl.execute(new LocalSConnector(2), new HashMap<>(),
                 Thread.currentThread().getContextClassLoader());
         connectorExecutorImpl.execute(new LocalSConnector(2), new HashMap<>(),

@@ -64,7 +64,7 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
     private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
         try {
             ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
-            return serviceAccessorFactory.createTenantServiceAccessor(tenantId);
+            return serviceAccessorFactory.createTenantServiceAccessor();
         } catch (Exception e) {
             throw new SHandlerExecutionException(e.getMessage(), null);
         }

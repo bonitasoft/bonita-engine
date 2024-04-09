@@ -23,7 +23,6 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
@@ -116,7 +115,7 @@ public class LoginAPIImpl implements LoginAPI {
                 .createPlatformServiceAccessor();
         final STenant sTenant = getTenant(tenantId, platformServiceAccessor);
 
-        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(sTenant.getId());
+        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         checkThatWeCanLogin(userName, sTenant, serviceAccessor.getTechnicalUser());
         final LoginService loginService = serviceAccessor.getLoginService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
@@ -140,8 +139,6 @@ public class LoginAPIImpl implements LoginAPI {
             throws SBonitaException {
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
-        // first call before create session: put the platform in cache if necessary
-        final TransactionContentWithResult<STenant> getTenant;
         try {
             if (tenantId == null) {
                 return transactionService.executeInTransaction(platformService::getDefaultTenant);
@@ -186,14 +183,14 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
-        return TenantServiceSingleton.getInstance(tenantId);
+    protected TenantServiceAccessor getTenantServiceAccessor() {
+        return TenantServiceSingleton.getInstance();
     }
 
     @Override
     @CustomTransactions
     public void logout(final APISession session) throws LogoutException, SessionNotFoundException {
-        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(session.getTenantId());
+        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         try {
             serviceAccessor.getLoginService().logout(session.getId());
         } catch (final SSessionNotFoundException sbe) {

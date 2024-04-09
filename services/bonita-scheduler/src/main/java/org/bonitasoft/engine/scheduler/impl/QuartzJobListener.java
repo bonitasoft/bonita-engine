@@ -35,8 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.model.SJobData;
@@ -51,15 +50,14 @@ import org.quartz.JobListener;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
+@Slf4j
 public class QuartzJobListener implements JobListener {
 
     private final SessionAccessor sessionAccessor;
-    private final TechnicalLogger logger;
     private final List<BonitaJobListener> bonitaJobListeners;
 
     QuartzJobListener(final List<BonitaJobListener> bonitaJobListeners,
-            final SessionAccessor sessionAccessor, final TechnicalLoggerService logger) {
-        this.logger = logger.asLogger(QuartzJobListener.class);
+            final SessionAccessor sessionAccessor) {
         this.bonitaJobListeners = bonitaJobListeners;
         this.sessionAccessor = sessionAccessor;
     }
@@ -114,7 +112,7 @@ public class QuartzJobListener implements JobListener {
         try {
             callable.call();
         } catch (Throwable e) {
-            logger.warn("Unable to execute job listener", e);
+            log.warn("Unable to execute job listener", e);
         }
     }
 

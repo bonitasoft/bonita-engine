@@ -120,10 +120,6 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
      */
     @Test
     public void pause_and_resume_jobs_of_a_tenant() throws Exception {
-        long tenantForJobTest1 = createTenant("tenantForJobTest1");
-        long tenantForJobTest2 = createTenant("tenantForJobTest2");
-
-        changeTenant(tenantForJobTest1);
         final String jobName = "ReleaseWaitersJob";
         Date now = new Date();
         SJobDescriptor jobDescriptor = SJobDescriptor.builder()
@@ -145,26 +141,6 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         getTransactionService().complete();
         Thread.sleep(100);
         ReleaseWaitersJob.checkNotExecutedDuring(1500);
-
-        // trigger the job in an other tenant
-        changeTenant(tenantForJobTest2);
-        now = new Date(System.currentTimeMillis() + 100);
-        jobDescriptor = SJobDescriptor.builder()
-                .jobClassName(ReleaseWaitersJob.class.getName()).jobName(jobName + "2").build();
-        parameters = new ArrayList<>();
-        parameters.add(SJobParameter.builder().key("jobName3").value(jobName).build());
-        parameters.add(SJobParameter.builder().key("jobKey").value("3").build());
-        trigger = new OneShotTrigger("events3", now, 10);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-        ReleaseWaitersJob.waitForJobToExecuteOnce();
-
-        //cleanup
-        after();
-        changeTenant(tenantForJobTest1);
-        after();
-        changeTenant(getDefaultTenantId());
     }
 
     @Test

@@ -46,7 +46,7 @@ public class AllConfigurationResourceVisitorTest {
         Files.walkFileTree(rootFolder, resourceVisitor);
 
         //then
-        assertThat(bonitaConfigurations).hasSize(8);
+        assertThat(bonitaConfigurations).hasSize(7);
         assertThat(bonitaConfigurations).as("should contains tenant level configuration files")
                 .extracting("tenantId")
                 .contains(0L, 456L);
@@ -54,10 +54,10 @@ public class AllConfigurationResourceVisitorTest {
                 .extracting("configurationType")
                 .containsOnly("TENANT_ENGINE", "TENANT_PORTAL", "TENANT_SECURITY_SCRIPTS",
                         "TENANT_TEMPLATE_SECURITY_SCRIPTS", "PLATFORM_PORTAL", "TENANT_TEMPLATE_ENGINE",
-                        "PLATFORM_INIT_ENGINE", "PLATFORM_ENGINE");
+                        "PLATFORM_ENGINE");
         assertThat(bonitaConfigurations).as("should add all configuration files and skip licenses")
                 .extracting("resourceName")
-                .containsOnly("bonita-platform-init-custom.xml", "cache-config.xml",
+                .containsOnly("cache-config.xml",
                         "compound-permissions-mapping.properties",
                         "SamplePermissionRule.groovy.sample",
                         "bonita-tenant-community.properties",

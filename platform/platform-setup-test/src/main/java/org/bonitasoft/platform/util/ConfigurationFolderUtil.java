@@ -28,11 +28,9 @@ public class ConfigurationFolderUtil {
     public static final String[] ALL_SQL_FILES = new String[] { "cleanTables.sql",
             "createQuartzTables.sql",
             "createTables.sql",
-            "deleteTenantObjects.sql",
             "dropQuartzTables.sql",
             "dropTables.sql",
             "initTables.sql",
-            "initTenantTables.sql",
             "postCreateStructure.sql",
             "preDropStructure.sql" };
 
@@ -42,19 +40,19 @@ public class ConfigurationFolderUtil {
         return initialFolder;
     }
 
-    public void buildInitialFolder(Path rootFolder) throws IOException {
-        Path platform_init_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
-                .resolve("platform_init_engine");
-        Files.createDirectories(platform_init_engine);
-        Files.write(platform_init_engine.resolve("initialConfig.properties"), "key=value".getBytes());
+    public void buildPlatformEngineFolder(Path rootFolder) throws IOException {
+        Path platform_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
+                .resolve("platform_engine");
+        Files.createDirectories(platform_engine);
+        Files.write(platform_engine.resolve("initialConfig.properties"), "key=value".getBytes());
     }
 
     public Path buildCurrentFolder(Path rootFolder) throws IOException {
-        Path platform_init_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current")
-                .resolve("platform_init_engine");
-        Files.createDirectories(platform_init_engine);
-        Files.write(platform_init_engine.resolve("currentConfig.properties"), "key=value".getBytes());
-        return platform_init_engine;
+        Path platform_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current")
+                .resolve("platform_engine");
+        Files.createDirectories(platform_engine);
+        Files.write(platform_engine.resolve("currentConfig.properties"), "key=value".getBytes());
+        return platform_engine;
     }
 
     public void buildSqlFolder(Path rootFolder, String dbVendor) throws IOException {

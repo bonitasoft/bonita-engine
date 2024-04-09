@@ -14,12 +14,10 @@
 package org.bonitasoft.engine.platform;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
@@ -70,7 +68,7 @@ public class PlatformManager {
     }
 
     /**
-     * Stop the platform and its tenants
+     * Stop the platform and default tenant
      *
      * @return true if the node was stopped, false if it was not stoppable (already stopped, starting or stopping)
      */
@@ -79,10 +77,7 @@ public class PlatformManager {
         if (!platformStateProvider.initializeStop()) {
             return false;
         }
-        List<TenantStateManager> tenantStateManagers = getTenantStateManagers();
-        for (TenantStateManager tenantStateManager : tenantStateManagers) {
-            tenantStateManager.stop();
-        }
+        getDefaultTenantStateManager().stop();
         for (final PlatformLifecycleService platformService : platformServices) {
             logger.info("Stop service of platform: {}", platformService);
             platformService.stop();
@@ -93,7 +88,7 @@ public class PlatformManager {
     }
 
     /**
-     * Start the platform and its tenants
+     * Start the platform and default tenant
      *
      * @return true if the node was started, false if it was not startable (already started, starting or stopping)
      */
@@ -107,23 +102,15 @@ public class PlatformManager {
         startPlatformServices();
         platformStateProvider.setStarted();
 
-        for (TenantStateManager tenantStateManager : getTenantStateManagers()) {
-            tenantStateManager.start();
-        }
+        getDefaultTenantStateManager().start();
 
         restartHandlersOfPlatform();
         logger.info("Platform started.");
         return true;
     }
 
-    TenantStateManager getTenantStateManager(STenant tenant) {
-        return TenantServiceSingleton.getInstance(tenant.getId()).getTenantStateManager();
-    }
-
-    private List<TenantStateManager> getTenantStateManagers() throws Exception {
-        List<STenant> sTenants = transactionService
-                .executeInTransaction(() -> platformService.getTenants(QueryOptions.ALL_RESULTS));
-        return sTenants.stream().map(this::getTenantStateManager).collect(Collectors.toList());
+    TenantStateManager getDefaultTenantStateManager() {
+        return TenantServiceSingleton.getInstance().getTenantStateManager();
     }
 
     private void restartHandlersOfPlatform() {
@@ -151,7 +138,7 @@ public class PlatformManager {
             throw new STenantActivationException(
                     "Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
         }
-        getTenantStateManager(tenant).activate();
+        getDefaultTenantStateManager().activate();
     }
 
     public void deactivateTenant(long tenantId) throws Exception {
@@ -159,7 +146,7 @@ public class PlatformManager {
         if (STenant.DEACTIVATED.equals(tenant.getStatus())) {
             throw new STenantDeactivationException("Tenant deactivation failed. Tenant is already deactivated");
         }
-        getTenantStateManager(tenant).deactivate();
+        getDefaultTenantStateManager().deactivate();
     }
 
     private STenant getTenantInTransaction(long tenantId) throws Exception {

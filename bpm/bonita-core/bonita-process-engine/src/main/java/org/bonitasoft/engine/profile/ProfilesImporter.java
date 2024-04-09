@@ -45,12 +45,14 @@ import org.bonitasoft.engine.profile.xml.MembershipNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
+import org.springframework.stereotype.Component;
 
 /**
- * Import profiles with mapping and entries using Policy
+ * Import profiles with mapping using Policy
  *
  * @author Baptiste Mesta
  */
+@Component
 public class ProfilesImporter {
 
     private final ProfileService profileService;
@@ -76,6 +78,8 @@ public class ProfilesImporter {
                 return new ReplaceDuplicateImportStrategy(profileService);
             case UPDATE_DEFAULTS:
                 return new UpdateDefaultsImportStrategy(profileService);
+            case UPDATE_DEFAULTS_AND_CREATE_NEW:
+                return new UpdateDefaultsAndCreateNewImportStrategy(profileService);
             default:
                 throw new IllegalStateException("No strategy defined for policy: " + policy);
         }

@@ -59,15 +59,14 @@ public class PageAPIImpl implements PageAPI {
     protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
+            return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
     }
 
     protected PageAPIDelegate getPageAPIDelegate() {
-        return new PageAPIDelegate(getTenantAccessor(), SessionInfos.getUserIdFromSession());
+        return PageAPIDelegate.getInstance();
     }
 
     @Override
@@ -87,12 +86,12 @@ public class PageAPIImpl implements PageAPI {
 
     @Override
     public Page createPage(final PageCreator pageCreator, final byte[] content) throws CreationException {
-        return getPageAPIDelegate().createPage(pageCreator, content);
+        return getPageAPIDelegate().createPage(pageCreator, content, SessionInfos.getUserIdFromSession());
     }
 
     @Override
     public Page createPage(final String contentName, final byte[] content) throws CreationException {
-        return getPageAPIDelegate().createPage(contentName, content);
+        return getPageAPIDelegate().createPage(contentName, content, SessionInfos.getUserIdFromSession());
     }
 
     @Override
@@ -119,12 +118,12 @@ public class PageAPIImpl implements PageAPI {
     @Override
     public Page updatePage(final long pageId, final PageUpdater pageUpdater)
             throws UpdateException, AlreadyExistsException {
-        return getPageAPIDelegate().updatePage(pageId, pageUpdater);
+        return getPageAPIDelegate().updatePage(pageId, pageUpdater, SessionInfos.getUserIdFromSession());
     }
 
     @Override
     public void updatePageContent(final long pageId, final byte[] content) throws UpdateException {
-        getPageAPIDelegate().updatePageContent(pageId, content);
+        getPageAPIDelegate().updatePageContent(pageId, content, SessionInfos.getUserIdFromSession());
     }
 
     @Override

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.page;
 import java.util.List;
 import java.util.Properties;
 
-import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -30,7 +29,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  * @author Baptiste Mesta
  * @author Laurent Leseigneur
  */
-public interface PageService extends TenantLifecycleService {
+public interface PageService {
 
     String PROPERTIES_FILE_NAME = "page.properties";
 
@@ -59,9 +58,16 @@ public interface PageService extends TenantLifecycleService {
             throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidPageZipException,
             SInvalidPageTokenException;
 
+    SPage insertPage(SPage page, byte[] content) throws SObjectAlreadyExistsException, SObjectCreationException;
+
+    SPage checkIfPageAlreadyExists(SPage page) throws SBonitaReadException;
+
     SPage getPage(long pageId) throws SBonitaReadException, SObjectNotFoundException;
 
     SPage getPageByName(String pageName) throws SBonitaReadException;
+
+    SPage buildPage(byte[] content, String contentName, long userId, boolean provided, boolean removable,
+            boolean editable) throws SInvalidPageZipException, SInvalidPageTokenException;
 
     /**
      * Read the content of a page in a zip
@@ -133,11 +139,6 @@ public interface PageService extends TenantLifecycleService {
      */
     List<SPage> getPageByProcessDefinitionId(long processDefinitionId, int fromIndex, int numberOfResults)
             throws SBonitaReadException;
-
-    /**
-     * @return true if the service has been started again since it was last paused/stopped
-     */
-    boolean initialized();
 
     void updatePageContent(long pageId, byte[] content, String contentName, SPageUpdateBuilder pageUpdateBuilder)
             throws SObjectAlreadyExistsException, SObjectModificationException, SInvalidPageZipException,

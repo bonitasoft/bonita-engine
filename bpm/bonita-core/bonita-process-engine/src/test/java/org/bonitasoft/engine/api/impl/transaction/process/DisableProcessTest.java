@@ -24,7 +24,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +42,6 @@ public class DisableProcessTest {
     @Mock
     private SchedulerService scheduler;
     @Mock
-    private TechnicalLoggerService logger;
-    @Mock
     private SProcessDefinition processDefinition;
     @Mock
     private SFlowElementContainerDefinition flowElementCOntainerDefintion;
@@ -58,8 +55,7 @@ public class DisableProcessTest {
         when(flowElementCOntainerDefintion.getStartEvents()).thenReturn(new ArrayList<>());
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processDefinitionId,
                 eventInstanceService,
-                scheduler,
-                logger, "matti");
+                scheduler, "matti");
 
         disableProcess.execute();
 

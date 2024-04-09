@@ -21,6 +21,8 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.persistence.JoinColumn;
+
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JDefinedClass;
@@ -29,7 +31,6 @@ import com.sun.codemodel.JFormatter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.business.data.generator.client.ClientBDMCodeGenerator;
-import org.hibernate.annotations.ForeignKey;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +62,7 @@ public class ForeignKeyAnnotatorTest {
     @Before
     public void before() throws Exception {
         codeGenerator = new ClientBDMCodeGenerator();
-        foreignKeyAnnotator = new ForeignKeyAnnotator(codeGenerator);
+        foreignKeyAnnotator = new ForeignKeyAnnotator();
         jDefinedClass = codeGenerator.addClass(EntityPojo.class.getName());
         jFieldVar = codeGenerator.addField(jDefinedClass, "fieldName", EntityPojo.class);
         doReturn(businessObject).when(relationField).getReference();
@@ -71,17 +72,19 @@ public class ForeignKeyAnnotatorTest {
     @Test
     public void should_annotate_with_foreign_key_name() throws Exception {
         // when
-        foreignKeyAnnotator.annotateForeignKeyName(jDefinedClass, jFieldVar, relationField);
+        var joinColumn = codeGenerator.addAnnotation(jFieldVar, JoinColumn.class);
+        foreignKeyAnnotator.annotateForeignKeyName(joinColumn, jDefinedClass, jFieldVar, relationField);
 
         // then
         final Collection<JAnnotationUse> annotations = jFieldVar.annotations();
         assertThat(annotations).hasSize(1);
         final JAnnotationUse jAnnotationUse = annotations.iterator().next();
         final Map<String, JAnnotationValue> annotationMembers = jAnnotationUse.getAnnotationMembers();
-        assertThat(annotationMembers).containsKey("name");
-        assertThat(jAnnotationUse.getAnnotationClass().fullName()).isEqualTo(ForeignKey.class.getCanonicalName());
+        assertThat(annotationMembers).containsKey("foreignKey");
+        assertThat(jAnnotationUse.getAnnotationClass().fullName()).isEqualTo(JoinColumn.class.getCanonicalName());
 
-        final JAnnotationValue jAnnotationValue = annotationMembers.get("name");
+        final JAnnotationUse foreignKeyAnnotation = (JAnnotationUse) annotationMembers.get("foreignKey");
+        JAnnotationValue jAnnotationValue = foreignKeyAnnotation.getAnnotationMembers().get("name");
 
         Writer stringWriter = new StringWriter();
         JFormatter jFormatter = new JFormatter(stringWriter);

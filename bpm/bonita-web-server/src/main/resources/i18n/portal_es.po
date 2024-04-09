@@ -1,0 +1,304 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: bonita\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-04 05:21+0200\n"
+"PO-Revision-Date: 2023-05-23 01:29\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: bonita\n"
+"X-Crowdin-Project-ID: 13316\n"
+"X-Crowdin-Language: es-ES\n"
+"X-Crowdin-File: /master/bonita-web/portal/portal.po\n"
+"X-Crowdin-File-ID: 61797\n"
+
+msgid "%attribute% file format is not allowed. Only %file_formats% files are allowed."
+msgstr "%attribute% formato de archivo no permitido. Sólo se permiten archivos %file_formats%."
+
+msgid "%attribute% file format not allowed or not starting with correct servlet path"
+msgstr "%attribute% formato de archivo no permitido o no está comenzando con la ruta de servlet correcta"
+
+msgid "%attribute% is mandatory"
+msgstr "%attribute% es obligatorio"
+
+msgid "%attribute% is not a valid Color value"
+msgstr "%attribute% no es un Color válido"
+
+msgid "%attribute% is not a valid URL"
+msgstr "%attribute% no es una URL valida"
+
+msgid "%attribute% is not a valid email"
+msgstr "%attribute% no es un email válido"
+
+msgid "%attribute% is not well written"
+msgstr "%attribute% no esta bien escrito"
+
+msgid "%attribute% must be a boolean value"
+msgstr "%attribute% debe ser un valor booleano"
+
+msgid "%attribute% must be a numeric value"
+msgstr "%attribute% debe ser un valor numérico"
+
+msgid "%attribute% must be an integer value"
+msgstr "%attribute% debe ser un valor entero"
+
+msgid "%attribute% must be less or equal than %value%"
+msgstr "%attribute% debe ser menor o igual que %value%"
+
+msgid "%attribute% must be less than %value%"
+msgstr "%attribute% debe ser menor que %value%"
+
+msgid "%attribute% must be on a single line"
+msgstr "%attribute% debe estar en una sola línea"
+
+msgid "%attribute% must be one of {%list%}"
+msgstr "%attribute% debe ser uno de {%list%}"
+
+msgid "%className% is not Serializable"
+msgstr "%className% no es Serializable"
+
+msgid "%className% not found. Only jdk types are supported"
+msgstr "%className% no encontrada. Solo los tipos jdk son soportados"
+
+msgid "%value% is not a valid value for %className%"
+msgstr "%value% no es un valor valido para %className%"
+
+msgid "A group with the name %groupName% already exists"
+msgstr "Ya existe un grupo con el mismo nombre %groupName%"
+
+msgid "An error occurred while creating a definition"
+msgstr "Error al crear una definición"
+
+msgid "An error occurred while deleting an item with the id %id%"
+msgstr "Error al eliminar un elemento con el identificador %id%"
+
+msgid "Bonita Applications"
+msgstr "Aplicaciones Bonita"
+
+msgid "Can't create group. Group '%groupName%' already exists"
+msgstr "No se puede crear el grupo. El grupo '%groupName%' ya existe"
+
+msgid "Can't create role. Role '%roleName%' already exists"
+msgstr "No se puede crear el rol. El rol '%roleName%' ya existe"
+
+msgid "Can't create user. User '%userName%' already exists"
+msgstr "No se puede crear el usuario. El usuario '%userName%' ya existe"
+
+msgid "Can't import Applications."
+msgstr "No se puede importar las aplicaciones."
+
+msgid "Can't import applications. An application '%token%' already exists"
+msgstr "No se puede importar las aplicaciones. Ya existe una aplicación '%token%'"
+
+msgid "Can't import organization"
+msgstr "No se puede importar la organización"
+
+msgid "Can't import organization. Please check that your file is well-formed."
+msgstr "No se puede importar la organización. Por favor, compruebe que su archivo está bien formateado."
+
+msgid "Can't parse json, non-well formed content"
+msgstr "No se puede convertir json, el contenido no está bien formateado"
+
+msgid "Can't start process %processId%, user %userId% not found"
+msgstr "No se puede iniciar proceso %processId%, no se encuentra el usuario %userId%"
+
+msgid "Can't start process, process %processId% is not enabled"
+msgstr "No se puede iniciar el proceso, el proceso %processId% no esta activado"
+
+msgid "Can't start process, process %processId% not found"
+msgstr "No se puede iniciar el proceso, no se encuentra el proceso %processId%"
+
+msgid "Can't update user. User not found"
+msgstr "No se puede actualizar el usuario. Usuario no encontrado"
+
+msgid "Category with name %categoryName% already exists"
+msgstr "La categoría %categoryName% ya existe"
+
+msgid "Data definition %dataName% doesn't exists for process %processId%"
+msgstr "La definición de dato %dataName% no existe para el proceso %processId%"
+
+msgid "Error during Application import file reading."
+msgstr "Error durante la lectura del archivo de importación de la aplicación."
+
+msgid "Error occured when starting process %processId%"
+msgstr "Ha ocurrido un error al iniciar el proceso %processId%"
+
+msgid "Error uploading the file. Maybe your session expired. You can try to refresh the page."
+msgstr "Error subiendo el fichero. Posiblemente su sesión ha expirado. Puede probar a refrescar la página."
+
+msgid "Error when adding group to actor member"
+msgstr "Error al agregar grupo al actor"
+
+msgid "Error when creating group"
+msgstr "Error al crear grupo"
+
+msgid "Error when creating user"
+msgstr "Ha ocurrido un error al crear el usuario"
+
+msgid "Error when deleting groups"
+msgstr "Error al suprimir los grupos"
+
+msgid "Error when deleting users"
+msgstr "Ha ocurrido un error al borrar los usuarios"
+
+msgid "Error when pausing BPM services"
+msgstr "Error al pausar los Servicios BPM"
+
+msgid "Error when resuming BPM services"
+msgstr "Error al arrancar los Servicios BPM"
+
+msgid "Error when searching users"
+msgstr "Ha ocurrido un error al buscar usuarios"
+
+msgid "Error when updating %activityId% activity variables"
+msgstr "Ha ocurrido un error al actualizar las variables de la actividad %activityId%"
+
+msgid "Error when updating group"
+msgstr "Error al actualizar el grupo"
+
+msgid "Error when updating process deployment informations"
+msgstr "Ha ocurrido un error al actualizar la información de despliegue del proceso"
+
+msgid "Error when updating user"
+msgstr "Ha ocurrido un error al actualizar el usuario"
+
+msgid "Filters are not supported by this API"
+msgstr "Los filtros no son soportados con este API"
+
+msgid "Json can't be mapped to "
+msgstr "Json no puede ser mapeado a "
+
+msgid "Login failed. No profile has been set up for this user. Contact your administrator."
+msgstr "Error de login. Ningún perfil está definido para este usuario. Contacte con tu administrador."
+
+msgid "Login form"
+msgstr "Formulario de login"
+
+msgid "MM/dd/yyyy"
+msgstr "dd/MM/yyyy"
+
+msgid "MM/dd/yyyy h:mm a"
+msgstr "dd/MM/yyyy HH:mm"
+
+msgid "MMMM dd, yyyy"
+msgstr "MMMM dd, yyyy"
+
+msgid "Only the value attribute can be updated"
+msgstr "Sólo el atributo de valor puede ser actualizado"
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Password must be at least %number% characters long"
+msgstr "Contraseña debe tener al menos %number% caracteres"
+
+msgid "Password must contain at least %number% digits"
+msgstr "La contraseña debe tener al menos %number% dígitos"
+
+msgid "Password must contain at least %number% lower case characters"
+msgstr "La contraseña debe tener al menos %number% minúsculas"
+
+msgid "Password must contain at least %number% special characters"
+msgstr "La contraseña debe tener al menos %number% caracteres especiales"
+
+msgid "Password must contain at least %number% upper case characters"
+msgstr "La contraseña debe tener al menos %number% mayusculas"
+
+msgid "Please, contact your administrator."
+msgstr "Por favor, ponte en contacto con tu administrador."
+
+msgid "Process %appName% in version %version% already exists"
+msgstr "El proceso %appName% en la version %version% ya existe"
+
+msgid "Process %appName% in version %version% contains 6.x Legacy artifacts (forms or case overview page). Those are based on Google Web Toolkit (GWT), a technology that is no longer supported by Bonita. To know more, check the documentation."
+msgstr "El proceso %appName% en la versión %version% contiene 6.x artefactos heredados (formularios o página de resumen de casos). Estos se basan en Google Web Toolkit (GWT), una tecnología que ya no está soportada por Bonita. Para saber más, consulte la documentación."
+
+msgid "Process definition not found for id %processId%"
+msgstr "No se encuentra la definición del proceso con identificador %processId%"
+
+msgid "Profile member already exists"
+msgstr "El usuario ya está asociado con este perfil "
+
+msgid "Request parameter \"id\" must be set."
+msgstr "Debe establecerse el parámetro \"id\"."
+
+msgid "Search terms are not supported by this API"
+msgstr "Los términos de búsqueda no son soportados por este API"
+
+msgid "Session expired. Please log in again."
+msgstr "La sesión expiró. Por favor inicie sesión de nuevo."
+
+msgid "Sorting is not supported by this API"
+msgstr "Ordenes no son soportados por la API"
+
+msgid "The only mandatory filter is %name%"
+msgstr "El único filtro obligatorio es %name%"
+
+msgid "The server is not available"
+msgstr "El servidor no está disponible"
+
+msgid "This category has already been added to this process"
+msgstr "Esta categoría ya ha sido añadida a este proceso"
+
+msgid "This group has already been mapped to actor"
+msgstr "Este grupo ya ha sido mapeado a un actor"
+
+msgid "This membership has already been mapped to actor"
+msgstr "Esta membresía ya ha sido mapeada a un actor"
+
+msgid "This membership is already added to user"
+msgstr "Este usuario ya posee esta membresia"
+
+msgid "This role has already been mapped to actor"
+msgstr "Este rol ya ha sido asignado a un actor"
+
+msgid "This service is offline for maintenance. Please try later."
+msgstr "Este servicio está desconectado por mantenimiento. Por favor, intente más tarde."
+
+msgid "This user has already been mapped to actor"
+msgstr "Este usuario ya ha sido mapeado a un actor"
+
+msgid "Unable to deploy business archive"
+msgstr "No se puede desplegar el archivo de negocios"
+
+msgid "Unable to disable process"
+msgstr "Incapaz de desactivar el proceso"
+
+msgid "Unable to enable process"
+msgstr "Incapaz de activar el proceso"
+
+msgid "Unable to find data instance %dataName% for activity %activityId%"
+msgstr "Imposible encontrar la instancia del dato %dataName% para la actividad %activityId%"
+
+msgid "Unable to find role %roleId%"
+msgstr "No se puede encontrar el rol %roleId%"
+
+msgid "Unable to get group path, group not found"
+msgstr "No se puede obtener la ruta al grupo, grupo no encontrado"
+
+msgid "Unable to get process data definitions, process %processId% not found"
+msgstr "Imposible recuperar la definición de los datos de proceso, no se encuentra el proceso %processId%"
+
+msgid "Unable to log in. Please check your username and password."
+msgstr "No se puede iniciar la sesión. Por favor comprueba tu nombre de usuario y tu contraseña."
+
+msgid "User"
+msgstr "Usuario"
+
+msgid "User not found"
+msgstr "Usuario no encontrado"
+
+msgid "Welcome to"
+msgstr "Bienvenido a"
+
+msgid "message"
+msgstr "mensaje"
+
+msgid "or"
+msgstr "o"
+

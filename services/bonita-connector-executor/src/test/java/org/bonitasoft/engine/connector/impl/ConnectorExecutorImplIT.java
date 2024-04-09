@@ -29,7 +29,6 @@ import org.bonitasoft.engine.connector.AbstractSConnector;
 import org.bonitasoft.engine.connector.ConnectorExecutionResult;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -57,7 +56,7 @@ public class ConnectorExecutorImplIT {
 
     @Before
     public void setUp() {
-        connectorExecutor = new ConnectorExecutorImpl(10, 5, new TechnicalLoggerSLF4JImpl(), 100, 100, sessionAccessor,
+        connectorExecutor = new ConnectorExecutorImpl(10, 5, 100, 100, sessionAccessor,
                 sessionService,
                 timeTracker, new SimpleMeterRegistry(), 12L, new DefaultExecutorServiceMetricsProvider());
         connectorExecutor.start();

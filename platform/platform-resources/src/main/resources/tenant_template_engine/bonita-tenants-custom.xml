@@ -33,7 +33,6 @@
     <bean id="customIsProcessInitiatorRule" class="org.bonitasoft.engine.core.form.impl.custom.CustomIsProcessInitiatorRule">
         <constructor-arg name="processInstanceService" ref="processInstanceService"/>
         <constructor-arg name="sessionService" ref="sessionService"/>
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
     </bean>
     -->
 
@@ -44,7 +43,6 @@
           class="org.bonitasoft.engine.core.form.impl.ManagerInvolvedAuthorizationRuleMappingImpl"/>
 
     <bean id="isManagerOfUserInvolvedInProcessInstanceRule" class="org.bonitasoft.engine.page.IsManagerOfUserInvolvedInProcessInstanceRule">
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
         <constructor-arg name="sessionService" ref="sessionService"/>
         <constructor-arg name="processInvolvementDelegate" ref="processInvolvementDelegate"/>
     </bean>
@@ -54,7 +52,6 @@
     <!-- Schema Manager that avoids to update the database schema when updating BDM -->
     <!--
     <bean id="schemaManager" class="org.bonitasoft.engine.business.data.impl.SchemaManagerReadOnly">
-        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
     </bean>
         -->
 </beans>

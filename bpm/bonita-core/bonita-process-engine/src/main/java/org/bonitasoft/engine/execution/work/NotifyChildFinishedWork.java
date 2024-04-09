@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkPreconditionException;
@@ -114,13 +113,12 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
-        TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(
                 tenantAccessor.getEventInstanceService(),
-                tenantAccessor.getSchedulerService(), loggerService);
+                tenantAccessor.getSchedulerService());
         FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter,
                 tenantAccessor.getActivityInstanceService(),
-                tenantAccessor.getFlowNodeStateManager(), loggerService);
+                tenantAccessor.getFlowNodeStateManager());
         userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstanceId));
     }
 

@@ -30,9 +30,9 @@ import java.util.Optional;
 
 import javax.transaction.xa.XAException;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.dao.TransientDataAccessException;
@@ -41,19 +41,18 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 /**
  * @author Baptiste Mesta.
  */
+
 public class DefaultExceptionRetryabilityEvaluator implements ExceptionRetryabilityEvaluator {
 
+    private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionRetryabilityEvaluator.class);
     private static final List<Integer> XA_RETRYABLE = Arrays.asList(XA_RBTRANSIENT, XA_RBTIMEOUT);
     private HashSet<Class<? extends Throwable>> exceptionClassesToRetry;
     private HashSet<Class<? extends Throwable>> exceptionClassesToNotRetry;
-    private TechnicalLogger logger;
 
     public DefaultExceptionRetryabilityEvaluator(List<String> exceptionClassesToRetry,
-            List<String> exceptionClassesToNotRetry,
-            TechnicalLoggerService logger) {
+            List<String> exceptionClassesToNotRetry) {
         this.exceptionClassesToRetry = toSetOfClasses(exceptionClassesToRetry);
         this.exceptionClassesToNotRetry = toSetOfClasses(exceptionClassesToNotRetry);
-        this.logger = logger.asLogger(DefaultExceptionRetryabilityEvaluator.class);
     }
 
     private HashSet<Class<? extends Throwable>> toSetOfClasses(List<String> exceptionClassesToRetry) {

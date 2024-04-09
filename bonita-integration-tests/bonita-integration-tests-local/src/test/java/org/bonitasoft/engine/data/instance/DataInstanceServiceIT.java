@@ -26,7 +26,7 @@ import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.ParentContainerResolverImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
@@ -47,7 +47,6 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -77,14 +76,12 @@ public class DataInstanceServiceIT extends CommonBPMServicesTest {
     public void setupDataInstanceService() {
         final Recorder recorder = getTenantAccessor().getRecorder();
         final ReadPersistenceService persistenceService = getTenantAccessor().getReadPersistenceService();
-        final TechnicalLoggerService technicalLoggerService = getTenantAccessor().getTechnicalLoggerService();
         final ArchiveService archiveService = getTenantAccessor().getArchiveService();
         expressionService = getTenantAccessor().getExpressionService();
         parentContainerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
-        dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService,
-                technicalLoggerService);
+        dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService);
         parentContainerResolver.setAllowUnknownContainer(true);
-        final CacheService cacheService = getTenantAccessor().getCacheService();
+        final EhCacheCacheService cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
                 cacheService.start();
@@ -96,7 +93,7 @@ public class DataInstanceServiceIT extends CommonBPMServicesTest {
 
     @After
     public void tearDown() {
-        final CacheService cacheService = getTenantAccessor().getCacheService();
+        final EhCacheCacheService cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
         try {
             cacheService.stop();
             cacheService.start();

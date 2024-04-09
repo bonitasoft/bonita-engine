@@ -18,6 +18,7 @@ import static org.bonitasoft.engine.form.FormMappingTarget.LEGACY;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -38,30 +39,26 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionE
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
  * @author Baptiste Mesta
  */
+@Slf4j
 public class BusinessArchiveServiceImpl implements BusinessArchiveService {
 
     private final ProcessDefinitionService processDefinitionService;
     private final DependencyService dependencyService;
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
-    private final TechnicalLoggerService logger;
     private final ClassLoaderService classLoaderService;
 
     public BusinessArchiveServiceImpl(ProcessDefinitionService processDefinitionService,
             DependencyService dependencyService,
-            BusinessArchiveArtifactsManager businessArchiveArtifactsManager, TechnicalLoggerService logger,
-            ClassLoaderService classLoaderService) {
+            BusinessArchiveArtifactsManager businessArchiveArtifactsManager, ClassLoaderService classLoaderService) {
         this.processDefinitionService = processDefinitionService;
         this.dependencyService = dependencyService;
         this.businessArchiveArtifactsManager = businessArchiveArtifactsManager;
-        this.logger = logger;
         this.classLoaderService = classLoaderService;
     }
 
@@ -115,12 +112,9 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
     }
 
     void info(SProcessDefinition sProcessDefinition) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
-                    "The user <" + SessionInfos.getUserNameFromSession() + "> has installed process <"
-                            + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion()
-                            + "> with id <" + sProcessDefinition.getId() + ">");
-        }
+        log.info("The user <{}> has installed process <{}> in version <{}> with id <{}>",
+                SessionInfos.getUserNameFromSession(), sProcessDefinition.getName(),
+                sProcessDefinition.getVersion(), sProcessDefinition.getId());
     }
 
     @Override

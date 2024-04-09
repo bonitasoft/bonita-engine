@@ -84,6 +84,20 @@ public class AutoUpdateConfigurationVisitorTest {
     }
 
     @Test
+    public void isAutoUpdateConfigurationFile_should_return_true_for_user_creation_attribute_mapping()
+            throws Exception {
+        // given:
+        final Path path = initial.resolve("user-creation-attribute-mapping.properties");
+        Files.createFile(path);
+
+        // when:
+        final boolean autoUpdateConfigurationFile = autoUpdateVisitor.isAutoUpdateConfigurationFile(path);
+
+        // then:
+        assertThat(autoUpdateConfigurationFile).isTrue();
+    }
+
+    @Test
     public void isAutoUpdateConfigurationFile_should_return_false_for_other_file() throws Exception {
         // given:
         final Path path = initial.resolve("wrong_file_name.lst");

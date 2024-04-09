@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
@@ -33,16 +34,13 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
+@Slf4j
 public class ContractConstraintsValidator {
 
-    private final TechnicalLoggerService logger;
     private final ExpressionService expressionService;
 
-    public ContractConstraintsValidator(final TechnicalLoggerService logger, ExpressionService expressionService) {
-        this.logger = logger;
+    public ContractConstraintsValidator(ExpressionService expressionService) {
         this.expressionService = expressionService;
     }
 
@@ -56,11 +54,8 @@ public class ContractConstraintsValidator {
         context.putAll(vars);
         context.put(ExpressionExecutorStrategy.DEFINITION_ID, processDefinitionId);
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
-            if (logger.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)) {
-                logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
-                        "Evaluating constraint [" + constraint.getName() + "] on input(s) "
-                                + constraint.getInputNames());
-            }
+            log.debug("Evaluating constraint [{}] on input(s) {}", constraint.getName(), constraint.getInputNames());
+
             validateConstraint(comments, constraint, context);
         }
         if (!comments.isEmpty()) {
@@ -78,16 +73,12 @@ public class ContractConstraintsValidator {
                     ContainerState.ACTIVE);
         } catch (SExpressionTypeUnknownException | SExpressionEvaluationException
                 | SExpressionDependencyMissingException | SInvalidExpressionException e) {
-            logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.ERROR,
-                    "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames()
-                            + " evaluation failed.",
-                    e);
+            log.error("Constraint [{}] on input(s) {} evaluation failed.",
+                    constraint.getName(), constraint.getInputNames(), e);
             throw new SContractViolationException("Exception while validating constraints", e);
         }
         if (!valid) {
-            logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING,
-                    "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames()
-                            + " is not valid");
+            log.warn("Constraint [{}] on input(s) {} is not valid", constraint.getName(), constraint.getInputNames());
             comments.add(constraint.getExplanation());
         }
     }

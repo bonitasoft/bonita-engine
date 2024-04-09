@@ -1,8 +1,11 @@
 allprojects {
-    apply plugin: 'maven'
     apply plugin: 'maven-publish'
     group = 'org.bonitasoft.engine'
 
+	tasks.withType(Copy).all {
+		duplicatesStrategy 'include'
+	 }
+	
     publishing {
         repositories {
             if (project.hasProperty("altDeploymentRepository")) {
@@ -24,7 +27,7 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'com.adarshr.test-logger'
 
@@ -58,17 +61,17 @@ subprojects {
     configurations.all {
     }
     afterEvaluate {
-            tasks.withType(AbstractCompile).configureEach { options.encoding = 'UTF-8' }
+        tasks.withType(AbstractCompile).configureEach { options.encoding = 'UTF-8' }
     }
-        tasks.withType(JavaCompile).configureEach {
-            options.encoding = 'UTF-8'
-            options.fork = true
-        }
-        tasks.withType(Javadoc).configureEach {
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.fork = true
+    }
+    tasks.withType(Javadoc).configureEach {
         options.addStringOption('Xdoclint:none', '-quiet')
         options.encoding = 'UTF-8'
     }
-        tasks.withType(DependencyReportTask).configureEach {
+    tasks.withType(DependencyReportTask).configureEach {
         group "Documentation"
         description "List runtime dependencies for a specified configuration"
         configurations = [project.configurations.runtimeClasspath]

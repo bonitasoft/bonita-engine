@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.math.BigInteger;
+import java.net.URI;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -57,6 +58,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.Pair;
@@ -666,4 +668,35 @@ public class IOUtil {
             return Optional.of(getAllContentFrom(inputStream));
         }
     }
+
+    // Copied from org.bonitasoft.engine.io.IOUtil, as it is used by client applications (bonita-web-sp)
+    public static File createTempDirectory(final URI directoryPath) {
+        final File tmpDir = new File(directoryPath);
+        tmpDir.setReadable(true);
+        tmpDir.setWritable(true);
+
+        mkdirs(tmpDir);
+
+        FileUtils.isSymlink(tmpDir);
+
+        try {
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    final boolean deleted = deleteDir(tmpDir);
+                    if (!deleted) {
+                        System.err.println(
+                                "Unable to delete directory: " + tmpDir + ". Trying with an alternative force delete.");
+                        FileUtils.forceDelete(tmpDir);
+                    }
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
+        } catch (IllegalStateException ignored) {
+            // happen in case of hook already registered and when shutting down
+        }
+        return tmpDir;
+    }
+
 }

@@ -111,6 +111,8 @@ public class PlatformSetupIT {
         assertThat(sequences).isGreaterThan(1);
         final int platformRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "platform");
         assertThat(platformRows).isEqualTo(1);
+        final int tenantRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "tenant");
+        assertThat(tenantRows).isEqualTo(1);
         final int configurationFiles = JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration");
         assertThat(configurationFiles).isGreaterThan(1);
     }
@@ -121,7 +123,7 @@ public class PlatformSetupIT {
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
         FileUtils.write(setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
-                .resolve("platform_init_engine")
+                .resolve("platform_engine")
                 .resolve("whatever.properties").toFile(), "custom content", Charset.defaultCharset());
         configurationFolderUtil.buildSqlFolder(setupFolder.toPath(), dbVendor);
         systemOutRule.clearLog();
@@ -193,7 +195,7 @@ public class PlatformSetupIT {
     public void init_method_should_store_security_scripts_from_folder_if_exists() throws Exception {
         //when
         final Path confFolder = temporaryFolder.newFolder().toPath();
-        configurationFolderUtil.buildInitialFolder(confFolder);
+        configurationFolderUtil.buildPlatformEngineFolder(confFolder);
         configurationFolderUtil.buildSqlFolder(confFolder, dbVendor);
 
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toString());
@@ -236,7 +238,6 @@ public class PlatformSetupIT {
         assertThat(configurations).extracting("resourceName").containsOnly(
                 "bonita-platform-community-custom.properties",
                 "bonita-platform-custom.xml",
-                "bonita-platform-init-custom.xml",
                 "cache-config.xml",
                 "platform-tenant-config.properties",
                 "security-config.properties",
@@ -266,13 +267,9 @@ public class PlatformSetupIT {
         assertThat(platformSetup.isPlatformAlreadyCreated()).isTrue();
 
         final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        final String[] split = log.split("\n");
         assertThat(log).as("should setup log message").doesNotContain("Platform is already created. Nothing to do.");
-        assertThat(split).as("should setup log message").isNotEmpty();
-        assertThat(log).as("should create platform and log message").contains("Platform created.");
-        assertThat(split[split.length - 1]).as("should push Initial configuration and log message")
-                .contains("INFO")
-                .endsWith("Initial configuration files successfully pushed to database");
+        assertThat(log).contains("Platform created.")
+                .contains("Initial configuration files successfully pushed to database");
     }
 
     @Test
@@ -330,14 +327,14 @@ public class PlatformSetupIT {
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
         platformSetup.pull();
-        final Path platform_init_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
-                .resolve("platform_init_engine");
-        FileUtils.deleteDirectory(platform_init_engine.toFile());
+        final Path platform_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
+                .resolve("platform_engine");
+        FileUtils.deleteDirectory(platform_engine.toFile());
 
         // then
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("You are trying to remove a protected folder from configuration");
-        expectedException.expectMessage(platform_init_engine.toString());
+        expectedException.expectMessage(platform_engine.toString());
         expectedException.expectMessage("To restore the deleted folders");
 
         // when
@@ -425,7 +422,7 @@ public class PlatformSetupIT {
         //given
         List<FullBonitaConfiguration> configurations = new ArrayList<>();
         final Path confFolder = temporaryFolder.newFolder().toPath();
-        configurationFolderUtil.buildInitialFolder(confFolder);
+        configurationFolderUtil.buildPlatformEngineFolder(confFolder);
         configurationFolderUtil.buildSqlFolder(confFolder, dbVendor);
 
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toString());
@@ -504,7 +501,7 @@ public class PlatformSetupIT {
     public void should_not_fail_when_pulling_twice_in_the_same_jvm() throws Exception {
         final Path setupFolder = temporaryFolder.newFolder().toPath();
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
-        configurationFolderUtil.buildInitialFolder(setupFolder);
+        configurationFolderUtil.buildPlatformEngineFolder(setupFolder);
         configurationFolderUtil.buildSqlFolder(setupFolder, dbVendor);
         platformSetup.init();
         platformSetup.pull();
@@ -573,30 +570,33 @@ public class PlatformSetupIT {
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList(
                         "SELECT * FROM CONFIGURATION WHERE resource_name = 'resources-permissions-mapping.properties'");
-        assertThat(rows).hasSize(1);
-        assertThat(rows.get(0).get("resource_content")).isEqualTo(new_7_6_0_content.getBytes());
+        assertThat(rows).hasSize(2)
+                .allSatisfy(row -> assertThat(row.get("RESOURCE_CONTENT")).isEqualTo(new_7_6_0_content.getBytes()));
     }
 
     @Test
     public void init_on_existing_platform_should_add_new_config_files() throws Exception {
         //given
         platformSetup.init();
-        final String countConfigFile = "SELECT count(1) FROM CONFIGURATION WHERE resource_name = 'bonita-tenant-community-custom.properties'";
-        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class)).isEqualTo(1);
+        final String countConfigFile = "SELECT * FROM CONFIGURATION WHERE resource_name = 'bonita-tenant-community-custom.properties'";
+        assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(2)
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"))
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_TEMPLATE_ENGINE"));
 
         // Delete it to check that init method adds it again:
         jdbcTemplate
                 .update("DELETE from configuration WHERE resource_name = 'bonita-tenant-community-custom.properties'");
 
-        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class)).isZero();
+        assertThat(jdbcTemplate.queryForList(countConfigFile)).isEmpty();
         systemOutRule.clearLog();
 
         //when
         platformSetup.init();
 
         //then
-        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class))
-                .isEqualTo(1);
+        assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(2)
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"))
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_TEMPLATE_ENGINE"));
         assertThat(systemOutRule.getLog()).contains(
                 "New configuration file detected 'bonita-tenant-community-custom.properties'");
     }

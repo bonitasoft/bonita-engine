@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * Contract validator factory - might be replaced by a spring configuration
@@ -23,9 +22,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ContractValidatorFactory {
 
-    public ContractValidator createContractValidator(final TechnicalLoggerService loggerService,
-            ExpressionService expressionService) {
-        return new ContractValidator(new ContractStructureValidator(new ContractTypeValidator(), loggerService),
-                new ContractConstraintsValidator(loggerService, expressionService));
+    public ContractValidator createContractValidator(ExpressionService expressionService) {
+        return new ContractValidator(new ContractStructureValidator(new ContractTypeValidator()),
+                new ContractConstraintsValidator(expressionService));
     }
 }

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,10 +27,10 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -40,11 +39,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TransientDataLeftOperandHandlerTest {
 
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     @Mock
     private TransientDataService transientDataService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @InjectMocks
     private TransientDataLeftOperandHandler transientDataLeftOperandHandler;
@@ -54,6 +52,7 @@ public class TransientDataLeftOperandHandlerTest {
         // given
         final SShortTextDataInstance data = createData();
         when(transientDataService.getDataInstance("myData", 42, "ctype")).thenReturn(data);
+        systemOutRule.clearLog();
         // when
         transientDataLeftOperandHandler.update(createLeftOperand("myData"), Collections.<String, Object> emptyMap(),
                 "new Value", 42, "ctype");
@@ -62,8 +61,7 @@ public class TransientDataLeftOperandHandlerTest {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField("value", "new Value");
         verify(transientDataService, times(1)).updateDataInstance(eq(data), eq(entityUpdateDescriptor));
-        verify(logger, times(1)).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING),
-                anyString());
+        assertThat(systemOutRule.getLog()).containsPattern("WARN.*");
     }
 
     private SLeftOperandImpl createLeftOperand(final String name) {

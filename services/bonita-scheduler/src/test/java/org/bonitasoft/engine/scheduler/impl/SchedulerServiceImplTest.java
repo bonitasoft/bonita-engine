@@ -31,7 +31,6 @@ import java.util.Random;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -74,13 +73,11 @@ public class SchedulerServiceImplTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         transactionService = mock(TransactionService.class);
 
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
 
-        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService,
+        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, eventService,
                 transactionService, sessionAccessor, servicesResolver,
                 persistenceService);
 

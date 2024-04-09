@@ -20,12 +20,8 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileCriterion;
-import org.bonitasoft.engine.profile.ProfileEntry;
-import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
-import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberCreator;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
@@ -66,25 +62,6 @@ public interface ProfileAPI {
      *
      * @param userId
      *        The identifier of the user
-     * @return The 1000 first profiles of the user, ordered by name
-     * @throws UserNotFoundException
-     *         If the user identifier does not refer to an existing user
-     * @throws org.bonitasoft.engine.exception.RetrieveException
-     *         If an exception occurs during the profile retrieving
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid (expired, unknown, ...)
-     * @since 6.0
-     * @deprecated since 6.3
-     * @see ProfileAPI#getProfilesForUser(long, int, int, ProfileCriterion)
-     */
-    @Deprecated
-    List<Profile> getProfilesForUser(long userId) throws UserNotFoundException;
-
-    /**
-     * Retrieves the profiles of the user.
-     *
-     * @param userId
-     *        The identifier of the user
      * @param startIndex
      *        The index of the first result (starting from 0).
      * @param maxResults
@@ -99,29 +76,6 @@ public interface ProfileAPI {
      * @since 6.3.2
      */
     List<Profile> getProfilesForUser(long userId, int startIndex, int maxResults, ProfileCriterion criterion);
-
-    /**
-     * Retrieves the profiles with portal navigation for the user.
-     *
-     * @param userId
-     *        The identifier of the user
-     * @param startIndex
-     *        The index of the first result (starting from 0).
-     * @param maxResults
-     *        The maximum number of elements to get per page.
-     * @param criterion
-     *        The criterion for sorting the items over pages.
-     * @return The paginated and ordered profiles of the user
-     * @throws org.bonitasoft.engine.exception.RetrieveException
-     *         If an exception occurs during the profile retrieving
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid (expired, unknown, ...)
-     * @since 7.6.1
-     * @deprecated since 7.13.0 use getProfilesForUser instead
-     */
-    @Deprecated(forRemoval = true)
-    List<Profile> getProfilesWithNavigationForUser(long userId, int startIndex, int maxResults,
-            ProfileCriterion criterion);
 
     /**
      * Searches for {@link Profile}s with specific search criteria. Use
@@ -180,72 +134,6 @@ public interface ProfileAPI {
      * @see SearchResult
      */
     SearchResult<ProfileMember> searchProfileMembers(String memberType, SearchOptions options) throws SearchException;
-
-    /**
-     * Searches for {@link ProfileEntry}s with specific search criteria. Use
-     * {@link org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor} to
-     * know the available filters.
-     *
-     * @param options
-     *        The search criteria.
-     * @return a {@link SearchResult} containing the list of {@code ProfileEntry}s matching the search criteria.
-     * @throws SearchException
-     *         If an exception occurs during the profile searching
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid (expired, unknown, ...)
-     * @since 6.0
-     * @see ProfileEntry
-     * @see ProfileEntrySearchDescriptor
-     * @see SearchResult
-     * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
-     */
-    @Deprecated(since = "7.13.0", forRemoval = true)
-    SearchResult<ProfileEntry> searchProfileEntries(SearchOptions options) throws SearchException;
-
-    /**
-     * Retrieves the full portal navigation of a profile.
-     * <br/>
-     * This navigation is what a user having the given profile have in the navigation bar of the portal.
-     * <p/>
-     * <b>WARNING:</b> this method is <b>Experimental</b>, it might change in later versions
-     *
-     * @param profileName name of the profile
-     * @return the list of profile entries linked to this profile
-     * @since 7.8
-     * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
-     */
-    @Deprecated(since = "7.13.0", forRemoval = true)
-    @Experimental
-    List<ProfileEntry> getProfileEntries(String profileName) throws ProfileNotFoundException;
-
-    /**
-     * Returns a profile entry according to its identifier.
-     *
-     * @param id
-     *        The profile entry identifier
-     * @return the searched profile entry
-     * @throws ProfileEntryNotFoundException
-     *         occurs when the identifier does not refer to an existing profile entry
-     * @since 6.0
-     */
-
-    /**
-     * Retrieves the profile entry.
-     *
-     * @param id
-     *        The identifier of the profile entry
-     * @return the searched profile entry
-     * @throws ProfileEntryNotFoundException
-     *         If the profile entry identifier does not refer to an existing user
-     * @throws org.bonitasoft.engine.exception.RetrieveException
-     *         If an exception occurs during the user retrieving
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid (expired, unknown, ...)
-     * @since 6.0
-     * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
-     */
-    @Deprecated(since = "7.13.0", forRemoval = true)
-    ProfileEntry getProfileEntry(long id) throws ProfileEntryNotFoundException;
 
     /**
      * Creates a profile member.

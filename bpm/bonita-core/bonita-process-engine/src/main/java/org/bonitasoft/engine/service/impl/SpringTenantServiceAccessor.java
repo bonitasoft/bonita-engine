@@ -69,7 +69,6 @@ import org.bonitasoft.engine.identity.IconService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
@@ -105,11 +104,9 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private final SpringBeanAccessor beanAccessor;
-    private Long tenantId;
 
-    public SpringTenantServiceAccessor(final SpringBeanAccessor beanAccessor, Long tenantId) {
+    public SpringTenantServiceAccessor(final SpringBeanAccessor beanAccessor) {
         this.beanAccessor = beanAccessor;
-        this.tenantId = tenantId;
     }
 
     @Override
@@ -150,11 +147,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public QueriableLoggerService getQueriableLoggerService() {
         return beanAccessor.getService("queriableLoggerService", QueriableLoggerService.class);
-    }
-
-    @Override
-    public TechnicalLoggerService getTechnicalLoggerService() {
-        return beanAccessor.getService("tenantTechnicalLoggerService", TechnicalLoggerService.class);
     }
 
     private TransactionService getTransactionService() {
@@ -233,7 +225,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public long getTenantId() {
-        return tenantId;
+        try {
+            return ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -343,7 +339,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public EventService getEventService() {
-        return beanAccessor.getService(EventService.class);
+        return beanAccessor.getService("platformEventService", EventService.class);
     }
 
     public SpringBeanAccessor getBeanAccessor() {

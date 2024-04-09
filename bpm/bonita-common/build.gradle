@@ -3,30 +3,32 @@ import org.bonitasoft.engine.gradle.PomUtils
 configurations { schemagen }
 
 dependencies {
-    compile platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
+    api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
 
-    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
-    compile "com.fasterxml.jackson.core:jackson-databind"
-    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    compile "com.fasterxml.jackson.core:jackson-annotations"
-    compile("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api "com.fasterxml.jackson.core:jackson-databind"
+    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "com.fasterxml.jackson.core:jackson-annotations"
+    api("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    compile("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
+    api("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    runtime "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile 'org.jmockit:jmockit:1.44'
-    testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
-    testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation 'org.jmockit:jmockit:1.44'
+    testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly project(':bpm:bonita-sap-jco-connector-api')
-    testCompile project(':bpm:bonita-sap-jco-connector-api')
+    testImplementation project(':bpm:bonita-sap-jco-connector-api')
+    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
 
     schemagen(
             "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",
@@ -36,7 +38,7 @@ dependencies {
             "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
 }
 
-def generateInfoProperties = task("generateInfoProperties") {
+def generateInfoProperties = tasks.register("generateInfoProperties") {
     doFirst {
         project.file("build/generated/main/resources").mkdirs()
         project.file("build/generated/main/resources/info.properties").text = "version $project.version"
@@ -84,7 +86,7 @@ publishing {
     }
 }
 
-task('schemagen') {
+tasks.register('schemagen') {
     def destDir = file("$buildDir/schemas")
     doLast {
         destDir.mkdirs()

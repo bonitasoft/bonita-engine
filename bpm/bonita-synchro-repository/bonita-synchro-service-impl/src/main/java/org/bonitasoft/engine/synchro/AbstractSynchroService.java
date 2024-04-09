@@ -21,15 +21,15 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 
-import org.bonitasoft.engine.cache.CommonCacheService;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Duchastenier
  * @author Charles Souillard
  */
+
 public abstract class AbstractSynchroService implements SynchroService {
 
     protected static final String SYNCHRO_SERVICE_CACHE = "SYNCHRO_SERVICE_CACHE";
@@ -38,6 +38,8 @@ public abstract class AbstractSynchroService implements SynchroService {
      * String value is an identifier of the sempaphore for the current event.
      */
     protected abstract Map<Map<String, Serializable>, String> getWaitersMap();
+
+    protected abstract Logger getLogger();
 
     /**
      * Maitains a map of <EventKey, ID of the object being waited for>
@@ -48,24 +50,21 @@ public abstract class AbstractSynchroService implements SynchroService {
 
     protected abstract Lock getServiceLock();
 
-    protected final TechnicalLoggerService logger;
+    protected final CacheService cacheService;
 
-    protected final CommonCacheService cacheService;
-
-    public AbstractSynchroService(final TechnicalLoggerService logger, final CommonCacheService cacheService) {
-        this.logger = logger;
+    public AbstractSynchroService(final CacheService cacheService) {
         this.cacheService = cacheService;
     }
 
     @Override
     public void fireEvent(final Map<String, Serializable> event, final Serializable id) {
-        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Firing event " + event + " with id " + id);
+        getLogger().debug("Firing event " + event + " with id " + id);
         getServiceLock().lock();
         try {
             final String semaphoreKey = getWaiterAndRemoveIt(event);
             if (semaphoreKey == null) {
                 // No waiter found yet:
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "No waiter found, storing event " + event);
+                getLogger().debug("No waiter found, storing event " + event);
                 try {
                     cacheService.store(SYNCHRO_SERVICE_CACHE, (Serializable) event, id);
                 } catch (SCacheException e) {
@@ -74,7 +73,7 @@ public abstract class AbstractSynchroService implements SynchroService {
             } else {
                 // Waiter already exists, let's release waiter:
                 getEventKeyAndIdMap().put(semaphoreKey, id);
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                getLogger().debug(
                         "releasing waiter for event " + event + " and id " + id);
                 releaseWaiter(semaphoreKey);
             }

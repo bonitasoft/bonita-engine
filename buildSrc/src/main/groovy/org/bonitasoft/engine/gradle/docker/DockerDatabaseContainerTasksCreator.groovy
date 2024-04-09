@@ -196,9 +196,9 @@ class DockerDatabaseContainerTasksCreator {
             }
 
             Task zipReport = project.tasks.create("zip${vendor.name}DatabaseTestReport" as String, Zip) {
-                archiveFileName = databaseTestTask.reports.html.destination.name + ".zip"
-                destinationDirectory = databaseTestTask.reports.html.destination.parentFile
-                from databaseTestTask.reports.html.destination
+                archiveFileName = databaseTestTask.reports.html.outputLocation.get().getAsFile().name + ".zip"
+                destinationDirectory = databaseTestTask.reports.html.outputLocation.get().getAsFile().parentFile
+                from databaseTestTask.reports.html.outputLocation.get().getAsFile()
             }
             project.afterEvaluate {
                 databaseTestTask.includes = extension.includes

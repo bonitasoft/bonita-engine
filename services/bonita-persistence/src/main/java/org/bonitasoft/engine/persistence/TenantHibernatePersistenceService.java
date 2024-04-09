@@ -20,11 +20,10 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -36,6 +35,7 @@ import org.hibernate.Session;
 import org.hibernate.StaleStateException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
 
 /**
  * @author Baptiste Mesta
@@ -44,6 +44,7 @@ import org.hibernate.query.Query;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public class TenantHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
     private static final String TENANT_ID = "tenantId";
@@ -54,12 +55,12 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
 
     public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
-            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
+            final SequenceManager sequenceManager, final DataSource datasource,
             HibernateMetricsBinder hibernateMetricsBinder,
             QueryBuilderFactory queryBuilderFactory)
             throws Exception {
-        super(name, hbmConfigurationProvider, extraHibernateProperties, logger,
-                sequenceManager, datasource, queryBuilderFactory);
+        super(name, hbmConfigurationProvider, extraHibernateProperties, sequenceManager, datasource,
+                queryBuilderFactory);
         this.sessionAccessor = sessionAccessor;
         hibernateMetricsBinder.bindMetrics(getSessionFactory());
     }
@@ -118,8 +119,8 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     @Override
     public void delete(final PersistentObject entity) throws SPersistenceException {
         try {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debug(
                         "[Tenant] Deleting instance of class " + entity.getClass().getSimpleName()
                                 + " with id=" + entity.getId());
             }
@@ -146,6 +147,11 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             setTenant(entity);
         }
         super.insertInBatch(entities);
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return log;
     }
 
     @Override
@@ -202,8 +208,8 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             query.setLong(TENANT_ID, getTenantId());
             parameters.forEach(query::setParameter);
             query.executeUpdate();
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debug(
                         "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
             }
         } catch (final STenantIdNotSetException e) {

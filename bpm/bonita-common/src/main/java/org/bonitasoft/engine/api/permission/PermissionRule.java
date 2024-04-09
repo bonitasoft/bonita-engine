@@ -34,8 +34,6 @@ public interface PermissionRule {
      *        the context of the api call
      * @param apiAccessor
      *        an accessor to call apis
-     * @param logger
-     *        a logger that use the engine logger
      * @return
      *         true if the user is allowed to access the api or false otherwise
      */

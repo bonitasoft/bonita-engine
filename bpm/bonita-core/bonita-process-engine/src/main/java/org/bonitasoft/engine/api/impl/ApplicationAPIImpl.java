@@ -54,7 +54,6 @@ import org.bonitasoft.engine.business.application.converter.ApplicationsToNodeCo
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
 import org.bonitasoft.engine.business.application.exporter.ApplicationExporter;
-import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationMenuCreatorValidator;
@@ -65,7 +64,6 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.page.PageService;
@@ -164,8 +162,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
+            return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -302,14 +299,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ApplicationImporter applicationImporter;
-        try {
-            applicationImporter = tenantAccessor.lookup(ApplicationImporter.class);
-        } catch (NotFoundException e) {
-            throw new IllegalStateException(e);
-        }
-        return applicationImporter.importApplications(xmlContent, null, null, SessionInfos.getUserIdFromSession(),
+        return getTenantAccessor().getApplicationImporter().importApplications(xmlContent, null, null,
+                SessionInfos.getUserIdFromSession(),
                 new StrategySelector().selectStrategy(policy));
     }
 

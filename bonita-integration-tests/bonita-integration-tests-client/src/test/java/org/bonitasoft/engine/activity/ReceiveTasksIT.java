@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -339,7 +338,7 @@ public class ReceiveTasksIT extends TestWithUser {
 
     private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName,
             final String messageName, final String targetProcess,
-            final String targetFlowNode, final List<BEntry<Expression, Expression>> correlations,
+            final String targetFlowNode, final List<Entry<Expression, Expression>> correlations,
             final Map<String, String> processData,
             final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
@@ -372,7 +371,7 @@ public class ReceiveTasksIT extends TestWithUser {
     private ProcessDefinition deployAndEnableProcessWithReceivedTask(final String processName,
             final String receiveTaskName, final String userTaskName,
             final String actorName, final User user, final String messageName,
-            final List<BEntry<Expression, Expression>> correlations,
+            final List<Entry<Expression, Expression>> correlations,
             final Map<String, String> processData, final List<Operation> operations) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
@@ -442,7 +441,7 @@ public class ReceiveTasksIT extends TestWithUser {
         }
     }
 
-    private void addCorrelations(final List<BEntry<Expression, Expression>> correlations,
+    private void addCorrelations(final List<Entry<Expression, Expression>> correlations,
             final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder) {
         if (correlations != null) {
             for (final Entry<Expression, Expression> entry : correlations) {

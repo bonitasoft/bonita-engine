@@ -16,7 +16,13 @@ package org.bonitasoft.engine.event;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNotNull;
 
 import java.util.ArrayList;
@@ -25,10 +31,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
-import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -184,11 +190,11 @@ public class MessageEventIT extends AbstractEventIT {
         data.put("docNumber", Integer.class.getName());
         data.put("lastName", String.class.getName());
 
-        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<>(1);
+        final ArrayList<Entry<Expression, Expression>> correlations = new ArrayList<>(1);
         final Expression docCorrelationKey = new ExpressionBuilder().createConstantStringExpression("docKey");
         final Expression docCorrelationValue = new ExpressionBuilder().createDataExpression("docNumber",
                 Integer.class.getName());
-        correlations.add(new BEntry<>(docCorrelationKey, docCorrelationValue));
+        correlations.add(Map.entry(docCorrelationKey, docCorrelationValue));
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(
                 CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, correlations,
@@ -287,24 +293,24 @@ public class MessageEventIT extends AbstractEventIT {
      */
     @Test
     public void correlationKeyInWrongOrderShouldWork() throws Exception {
-        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<>(2);
-        correlations.add(
-                new BEntry<>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
+        final ArrayList<Entry<Expression, Expression>> correlations = new ArrayList<>(2);
+        correlations
+                .add(Map.entry(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
                         .createConstantStringExpression("value1")));
         correlations.add(
-                new BEntry<>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
+                Map.entry(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
                         .createConstantStringExpression("value2")));
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(
                 CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME,
                 correlations, null, null, null);
 
-        final ArrayList<BEntry<Expression, Expression>> correlationsReceive = new ArrayList<>(2);
+        final ArrayList<Entry<Expression, Expression>> correlationsReceive = new ArrayList<>(2);
         correlationsReceive.add(
-                new BEntry<>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
+                Map.entry(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
                         .createConstantStringExpression("value2")));
         correlationsReceive.add(
-                new BEntry<>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
+                Map.entry(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
                         .createConstantStringExpression("value1")));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent(
@@ -901,12 +907,12 @@ public class MessageEventIT extends AbstractEventIT {
             // Catch Message Event
             final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processToKillDefinitionBuilder
                     .addIntermediateCatchEvent(CATCH_EVENT_NAME).addMessageEventTrigger("msgKiller");
-            final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<>(1);
+            final ArrayList<Entry<Expression, Expression>> correlations = new ArrayList<>(1);
             final Expression correlationKey = new ExpressionBuilder().createConstantStringExpression("key");
             final Expression correlationValue = new ExpressionBuilder().createGroovyScriptExpression("getId",
                     "processInstanceId", Long.class.getName(),
                     new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID));
-            correlations.add(new BEntry<>(correlationKey, correlationValue));
+            correlations.add(Map.entry(correlationKey, correlationValue));
             addCorrelations(catchMessageEventTriggerDefinitionBuilder, correlations);
             // Transitions
             processToKillDefinitionBuilder.addTransition("ToKillStart", "Gateway");
@@ -933,11 +939,11 @@ public class MessageEventIT extends AbstractEventIT {
             final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder = killerProcessDefinitionBuilder
                     .addEndEvent("KillerEnd")
                     .addMessageEventTrigger("msgKiller", targetProcess, targetFlowNode);
-            final ArrayList<BEntry<Expression, Expression>> endCorrelations = new ArrayList<>(1);
+            final ArrayList<Entry<Expression, Expression>> endCorrelations = new ArrayList<>(1);
             final Expression endCorrelationKey = new ExpressionBuilder().createConstantStringExpression("key");
             final Expression endCorrelationValue = new ExpressionBuilder()
                     .createConstantLongExpression(processToKillInstance.getId());
-            endCorrelations.add(new BEntry<>(endCorrelationKey, endCorrelationValue));
+            endCorrelations.add(Map.entry(endCorrelationKey, endCorrelationValue));
             addCorrelations(throwMessageEventTriggerBuilder, endCorrelations);
             // Transitions
             killerProcessDefinitionBuilder.addTransition("KillerStart", "Step3");

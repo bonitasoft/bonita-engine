@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -25,12 +25,11 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -38,6 +37,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FailedStateSetterTest {
 
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     @Mock
     private WaitingEventsInterrupter waitingEventsInterrupter;
 
@@ -53,9 +54,6 @@ public class FailedStateSetterTest {
     @Mock
     private FlowNodeState failedState;
 
-    @Mock
-    private TechnicalLoggerService loggerService;
-
     @InjectMocks
     private FailedStateSetter failedStateSetter;
 
@@ -69,8 +67,6 @@ public class FailedStateSetterTest {
     public void setUp() throws Exception {
         given(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).willReturn(failedState);
         given(flowNodeInstance.getStateId()).willReturn(STATE_ID);
-        given(loggerService.isLoggable(ArgumentMatchers.<Class<?>> any(), any(TechnicalLogSeverity.class)))
-                .willReturn(true);
     }
 
     @Test
@@ -93,12 +89,12 @@ public class FailedStateSetterTest {
                 .willThrow(new SFlowNodeNotFoundException(FLOW_NODE_INSTANCE_ID));
 
         //when
+        systemOutRule.clearLog();
         failedStateSetter.setAsFailed(FLOW_NODE_INSTANCE_ID);
-
         //then
-        verify(loggerService).log(ArgumentMatchers.<Class<?>> any(), eq(TechnicalLogSeverity.DEBUG),
-                eq("Impossible to put flow node instance in failed state: flow node instance with id '"
-                        + FLOW_NODE_INSTANCE_ID + "' not found."));
+        assertThat(systemOutRule.getLog())
+                .contains("Impossible to put flow node instance in failed state: flow node instance with id '"
+                        + FLOW_NODE_INSTANCE_ID + "' not found.");
         verify(activityInstanceService, never()).setState(flowNodeInstance, failedState);
     }
 

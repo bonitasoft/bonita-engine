@@ -85,11 +85,18 @@ public class ScriptExecutor {
         }
     }
 
+    /**
+     * Creates and initializes the platform if it is not already done. It creates database tables and populates it.
+     *
+     * @return <code>true</code> if it is a first initialization of the platform.
+     * @throws PlatformException if it fails to create or initialize tables.
+     */
     public void createAndInitializePlatformIfNecessary() throws PlatformException {
         if (!isPlatformAlreadyCreated()) {
             createTables();
             initializePlatformStructure();
             insertPlatform();
+            insertTenant();
         } else {
             logger.info("Bonita platform already exists. Nothing to do. Stopping.");
         }
@@ -103,6 +110,14 @@ public class ScriptExecutor {
                 "VALUES (1, '%s', '%s', %d, 'platformAdmin')",
                 databaseSchemaVersion, version, System.currentTimeMillis());
         new JdbcTemplate(datasource).update(sql);
+    }
+
+    private void insertTenant() {
+        final String sql = "INSERT INTO tenant (id, created, createdBy, description, defaultTenant, name, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        new JdbcTemplate(datasource).update(sql, 1L, System.currentTimeMillis(),
+                "defaultUser", "Default tenant", true, "default", "ACTIVATED");
     }
 
     public boolean isPlatformAlreadyCreated() {

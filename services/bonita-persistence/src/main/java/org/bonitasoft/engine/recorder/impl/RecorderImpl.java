@@ -16,14 +16,14 @@ package org.bonitasoft.engine.recorder.impl;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -39,18 +39,16 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@Slf4j
 public class RecorderImpl implements Recorder {
-
-    private final TechnicalLoggerService logger;
 
     private final PersistenceService persistenceService;
 
     private final EventService eventService;
 
-    public RecorderImpl(final PersistenceService persistenceService, final TechnicalLoggerService logger,
+    public RecorderImpl(final PersistenceService persistenceService,
             final EventService eventService) {
         this.persistenceService = persistenceService;
-        this.logger = logger;
         this.eventService = eventService;
     }
 
@@ -135,9 +133,11 @@ public class RecorderImpl implements Recorder {
         if (!(e instanceof SFireEventException)) {
             return;
         }
-        final List<Exception> handlerExceptions = ((SFireEventException) e).getHandlerExceptions();
-        for (Exception exception : handlerExceptions) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "error while executing handler", exception);
+        if (log.isDebugEnabled()) {
+            final List<Exception> handlerExceptions = ((SFireEventException) e).getHandlerExceptions();
+            for (Exception exception : handlerExceptions) {
+                log.debug("error while executing handler e {}", ExceptionUtils.printLightWeightStacktrace(exception));
+            }
         }
     }
 

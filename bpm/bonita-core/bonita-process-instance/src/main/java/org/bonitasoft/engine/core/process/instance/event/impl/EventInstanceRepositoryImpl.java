@@ -15,49 +15,23 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 
 import static java.util.Collections.singletonMap;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.*;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.*;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -74,6 +48,7 @@ import org.bonitasoft.engine.services.SPersistenceException;
  * @author Frederic Bouquet
  * @author Celine Souchet
  */
+@Slf4j
 public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     public static final String QUERY_RESET_IN_PROGRESS_WAITING_EVENTS = "resetInProgressWaitingEvents";
@@ -86,17 +61,12 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     private final PersistenceService persistenceService;
 
-    private final TechnicalLoggerService logger;
-
     public EventInstanceRepositoryImpl(final Recorder recorder, final PersistenceService persistenceService,
-            final EventService eventService,
-            final TechnicalLoggerService logger, final ArchiveService archiveService) {
+            final EventService eventService, final ArchiveService archiveService) {
 
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceService = persistenceService;
-        this.logger = logger;
-
     }
 
     @Override
@@ -106,7 +76,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
         } catch (final SRecorderException e) {
             throw new SEventInstanceCreationException(e);
         }
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+        if (log.isDebugEnabled()) {
             final StringBuilder stb = new StringBuilder();
             stb.append("Created ");
             stb.append(eventInstance.getType().getValue());
@@ -122,7 +92,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
             stb.append(eventInstance.getProcessDefinitionId());
             stb.append(">");
             final String message = stb.toString();
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
+            log.debug(message);
         }
     }
 

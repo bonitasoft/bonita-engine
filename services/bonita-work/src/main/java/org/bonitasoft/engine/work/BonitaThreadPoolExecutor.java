@@ -30,23 +30,24 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.time.EngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Julien Reboul
  * @author Baptiste Mesta
  */
+
 public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements BonitaExecutorService {
 
+    private Logger log = LoggerFactory.getLogger(BonitaThreadPoolExecutor.class);
     public static final String NUMBER_OF_WORKS_PENDING = "bonita.bpmengine.work.pending";
     public static final String NUMBER_OF_WORKS_RUNNING = "bonita.bpmengine.work.running";
     public static final String NUMBER_OF_WORKS_EXECUTED = "bonita.bpmengine.work.executed";
 
     private final BlockingQueue<Runnable> workQueue;
     private final WorkFactory workFactory;
-    private final TechnicalLogger log;
     private final EngineClock engineClock;
     private final WorkExecutionCallback workExecutionCallback;
     private WorkExecutionAuditor workExecutionAuditor;
@@ -63,13 +64,12 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
             final TimeUnit unit,
             final BlockingQueue<Runnable> workQueue,
             final ThreadFactory threadFactory,
-            final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
-            EngineClock engineClock, WorkExecutionCallback workExecutionCallback,
+            final RejectedExecutionHandler handler, WorkFactory workFactory, EngineClock engineClock,
+            WorkExecutionCallback workExecutionCallback,
             WorkExecutionAuditor workExecutionAuditor, MeterRegistry meterRegistry, long tenantId) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;
-        this.log = logger.asLogger(BonitaThreadPoolExecutor.class);
         this.engineClock = engineClock;
         this.workExecutionCallback = workExecutionCallback;
         this.workExecutionAuditor = workExecutionAuditor;

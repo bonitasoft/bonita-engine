@@ -13,30 +13,25 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
+@Slf4j
 public class ContractStructureValidator {
 
     private final ContractTypeValidator typeValidator;
-    private final TechnicalLoggerService logger;
 
-    public ContractStructureValidator(final ContractTypeValidator typeValidator,
-            final TechnicalLoggerService loggerService) {
+    public ContractStructureValidator(final ContractTypeValidator typeValidator) {
         this.typeValidator = typeValidator;
-        logger = loggerService;
     }
 
     public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs)
@@ -50,7 +45,7 @@ public class ContractStructureValidator {
 
     void validateInputContainer(SInputContainerDefinition inputContainer, Map<String, Serializable> inputs,
             ErrorReporter errorReporter) {
-        logInputsWhichAreNotInContract(DEBUG, inputContainer.getInputDefinitions(), inputs);
+        logInputsWhichAreNotInContract(inputContainer.getInputDefinitions(), inputs);
         for (final SInputDefinition inputDefinition : inputContainer.getInputDefinitions()) {
             // For each input, fills the errorReporter if some rule is not valid:
             validateInput(inputs != null ? inputs : Collections.<String, Serializable> emptyMap(), errorReporter,
@@ -97,12 +92,11 @@ public class ContractStructureValidator {
     }
 
     // Log when some inputs were not expected but provided:
-    private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity,
-            final List<SInputDefinition> simpleInputs,
+    private void logInputsWhichAreNotInContract(final List<SInputDefinition> simpleInputs,
             final Map<String, Serializable> inputs) {
-        if (logger.isLoggable(ContractStructureValidator.class, severity)) {
+        if (log.isDebugEnabled()) {
             for (final String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
-                logger.log(ContractStructureValidator.class, severity, "Unexpected input [" + input + "] provided");
+                log.debug("Unexpected input [" + input + "] provided");
             }
         }
     }

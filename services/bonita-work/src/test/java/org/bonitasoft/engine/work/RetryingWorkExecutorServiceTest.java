@@ -15,24 +15,10 @@ package org.bonitasoft.engine.work;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.work.ExceptionRetryabilityEvaluator.Retryability.NOT_RETRYABLE;
-import static org.bonitasoft.engine.work.ExceptionRetryabilityEvaluator.Retryability.RETRYABLE;
-import static org.bonitasoft.engine.work.ExceptionRetryabilityEvaluator.Retryability.UNCERTAIN_COMPLETION_OF_COMMIT;
+import static org.bonitasoft.engine.work.ExceptionRetryabilityEvaluator.Retryability.*;
 import static org.bonitasoft.engine.work.RetryingWorkExecutorService.NUMBER_OF_WORKS_RETRIED;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -47,8 +33,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.commons.time.FixedEngineClock;
 import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.junit.Before;
@@ -81,8 +65,6 @@ public class RetryingWorkExecutorServiceTest {
     @Mock(lenient = true)
     private BonitaExecutorService bonitaExecutorService;
     @Mock
-    private TechnicalLogger logger;
-    @Mock
     private BonitaWork bonitaWork;
     private final WorkDescriptor workDescriptor = WorkDescriptor.create("myWork");
     @Mock
@@ -106,8 +88,7 @@ public class RetryingWorkExecutorServiceTest {
         doReturn(NOT_RETRYABLE).when(retryabilityEvaluator)
                 .evaluateRetryability(argThat(t -> !(t instanceof SRetryableException)));
         workExecutorService = new RetryingWorkExecutorService(
-                bonitaExecutorServiceFactory,
-                new TechnicalLoggerSLF4JImpl(), engineClock, WORK_TERMINATION_TIMEOUT, MAX_RETRY, DELAY, DELAY_FACTOR,
+                bonitaExecutorServiceFactory, engineClock, WORK_TERMINATION_TIMEOUT, MAX_RETRY, DELAY, DELAY_FACTOR,
                 retryabilityEvaluator,
                 workExecutionAuditor, meterRegistry, incidentService, TENANT_ID);
         doReturn(true).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));

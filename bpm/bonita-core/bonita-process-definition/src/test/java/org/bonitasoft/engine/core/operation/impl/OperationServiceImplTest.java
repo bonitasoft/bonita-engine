@@ -44,7 +44,6 @@ import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.operation.model.impl.SOperationImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,9 +75,6 @@ public class OperationServiceImplTest {
 
     @Mock
     private LeftOperandHandler leftOperandHandler4;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @Mock
     private OperationExecutorStrategyProvider operationExecutorStrategyProvider;
@@ -144,7 +140,7 @@ public class OperationServiceImplTest {
         operationServiceImpl = new OperationServiceImpl(operationExecutorStrategyProvider,
                 asList(leftOperandHandler1, leftOperandHandler2, leftOperandHandler3, leftOperandHandler4),
                 expressionResolverService,
-                persistRightOperandResolver, logger);
+                persistRightOperandResolver);
     }
 
     @Test

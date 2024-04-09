@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.cache;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +22,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +42,7 @@ public class CacheServiceIT {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CacheServiceIT.class);
 
-    private CacheService cacheService;
+    private EhCacheCacheService cacheService;
 
     @Rule
     public TestName name = new TestName();
@@ -52,7 +50,7 @@ public class CacheServiceIT {
     @Before
     public void setUp() throws Exception {
         LOGGER.info("Testing : {}", name.getMethodName());
-        cacheService = getCacheService();
+        cacheService = (EhCacheCacheService) getCacheService();
         cacheService.clearAll();
         cacheService.start();
     }
@@ -105,8 +103,8 @@ public class CacheServiceIT {
         final CacheConfiguration cacheWithOneElementInMemoryOnly = createOneElementInMemoryOnlyCacheConfiguration();
         configurationsList.add(cacheWithOneElementInMemoryOnly);
 
-        return new EhCacheCacheService(mock(TechnicalLoggerService.class), configurationsList, new CacheConfiguration(),
-                "target", 1) {
+        return new EhCacheCacheService(configurationsList, new CacheConfiguration(),
+                "target") {
 
             @Override
             protected String getCacheManagerName() {

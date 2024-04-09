@@ -16,19 +16,14 @@ package org.bonitasoft.engine.authorization;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
@@ -42,8 +37,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
@@ -53,6 +46,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
@@ -63,14 +57,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class PermissionServiceImplTest {
 
     public static final long TENANT_ID = 12L;
+
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     @Mock
     private ClassLoaderService classLoaderService;
-    @Mock
-    private TechnicalLoggerService logger;
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
@@ -106,7 +101,7 @@ public class PermissionServiceImplTest {
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
                 .getClassLoader(any());
         permissionService = spy(
-                new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID,
+                new PermissionServiceImpl(classLoaderService, sessionAccessor, sessionService, TENANT_ID,
                         compoundPermissionsMapping, resourcesPermissionsMapping, customPermissionsMapping));
         doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
@@ -185,6 +180,7 @@ public class PermissionServiceImplTest {
         FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent(methodBody),
                 Charset.defaultCharset());
 
+        systemOutRule.clearLog();
         permissionService.start();
 
         //when
@@ -192,8 +188,7 @@ public class PermissionServiceImplTest {
                 false);
 
         assertThat(myCustomRule).isTrue();
-        verify(logger).log(argThat(rule -> rule.getName().equals("MyCustomRule")), eq(TechnicalLogSeverity.WARNING),
-                eq("Executing my custom rule"));
+        assertThat(systemOutRule.getLog()).containsPattern("WARN.*.Executing my custom rule");
     }
 
     @Test
@@ -205,6 +200,7 @@ public class PermissionServiceImplTest {
         FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"),
                 getRuleContent("test", "        return true\n"), Charset.defaultCharset());
 
+        systemOutRule.clearLog();
         permissionService.start();
 
         //when
@@ -212,8 +208,7 @@ public class PermissionServiceImplTest {
                 false);
 
         assertThat(myCustomRule).isTrue();
-        verify(logger).log(argThat(rule -> rule.getName().equals("test.MyCustomRule")),
-                eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+        assertThat(systemOutRule.getLog()).containsPattern("WARN.*.Executing my custom rule");
     }
 
     /*

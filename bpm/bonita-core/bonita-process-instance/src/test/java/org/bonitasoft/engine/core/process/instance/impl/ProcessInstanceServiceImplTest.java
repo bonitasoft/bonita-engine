@@ -70,8 +70,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatc
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -79,7 +77,9 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -95,6 +95,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessInstanceServiceImplTest {
 
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     private final long processInstanceId = 574815189L;
 
     private final long archivedProcessInstanceId = 11223344L;
@@ -122,9 +124,6 @@ public class ProcessInstanceServiceImplTest {
 
     @Mock
     private ActivityInstanceService activityInstanceService;
-
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
 
     @Mock
     private DataInstanceService dataInstanceService;
@@ -158,8 +157,6 @@ public class ProcessInstanceServiceImplTest {
         when(processInstance.getId()).thenReturn(processInstanceId);
 
         when(archiveService.getDefinitiveArchiveReadPersistenceService()).thenReturn(readPersistenceService);
-
-        doReturn(true).when(technicalLoggerService).isLoggable((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG));
     }
 
     @Test
@@ -169,8 +166,6 @@ public class ProcessInstanceServiceImplTest {
                 .deleteProcessInstance(processInstance);
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService)
                 .getProcessInstance(processInstanceId);
-        doNothing().when(processInstanceService)
-                .logProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
 
         // when:
         processInstanceService.deleteParentProcessInstanceAndElements(processInstance);
@@ -604,14 +599,15 @@ public class ProcessInstanceServiceImplTest {
         doThrow(exception).when(processInstanceService).getChildOfActivity(flowNodeInstance.getId());
 
         // When
+        systemOutRule.clearLog();
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
 
         // Then
-        verify(technicalLoggerService).log((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG), eq(exception));
+        assertThat(systemOutRule.getLog()).contains("Process instance with id <6> not found");
     }
 
     @Test
-    public void deleteFlowNodeInstanceElements_should_do_nothing_when_getChildOfActivity_failed_and_no_log()
+    public void deleteFlowNodeInstanceElements_should_only_log_in_debug_when_getChildOfActivity_failed()
             throws Exception {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SCallActivityInstance();
@@ -622,13 +618,10 @@ public class ProcessInstanceServiceImplTest {
                 processDefinition);
         final SProcessInstanceNotFoundException exception = new SProcessInstanceNotFoundException(6);
         doThrow(exception).when(processInstanceService).getChildOfActivity(flowNodeInstance.getId());
-        doReturn(false).when(technicalLoggerService).isLoggable((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG));
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
-
-        // Then
-        verify(technicalLoggerService, never()).log((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG), eq(exception));
+        assertThat(systemOutRule.getLog()).containsPattern("DEBUG.*.Process instance with id <6> not found");
     }
 
     @Test

@@ -59,6 +59,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlatformSetup {
 
+    public static final long DEFAULT_TENANT_ID = 1L;
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     public static final String BONITA_SETUP_FOLDER = "org.bonitasoft.platform.setup.folder";
@@ -132,6 +133,17 @@ public class PlatformSetup {
         }
         pushLicenses();
         LOGGER.info("Initial configuration files successfully pushed to database");
+        initializeTenant();
+
+    }
+
+    private void initializeTenant() {
+        configurationService.storeTenantEngineConf(configurationService.getTenantTemplateEngineConf(),
+                DEFAULT_TENANT_ID);
+        configurationService
+                .storeTenantSecurityScripts(configurationService.getTenantTemplateSecurityScripts(), DEFAULT_TENANT_ID);
+        configurationService.storeTenantPortalConf(configurationService.getTenantTemplatePortalConf(),
+                DEFAULT_TENANT_ID);
     }
 
     boolean isPlatformAlreadyCreated() {
@@ -357,7 +369,6 @@ public class PlatformSetup {
         final List<Long> allTenants = configurationService.getAllTenants();
         try {
             configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_ENGINE, allTenants));
-            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_INIT_ENGINE, allTenants));
             configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_PORTAL, allTenants));
             configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_ENGINE, allTenants));
             configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_PORTAL, allTenants));
@@ -465,6 +476,7 @@ public class PlatformSetup {
         initDataSource();
     }
 
+    // Used by distrib bundle tests
     public ConfigurationService getConfigurationService() {
         return configurationService;
     }
