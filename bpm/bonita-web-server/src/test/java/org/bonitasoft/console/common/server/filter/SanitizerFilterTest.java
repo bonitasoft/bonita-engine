@@ -179,6 +179,7 @@ public class SanitizerFilterTest {
     @Test
     public void shouldSanitizeAttackFromBody() throws Exception {
         when(httpRequest.getContentType()).thenReturn("application/JSON");
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
         when(sanitizerFilter.getAttributesExcluded()).thenReturn(List.of("email", "password"));
         // Classic XSS attack in value
         final String attName1 = "test1";

@@ -108,8 +108,8 @@ public class SecurityProperties {
      */
     public boolean isSanitizerProtectionEnabled() {
         final String res = getPlatformProperty(SANITIZER_PROTECTION);
-        // keep true as default when not set correctly
-        return !Boolean.FALSE.toString().equalsIgnoreCase(res);
+        // keep false as default when not set correctly (empty string, null, or any non-"true" value)
+        return Boolean.parseBoolean(res);
     }
 
     /**
