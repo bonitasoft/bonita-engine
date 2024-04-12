@@ -14,6 +14,7 @@
 	<logger name="org.bonitasoft.web.rest.server.api.bpm.process" level="INFO" />
 	<logger name="org.bonitasoft.web.rest.server.api.resource" level="INFO" />
 	<logger name="org.bonitasoft.console.common.server.login.servlet" level="TRACE" />
+	<logger name="org.bonitasoft.console.common.server.filter.SanitizerFilter" level="DEBUG" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />
