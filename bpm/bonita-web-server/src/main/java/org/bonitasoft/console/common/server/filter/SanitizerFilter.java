@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
@@ -40,6 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.owasp.html.HtmlChangeListener;
@@ -54,9 +54,8 @@ import org.springframework.web.util.HtmlUtils;
  *
  * @author Vincent Hemery
  */
+@Slf4j
 public class SanitizerFilter extends ExcludingPatternFilter {
-
-    protected static Logger log = Logger.getLogger(SanitizerFilter.class.getName());
 
     /**
      * Sanitizer to apply to values.
@@ -84,14 +83,18 @@ public class SanitizerFilter extends ExcludingPatternFilter {
 
         @Override
         public void discardedTag(@Nullable Object context, String elementName) {
-            log.fine(() -> format("Tag '%s' has been discarded", elementName));
+            if (log.isDebugEnabled()) {
+                log.debug(format("Tag '%s' has been discarded", elementName));
+            }
         }
 
         @Override
         public void discardedAttributes(
                 @Nullable Object context, String elementName, String... attributeNames) {
-            log.fine(() -> format("Tag '%s' has been cleaned from the following attributes: %s", elementName,
-                    attributeNames));
+            if (log.isDebugEnabled()) {
+                log.debug(format("Tag '%s' has been cleaned from the following attributes: %s", elementName,
+                        String.join(", ", attributeNames)));
+            }
         }
     };
 
@@ -281,7 +284,7 @@ public class SanitizerFilter extends ExcludingPatternFilter {
         sanitized = HtmlUtils.htmlUnescape(sanitized);
         // check whether value has effectively changed before doing anything
         if (!sanitized.equals(value)) {
-            log.warning("Incoming HTML content has been altered. More details at debug level");
+            log.warn("Incoming HTML content has been altered. More details at debug level");
             action.accept(sanitized);
             return Optional.of(sanitized);
         }

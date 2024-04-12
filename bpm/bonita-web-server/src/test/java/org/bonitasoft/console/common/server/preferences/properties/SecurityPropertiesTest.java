@@ -25,23 +25,23 @@ public class SecurityPropertiesTest {
     private final SecurityProperties securityProperties = spy(new SecurityProperties());
 
     @Test
-    public void invalid_or_absent_sanitizer_conf_should_be_disabled() {
+    public void invalid_or_absent_sanitizer_conf_should_be_enabled() {
         doReturn(null).when(securityProperties).getPlatformProperty(SANITIZER_PROTECTION);
-        assertThat(securityProperties.isSanitizerProtectionEnabled()).isFalse();
+        assertThat(securityProperties.isSanitizerProtectionEnabled()).isTrue();
 
         doReturn("").when(securityProperties).getPlatformProperty(SANITIZER_PROTECTION);
-        assertThat(securityProperties.isSanitizerProtectionEnabled()).isFalse();
+        assertThat(securityProperties.isSanitizerProtectionEnabled()).isTrue();
 
-        doReturn("false").when(securityProperties).getPlatformProperty(SANITIZER_PROTECTION);
-        assertThat(securityProperties.isSanitizerProtectionEnabled()).isFalse();
+        doReturn("true").when(securityProperties).getPlatformProperty(SANITIZER_PROTECTION);
+        assertThat(securityProperties.isSanitizerProtectionEnabled()).isTrue();
     }
 
     @Test
-    public void sanitizer_should_be_enabled_for_true_value_whatever_the_case() {
-        doReturn("true").when(securityProperties).getPlatformProperty(SANITIZER_PROTECTION);
-        assertThat(securityProperties.isSanitizerProtectionEnabled()).isTrue();
+    public void sanitizer_should_be_disabled_for_false_value_whatever_the_case() {
+        doReturn("false").when(securityProperties).getPlatformProperty(SANITIZER_PROTECTION);
+        assertThat(securityProperties.isSanitizerProtectionEnabled()).isFalse();
 
-        doReturn("trUE").when(securityProperties).getPlatformProperty(SANITIZER_PROTECTION);
-        assertThat(securityProperties.isSanitizerProtectionEnabled()).isTrue();
+        doReturn("falSE").when(securityProperties).getPlatformProperty(SANITIZER_PROTECTION);
+        assertThat(securityProperties.isSanitizerProtectionEnabled()).isFalse();
     }
 }
