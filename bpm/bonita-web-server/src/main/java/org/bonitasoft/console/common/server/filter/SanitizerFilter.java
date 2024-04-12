@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.console.common.server.filter;
 
+import static java.lang.String.format;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,8 +22,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
 import javax.servlet.FilterChain;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletException;
@@ -38,6 +42,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
+import org.owasp.html.HtmlChangeListener;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.springframework.util.StringUtils;
@@ -51,6 +56,8 @@ import org.springframework.web.util.HtmlUtils;
  */
 public class SanitizerFilter extends ExcludingPatternFilter {
 
+    protected static Logger log = Logger.getLogger(SanitizerFilter.class.getName());
+
     /**
      * Sanitizer to apply to values.
      * Do not let TABLES and LINKS which can be mis-leading as phishing.
@@ -58,16 +65,35 @@ public class SanitizerFilter extends ExcludingPatternFilter {
     private static final PolicyFactory sanitizer = Sanitizers.BLOCKS.and(Sanitizers.FORMATTING).and(Sanitizers.STYLES)
             .and(Sanitizers.IMAGES);
 
-    /** The HTTP methods concerned by this filter. */
+    /**
+     * The HTTP methods concerned by this filter.
+     */
     private static final String[] CONCERNED_METHODS = { "POST", "PUT", "PATCH" };
 
-    /** Json object mapper */
-    private ObjectMapper mapper = new ObjectMapper();
+    /**
+     * Json object mapper
+     */
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    private boolean isEnabled = PropertiesFactory.getSecurityProperties().isSanitizerProtectionEnabled();
+    private final boolean isEnabled = PropertiesFactory.getSecurityProperties().isSanitizerProtectionEnabled();
 
-    private List<String> attributesExcluded = PropertiesFactory.getSecurityProperties()
+    private final List<String> attributesExcluded = PropertiesFactory.getSecurityProperties()
             .getAttributeExcludedFromSanitizerProtection();
+
+    private final HtmlChangeListener<Object> changeListener = new HtmlChangeListener<>() {
+
+        @Override
+        public void discardedTag(@Nullable Object context, String elementName) {
+            log.fine(() -> format("Tag '%s' has been discarded", elementName));
+        }
+
+        @Override
+        public void discardedAttributes(
+                @Nullable Object context, String elementName, String... attributeNames) {
+            log.fine(() -> format("Tag '%s' has been cleaned from the following attributes: %s", elementName,
+                    attributeNames));
+        }
+    };
 
     @Override
     public void destroy() {
@@ -239,7 +265,7 @@ public class SanitizerFilter extends ExcludingPatternFilter {
          * Sanitize the value.
          * It's not just about applying the sanitizer...
          * We want the value to contain unescaped characters, but no script.
-         * To avoid values with multiple escaping, we unescape untill the value does not
+         * To avoid values with multiple escaping, we unescape until the value does not
          * change.
          * Then we apply the sanitizer.
          * And finally, we unescape once again to get values that the frontend can
@@ -251,10 +277,11 @@ public class SanitizerFilter extends ExcludingPatternFilter {
             previous = unescaped;
             unescaped = HtmlUtils.htmlUnescape(previous);
         }
-        var sanitized = sanitizer.sanitize(unescaped);
+        var sanitized = sanitizer.sanitize(unescaped, changeListener, null);
         sanitized = HtmlUtils.htmlUnescape(sanitized);
         // check whether value has effectively changed before doing anything
         if (!sanitized.equals(value)) {
+            log.warning("Incoming HTML content has been altered. More details at debug level");
             action.accept(sanitized);
             return Optional.of(sanitized);
         }
@@ -268,4 +295,5 @@ public class SanitizerFilter extends ExcludingPatternFilter {
     public boolean isSanitizerEnabled() {
         return isEnabled;
     }
+
 }
