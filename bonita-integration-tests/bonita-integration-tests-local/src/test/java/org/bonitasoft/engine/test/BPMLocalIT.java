@@ -551,7 +551,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
     @Test
     public void timerBoundaryEvent_should_not_trigger_and_be_deleted_at_flownode_execution() throws Exception {
         final int timerDuration = 10000;//long enough not to trigger
-        SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
+        SchedulerService schedulerService = getServiceAccessor().getSchedulerService();
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("pTimerBoundary", "2.0");
