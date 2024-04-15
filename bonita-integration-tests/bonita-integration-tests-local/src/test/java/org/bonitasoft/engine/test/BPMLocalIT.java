@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -40,6 +41,7 @@ import org.bonitasoft.engine.bpm.flownode.*;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -55,6 +57,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -544,4 +547,41 @@ public class BPMLocalIT extends CommonAPILocalIT {
         Assertions.assertThat(log).contains(
                 "You are declaring an API access to Bonita Engine as a remote connection, whereas it looks like you are running in the same JVM.");
     }
+
+    @Test
+    public void timerBoundaryEvent_should_not_trigger_and_be_deleted_at_flownode_execution() throws Exception {
+        final int timerDuration = 10000;//long enough not to trigger
+        SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("pTimerBoundary", "2.0");
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addStartEvent("start");
+        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1",
+                ACTOR_NAME);
+        userTaskDefinitionBuilder.addBoundaryEvent("Boundary timer").addTimerEventTriggerDefinition(TimerType.DURATION,
+                new ExpressionBuilder().createConstantLongExpression(timerDuration));
+        userTaskDefinitionBuilder.addUserTask("exceptionStep", ACTOR_NAME);
+        userTaskDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addEndEvent("end");
+        processDefinitionBuilder.addTransition("start", "step1");
+        processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addTransition("Boundary timer", "exceptionStep");
+        processDefinitionBuilder.addTransition("exceptionStep", "end");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, john);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForUserTaskAndExecuteIt(processInstance, "step1", john);
+        Thread.sleep(1000);//The work needs some time to finish
+        List<String> allJobs = schedulerService.getAllJobs();
+        assertThat(allJobs).isEmpty();
+        waitForUserTaskAndExecuteIt(processInstance, "step2", john);
+        waitForProcessToFinish(processInstance);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
 }
