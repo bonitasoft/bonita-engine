@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
@@ -27,6 +28,7 @@ import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeState;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -63,6 +65,10 @@ public class FlowNodeExecutorImplTest {
     private StateBehaviors stateBehaviors;
     @Mock
     BPMArchiverService bpmArchiverService;
+    @Mock
+    EventInstanceService eventInstanceService;
+    @Mock
+    SchedulerService schedulerService;
     @Captor
     private ArgumentCaptor<WorkDescriptor> workDescriptorArgumentCaptor;
     private FlowNodeExecutorImpl flowNodeExecutor;
@@ -72,7 +78,7 @@ public class FlowNodeExecutorImplTest {
     public void before() throws Exception {
         flowNodeExecutor = new FlowNodeExecutorImpl(flowNodeStateManager, activityInstanceService,
                 containerRegistry, processDefinitionService, null, null, workService, workFactory,
-                processInstanceInterruptor, bpmArchiverService);
+                processInstanceInterruptor, bpmArchiverService, eventInstanceService, schedulerService);
         skippedFlowNodeState = new SkippedFlowNodeState();
         doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeState.ID);
         doReturn(stateBehaviors).when(flowNodeStateManager).getStateBehaviors();

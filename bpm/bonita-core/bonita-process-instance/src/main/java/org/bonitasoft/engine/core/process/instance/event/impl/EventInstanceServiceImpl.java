@@ -58,7 +58,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     public static final String BONITA_BPMENGINE_MESSAGE_SENT = "bonita.bpmengine.message.sent";
     private final Counter messageSentCounter;
 
-    private EventInstanceRepository eventInstanceRepository;
+    private final EventInstanceRepository eventInstanceRepository;
 
     public EventInstanceServiceImpl(EventInstanceRepository eventInstanceRepository,
             DataInstanceService dataInstanceService, MeterRegistry meterRegistry, Long tenantId) {
@@ -99,12 +99,11 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     @Override
     public void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId)
             throws SBonitaReadException, SEventTriggerInstanceDeletionException {
-        Optional<STimerEventTriggerInstance> timerEventTriggerInstanceOfFlowNode = getTimerEventTriggerInstanceOfFlowNode(
-                flowNodeInstanceId);
-        if (!timerEventTriggerInstanceOfFlowNode.isPresent()) {
-            return;
+        var timerEventTriggerInstanceOfFlowNode = getTimerEventTriggerInstanceOfFlowNode(
+                flowNodeInstanceId).orElse(null);
+        if (timerEventTriggerInstanceOfFlowNode != null) {
+            deleteEventTriggerInstance(timerEventTriggerInstanceOfFlowNode);
         }
-        deleteEventTriggerInstance(timerEventTriggerInstanceOfFlowNode.get());
     }
 
     @Override
@@ -114,6 +113,11 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public void deleteWaitingEvent(SWaitingEvent sWaitingEvent) throws SWaitingEventModificationException {
+        try {
+            deleteEventTriggerInstanceOfFlowNode(sWaitingEvent.getId());
+        } catch (SBonitaReadException | SEventTriggerInstanceDeletionException e) {
+            throw new SWaitingEventModificationException(e);
+        }
         this.eventInstanceRepository.deleteWaitingEvent(sWaitingEvent);
     }
 
@@ -264,7 +268,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
         try {
             List<Long> messageInstanceIdOlderThanCreationDate = eventInstanceRepository
                     .getMessageInstanceIdOlderThanCreationDate(creationDate, queryOptions);
-            if (messageInstanceIdOlderThanCreationDate.size() > 0) {
+            if (!messageInstanceIdOlderThanCreationDate.isEmpty()) {
                 eventInstanceRepository.deleteMessageInstanceByIds(messageInstanceIdOlderThanCreationDate);
                 for (Long messageId : messageInstanceIdOlderThanCreationDate) {
                     dataInstanceService.deleteLocalDataInstances(messageId,
