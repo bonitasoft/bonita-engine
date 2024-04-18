@@ -13,16 +13,27 @@
  **/
 package org.bonitasoft.web.rest.server.datastore.bpm.flownode.archive;
 
-import org.bonitasoft.web.rest.server.datastore.bpm.flownode.archive.converter.ArchivedFlowNodeSearchDescriptorConverter;
-import org.bonitasoft.web.rest.server.datastore.filter.GenericFilterCreator;
+import java.io.Serializable;
 
-/**
- * @author Vincent Elcrin
- */
+import org.bonitasoft.web.rest.model.bpm.flownode.IFlowNodeItem;
+import org.bonitasoft.web.rest.server.datastore.bpm.flownode.FlowNodeTypeConverter;
+import org.bonitasoft.web.rest.server.datastore.bpm.flownode.archive.converter.ArchivedFlowNodeSearchDescriptorConverter;
+import org.bonitasoft.web.rest.server.datastore.filter.Field;
+import org.bonitasoft.web.rest.server.datastore.filter.Filter;
+import org.bonitasoft.web.rest.server.datastore.filter.GenericFilterCreator;
+import org.bonitasoft.web.rest.server.datastore.filter.Value;
+
 class ArchivedFlowNodeFilterCreator extends GenericFilterCreator {
 
     ArchivedFlowNodeFilterCreator(ArchivedFlowNodeSearchDescriptorConverter converter) {
         super(converter);
     }
 
+    @Override
+    public Filter<? extends Serializable> create(String attribute, String value) {
+        if (IFlowNodeItem.ATTRIBUTE_TYPE.equals(attribute)) {
+            return new Filter<>(new Field(attribute, fieldConverter), new Value<>(value, new FlowNodeTypeConverter()));
+        }
+        return super.create(attribute, value);
+    }
 }
