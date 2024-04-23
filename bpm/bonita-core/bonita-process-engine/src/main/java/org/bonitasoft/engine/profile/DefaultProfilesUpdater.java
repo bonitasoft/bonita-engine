@@ -99,8 +99,7 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
                 IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
             }
         } catch (ExecutionException e) {
-            log.error(
-                    "Unable to update default profiles", e);
+            log.error("Unable to update default profiles", e);
         }
         return null;
     }
