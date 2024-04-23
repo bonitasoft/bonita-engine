@@ -18,11 +18,7 @@ import static org.assertj.core.api.Assertions.contentOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,7 +74,7 @@ public class DefaultProfilesUpdaterTest {
     public void execute_should_update_when_shouldUpdateProfiles_returns_true() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class),
+        doNothing().when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class),
                 anyString());
         // When
         boolean hasUpdated = defaultProfilesUpdater.execute();
@@ -90,7 +86,7 @@ public class DefaultProfilesUpdaterTest {
     public void execute_call_doUpdateProfiles() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class),
+        doNothing().when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class),
                 anyString());
         // When
         defaultProfilesUpdater.execute();

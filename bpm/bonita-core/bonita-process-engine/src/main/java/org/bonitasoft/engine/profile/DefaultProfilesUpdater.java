@@ -58,7 +58,7 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
      * Executes a default profile update
      *
      * @return whether the default profiles where updated
-     * @throws Exception if execution fails
+     * @throws RuntimeException if execution fails
      */
     public boolean execute() {
         try {
@@ -88,20 +88,18 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
         return false;
     }
 
-    Object doUpdateProfiles(final ProfilesNode defaultProfiles, final File md5File, final String defaultProfilesXml)
+    void doUpdateProfiles(final ProfilesNode defaultProfiles, final File md5File, final String defaultProfilesXml)
             throws NoSuchAlgorithmException, IOException {
         try {
             final List<ImportStatus> importStatuses = profilesImporter.importProfiles(defaultProfiles,
                     ImportPolicy.UPDATE_DEFAULTS, SessionService.SYSTEM_ID);
-            log.info(
-                    "Updated default profiles " + importStatuses);
+            log.info("Updated default profiles " + importStatuses);
             if (md5File != null) { // but may not exist
                 IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
             }
         } catch (ExecutionException e) {
             log.error("Unable to update default profiles", e);
         }
-        return null;
     }
 
     File getProfilesMD5File() throws BonitaHomeNotSetException, IOException {
@@ -111,10 +109,7 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
     /**
      * Checks if profiles should be updated: if MD5 file differs from MD5 of XML file
      *
-     * @param md5File
-     * @param defaultProfilesXml
      * @return true if profiles should be updated
-     * @throws NoSuchAlgorithmException
      */
     boolean shouldUpdateProfiles(final File md5File, final String defaultProfilesXml) throws NoSuchAlgorithmException {
         return md5File == null || !IOUtil.checkMD5(md5File, defaultProfilesXml.getBytes());
@@ -127,12 +122,10 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
     String getDefaultProfilesXml() throws IOException {
         String profiles = IOUtil.readResource("profiles-sp.xml");
         if (profiles != null) {
-            log.info(
-                    "Loading profiles from file profiles-sp.xml");
+            log.info("Loading profiles from file profiles-sp.xml");
         } else {
             profiles = IOUtil.readResource("profiles.xml");
-            log.info(
-                    "Loading profiles from file profiles.xml");
+            log.info("Loading profiles from file profiles.xml");
         }
         return profiles;
     }

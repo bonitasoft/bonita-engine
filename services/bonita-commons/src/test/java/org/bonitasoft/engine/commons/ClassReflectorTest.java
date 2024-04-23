@@ -26,10 +26,7 @@ import java.util.Date;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 class ClassReflectorTest {
 
     private static final String NOT_A_METHOD = "not a method";

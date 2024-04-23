@@ -101,7 +101,8 @@ public class ProfileAPIImpl implements ProfileAPI {
         getProfileAPIDelegate().deleteProfileMember(profileMemberId);
     }
 
-    protected long getUserIdFromSession() {
+    @VisibleForTesting
+    public long getUserIdFromSession() {
         return SessionInfos.getUserIdFromSession();
     }
 
