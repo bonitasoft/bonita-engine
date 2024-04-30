@@ -13,7 +13,7 @@ dependencies {
     api libs.springTx
     api libs.springJdbc
     api libs.springContext
-    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api libs.slf4jApi
     api libs.commonsIO
 
     testImplementation "junit:junit:${Deps.junit4Version}"

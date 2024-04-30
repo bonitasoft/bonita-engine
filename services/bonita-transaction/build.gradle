@@ -1,6 +1,6 @@
 dependencies {
     api project(':services:bonita-commons')
-    api "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
+    api libs.jakartaTransactionApi
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

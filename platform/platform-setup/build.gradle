@@ -13,7 +13,7 @@ configurations {
 
 dependencies {
     api "org.apache.commons:commons-text:1.10.0"
-    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api libs.slf4jApi
     api(libs.springBootStarter) {
         exclude(module: 'jul-to-slf4j')
         exclude(module: 'log4j-to-slf4j')
@@ -35,7 +35,7 @@ dependencies {
         exclude(module: "ucp")
         exclude(module: "simplefan")
     }
-    api "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
+    api libs.commonsCLI
     annotationProcessor libs.lombok
     compileOnly libs.lombok
     api(project(":platform:platform-resources"))

@@ -1,23 +1,5 @@
 class Deps {
 
-    public static String commonsCollections4Version = "4.4"
-    public static String tomcatDbcpVersion = "9.0.83"
-    public static String commonsCLIVersion = "1.4"
-    public static String semver4jVersion = '3.1.0'
-    public static String slf4jVersion = "1.7.36"
-
-    // Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
-    public static String hibernateVersion = "5.4.32.Final"
-
-    public static String jacksonBomVersion = "2.15.3"
-    public static String jakartaTransactionVersion = "1.3.3"
-    public static String jakartaServletVersion = "4.0.4"
-    // Keep this until all client projects have migrated to jakarta or it will break their builds !
-    public static String javaxServletVersion = "4.0.1"
-    // The groovy version must be in synch with the runtime-bom artifact
-    public static String groovyVersion = "3.0.19"
-    public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
-    public static String httpComponentsVersion = "4.5.13"
     public static String xstreamVersion = "1.4.20"
     public static String ehcacheVersion = "2.10.10.12.7"
     public static String eclipseCompilerVersion = "3.20.0"

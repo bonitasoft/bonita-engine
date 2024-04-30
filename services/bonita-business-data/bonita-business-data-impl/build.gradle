@@ -8,7 +8,7 @@ dependencies {
     api project(':services:bonita-resources')
     api project(':services:bonita-transaction')
     api project(':services:bonita-commons')
-    api(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) {
+    api(libs.hibernateCore) {
         exclude(module: 'jboss-transaction-api_1.2_spec')
     }
     api libs.commonsLang
@@ -25,7 +25,7 @@ dependencies {
     testImplementation libs.springTest
     testImplementation libs.springJdbc
     testImplementation testFixtures(project(':bpm:bonita-common'))
-    testRuntimeOnly "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
+    testRuntimeOnly libs.tomcatDbcp
     testRuntimeOnly libs.h2
     testRuntimeOnly "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
     testRuntimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"

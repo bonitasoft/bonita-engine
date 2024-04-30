@@ -7,11 +7,11 @@ plugins {
 dependencyManagement {
     dependencies {
         imports {
-            mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}"
-            mavenBom "org.codehaus.groovy:groovy-bom:${Deps.groovyVersion}"
+            mavenBom libs.jacksonBom.get() as String
+            mavenBom libs.groovyBom.get() as String
             mavenBom libs.bonitaArtifactsModelBom.get() as String
         }
-        dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
+        dependencySet(group: 'org.slf4j', version: libs.versions.slf4jVersion.get()) {
             entry 'slf4j-api'
             entry 'slf4j-jdk14'
         }
@@ -27,10 +27,10 @@ dependencyManagement {
             entry "spring-boot-starter-jdbc"
             entry "spring-boot-autoconfigure"
         }
-        dependency("org.hibernate:hibernate-core:${Deps.hibernateVersion}") {
+        dependency(libs.hibernateCore.get() as String) {
             exclude 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec'
         }
-        dependency "org.hibernate:hibernate-jcache:${Deps.hibernateVersion}"
+        dependency(libs.hibernateJCache.get() as String)
         dependency("javax.cache:cache-api:${Deps.jcacheVersion}")
         dependency "javax.persistence:javax.persistence-api:${Deps.javaxPersistenceApiVersion}"
         dependency libs.commonsIO.get() as String
@@ -38,17 +38,17 @@ dependencyManagement {
         dependency(libs.commonsBeanUtils.get() as String) {
             exclude 'commons-collections:commons-collections'
         }
-        dependency("commons-cli:commons-cli:${Deps.commonsCLIVersion}")
+        dependency(libs.commonsCLI.get() as String)
         dependency libs.commonsLang.get() as String
-        dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
-        dependency "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
-        dependency "org.javassist:javassist:${Deps.javassistVersion}"
-        dependencySet(group: 'org.apache.httpcomponents', version: Deps.httpComponentsVersion) {
+        dependency libs.commonsCollections.get() as String
+        dependency libs.jakartaTransactionApi.get() as String
+        dependency libs.javassist.get() as String
+        dependencySet(group: 'org.apache.httpcomponents', version: libs.versions.httpComponentsVersion.get()) {
             entry 'httpclient'
             entry 'httpmime'
         }
         dependency "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
-        dependency "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
+        dependency libs.tomcatDbcp.get() as String
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
         dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
         dependency libs.snakeyaml.get() as String
@@ -66,10 +66,10 @@ dependencyManagement {
             entry 'hazelcast-spring'
         }
         // declared here because it is used by web-extension and by distrib
-        dependency "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
+        dependency(libs.jakartaServletApi.get() as String)
         // To be removed only when client projects (rest api extension) have all moved their deps to jakarta
         // Just keep a version managed to prevent client build breaks
-        dependency "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
+        dependency(libs.javaxServletApi.get() as String)
 
         // Bonita engine dependencies:
         dependency "org.bonitasoft.engine:bonita-common:${project.version}"

@@ -7,9 +7,9 @@ plugins {
 
 dependencies {
     api project(':bpm:bonita-common')
-    api "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
+    api libs.httpComponentsClient
     api "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
-    api "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"
+    api libs.httpComponentsMime
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"

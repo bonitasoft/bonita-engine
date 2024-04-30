@@ -17,8 +17,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testRuntimeOnly libs.springWebMvc
-    compileOnly "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
-    testImplementation "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
+    compileOnly libs.jakartaServletApi
+    testImplementation libs.jakartaServletApi
 }
 
 test {

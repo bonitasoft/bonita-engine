@@ -9,9 +9,9 @@ repositories {
 dependencies {
     implementation project(':bpm:bonita-web-server')
     implementation project(':bonita-test-api')
-    implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    implementation libs.slf4jApi
     implementation libs.commonsIO
-    implementation "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
+    implementation libs.jakartaServletApi
     implementation libs.springTest
     testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"

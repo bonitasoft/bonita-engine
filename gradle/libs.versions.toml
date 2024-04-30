@@ -1,5 +1,5 @@
 [versions]
-# The groovy version must be in synch with the runtime-bom artifact:
+# The groovy version must be in synch with the bonita-project-parent POM (bonita-project repository):
 groovyVersion = "3.0.19"
 springVersion = "5.3.34"
 springSessionVersion = "2.7.4"
@@ -10,6 +10,21 @@ bonitaArtifactsModelVersion = "1.0.0"
 commonsIOVersion = "2.8.0"
 commonsFileUploadVersion = "1.5"
 commonsBeanutilsVersion = "1.9.4"
+commonsCollectionsVersion = "4.4"
+tomcatDbcpVersion = "9.0.83"
+commonsCLIVersion = "1.4"
+semver4jVersion = '3.1.0'
+slf4jVersion = "1.7.36"
+# Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
+hibernateVersion = "5.4.32.Final"
+# version used by hibernate 5.4.32.Final (MUST BE REMOVED WHEN HIBERNATE IS UPGRADED to 5.6+):
+javassistVersion = "3.27.0-GA"
+jacksonBomVersion = "2.15.3"
+jakartaTransactionVersion = "1.3.3"
+jakartaServletVersion = "4.0.4"
+# Keep this until all client projects have migrated to jakarta or it will break their builds !
+javaxServletVersion = "4.0.1"
+httpComponentsVersion = "4.5.13"
 
 [libraries]
 springCore = { module = "org.springframework:spring-core", version.ref = "springVersion" }
@@ -29,6 +44,7 @@ springBootStarter = { module = "org.springframework.boot:spring-boot-starter", v
 springBootStarterJdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "springBootVersion" }
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBootVersion" }
 
+groovyBom = { module = "org.codehaus.groovy:groovy-bom", version.ref = "groovyVersion" }
 groovyCore = { module = "org.codehaus.groovy:groovy", version.ref = "groovyVersion" }
 groovyServlet = { module = "org.codehaus.groovy:groovy-servlet", version.ref = "groovyVersion" }
 groovyXml = { module = "org.codehaus.groovy:groovy-xml", version.ref = "groovyVersion" }
@@ -63,6 +79,24 @@ snakeyaml = "org.yaml:snakeyaml:1.32"
 commonsIO = { group = "commons-io", name = "commons-io", version.ref = "commonsIOVersion" }
 commonsFileUpload = { group = "commons-fileupload", name = "commons-fileupload", version.ref = "commonsFileUploadVersion" }
 commonsBeanUtils = { group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutilsVersion" }
+commonsCollections = { group = "org.apache.commons", name = "commons-collections4", version.ref = "commonsCollectionsVersion" }
+tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatDbcpVersion" }
+commonsCLI = { group = "commons-cli", name = "commons-cli", version.ref = "commonsCLIVersion" }
+semver4j = { group = "com.vdurmont", name = "semver4j", version.ref = "semver4jVersion" }
+slf4jApi = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jVersion" }
+
+hibernateCore = { group = "org.hibernate", name = "hibernate-core", version.ref = "hibernateVersion" }
+hibernateJCache = { group = "org.hibernate", name = "hibernate-jcache", version.ref = "hibernateVersion" }
+javassist = { group = "org.javassist", name = "javassist", version.ref = "javassistVersion" }
+
+jacksonBom = { group = "com.fasterxml.jackson", name = "jackson-bom", version.ref = "jacksonBomVersion" }
+
+jakartaTransactionApi = { group = "jakarta.transaction", name = "jakarta.transaction-api", version.ref = "jakartaTransactionVersion" }
+jakartaServletApi = { group = "jakarta.servlet", name = "jakarta.servlet-api", version.ref = "jakartaServletVersion" }
+javaxServletApi = { group = "javax.servlet", name = "javax.servlet-api", version.ref = "javaxServletVersion" }
+
+httpComponentsClient = { group = "org.apache.httpcomponents", name = "httpclient", version.ref = "httpComponentsVersion" }
+httpComponentsMime = { group = "org.apache.httpcomponents", name = "httpmime", version.ref = "httpComponentsVersion" }
 
 h2 = "com.h2database:h2:1.4.199"
 

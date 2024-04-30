@@ -3,7 +3,7 @@ import org.bonitasoft.engine.gradle.PomUtils
 apply plugin: 'java-test-fixtures'
 
 dependencies {
-    api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
+    api platform(libs.jacksonBom)
     api platform(libs.bonitaArtifactsModelBom)
 
     api "org.bonitasoft.engine:bonita-business-archive"
@@ -12,7 +12,7 @@ dependencies {
     api "org.bonitasoft.engine:bonita-organization-model"
     api "org.bonitasoft.engine:bonita-application-model"
     api "com.fasterxml.jackson.core:jackson-databind"
-    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api libs.slf4jApi
     api "com.fasterxml.jackson.core:jackson-annotations"
 
     runtimeOnly "com.sun.activation:jakarta.activation"

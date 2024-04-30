@@ -11,7 +11,7 @@ dependencies {
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     api libs.springContext
     api libs.springBootAutoconfigure
-    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api libs.slf4jApi
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

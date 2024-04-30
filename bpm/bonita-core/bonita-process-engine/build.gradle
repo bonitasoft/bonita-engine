@@ -5,7 +5,7 @@ plugins {
 dependencies {
     api platform(libs.bonitaArtifactsModelBom)
 
-    api "com.vdurmont:semver4j:${Deps.semver4jVersion}"
+    api libs.semver4j
     api "org.bonitasoft.engine:bonita-organization-model"
     api project(':bpm:bonita-core:bonita-home-server')
     api project(':bpm:bonita-core:bonita-actor-mapping')

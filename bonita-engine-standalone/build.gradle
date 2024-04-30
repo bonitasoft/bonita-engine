@@ -13,8 +13,8 @@ dependencies {
 
     implementation libs.springContext
     implementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
-    implementation "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
-    implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    implementation libs.tomcatDbcp
+    implementation libs.slf4jApi
     runtimeOnly libs.h2
 
 

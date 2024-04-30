@@ -7,10 +7,10 @@ plugins {
 
 dependencies {
     api project(':services:bonita-commons')
-    api "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
+    api libs.hibernateCore
     api "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
     api libs.springCore
-    api "org.javassist:javassist:${Deps.javassistVersion}"
+    api libs.javassist
     api project(':bpm:bonita-common')
     api libs.commonsLang
     api "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"

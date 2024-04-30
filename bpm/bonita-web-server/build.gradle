@@ -11,11 +11,11 @@ dependencies {
     implementation(project(":bpm:bonita-common"))
     implementation(project(":bpm:bonita-web-extensions"))
     implementation libs.commonsIO
-    implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    implementation libs.slf4jApi
     implementation "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
     implementation libs.commonsFileUpload
     implementation libs.commonsBeanUtils
-    implementation "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
+    implementation libs.commonsCollections
     implementation libs.commonsLang
     implementation "com.googlecode.json-simple:json-simple:${Deps.jsonSimpleVersion}"
     implementation "org.tuckey:urlrewritefilter:${Deps.urlrewriteVersion}"
