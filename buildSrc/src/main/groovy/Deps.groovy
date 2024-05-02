@@ -1,10 +1,5 @@
 class Deps {
 
-    public static String xstreamVersion = "1.4.20"
-    public static String ehcacheVersion = "2.10.10.12.7"
-    public static String eclipseCompilerVersion = "3.20.0"
-    public static String jbcryptVersion = "0.4"
-    public static String activationVersion = "1.2.2"
     public static String quartzVersion = "2.3.2"
     public static String micrometerVersion = "1.6.1"
 

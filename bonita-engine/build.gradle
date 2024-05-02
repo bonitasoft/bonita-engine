@@ -16,7 +16,7 @@ dependencyManagement {
             entry 'slf4j-jdk14'
         }
         dependency libs.h2.get() as String
-        dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
+        dependency libs.ehCache.get() as String
 
         dependencySet(group: 'org.springframework', version: libs.versions.springVersion.get()) {
             entry 'spring-context'
@@ -47,14 +47,13 @@ dependencyManagement {
             entry 'httpclient'
             entry 'httpmime'
         }
-        dependency "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+        dependency libs.xstream.get() as String
         dependency libs.tomcatDbcp.get() as String
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
-        dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+        dependency libs.jakartaActivation.get() as String
         dependency libs.snakeyaml.get() as String
-        dependency "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
         dependency("org.quartz-scheduler:quartz:${Deps.quartzVersion}")
-        dependency "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
+        dependency(libs.eclipseCompiler.get() as String)
         dependency("javax.annotation:javax.annotation-api:$Deps.javaxAnnotationsVersion")
         dependencySet(group: "io.micrometer", version: Deps.micrometerVersion) {
             entry "micrometer-core"

@@ -5,9 +5,9 @@ dependencies {
         exclude(module: 'commons-collections')
     }
     api libs.commonsIO
-    api "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+    api libs.jakartaActivation
     api libs.commonsLang
-    api(group: 'com.thoughtworks.xstream', name: 'xstream', version: Deps.xstreamVersion)
+    api(libs.xstream)
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     api libs.springContext
     api libs.springBootAutoconfigure

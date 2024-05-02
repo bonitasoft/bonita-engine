@@ -25,6 +25,10 @@ jakartaServletVersion = "4.0.4"
 # Keep this until all client projects have migrated to jakarta or it will break their builds !
 javaxServletVersion = "4.0.1"
 httpComponentsVersion = "4.5.13"
+xstreamVersion = "1.4.20"
+ehCacheVersion = "2.10.10.12.7"
+eclipseCompilerVersion = "3.20.0"
+jakartaActivationVersion = "1.2.2"
 
 [libraries]
 springCore = { module = "org.springframework:spring-core", version.ref = "springVersion" }
@@ -63,16 +67,16 @@ groovyYaml = { module = "org.codehaus.groovy:groovy-yaml", version.ref = "groovy
 
 bonitaArtifactsModelBom = { module = "org.bonitasoft.engine:bonita-artifacts-model-dependencies", version.ref = "bonitaArtifactsModelVersion" }
 
-bonitaCommonArtifactsModel =  { module = "org.bonitasoft.engine:bonita-common-artifacts-model", version.ref = "bonitaArtifactsModelVersion" }
-bonitaBusinessArchiveModel =  { module = "org.bonitasoft.engine:bonita-business-archive", version.ref = "bonitaArtifactsModelVersion" }
-bonitaProcessDefinitionModel =  { module = "org.bonitasoft.engine:bonita-process-definition-model", version.ref = "bonitaArtifactsModelVersion" }
-bonitaFormMappingModel =  { module = "org.bonitasoft.engine:bonita-form-mapping-model", version.ref = "bonitaArtifactsModelVersion" }
-bonitaBusinessObjectModel =  { module = "org.bonitasoft.engine:bonita-business-object-model", version.ref = "bonitaArtifactsModelVersion" }
-bonitaBdmAccessControlModel =  { module = "org.bonitasoft.engine:bonita-bdm-access-control-model", version.ref = "bonitaArtifactsModelVersion" }
-bonitaProfileModel =  { module = "org.bonitasoft.engine:bonita-profile-model", version.ref = "bonitaArtifactsModelVersion" }
-bonitaOrganizationModel =  { module = "org.bonitasoft.engine:bonita-organization-model", version.ref = "bonitaArtifactsModelVersion" }
-bonitaApplicationModel =  { module = "org.bonitasoft.engine:bonita-application-model", version.ref = "bonitaArtifactsModelVersion" }
-bonitaConnectorModel =  { module = "org.bonitasoft.engine:bonita-connector-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaCommonArtifactsModel = { module = "org.bonitasoft.engine:bonita-common-artifacts-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaBusinessArchiveModel = { module = "org.bonitasoft.engine:bonita-business-archive", version.ref = "bonitaArtifactsModelVersion" }
+bonitaProcessDefinitionModel = { module = "org.bonitasoft.engine:bonita-process-definition-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaFormMappingModel = { module = "org.bonitasoft.engine:bonita-form-mapping-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaBusinessObjectModel = { module = "org.bonitasoft.engine:bonita-business-object-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaBdmAccessControlModel = { module = "org.bonitasoft.engine:bonita-bdm-access-control-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaProfileModel = { module = "org.bonitasoft.engine:bonita-profile-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaOrganizationModel = { module = "org.bonitasoft.engine:bonita-organization-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaApplicationModel = { module = "org.bonitasoft.engine:bonita-application-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaConnectorModel = { module = "org.bonitasoft.engine:bonita-connector-model", version.ref = "bonitaArtifactsModelVersion" }
 
 commonsLang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLangVersion" }
 snakeyaml = "org.yaml:snakeyaml:1.32"
@@ -97,6 +101,13 @@ javaxServletApi = { group = "javax.servlet", name = "javax.servlet-api", version
 
 httpComponentsClient = { group = "org.apache.httpcomponents", name = "httpclient", version.ref = "httpComponentsVersion" }
 httpComponentsMime = { group = "org.apache.httpcomponents", name = "httpmime", version.ref = "httpComponentsVersion" }
+
+xstream = { group = "com.thoughtworks.xstream", name = "xstream", version.ref = "xstreamVersion" }
+ehCache = { group = "net.sf.ehcache", name = "ehcache", version.ref = "ehCacheVersion" }
+eclipseCompiler = { group = "org.eclipse.jdt", name = "ecj", version.ref = "eclipseCompilerVersion" }
+jakartaActivation = { group = "com.sun.activation", name = "jakarta.activation", version.ref = "jakartaActivationVersion" }
+
+
 
 h2 = "com.h2database:h2:1.4.199"
 

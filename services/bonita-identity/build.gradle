@@ -7,8 +7,7 @@ dependencies {
     api project(':services:bonita-persistence')
     api project(':services:bonita-commons')
     api project(':services:bonita-events')
-    api "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
-    api "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+    api libs.jakartaActivation
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

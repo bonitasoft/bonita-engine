@@ -4,7 +4,7 @@ dependencies {
     api project(':services:bonita-platform-session')
     api project(':services:bonita-session')
     api project(':bpm:bonita-common')
-    api "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    api libs.xstream
     api libs.commonsFileUpload
     api libs.commonsIO
     testImplementation libs.springTest

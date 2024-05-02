@@ -8,7 +8,7 @@ plugins {
 dependencies {
     api project(':bpm:bonita-common')
     api libs.httpComponentsClient
-    api "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    api libs.xstream
     api libs.httpComponentsMime
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

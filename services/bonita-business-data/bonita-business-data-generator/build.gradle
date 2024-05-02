@@ -8,7 +8,7 @@ plugins {
 dependencies {
     api project(':services:bonita-commons')
     api libs.hibernateCore
-    api "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
+    api(libs.eclipseCompiler)
     api libs.springCore
     api libs.javassist
     api project(':bpm:bonita-common')

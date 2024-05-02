@@ -1,7 +1,7 @@
 
 
 dependencies {
-    api "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
+    api libs.ehCache
     api project(':services:bonita-commons')
     api project(':services:bonita-session')
     api libs.springContext

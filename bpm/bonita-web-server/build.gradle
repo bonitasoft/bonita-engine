@@ -12,7 +12,7 @@ dependencies {
     implementation(project(":bpm:bonita-web-extensions"))
     implementation libs.commonsIO
     implementation libs.slf4jApi
-    implementation "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
+    implementation libs.ehCache
     implementation libs.commonsFileUpload
     implementation libs.commonsBeanUtils
     implementation libs.commonsCollections
