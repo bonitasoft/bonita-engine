@@ -68,7 +68,7 @@ class Deps {
     public static String woodstoxCoreVersion = "6.4.0"
     public static String keycloakVersion = "21.1.2"
     public static String xmlsecVersion = "2.2.6"
-    public static String bouncyCastleVersion = "1.77"
+    public static String bouncyCastleVersion = "1.78.1"
     public static String spnegoVersion = "1.1.1"
     public static String owaspHTMLSanitizerVersion = "20220608.1"
 
