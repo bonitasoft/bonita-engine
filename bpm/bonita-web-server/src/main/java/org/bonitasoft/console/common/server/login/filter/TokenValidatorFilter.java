@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.filter.ExcludingPatternFilter;
+import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
