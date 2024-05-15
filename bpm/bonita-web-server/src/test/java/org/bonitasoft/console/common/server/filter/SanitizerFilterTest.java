@@ -98,6 +98,7 @@ public class SanitizerFilterTest {
     @Test
     public void shouldNotAffectAttributeValue() throws Exception {
         when(httpRequest.getContentType()).thenReturn("application/json");
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
         final String attributeName = "key";
         final String attributeValue = "value";
         when(httpRequest.getAttribute(attributeName)).thenReturn(attributeValue);
@@ -116,6 +117,7 @@ public class SanitizerFilterTest {
     @Test
     public void shouldNotAffectParameterValues() throws Exception {
         when(httpRequest.getContentType()).thenReturn("application/json");
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
         final String parameterName = "key";
         final String parameterValue = "value";
         when(httpRequest.getParameter(parameterName)).thenReturn(parameterValue);
@@ -134,6 +136,7 @@ public class SanitizerFilterTest {
     @Test
     public void shouldNotAffectFileUpload() throws Exception {
         when(httpRequest.getContentType()).thenReturn("text/xml");
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
         final String body = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>%n" +
                 "<organization:Organization xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema/1.1\">%n"
                 +
@@ -142,28 +145,7 @@ public class SanitizerFilterTest {
                 "</organization:Organization>");
         var is = new ByteArrayInputStream(body.getBytes());
 
-        when(httpRequest.getInputStream()).thenReturn(new ServletInputStream() {
-
-            @Override
-            public int read() throws IOException {
-                return is.read();
-            }
-
-            @Override
-            public boolean isFinished() {
-                return is.available() == 0;
-            }
-
-            @Override
-            public boolean isReady() {
-                return !isFinished();
-            }
-
-            @Override
-            public void setReadListener(ReadListener readListener) {
-                throw new UnsupportedOperationException("Unimplemented method 'setReadListener'");
-            }
-        });
+        when(httpRequest.getInputStream()).thenReturn(getServletInputStream(is));
 
         sanitizerFilter.init(filterConfig);
         sanitizerFilter.doFilter(httpRequest, httpResponse, chain);
@@ -174,6 +156,70 @@ public class SanitizerFilterTest {
         ServletRequest r = requestCaptor.getValue();
         var updatedBody = new String(r.getInputStream().readAllBytes());
         assertThat(updatedBody).isEqualTo(body);
+    }
+
+    @Test
+    public void shouldNotAffectNonHtml() throws Exception {
+        when(httpRequest.getContentType()).thenReturn("application/json");
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
+        when(sanitizerFilter.getAttributesExcluded()).thenReturn(Collections.emptyList());
+        final String body = "{\"key\":\"value\"}";
+        var is = new ByteArrayInputStream(body.getBytes());
+
+        when(httpRequest.getInputStream()).thenReturn(getServletInputStream(is));
+
+        sanitizerFilter.init(filterConfig);
+        sanitizerFilter.doFilter(httpRequest, httpResponse, chain);
+
+        ArgumentCaptor<ServletRequest> requestCaptor = ArgumentCaptor.forClass(ServletRequest.class);
+        verify(chain, times(1)).doFilter(requestCaptor.capture(), any(ServletResponse.class));
+
+        ServletRequest r = requestCaptor.getValue();
+        var updatedBody = new String(r.getInputStream().readAllBytes());
+        assertThat(updatedBody).isEqualTo(body);
+    }
+
+    @Test
+    public void shouldNotAffectPre() throws Exception {
+        when(httpRequest.getContentType()).thenReturn("application/json");
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
+        when(sanitizerFilter.getAttributesExcluded()).thenReturn(Collections.emptyList());
+        final String body = "{\"key\":\"<div><p>text</p><pre>value formatted</pre></div>\"}";
+        var is = new ByteArrayInputStream(body.getBytes());
+
+        when(httpRequest.getInputStream()).thenReturn(getServletInputStream(is));
+
+        sanitizerFilter.init(filterConfig);
+        sanitizerFilter.doFilter(httpRequest, httpResponse, chain);
+
+        ArgumentCaptor<ServletRequest> requestCaptor = ArgumentCaptor.forClass(ServletRequest.class);
+        verify(chain, times(1)).doFilter(requestCaptor.capture(), any(ServletResponse.class));
+
+        ServletRequest r = requestCaptor.getValue();
+        var updatedBody = new String(r.getInputStream().readAllBytes());
+        assertThat(updatedBody).isEqualTo(body);
+    }
+
+    @Test
+    public void shouldNotAffectLinks() throws Exception {
+        when(httpRequest.getContentType()).thenReturn("application/json");
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
+        when(sanitizerFilter.getAttributesExcluded()).thenReturn(Collections.emptyList());
+        final String body = "{\"key\":\"<p><a href=\\\"https://documentation.bonitasoft.com/bonita/latest/\\\">link text</a></p>\"}";
+        var is = new ByteArrayInputStream(body.getBytes());
+
+        when(httpRequest.getInputStream()).thenReturn(getServletInputStream(is));
+
+        sanitizerFilter.init(filterConfig);
+        sanitizerFilter.doFilter(httpRequest, httpResponse, chain);
+
+        ArgumentCaptor<ServletRequest> requestCaptor = ArgumentCaptor.forClass(ServletRequest.class);
+        verify(chain, times(1)).doFilter(requestCaptor.capture(), any(ServletResponse.class));
+
+        ServletRequest r = requestCaptor.getValue();
+        var updatedBody = new String(r.getInputStream().readAllBytes());
+        assertThat(updatedBody).isEqualTo(
+                "{\"key\":\"<p><a href=\\\"https://documentation.bonitasoft.com/bonita/latest/\\\" rel=\\\"noopener noreferrer nofollow\\\">link text</a></p>\"}");
     }
 
     @Test
@@ -237,28 +283,7 @@ public class SanitizerFilterTest {
                 attName7, JSonUtil.escape(attValue7), attName8, JSonUtil.escape(attValue8));
         var is = new ByteArrayInputStream(body.getBytes());
 
-        when(httpRequest.getInputStream()).thenReturn(new ServletInputStream() {
-
-            @Override
-            public int read() throws IOException {
-                return is.read();
-            }
-
-            @Override
-            public boolean isFinished() {
-                return is.available() == 0;
-            }
-
-            @Override
-            public boolean isReady() {
-                return !isFinished();
-            }
-
-            @Override
-            public void setReadListener(ReadListener readListener) {
-                throw new UnsupportedOperationException("Unimplemented method 'setReadListener'");
-            }
-        });
+        when(httpRequest.getInputStream()).thenReturn(getServletInputStream(is));
 
         sanitizerFilter.init(filterConfig);
         sanitizerFilter.doFilter(httpRequest, httpResponse, chain);
@@ -291,4 +316,28 @@ public class SanitizerFilterTest {
         }
     }
 
+    private ServletInputStream getServletInputStream(ByteArrayInputStream is) {
+        return new ServletInputStream() {
+
+            @Override
+            public int read() throws IOException {
+                return is.read();
+            }
+
+            @Override
+            public boolean isFinished() {
+                return is.available() == 0;
+            }
+
+            @Override
+            public boolean isReady() {
+                return !isFinished();
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+                throw new UnsupportedOperationException("Unimplemented method 'setReadListener'");
+            }
+        };
+    }
 }

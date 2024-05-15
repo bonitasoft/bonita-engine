@@ -43,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.owasp.html.HtmlChangeListener;
+import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.springframework.util.StringUtils;
@@ -57,12 +58,15 @@ import org.springframework.web.util.HtmlUtils;
 @Slf4j
 public class SanitizerFilter extends ExcludingPatternFilter {
 
+    private static final HtmlPolicyBuilder CUSTOM_POLICY = new HtmlPolicyBuilder().allowElements("a", "pre")
+            .allowStandardUrlProtocols()
+            .allowAttributes("href").onElements("a").requireRelsOnLinks("noopener", "noreferrer", "nofollow");
+
     /**
      * Sanitizer to apply to values.
-     * Do not let TABLES and LINKS which can be mis-leading as phishing.
      */
     private static final PolicyFactory sanitizer = Sanitizers.BLOCKS.and(Sanitizers.FORMATTING).and(Sanitizers.STYLES)
-            .and(Sanitizers.IMAGES);
+            .and(Sanitizers.IMAGES).and(Sanitizers.TABLES).and(CUSTOM_POLICY.toFactory());
 
     /**
      * The HTTP methods concerned by this filter.
@@ -121,60 +125,68 @@ public class SanitizerFilter extends ExcludingPatternFilter {
         }
         // get body of request as Json
         var body = getJsonBody(req);
-        // sanitize body
-        final var sanitized = sanitize(body);
-        if (sanitized.isPresent()) {
-            // serialize the sanitized json node
-            byte[] saneBodyBytes = mapper.writeValueAsBytes(sanitized.get());
+        if (body != null) {
+            // sanitize body
+            final var sanitized = sanitize(body);
+            byte[] saneBodyBytes;
+            if (sanitized.isPresent()) {
+                // serialize the sanitized json node
+                saneBodyBytes = mapper.writeValueAsBytes(sanitized.get());
+            } else {
+                saneBodyBytes = mapper.writeValueAsBytes(body);
+            }
+            if (req instanceof MultiReadHttpServletRequest) {
+                // if the HttpServletRequest is already a MultiReadHttpServletRequest (already wrapped by another filter), we don't need to wrap it
+                chain.doFilter(req, response);
+            } else {
+                // wrap request with sanitized body for input stream
+                final var wrapper = new HttpServletRequestWrapper(req) {
 
-            // wrap request with sanitized body for input stream
-            sanitized.get();
-            final var wrapper = new HttpServletRequestWrapper(req) {
+                    private ServletInputStream inputStream = null;
 
-                private ServletInputStream inputStream = null;
+                    @Override
+                    public ServletInputStream getInputStream() throws IOException {
+                        if (inputStream == null) {
+                            final ByteArrayInputStream is = new ByteArrayInputStream(saneBodyBytes);
+                            inputStream = new ServletInputStream() {
 
-                @Override
-                public ServletInputStream getInputStream() throws IOException {
-                    if (inputStream == null) {
-                        final ByteArrayInputStream is = new ByteArrayInputStream(saneBodyBytes);
-                        inputStream = new ServletInputStream() {
+                                @Override
+                                public int read() throws IOException {
+                                    return is.read();
+                                }
 
-                            @Override
-                            public int read() throws IOException {
-                                return is.read();
-                            }
+                                @Override
+                                public boolean isFinished() {
+                                    return is.available() == 0;
+                                }
 
-                            @Override
-                            public boolean isFinished() {
-                                return is.available() == 0;
-                            }
+                                @Override
+                                public boolean isReady() {
+                                    return !isFinished();
+                                }
 
-                            @Override
-                            public boolean isReady() {
-                                return !isFinished();
-                            }
-
-                            @Override
-                            public void setReadListener(ReadListener readListener) {
-                                throw new UnsupportedOperationException("Unimplemented method 'setReadListener'");
-                            }
-                        };
+                                @Override
+                                public void setReadListener(ReadListener readListener) {
+                                    throw new UnsupportedOperationException("Unimplemented method 'setReadListener'");
+                                }
+                            };
+                        }
+                        return inputStream;
                     }
-                    return inputStream;
-                }
 
-                @Override
-                public int getContentLength() {
-                    return saneBodyBytes.length;
-                }
+                    @Override
+                    public int getContentLength() {
+                        return saneBodyBytes.length;
+                    }
 
-                @Override
-                public long getContentLengthLong() {
-                    return saneBodyBytes.length;
-                }
+                    @Override
+                    public long getContentLengthLong() {
+                        return saneBodyBytes.length;
+                    }
 
-            };
-            chain.doFilter(wrapper, response);
+                };
+                chain.doFilter(wrapper, response);
+            }
         } else {
             chain.doFilter(req, response);
         }
