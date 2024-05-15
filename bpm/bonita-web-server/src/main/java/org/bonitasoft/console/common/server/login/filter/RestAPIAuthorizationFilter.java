@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.filter.ExcludingPatternFilter;
+import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
 import org.bonitasoft.console.common.server.login.servlet.PlatformLoginServlet;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.bonitasoft.console.common.server.utils.SessionUtil;

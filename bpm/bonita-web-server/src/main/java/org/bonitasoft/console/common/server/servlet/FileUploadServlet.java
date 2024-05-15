@@ -35,7 +35,7 @@ import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededExcepti
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.bonitasoft.console.common.server.login.filter.MultiReadHttpServletRequest;
+import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
 import org.bonitasoft.console.common.server.utils.DocumentUtil;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.TemporaryContentAPI;
@@ -134,7 +134,6 @@ public abstract class FileUploadServlet extends HttpServlet {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/plain;charset=UTF-8");
