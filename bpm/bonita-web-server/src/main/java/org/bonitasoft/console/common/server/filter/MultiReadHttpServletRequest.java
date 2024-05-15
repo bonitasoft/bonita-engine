@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.console.common.server.login.filter;
+package org.bonitasoft.console.common.server.filter;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
