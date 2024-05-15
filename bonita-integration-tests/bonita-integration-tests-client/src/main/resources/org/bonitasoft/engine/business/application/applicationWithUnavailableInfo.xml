@@ -8,7 +8,7 @@
   ~ or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.1">
     <application profile="ThisProfileDoesNotExist" state="ACTIVATED" token="HR-dashboard" version="2.0" layout="custompage_layoutBonita" theme="custompage_themeBonita">
         <displayName>My HR dashboard</displayName>
         <description>This is the HR dashboard.</description>

@@ -217,7 +217,7 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         assertThat(menuSearchResult.getResult().get(1).getDisplayName()).isEqualTo("Daily HR follow-up");
         assertThat(menuSearchResult.getResult().get(1).getIndex()).isEqualTo(1);
         assertThat(menuSearchResult.getResult().get(2).getDisplayName()).isEqualTo("Empty menu");
-        assertThat(menuSearchResult.getResult().get(1).getIndex()).isEqualTo(1);
+        assertThat(menuSearchResult.getResult().get(2).getIndex()).isEqualTo(3);
 
         getLivingApplicationAPI().deleteApplication(app1.getId());
         getPageAPI().deletePage(myPage.getId());
