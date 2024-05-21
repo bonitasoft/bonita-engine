@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.1">
+  <advancedApplication token="app1" version="1.0" profile="User" state="ACTIVATED">
+    <displayName>Application 1</displayName>
+    <description>Description of Application 1</description>
+    <iconPath>/app1.jpg</iconPath>
+  </advancedApplication>
+  <advancedApplication token="app2" version="1.1" state="DEACTIVATED">
+    <displayName>Application 2</displayName>
+  </advancedApplication>
+</applications>

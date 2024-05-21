@@ -87,6 +87,8 @@ public abstract class AbstractSApplication implements PersistentObject {
     private boolean editable = true;
     @Column
     private String internalProfile;
+    @Column
+    private boolean advanced;
 
     public AbstractSApplication(String token, String displayName, String version, long creationDate,
             long createdBy, String state, boolean editable) {

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.1">
+  <advancedApplication token="app1" version="1.0" profile="User" state="ACTIVATED">
+    <displayName>Application 1</displayName>
+    <description>Description of Application 1</description>
+    <iconPath>/app1.jpg</iconPath>
+  </advancedApplication>
+  <advancedApplication token="app2" version="1.1" state="DEACTIVATED">
+    <displayName>Application 2</displayName>
+  </advancedApplication>
+  <application token="app3" version="2.0" profile="User" state="ACTIVATED" homePage="my-new-custom-page"
+               layout="custompage_layoutBonita" theme="custompage_themeBonita">
+    <displayName>Application 3</displayName>
+    <description>Description of Application 3</description>
+    <iconPath>/app3.jpg</iconPath>
+    <applicationPages>
+      <applicationPage customPage="custompage_mynewcustompage" token="my-new-custom-page"/>
+    </applicationPages>
+    <applicationMenus>
+      <applicationMenu>
+        <displayName>Menu level 1</displayName>
+        <applicationMenus>
+          <applicationMenu applicationPage="my-new-custom-page">
+            <displayName>Menu level 1.1</displayName>
+          </applicationMenu>
+        </applicationMenus>
+      </applicationMenu>
+      <applicationMenu>
+        <displayName>Empty menu</displayName>
+      </applicationMenu>
+    </applicationMenus>
+  </application>
+  <application token="app4" version="2.0" state="DEACTIVATED" layout="custompage_layoutBonita"
+               theme="custompage_themeBonita">
+    <displayName>Application 4</displayName>
+    <applicationPages/>
+    <applicationMenus/>
+  </application>
+</applications>

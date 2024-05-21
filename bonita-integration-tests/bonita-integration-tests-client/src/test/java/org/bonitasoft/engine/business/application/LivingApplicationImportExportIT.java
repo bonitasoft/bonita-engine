@@ -92,7 +92,7 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
     }
 
     @Test
-    public void importApplications_should_create_all_applications_contained_by_xml_file_and_return_status_ok_()
+    public void importApplications_should_create_all_applications_contained_by_xml_file_and_return_status_ok()
             throws Exception {
         //given
         final Profile profile = getProfileUser();
@@ -117,15 +117,15 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         assertIsAddOkStatus(importStatus.get(0), "HR-dashboard");
         assertIsAddOkStatus(importStatus.get(1), "My");
 
-        // check applications ware created
+        // check applications were created
         final SearchResult<Application> searchResult = getLivingApplicationAPI()
                 .searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(initialCount + 2);
         Application hrApp = searchResult.getResult().stream().filter(a -> a.getToken().contains("HR")).findFirst()
-                .get();
+                .orElseThrow();
         assertIsHRApplication(profile, defaultLayout, defaultTheme, hrApp);
         assertIsMarketingApplication(
-                searchResult.getResult().stream().filter(a -> a.getToken().contains("My")).findFirst().get());
+                searchResult.getResult().stream().filter(a -> a.getToken().contains("My")).findFirst().orElseThrow());
 
         //check pages were created
         SearchOptionsBuilder builder = getAppSearchBuilderOrderById(0, 10);
@@ -152,7 +152,6 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
 
         getLivingApplicationAPI().deleteApplication(hrApp.getId());
         getPageAPI().deletePage(myPage.getId());
-
     }
 
     @Test
@@ -183,12 +182,12 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError, appPageError1,
                 appPageError2);
 
-        // check applications ware created
+        // check applications were created
         final SearchResult<Application> searchResult = getLivingApplicationAPI()
                 .searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(initialCount + 1);
         final Application app1 = searchResult.getResult().stream().filter(a -> a.getToken().contains("HR")).findFirst()
-                .get();
+                .orElseThrow();
         assertThat(app1.getToken()).isEqualTo("HR-dashboard");
         assertThat(app1.getVersion()).isEqualTo("2.0");
         assertThat(app1.getDisplayName()).isEqualTo("My HR dashboard");
@@ -221,7 +220,6 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
 
         getLivingApplicationAPI().deleteApplication(app1.getId());
         getPageAPI().deletePage(myPage.getId());
-
     }
 
     @Test
@@ -243,9 +241,10 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
 
         //when
         Application hrApplication = searchResult.getResult().stream().filter(a -> a.getToken().contains("HR"))
-                .findFirst().get();
+                .findFirst().orElseThrow();
         byte[] exportedByteArray = getLivingApplicationAPI().exportApplications(hrApplication.getId(),
-                searchResult.getResult().stream().filter(a -> a.getToken().contains("My")).findFirst().get().getId());
+                searchResult.getResult().stream().filter(a -> a.getToken().contains("My")).findFirst().orElseThrow()
+                        .getId());
 
         //then
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(importedByteArray));
@@ -254,7 +253,6 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
 
         getLivingApplicationAPI().deleteApplication(hrApplication.getId());
         getPageAPI().deletePage(myPage.getId());
-
     }
 
 }

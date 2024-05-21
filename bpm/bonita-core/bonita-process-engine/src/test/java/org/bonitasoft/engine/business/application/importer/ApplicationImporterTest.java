@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.application.importer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -31,6 +32,7 @@ import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
+import org.bonitasoft.engine.business.application.xml.AdvancedApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
@@ -40,6 +42,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.session.SessionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,7 +84,8 @@ public class ApplicationImporterTest {
             throws Exception {
         //given
         long createdBy = 5L;
-        SApplicationWithIcon app = new SApplicationWithIcon("app", "app", "1.0", 1L, createdBy, "state", true);
+        boolean editable = false;
+        SApplicationWithIcon app = new SApplicationWithIcon("app", "app", "1.0", 1L, createdBy, "state", editable);
         app.setId(1);
         given(importResult.getApplication()).willReturn(app);
         given(importResult.getImportStatus()).willReturn(new ImportStatus(app.getToken()));
@@ -100,8 +104,9 @@ public class ApplicationImporterTest {
         applicationNode.setHomePage(homePage.getToken());
         applicationNode.setToken("app");
 
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
 
         long homePageId = 222L;
         SApplicationPage applicationPage = new SApplicationPage(app.getId(), homePageId, "home");
@@ -121,15 +126,14 @@ public class ApplicationImporterTest {
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
-        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, false, createdBy,
-                ICON_CONTENT,
-                ICON_MIME_TYPE, true, strategy);
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, editable, createdBy,
+                ICON_CONTENT, ICON_MIME_TYPE, true, strategy);
 
         //then
         //create application
         assertThat(retrievedStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        verify(applicationService, times(1)).createApplication(app);
-        assertThat(app.isEditable()).isEqualTo(false);
+        verify(applicationService).createApplication(app);
+        assertThat(app.isEditable()).isFalse();
         verifyNoInteractions(strategy);
 
         //add pages
@@ -141,7 +145,6 @@ public class ApplicationImporterTest {
         //set home page
         verify(applicationService).updateApplication(eq(app),
                 argThat(desc -> desc.getFields().get(AbstractSApplication.HOME_PAGE_ID).equals(homePageId)));
-
     }
 
     @Test
@@ -149,7 +152,8 @@ public class ApplicationImporterTest {
             throws Exception {
         //given
         long createdBy = 5L;
-        SApplicationWithIcon app = new SApplicationWithIcon("app", "app", "1.0", 1L, createdBy, "state", true);
+        boolean editable = false;
+        SApplicationWithIcon app = new SApplicationWithIcon("app", "app", "1.0", 1L, createdBy, "state", editable);
         app.setId(1);
         given(importResult.getApplication()).willReturn(app);
         given(importResult.getImportStatus()).willReturn(new ImportStatus(app.getToken()));
@@ -168,21 +172,21 @@ public class ApplicationImporterTest {
         applicationNode.setHomePage(homePage.getToken());
         applicationNode.setToken("app");
 
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
 
         long homePageId = 222L;
 
         //when
-        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, false, createdBy,
-                ICON_CONTENT,
-                ICON_MIME_TYPE, false, strategy);
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, editable, createdBy,
+                ICON_CONTENT, ICON_MIME_TYPE, false, strategy);
 
         //then
         //create application
         assertThat(retrievedStatus.getStatus()).isEqualTo(ImportStatus.Status.SKIPPED);
         verify(applicationService, never()).createApplication(app);
-        assertThat(app.isEditable()).isEqualTo(false);
+        assertThat(app.isEditable()).isFalse();
         verifyNoInteractions(strategy);
 
         //add pages
@@ -193,13 +197,13 @@ public class ApplicationImporterTest {
         //set home page
         verify(applicationService, never()).updateApplication(eq(app),
                 argThat(desc -> desc.getFields().get(AbstractSApplication.HOME_PAGE_ID).equals(homePageId)));
-
     }
 
     @Test
     public void importApplication_should_not_add_error_when_error_already_exists() throws Exception {
         //given
         long createdBy = 5L;
+        boolean editable = true;
         SApplicationWithIcon app = mock(SApplicationWithIcon.class);
 
         ImportResult importResult = mock(ImportResult.class);
@@ -214,20 +218,19 @@ public class ApplicationImporterTest {
 
         ApplicationNode applicationNode = new ApplicationNode();
         applicationNode.addApplicationPage(pageNode1);
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
 
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
-        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, true, createdBy,
-                ICON_CONTENT,
-                ICON_MIME_TYPE, true, strategy);
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, editable, createdBy,
+                ICON_CONTENT, ICON_MIME_TYPE, true, strategy);
 
         //then
         assertThat(retrievedStatus).isEqualTo(importResult.getImportStatus());
         assertThat(retrievedStatus.getErrors()).containsExactly(errorPage);
-
     }
 
     @Test
@@ -235,6 +238,7 @@ public class ApplicationImporterTest {
             throws Exception {
         //given
         long createdBy = 5L;
+        boolean editable = true;
         SApplicationWithIcon app = mock(SApplicationWithIcon.class);
 
         ImportResult importResult = mock(ImportResult.class);
@@ -244,12 +248,13 @@ public class ApplicationImporterTest {
 
         ApplicationNode applicationNode = new ApplicationNode();
         applicationNode.setToken("app");
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
-        applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT,
+        applicationImporter.importApplication(applicationNode, editable, createdBy, ICON_CONTENT,
                 ICON_MIME_TYPE, true, strategy);
 
         //then
@@ -262,6 +267,7 @@ public class ApplicationImporterTest {
     public void importApplication_should_add_error_when_home_page_is_not_found() throws Exception {
         //given
         long createdBy = 5L;
+        boolean editable = true;
         SApplicationWithIcon app = mock(SApplicationWithIcon.class);
 
         ImportResult importResult = mock(ImportResult.class);
@@ -273,21 +279,22 @@ public class ApplicationImporterTest {
         applicationNode.setToken("app");
         applicationNode.setHomePage("home");
 
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
         given(applicationService.createApplication(app)).willReturn(app);
 
         given(applicationService.getApplicationPage("app", "home")).willThrow(new SObjectNotFoundException(""));
 
         //when
-        applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT,
+        applicationImporter.importApplication(applicationNode, editable, createdBy, ICON_CONTENT,
                 ICON_MIME_TYPE, true, strategy);
 
         //then
         //set home page
         verify(applicationService, never()).updateApplication(any(SApplicationWithIcon.class),
                 any(EntityUpdateDescriptor.class));
-        verify(importStatus, times(1))
+        verify(importStatus)
                 .addErrorsIfNotExists(List.of(new ImportError("home", ImportError.Type.APPLICATION_PAGE)));
     }
 
@@ -295,6 +302,7 @@ public class ApplicationImporterTest {
     public void importApplication_should_skip_when_strategy_return_skip() throws Exception {
         //given
         long createdBy = 5L;
+        boolean editable = true;
         SApplicationWithIcon appToBeImported = mock(SApplicationWithIcon.class);
         given(appToBeImported.getToken()).willReturn("application");
 
@@ -303,12 +311,13 @@ public class ApplicationImporterTest {
         SApplication appInConflict = mock(SApplication.class);
 
         ApplicationNode applicationNode = mock(ApplicationNode.class);
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
         given(strategy.whenApplicationExists(any(), any())).willReturn(ApplicationImportStrategy.ImportStrategy.SKIP);
         //when
-        ImportStatus importStatus = applicationImporter.importApplication(applicationNode, true, createdBy,
+        ImportStatus importStatus = applicationImporter.importApplication(applicationNode, editable, createdBy,
                 ICON_CONTENT, ICON_MIME_TYPE, true, strategy);
 
         //then
@@ -321,6 +330,7 @@ public class ApplicationImporterTest {
     public void importApplication_replace_application_when_strategy_is_replace_duplicate() throws Exception {
         //given
         long createdBy = 5L;
+        boolean editable = true;
         SApplicationWithIcon appToBeImported = mock(SApplicationWithIcon.class);
         given(appToBeImported.getToken()).willReturn("application");
 
@@ -329,28 +339,30 @@ public class ApplicationImporterTest {
         SApplication appInConflict = mock(SApplication.class);
 
         ApplicationNode applicationNode = mock(ApplicationNode.class);
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
 
         //when
-        ImportStatus importStatus = applicationImporter.importApplication(applicationNode, true, createdBy,
+        ImportStatus importStatus = applicationImporter.importApplication(applicationNode, editable, createdBy,
                 ICON_CONTENT, ICON_MIME_TYPE, true, new ReplaceDuplicateApplicationImportStrategy());
 
         //then
-        verify(applicationService, times(1)).forceDeleteApplication(appInConflict);
-        verify(applicationService, times(1)).createApplication(appToBeImported);
-        verify(applicationService, times(1)).createApplication(appToBeImported);
-        verify(applicationService, times(1)).createApplication(appToBeImported);
+        verify(applicationService).forceDeleteApplication(appInConflict);
+        verify(applicationService).createApplication(appToBeImported);
+        verify(applicationService).createApplication(appToBeImported);
+        verify(applicationService).createApplication(appToBeImported);
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
     }
 
-    @Test(expected = AlreadyExistsException.class)
+    @Test
     public void importApplication_should_throw_alreadyExistsException_when_strategy_FailOnDuplicateApplicationImportStrategy()
             throws Exception {
 
         //given
         long createdBy = 5L;
+        boolean editable = true;
         SApplicationWithIcon appToBeImported = mock(SApplicationWithIcon.class);
         given(appToBeImported.getToken()).willReturn("application");
 
@@ -362,18 +374,19 @@ public class ApplicationImporterTest {
         SApplication appInConflict = mock(SApplication.class);
 
         ApplicationNode applicationNode = mock(ApplicationNode.class);
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
 
-        //when
-        applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT, ICON_MIME_TYPE,
-                true, new FailOnDuplicateApplicationImportStrategy());
-
-        //then exception
+        //when - then exception
+        assertThatExceptionOfType(AlreadyExistsException.class)
+                .isThrownBy(() -> applicationImporter
+                        .importApplication(applicationNode, editable, createdBy, ICON_CONTENT, ICON_MIME_TYPE, true,
+                                new FailOnDuplicateApplicationImportStrategy()));
     }
 
-    @Test(expected = ImportException.class)
+    @Test
     public void importApplication_should_throw_ExecutionException_when_application_service_throws_exception()
             throws Exception {
         //given
@@ -384,19 +397,58 @@ public class ApplicationImporterTest {
         given(importResult.getImportStatus()).willReturn(importStatus);
 
         long createdBy = 5L;
+        boolean editable = true;
 
         given(importResult.getApplication()).willReturn(app1);
 
         ApplicationNode applicationNode = mock(ApplicationNode.class);
-        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
-                .willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable))
+                        .willReturn(importResult);
 
         given(applicationService.createApplication(app1)).willThrow(new SObjectCreationException(""));
 
-        //when
-        applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT, ICON_MIME_TYPE, true,
-                strategy);
+        //when - then exception
+        assertThatExceptionOfType(ImportException.class).isThrownBy(() -> applicationImporter
+                .importApplication(applicationNode, editable, createdBy, ICON_CONTENT, ICON_MIME_TYPE, true, strategy));
+    }
 
-        //then exception
+    @Test
+    public void importAdvancedApplication_should_create_advanced_application_with_no_menus_and_no_pages_and_no_home_page()
+            throws Exception {
+        //given
+        long createdBy = SessionService.SYSTEM_ID;
+        boolean editable = true;
+        SApplicationWithIcon app = new SApplicationWithIcon("app", "app", "1.0", 1L, createdBy, "state", editable);
+        app.setId(1);
+        app.setAdvanced(true);
+        given(importResult.getApplication()).willReturn(app);
+        given(importResult.getImportStatus()).willReturn(new ImportStatus(app.getToken()));
+
+        AdvancedApplicationNode advancedApplicationNode = new AdvancedApplicationNode();
+        advancedApplicationNode.setToken("app");
+
+        given(nodeToApplicationConverter.toSApplication(advancedApplicationNode, null, null, createdBy, editable))
+                .willReturn(importResult);
+
+        given(applicationService.createApplication(app)).willReturn(app);
+
+        //when
+        ImportStatus retrievedStatus = applicationImporter.importApplication(advancedApplicationNode, editable,
+                createdBy, null, null, true, strategy);
+
+        //then
+        //create application
+        assertThat(retrievedStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(retrievedStatus.getErrors()).isEmpty();
+        verify(applicationService).createApplication(app);
+        verifyNoInteractions(strategy);
+
+        //no pages added
+        verify(applicationPageImporter, never()).importApplicationPages(any(), any());
+        //no menus added
+        verify(applicationMenuImporter, never()).importApplicationMenus(any(), any());
+        //no home page set
+        verify(applicationService, never()).updateApplication(any(), any());
     }
 }

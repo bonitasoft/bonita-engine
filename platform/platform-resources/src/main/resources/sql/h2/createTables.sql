@@ -524,7 +524,8 @@ CREATE TABLE business_app (
   iconContent LONGBLOB,
   displayName VARCHAR(255) NOT NULL,
   editable BOOLEAN,
-  internalProfile VARCHAR(255)
+  internalProfile VARCHAR(255),
+  advanced BOOLEAN DEFAULT FALSE
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
