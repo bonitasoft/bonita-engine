@@ -58,7 +58,13 @@ public class LivingApplicationAPIDelegate {
             validateCreator(applicationCreator);
             final SApplicationWithIcon sApplicationWithIcon = applicationService
                     .createApplication(converter.buildSApplication(applicationCreator, loggedUserId));
-            return converter.toApplication(sApplicationWithIcon);
+            var converted = converter.toApplication(sApplicationWithIcon);
+            if (converted instanceof Application res) {
+                return res;
+            } else {
+                // should not occur anyway
+                throw new CreationException("This deprecated API is not supported for advanced applications.");
+            }
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SBonitaException e) {
@@ -77,7 +83,7 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
+    public IApplication getIApplication(final long applicationId) throws ApplicationNotFoundException {
         try {
             return converter.toApplication(applicationService.getApplication(applicationId));
         } catch (final SBonitaReadException e) {
@@ -87,7 +93,7 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    public Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
+    public IApplication getIApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
         try {
             SApplication applicationByToken = applicationService.getApplicationByToken(applicationToken);
             if (applicationByToken == null) {
@@ -123,8 +129,8 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    public SearchResult<Application> searchApplications(
-            final AbstractSearchEntity<Application, SApplication> searchApplications)
+    public <E extends IApplication> SearchResult<E> searchIApplications(
+            final AbstractSearchEntity<E, SApplication> searchApplications)
             throws SearchException {
         try {
             searchApplications.execute();
@@ -150,7 +156,13 @@ public class LivingApplicationAPIDelegate {
             } else {
                 application = applicationService.getApplication(applicationId);
             }
-            return converter.toApplication(application);
+            var converted = converter.toApplication(application);
+            if (converted instanceof Application res) {
+                return res;
+            } else {
+                throw new UpdateException(
+                        "This deprecated API is not supported for advanced applications. The update has been applied nonetheless.");
+            }
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SObjectNotFoundException e) {

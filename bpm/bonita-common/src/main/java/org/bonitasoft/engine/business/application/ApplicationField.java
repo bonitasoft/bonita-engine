@@ -22,7 +22,9 @@ import org.bonitasoft.engine.profile.Profile;
  * @see ApplicationCreator
  * @see ApplicationUpdater
  * @since 7.0.0
+ * @deprecated This class should no longer be used. Since 9.0.0, Applications should be updated at startup.
  */
+@Deprecated(since = "10.2.0")
 public enum ApplicationField {
 
     /**

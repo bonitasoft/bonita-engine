@@ -121,7 +121,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         assertThat(createdApp).isNotNull();
 
         //when
-        final Application retrievedApp = getLivingApplicationAPI().getApplication(createdApp.getId());
+        final IApplication retrievedApp = getLivingApplicationAPI().getIApplication(createdApp.getId());
 
         //then
         assertThat(retrievedApp).isEqualTo(createdApp);
@@ -136,7 +136,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         assertThat(createdApp).isNotNull();
 
         //when
-        final Application retrievedApp = getLivingApplicationAPI().getApplicationByToken(createdApp.getToken());
+        final IApplication retrievedApp = getLivingApplicationAPI().getIApplicationByToken(createdApp.getToken());
 
         //then
         assertThat(retrievedApp).isEqualTo(createdApp);
@@ -177,8 +177,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         final Application marketing = getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchResult<Application> firstPage = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions("AAA", 0, 2));
+        final SearchResult<IApplication> firstPage = getLivingApplicationAPI()
+                .searchIApplications(buildSearchOptions("AAA", 0, 2));
 
         //then
         assertThat(firstPage).isNotNull();
@@ -186,8 +186,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         assertThat(firstPage.getResult()).containsExactly(engineering, hr);
 
         //when
-        final SearchResult<Application> secondPage = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions("AAA", 2, 2));
+        final SearchResult<IApplication> secondPage = getLivingApplicationAPI()
+                .searchIApplications(buildSearchOptions("AAA", 2, 2));
 
         //then
         assertThat(secondPage).isNotNull();
@@ -212,7 +212,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.TOKEN, "Engineering-dashboard");
 
-        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
+        final SearchResult<IApplication> applications = getLivingApplicationAPI().searchIApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(engineering);
@@ -235,7 +235,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "HR dashboard");
 
-        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
+        final SearchResult<IApplication> applications = getLivingApplicationAPI().searchIApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(hr);
@@ -258,7 +258,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.VERSION, "2.0");
 
-        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
+        final SearchResult<IApplication> applications = getLivingApplicationAPI().searchIApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);
@@ -270,7 +270,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         //given
         final Profile profile = getProfileUser();
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
-        long initialCount = getLivingApplicationAPI().searchApplications(builder.done()).getCount();
+        long initialCount = getLivingApplicationAPI().searchIApplications(builder.done()).getCount();
         builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
@@ -285,7 +285,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
 
         //when
 
-        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
+        final SearchResult<IApplication> applications = getLivingApplicationAPI().searchIApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(initialCount + 1);
         assertThat(applications.getResult()).contains(engineering);
@@ -311,7 +311,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.searchTerm("My");
 
-        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
+        final SearchResult<IApplication> applications = getLivingApplicationAPI().searchIApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);

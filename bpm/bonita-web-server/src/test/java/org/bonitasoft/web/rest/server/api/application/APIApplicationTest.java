@@ -25,7 +25,8 @@ import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.ModelFactory;
-import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
 import org.bonitasoft.web.rest.model.portal.profile.ProfileItem;
 import org.bonitasoft.web.rest.server.api.applicationpage.APIApplicationDataStoreFactory;
@@ -102,7 +103,7 @@ public class APIApplicationTest {
         given(dataStore.add(itemToCreate)).willReturn(createdItem);
         given(dataStore.add(itemToCreate)).willReturn(createdItem);
         //when
-        final ApplicationItem retrievedItem = apiApplication.add(itemToCreate);
+        final ApplicationItem retrievedItem = (ApplicationItem) apiApplication.add(itemToCreate);
 
         //then
         assertThat(retrievedItem).isEqualTo(createdItem);
@@ -112,11 +113,12 @@ public class APIApplicationTest {
     public void search_should_return_the_result_of_dataStore_search() throws Exception {
         //given
         @SuppressWarnings("unchecked")
-        final ItemSearchResult<ApplicationItem> result = mock(ItemSearchResult.class);
+        final ItemSearchResult<AbstractApplicationItem> result = mock(ItemSearchResult.class);
         given(dataStore.search(0, 10, "request", "default", Collections.singletonMap("name", "hr"))).willReturn(result);
 
         //when
-        final ItemSearchResult<ApplicationItem> retrievedResult = apiApplication.search(0, 10, "request", "default",
+        final ItemSearchResult<AbstractApplicationItem> retrievedResult = apiApplication.search(0, 10, "request",
+                "default",
                 Collections.singletonMap("name", "hr"));
 
         //then
@@ -133,12 +135,12 @@ public class APIApplicationTest {
     }
 
     @Test
-    public void defineItemDefinition_return_an_instance_of_ApplicationDefinition() throws Exception {
+    public void defineItemDefinition_return_an_instance_of_AbstractApplicationDefinition() throws Exception {
         //when
-        final ItemDefinition<ApplicationItem> itemDefinition = apiApplication.defineItemDefinition();
+        final ItemDefinition<AbstractApplicationItem> itemDefinition = apiApplication.defineItemDefinition();
 
         //then
-        assertThat(itemDefinition).isExactlyInstanceOf(ApplicationDefinition.class);
+        assertThat(itemDefinition).isExactlyInstanceOf(AbstractApplicationDefinition.class);
     }
 
     @Test

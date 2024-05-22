@@ -47,6 +47,7 @@ public abstract class AbstractSApplication implements PersistentObject {
     public static final String ICON_MIME_TYPE = "iconMimeType";
     public static final String EDITABLE = "editable";
     public static final String INTERNAL_PROFILE = "internalProfile";
+    public static final String ADVANCED = "advanced";
 
     @Id
     private long tenantId;

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.Order;
@@ -68,28 +69,32 @@ public class ApplicationIT extends TestWithTechnicalUser {
         final SearchOptionsBuilder builderUser1 = new SearchOptionsBuilder(0, 10);
         builderUser1.filter(ApplicationSearchDescriptor.USER_ID, user1.getId());
         builderUser1.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
-        final SearchResult<Application> applicationsUser1 = getApplicationAPI().searchApplications(builderUser1.done());
+        final SearchResult<IApplication> applicationsUser1 = getApplicationAPI()
+                .searchIApplications(builderUser1.done());
         assertThat(applicationsUser1).isNotNull();
         assertThat(applicationsUser1.getResult()).contains(engineering, hr).doesNotContain(marketing);
 
         final SearchOptionsBuilder builderUser2 = new SearchOptionsBuilder(0, 10);
         builderUser2.filter(ApplicationSearchDescriptor.USER_ID, user2.getId());
         builderUser2.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
-        final SearchResult<Application> applicationsUser2 = getApplicationAPI().searchApplications(builderUser2.done());
+        final SearchResult<IApplication> applicationsUser2 = getApplicationAPI()
+                .searchIApplications(builderUser2.done());
         assertThat(applicationsUser2).isNotNull();
         assertThat(applicationsUser2.getResult()).contains(marketing).doesNotContain(engineering, hr);
 
         final SearchOptionsBuilder builderUser3 = new SearchOptionsBuilder(0, 10);
         builderUser3.filter(ApplicationSearchDescriptor.USER_ID, user3.getId());
         builderUser3.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
-        final SearchResult<Application> applicationsUser3 = getApplicationAPI().searchApplications(builderUser3.done());
+        final SearchResult<IApplication> applicationsUser3 = getApplicationAPI()
+                .searchIApplications(builderUser3.done());
         assertThat(applicationsUser3).isNotNull();
         assertThat(applicationsUser3.getResult()).contains(engineering, hr, marketing);
 
         final SearchOptionsBuilder builderUser4 = new SearchOptionsBuilder(0, 10);
         builderUser4.filter(ApplicationSearchDescriptor.USER_ID, user4.getId());
         builderUser4.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
-        final SearchResult<Application> applicationsUser4 = getApplicationAPI().searchApplications(builderUser4.done());
+        final SearchResult<IApplication> applicationsUser4 = getApplicationAPI()
+                .searchIApplications(builderUser4.done());
         assertThat(applicationsUser4.getResult()).isEmpty();
 
         // Let's check SAM (=tenant admin), has access to applications mapped to "_BONITA_INTERNAL_PROFILE_SUPER_ADMIN":
@@ -99,8 +104,9 @@ public class ApplicationIT extends TestWithTechnicalUser {
         assertThat(importStatus).isNotEmpty().allMatch(status -> status.getStatus().equals(ImportStatus.Status.ADDED));
         final SearchOptionsBuilder soSystemAdmin = new SearchOptionsBuilder(0, 10);
         soSystemAdmin.filter(ApplicationSearchDescriptor.USER_ID, "-1"); // -1 is userId for SAM (= tenant admin)
-        final SearchResult<Application> samApplications = getApplicationAPI().searchApplications(soSystemAdmin.done());
-        final List<Application> applications = samApplications.getResult();
+        final SearchResult<IApplication> samApplications = getApplicationAPI()
+                .searchIApplications(soSystemAdmin.done());
+        final List<IApplication> applications = samApplications.getResult();
         assertThat(applications).hasSize(1);
         assertThat(applications.get(0).getToken()).isEqualTo("superAdminAppBonita");
 
@@ -132,7 +138,8 @@ public class ApplicationIT extends TestWithTechnicalUser {
         final SearchOptionsBuilder builderUser1 = new SearchOptionsBuilder(0, 10);
         builderUser1.filter(ApplicationSearchDescriptor.USER_ID, user1.getId());
         builderUser1.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "Engineering dashboard");
-        final SearchResult<Application> applicationsUser1 = getApplicationAPI().searchApplications(builderUser1.done());
+        final SearchResult<IApplication> applicationsUser1 = getApplicationAPI()
+                .searchIApplications(builderUser1.done());
         assertThat(applicationsUser1).isNotNull();
         assertThat(applicationsUser1.getCount()).isEqualTo(1);
         assertThat(applicationsUser1.getResult()).containsExactly(engineering);

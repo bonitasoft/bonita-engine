@@ -16,7 +16,8 @@ package org.bonitasoft.web.rest.server.api.application;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
 import org.bonitasoft.web.rest.server.api.ConsoleAPI;
 import org.bonitasoft.web.rest.server.api.applicationpage.APIApplicationDataStoreFactory;
@@ -31,15 +32,21 @@ import org.bonitasoft.web.rest.server.framework.api.APIHasGet;
 import org.bonitasoft.web.rest.server.framework.api.APIHasSearch;
 import org.bonitasoft.web.rest.server.framework.api.APIHasUpdate;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 
 /**
+ * Defines the REST API for applications.
+ * <p>Since 10.2.0 some types have changed in this interface.
+ * Yet, these are not breaking changes as the json conversion does not change when using only legacy applications.
+ * This class is not intended to be used as a Java API.</p>
+ *
  * @author Julien Mege
  */
-public class APIApplication extends ConsoleAPI<ApplicationItem>
-        implements APIHasAdd<ApplicationItem>, APIHasSearch<ApplicationItem>,
-        APIHasGet<ApplicationItem>, APIHasUpdate<ApplicationItem>, APIHasDelete {
+public class APIApplication extends ConsoleAPI<AbstractApplicationItem>
+        implements APIHasAdd<AbstractApplicationItem>, APIHasSearch<AbstractApplicationItem>,
+        APIHasGet<AbstractApplicationItem>, APIHasUpdate<ApplicationItem>, APIHasDelete {
 
     private final ApplicationDataStoreCreator creator;
 
@@ -56,8 +63,12 @@ public class APIApplication extends ConsoleAPI<ApplicationItem>
      */
     @Override
     @Deprecated(since = "9.0.0")
-    public ApplicationItem add(final ApplicationItem item) {
-        return creator.create(getEngineSession()).add(item);
+    public AbstractApplicationItem add(final AbstractApplicationItem item) {
+        if (item instanceof ApplicationItem legacy) {
+            return creator.create(getEngineSession()).add(legacy);
+        } else {
+            throw new APIException("This deprecated API is not supported for advanced applications.");
+        }
     }
 
     /**
@@ -70,7 +81,7 @@ public class APIApplication extends ConsoleAPI<ApplicationItem>
     }
 
     @Override
-    public ApplicationItem get(final APIID id) {
+    public AbstractApplicationItem get(final APIID id) {
         return creator.create(getEngineSession()).get(id);
     }
 
@@ -80,7 +91,8 @@ public class APIApplication extends ConsoleAPI<ApplicationItem>
     }
 
     @Override
-    public ItemSearchResult<ApplicationItem> search(final int page, final int resultsByPage, final String search,
+    public ItemSearchResult<AbstractApplicationItem> search(final int page, final int resultsByPage,
+            final String search,
             final String orders,
             final Map<String, String> filters) {
         return creator.create(getEngineSession()).search(page, resultsByPage, search, orders, filters);
@@ -88,27 +100,30 @@ public class APIApplication extends ConsoleAPI<ApplicationItem>
 
     @Override
     public String defineDefaultSearchOrder() {
-        return ApplicationItem.ATTRIBUTE_DISPLAY_NAME;
+        return AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected ItemDefinition<AbstractApplicationItem> defineItemDefinition() {
+        return (ItemDefinition<AbstractApplicationItem>) AbstractApplicationDefinition.get();
     }
 
     @Override
-    protected ItemDefinition<ApplicationItem> defineItemDefinition() {
-        return ApplicationDefinition.get();
-    }
-
-    @Override
-    protected void fillDeploys(final ApplicationItem item, final List<String> deploys) {
+    protected void fillDeploys(final AbstractApplicationItem item, final List<String> deploys) {
         addDeployer(new UserDeployer(
-                new UserDatastore(getEngineSession()), ApplicationItem.ATTRIBUTE_CREATED_BY));
+                new UserDatastore(getEngineSession()), AbstractApplicationItem.ATTRIBUTE_CREATED_BY));
         addDeployer(new UserDeployer(
-                new UserDatastore(getEngineSession()), ApplicationItem.ATTRIBUTE_UPDATED_BY));
-        addDeployer(getDeployerFactory().createProfileDeployer(ApplicationItem.ATTRIBUTE_PROFILE_ID));
-        addDeployer(new PageDeployer(
-                applicationDataStoreFactory.createPageDataStore(getEngineSession()),
-                ApplicationItem.ATTRIBUTE_LAYOUT_ID));
-        addDeployer(new PageDeployer(
-                applicationDataStoreFactory.createPageDataStore(getEngineSession()),
-                ApplicationItem.ATTRIBUTE_THEME_ID));
+                new UserDatastore(getEngineSession()), AbstractApplicationItem.ATTRIBUTE_UPDATED_BY));
+        addDeployer(getDeployerFactory().createProfileDeployer(AbstractApplicationItem.ATTRIBUTE_PROFILE_ID));
+        if (item instanceof ApplicationItem) {
+            addDeployer(new PageDeployer(
+                    applicationDataStoreFactory.createPageDataStore(getEngineSession()),
+                    ApplicationItem.ATTRIBUTE_LAYOUT_ID));
+            addDeployer(new PageDeployer(
+                    applicationDataStoreFactory.createPageDataStore(getEngineSession()),
+                    ApplicationItem.ATTRIBUTE_THEME_ID));
+        }
 
         super.fillDeploys(item, deploys);
     }

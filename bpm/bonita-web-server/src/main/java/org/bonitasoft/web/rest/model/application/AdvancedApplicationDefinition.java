@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Bonitasoft S.A.
+ * Copyright (C) 2024 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,14 +14,13 @@
 package org.bonitasoft.web.rest.model.application;
 
 import org.bonitasoft.web.toolkit.client.data.item.Definitions;
-import org.bonitasoft.web.toolkit.client.data.item.attribute.ItemAttribute;
 
 /**
- * Item definition for a Legacy Bonita Living Application for the REST API.
+ * Item definition for an Advanced Bonita Living Application for the REST API.
  */
-public class ApplicationDefinition extends AbstractApplicationDefinition<ApplicationItem> {
+public class AdvancedApplicationDefinition extends AbstractApplicationDefinition<AdvancedApplicationItem> {
 
-    public static final String TOKEN = "application";
+    public static final String TOKEN = "advancedApplication";
 
     @Override
     protected String defineToken() {
@@ -29,20 +28,12 @@ public class ApplicationDefinition extends AbstractApplicationDefinition<Applica
     }
 
     @Override
-    protected void defineAttributes() {
-        super.defineAttributes();
-        createAttribute(ApplicationItem.ATTRIBUTE_HOME_PAGE_ID, ItemAttribute.TYPE.ITEM_ID);
-        createAttribute(ApplicationItem.ATTRIBUTE_LAYOUT_ID, ItemAttribute.TYPE.ITEM_ID);
-        createAttribute(ApplicationItem.ATTRIBUTE_THEME_ID, ItemAttribute.TYPE.ITEM_ID);
+    protected AdvancedApplicationItem _createItem() {
+        return new AdvancedApplicationItem();
     }
 
-    @Override
-    protected ApplicationItem _createItem() {
-        return new ApplicationItem();
-    }
-
-    public static ApplicationDefinition get() {
-        return (ApplicationDefinition) Definitions.get(TOKEN);
+    public static AdvancedApplicationDefinition get() {
+        return (AdvancedApplicationDefinition) Definitions.get(TOKEN);
     }
 
 }

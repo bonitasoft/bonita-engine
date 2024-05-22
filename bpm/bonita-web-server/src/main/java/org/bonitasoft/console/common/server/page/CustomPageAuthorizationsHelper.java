@@ -15,9 +15,9 @@ package org.bonitasoft.console.common.server.page;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
-import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -62,8 +62,9 @@ public class CustomPageAuthorizationsHelper {
     }
 
     private Long getApplicationId(String applicationToken) throws BonitaException {
-        SearchResult<Application> applicationSResult = applicationAPI.searchApplications(new SearchOptionsBuilder(0, 1)
-                .filter(ApplicationSearchDescriptor.TOKEN, applicationToken).done());
+        SearchResult<IApplication> applicationSResult = applicationAPI
+                .searchIApplications(new SearchOptionsBuilder(0, 1)
+                        .filter(ApplicationSearchDescriptor.TOKEN, applicationToken).done());
 
         if (applicationSResult.getResult().isEmpty()) {
             return null;

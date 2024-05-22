@@ -20,6 +20,9 @@ import org.bonitasoft.console.common.server.utils.IconDescriptor;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.IApplication;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
+import org.bonitasoft.web.rest.model.application.AdvancedApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
 import org.bonitasoft.web.toolkit.client.common.util.MapUtil;
 import org.bonitasoft.web.toolkit.client.data.item.template.ItemHasIcon;
@@ -35,8 +38,31 @@ public class ApplicationItemConverter {
         this.bonitaHomeFolderAccessor = bonitaHomeFolderAccessor;
     }
 
-    public ApplicationItem toApplicationItem(final Application application) {
-        final ApplicationItem item = new ApplicationItem();
+    public AbstractApplicationItem toApplicationItem(final IApplication application) {
+        final AbstractApplicationItem item;
+
+        if (application instanceof Application legacy) {
+            var legacyItem = new ApplicationItem();
+            item = legacyItem;
+            if (legacy.getHomePageId() != null) {
+                legacyItem.setHomePageId(legacy.getHomePageId());
+            } else {
+                legacyItem.setHomePageId(-1L);
+            }
+            if (legacy.getLayoutId() != null) {
+                legacyItem.setLayoutId(legacy.getLayoutId());
+            } else {
+                legacyItem.setLayoutId(-1L);
+            }
+            if (legacy.getThemeId() != null) {
+                legacyItem.setThemeId(legacy.getThemeId());
+            } else {
+                legacyItem.setThemeId(-1L);
+            }
+        } else {
+            item = new AdvancedApplicationItem();
+        }
+
         item.setId(application.getId());
         item.setToken(application.getToken());
         item.setDisplayName(application.getDisplayName());
@@ -56,25 +82,14 @@ public class ApplicationItemConverter {
         } else {
             item.setProfileId(-1L);
         }
-        if (application.getHomePageId() != null) {
-            item.setHomePageId(application.getHomePageId());
-        } else {
-            item.setHomePageId(-1L);
-        }
-        if (application.getLayoutId() != null) {
-            item.setLayoutId(application.getLayoutId());
-        } else {
-            item.setLayoutId(-1L);
-        }
-        if (application.getThemeId() != null) {
-            item.setThemeId(application.getThemeId());
-        } else {
-            item.setThemeId(-1L);
-        }
 
         return item;
     }
 
+    /**
+     * @deprecated ApplicationCreator should no longer be used. Since 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "10.2.0")
     public ApplicationCreator toApplicationCreator(final ApplicationItem appItem) {
         final ApplicationCreator creator = new ApplicationCreator(appItem.getToken(), appItem.getDisplayName(),
                 appItem.getVersion());
@@ -83,6 +98,10 @@ public class ApplicationItemConverter {
         return creator;
     }
 
+    /**
+     * @deprecated ApplicationUpdater should no longer be used. Since 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "10.2.0")
     public ApplicationUpdater toApplicationUpdater(final Map<String, String> attributes) {
         final ApplicationUpdater applicationUpdater = getApplicationUpdater();
 
@@ -123,6 +142,10 @@ public class ApplicationItemConverter {
 
     }
 
+    /**
+     * @deprecated ApplicationUpdater should no longer be used. Since 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "10.2.0")
     protected ApplicationUpdater getApplicationUpdater() {
         return new ApplicationUpdater();
     }

@@ -97,7 +97,7 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         //given
         final Profile profile = getProfileUser();
         long initialCount = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions(0, 10)).getCount();
+                .searchIApplications(buildSearchOptions(0, 10)).getCount();
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
@@ -118,14 +118,15 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         assertIsAddOkStatus(importStatus.get(1), "My");
 
         // check applications were created
-        final SearchResult<Application> searchResult = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<IApplication> searchResult = getLivingApplicationAPI()
+                .searchIApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(initialCount + 2);
-        Application hrApp = searchResult.getResult().stream().filter(a -> a.getToken().contains("HR")).findFirst()
-                .orElseThrow();
+        Application hrApp = (Application) searchResult.getResult().stream().filter(a -> a.getToken().contains("HR"))
+                .findFirst().orElseThrow();
         assertIsHRApplication(profile, defaultLayout, defaultTheme, hrApp);
         assertIsMarketingApplication(
-                searchResult.getResult().stream().filter(a -> a.getToken().contains("My")).findFirst().orElseThrow());
+                (Application) searchResult.getResult().stream().filter(a -> a.getToken().contains("My"))
+                        .findFirst().orElseThrow());
 
         //check pages were created
         SearchOptionsBuilder builder = getAppSearchBuilderOrderById(0, 10);
@@ -158,7 +159,7 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
     public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_if_there_is_unavailable_info()
             throws Exception {
         long initialCount = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions(0, 10)).getCount();
+                .searchIApplications(buildSearchOptions(0, 10)).getCount();
         //given
         final byte[] applicationsByteArray = IOUtils.toByteArray(LivingApplicationIT.class
                 .getResourceAsStream("applicationWithUnavailableInfo.xml"));
@@ -183,11 +184,12 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
                 appPageError2);
 
         // check applications were created
-        final SearchResult<Application> searchResult = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<IApplication> searchResult = getLivingApplicationAPI()
+                .searchIApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(initialCount + 1);
-        final Application app1 = searchResult.getResult().stream().filter(a -> a.getToken().contains("HR")).findFirst()
-                .orElseThrow();
+        final Application app1 = (Application) searchResult.getResult().stream()
+                .filter(a -> a.getToken().contains("HR"))
+                .findFirst().orElseThrow();
         assertThat(app1.getToken()).isEqualTo("HR-dashboard");
         assertThat(app1.getVersion()).isEqualTo("2.0");
         assertThat(app1.getDisplayName()).isEqualTo("My HR dashboard");
@@ -226,7 +228,7 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
     public void export_after_import_should_return_the_same_xml_file() throws Exception {
         //given
         long initialCount = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions(0, 10)).getCount();
+                .searchIApplications(buildSearchOptions(0, 10)).getCount();
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
                 IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
@@ -235,12 +237,13 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
                 .getResourceAsStream("applications.xml"));
 
         getLivingApplicationAPI().importApplications(importedByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
-        final SearchResult<Application> searchResult = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<IApplication> searchResult = getLivingApplicationAPI()
+                .searchIApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(initialCount + 2);
 
         //when
-        Application hrApplication = searchResult.getResult().stream().filter(a -> a.getToken().contains("HR"))
+        Application hrApplication = (Application) searchResult.getResult().stream()
+                .filter(a -> a.getToken().contains("HR"))
                 .findFirst().orElseThrow();
         byte[] exportedByteArray = getLivingApplicationAPI().exportApplications(hrApplication.getId(),
                 searchResult.getResult().stream().filter(a -> a.getToken().contains("My")).findFirst().orElseThrow()

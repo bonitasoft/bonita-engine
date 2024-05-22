@@ -18,6 +18,7 @@ import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -40,7 +41,7 @@ public class ApplicationModelFactory {
     public ApplicationModel createApplicationModel(final String name) throws CreationException {
 
         try {
-            final SearchResult<Application> result = applicationApi.searchApplications(
+            final SearchResult<IApplication> result = applicationApi.searchIApplications(
                     new SearchOptionsBuilder(0, 1)
                             .filter(ApplicationSearchDescriptor.TOKEN, name)
                             .done());
@@ -48,12 +49,18 @@ public class ApplicationModelFactory {
             if (result.getCount() == 0) {
                 throw new CreationException("No application found with name " + name);
             }
+            // find a legacy application
+            var legacyApplication = result.getResult().stream().filter(Application.class::isInstance)
+                    .map(Application.class::cast).findFirst();
+            if (legacyApplication.isEmpty()) {
+                throw new CreationException("Only advanced applications were found with name " + name);
+            }
 
             return new ApplicationModel(
                     applicationApi,
                     customPageApi,
                     profileApi,
-                    result.getResult().get(0),
+                    legacyApplication.get(),
                     new MenuFactory(applicationApi));
         } catch (final SearchException e) {
             throw new CreationException("Error while searching for the application " + name, e);

@@ -14,9 +14,13 @@
 package org.bonitasoft.web.rest.server.datastore.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +29,12 @@ import java.util.HashMap;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
-import org.bonitasoft.engine.business.application.*;
+import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import org.bonitasoft.engine.business.application.ApplicationPage;
+import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.ApplicationVisibility;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -35,6 +44,7 @@ import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
 import org.bonitasoft.web.rest.server.APITestWithMock;
@@ -186,10 +196,10 @@ public class ApplicationDataStoreTest extends APITestWithMock {
         final ApplicationItem item = new ApplicationItem();
         given(converter.toApplicationItem(application)).willReturn(item);
         application.setId(1);
-        given(applicationAPI.getApplication(1)).willReturn(application);
+        given(applicationAPI.getIApplication(1)).willReturn(application);
 
         //when
-        final ApplicationItem retrivedItem = dataStore.get(APIID.makeAPIID("1"));
+        final AbstractApplicationItem retrivedItem = dataStore.get(APIID.makeAPIID("1"));
 
         //then
         assertThat(retrivedItem).isEqualTo(item);
@@ -198,7 +208,7 @@ public class ApplicationDataStoreTest extends APITestWithMock {
     @Test(expected = APIException.class)
     public void should_return_throw_APIException_on_get_when_engine_throws_exception() throws Exception {
         //given
-        given(applicationAPI.getApplication(1)).willThrow(new ApplicationNotFoundException(1));
+        given(applicationAPI.getIApplication(1)).willThrow(new ApplicationNotFoundException(1));
 
         //when
         dataStore.get(APIID.makeAPIID("1"));
@@ -245,15 +255,15 @@ public class ApplicationDataStoreTest extends APITestWithMock {
         application.setLastUpdateDate(new Date());
         application.setVisibility(ApplicationVisibility.ALL);
 
-        given(applicationAPI.searchApplications(any(SearchOptions.class)))
-                .willReturn(new SearchResultImpl<>(2, Arrays.<Application> asList(application)));
+        given(applicationAPI.searchIApplications(any(SearchOptions.class)))
+                .willReturn(new SearchResultImpl<>(2, Arrays.<IApplication> asList(application)));
 
         //when
         dataStore.search(page, resultsByPage, search, orders, filters);
 
         //then
         final ArgumentCaptor<SearchOptions> searchOptionCaptor = ArgumentCaptor.forClass(SearchOptions.class);
-        verify(applicationAPI, times(1)).searchApplications(searchOptionCaptor.capture());
+        verify(applicationAPI, times(1)).searchIApplications(searchOptionCaptor.capture());
 
         final SearchOptions searchOption = searchOptionCaptor.getValue();
         assertThat(searchOption.getFilters().get(0).getField()).isEqualTo(ApplicationItem.ATTRIBUTE_CREATED_BY);
@@ -285,12 +295,12 @@ public class ApplicationDataStoreTest extends APITestWithMock {
         application.setLastUpdateDate(new Date());
         application.setVisibility(ApplicationVisibility.ALL);
 
-        given(applicationAPI.searchApplications(any(SearchOptions.class)))
-                .willReturn(new SearchResultImpl<>(2, Arrays.<Application> asList(application)));
+        given(applicationAPI.searchIApplications(any(SearchOptions.class)))
+                .willReturn(new SearchResultImpl<>(2, Arrays.<IApplication> asList(application)));
 
         //when
-        final ItemSearchResult<ApplicationItem> retrievedItems = dataStore.search(page, resultsByPage, search, orders,
-                filters);
+        final ItemSearchResult<AbstractApplicationItem> retrievedItems = dataStore.search(page, resultsByPage, search,
+                orders, filters);
 
         //then
         assertThat(retrievedItems.getLength()).isEqualTo(1);
@@ -303,7 +313,7 @@ public class ApplicationDataStoreTest extends APITestWithMock {
     @Test(expected = APIException.class)
     public void should_throw_APIException_on_search_when_engine_throws_exception() throws Exception {
         //given
-        given(applicationAPI.searchApplications(any(SearchOptions.class)))
+        given(applicationAPI.searchIApplications(any(SearchOptions.class)))
                 .willThrow(new SearchException(new Exception()));
 
         //when

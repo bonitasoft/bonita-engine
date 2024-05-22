@@ -327,10 +327,18 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor,
-            final SApplicationWithIcon application) throws SBonitaReadException, SObjectAlreadyExistsException {
+            final SApplicationWithIcon application)
+            throws SBonitaReadException, SObjectAlreadyExistsException, SObjectModificationException {
         if (updateDescriptor.getFields().containsKey(AbstractSApplication.TOKEN)
                 && !application.getToken().equals(updateDescriptor.getFields().get(AbstractSApplication.TOKEN))) {
             validateApplicationToken((String) updateDescriptor.getFields().get(AbstractSApplication.TOKEN));
+        }
+        if (updateDescriptor.getFields().containsKey(AbstractSApplication.ADVANCED)
+                && !Boolean.valueOf(application.isAdvanced())
+                        .equals(updateDescriptor.getFields().get(AbstractSApplication.ADVANCED))) {
+            throw new SObjectModificationException(format(
+                    "The 'advanced' nature of application '%s' is not modifiable. You can not switch between legacy and advanced applications.",
+                    application.getDisplayName()));
         }
     }
 

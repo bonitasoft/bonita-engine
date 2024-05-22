@@ -35,6 +35,11 @@ public class ApplicationSearchDescriptor {
     public static final String ID = "id";
 
     /**
+     * Used to filter or order <code>Application</code> items by legacy or advanced criteria
+     */
+    public static final String ADVANCED = "advanced";
+
+    /**
      * Used to filter or order by the <code>Application</code> token
      */
     public static final String TOKEN = "token";

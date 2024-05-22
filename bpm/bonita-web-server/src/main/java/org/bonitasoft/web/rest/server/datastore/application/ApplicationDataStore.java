@@ -24,11 +24,13 @@ import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
@@ -48,10 +50,10 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Application>
+public class ApplicationDataStore extends CommonDatastore<AbstractApplicationItem, IApplication>
         implements DatastoreHasAdd<ApplicationItem>,
         DatastoreHasUpdate<ApplicationItem>,
-        DatastoreHasGet<ApplicationItem>, DatastoreHasSearch<ApplicationItem>, DatastoreHasDelete {
+        DatastoreHasGet<AbstractApplicationItem>, DatastoreHasSearch<AbstractApplicationItem>, DatastoreHasDelete {
 
     private final ApplicationAPI applicationAPI;
     private final ApplicationItemConverter converter;
@@ -82,9 +84,9 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
     }
 
     @Override
-    public ApplicationItem get(final APIID id) {
+    public AbstractApplicationItem get(final APIID id) {
         try {
-            final Application application = applicationAPI.getApplication(id.toLong());
+            final IApplication application = applicationAPI.getIApplication(id.toLong());
             return converter.toApplicationItem(application);
         } catch (final BonitaException e) {
             throw new APIException(e);
@@ -107,7 +109,13 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
             final ApplicationPage appHomePage = applicationAPI.createApplicationPage(application.getId(),
                     homePageDef.getId(), "home");
             applicationAPI.setApplicationHomePage(application.getId(), appHomePage.getId());
-            return converter.toApplicationItem(application);
+            var converted = converter.toApplicationItem(application);
+            if (converted instanceof ApplicationItem res) {
+                return res;
+            } else {
+                // should not occur anyway
+                throw new APIException("This deprecated API is not supported for advanced applications.");
+            }
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
@@ -122,21 +130,28 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
         try {
             final ApplicationUpdater applicationUpdater = converter.toApplicationUpdater(attributes);
             final Application application = applicationAPI.updateApplication(id.toLong(), applicationUpdater);
-            return converter.toApplicationItem(application);
+            var converted = converter.toApplicationItem(application);
+            if (converted instanceof ApplicationItem res) {
+                return res;
+            } else {
+                throw new APIException(
+                        "This deprecated API is not supported for advanced applications. The update has been applied nonetheless.");
+            }
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
 
     @Override
-    public ItemSearchResult<ApplicationItem> search(final int page, final int resultsByPage, final String search,
+    public ItemSearchResult<AbstractApplicationItem> search(final int page, final int resultsByPage,
+            final String search,
             final String orders,
             final Map<String, String> filters) {
         // Build search
         final SearchOptionsCreator creator = makeSearchOptionCreator(page, resultsByPage, search, orders, filters);
 
         // Run search depending on filters passed
-        SearchResult<Application> searchResult;
+        SearchResult<IApplication> searchResult;
         try {
             searchResult = runSearch(creator);
 
@@ -157,8 +172,8 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
                         new ApplicationFilterCreator(getSearchDescriptorConverter())));
     }
 
-    protected SearchResult<Application> runSearch(final SearchOptionsCreator creator) throws SearchException {
-        return applicationAPI.searchApplications(creator.create());
+    protected SearchResult<IApplication> runSearch(final SearchOptionsCreator creator) throws SearchException {
+        return applicationAPI.searchIApplications(creator.create());
     }
 
     protected ApplicationSearchDescriptorConverter getSearchDescriptorConverter() {
@@ -166,7 +181,7 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
     }
 
     @Override
-    protected ApplicationItem convertEngineToConsoleItem(final Application item) {
+    protected AbstractApplicationItem convertEngineToConsoleItem(final IApplication item) {
         return new ApplicationItemConverter(new BonitaHomeFolderAccessor()).toApplicationItem(item);
     }
 

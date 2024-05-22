@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
 import org.bonitasoft.web.rest.server.datastore.converter.AttributeConverter;
 import org.bonitasoft.web.toolkit.client.common.util.MapUtil;
@@ -33,19 +34,21 @@ public class ApplicationSearchDescriptorConverter implements AttributeConverter 
 
     private Map<String, String> createMapping() {
         final Map<String, String> mapping = new HashMap<>();
-        mapping.put(ApplicationItem.ATTRIBUTE_ID, ApplicationSearchDescriptor.ID);
-        mapping.put(ApplicationItem.ATTRIBUTE_TOKEN, ApplicationSearchDescriptor.TOKEN);
-        mapping.put(ApplicationItem.ATTRIBUTE_DISPLAY_NAME, ApplicationSearchDescriptor.DISPLAY_NAME);
-        mapping.put(ApplicationItem.ATTRIBUTE_STATE, ApplicationSearchDescriptor.STATE);
-        mapping.put(ApplicationItem.ATTRIBUTE_CREATED_BY, ApplicationSearchDescriptor.CREATED_BY);
-        mapping.put(ApplicationItem.ATTRIBUTE_CREATION_DATE, ApplicationSearchDescriptor.CREATION_DATE);
-        mapping.put(ApplicationItem.ATTRIBUTE_LAST_UPDATE_DATE, ApplicationSearchDescriptor.LAST_UPDATE_DATE);
-        mapping.put(ApplicationItem.ATTRIBUTE_UPDATED_BY, ApplicationSearchDescriptor.UPDATED_BY);
-        mapping.put(ApplicationItem.ATTRIBUTE_VERSION, ApplicationSearchDescriptor.VERSION);
-        mapping.put(ApplicationItem.ATTRIBUTE_PROFILE_ID, ApplicationSearchDescriptor.PROFILE_ID);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_ID, ApplicationSearchDescriptor.ID);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_ADVANCED, ApplicationSearchDescriptor.ADVANCED);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_TOKEN, ApplicationSearchDescriptor.TOKEN);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, ApplicationSearchDescriptor.DISPLAY_NAME);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_STATE, ApplicationSearchDescriptor.STATE);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_CREATED_BY, ApplicationSearchDescriptor.CREATED_BY);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_CREATION_DATE, ApplicationSearchDescriptor.CREATION_DATE);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_LAST_UPDATE_DATE, ApplicationSearchDescriptor.LAST_UPDATE_DATE);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_UPDATED_BY, ApplicationSearchDescriptor.UPDATED_BY);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_VERSION, ApplicationSearchDescriptor.VERSION);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_PROFILE_ID, ApplicationSearchDescriptor.PROFILE_ID);
+        mapping.put(AbstractApplicationItem.FILTER_USER_ID, ApplicationSearchDescriptor.USER_ID);
+
         mapping.put(ApplicationItem.ATTRIBUTE_LAYOUT_ID, ApplicationSearchDescriptor.LAYOUT_ID);
         mapping.put(ApplicationItem.ATTRIBUTE_THEME_ID, ApplicationSearchDescriptor.THEME_ID);
-        mapping.put(ApplicationItem.FILTER_USER_ID, ApplicationSearchDescriptor.USER_ID);
 
         return mapping;
     }

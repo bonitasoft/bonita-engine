@@ -62,7 +62,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
     public void custom_application_should_be_deployed_entirely() throws Exception {
         // ensure application did not exist initially:
         assertThatExceptionOfType(ApplicationNotFoundException.class)
-                .isThrownBy(() -> getApplicationAPI().getApplicationByToken("appsManagerBonita"));
+                .isThrownBy(() -> getApplicationAPI().getIApplicationByToken("appsManagerBonita"));
 
         // given:
         ApplicationInstaller applicationInstallerImpl = ServiceAccessorSingleton.getInstance()
@@ -87,7 +87,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         assertThat(getIdentityAPI().getRoleByName("appsManager")).isNotNull();
         assertThat(getIdentityAPI().getGroupByPath("/appsManagement")).isNotNull();
 
-        assertThat(getApplicationAPI().getApplicationByToken("appsManagerBonita").getDisplayName())
+        assertThat(getApplicationAPI().getIApplicationByToken("appsManagerBonita").getDisplayName())
                 .isEqualTo("Application manager");
         final long processDefinitionId = getProcessAPI().getProcessDefinitionId("CallHealthCheck", "1.0");
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);

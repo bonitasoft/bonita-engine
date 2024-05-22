@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.business.application.*;
-import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import org.bonitasoft.engine.business.application.impl.*;
 import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
@@ -114,11 +114,22 @@ public class ApplicationModelConverter {
         }
     }
 
-    public Application toApplication(final AbstractSApplication abstractSApplication) {
-        final ApplicationImpl application = new ApplicationImpl(abstractSApplication.getToken(),
-                abstractSApplication.getVersion(),
-                abstractSApplication.getDescription(),
-                abstractSApplication.getLayoutId(), abstractSApplication.getThemeId());
+    public IApplication toApplication(final AbstractSApplication abstractSApplication) {
+        final AbstractApplicationImpl application;
+        if (abstractSApplication.isAdvanced()) {
+            final AdvancedApplicationImpl advancedApplication = new AdvancedApplicationImpl(
+                    abstractSApplication.getToken(),
+                    abstractSApplication.getVersion(),
+                    abstractSApplication.getDescription());
+            application = advancedApplication;
+        } else {
+            ApplicationImpl legacyApplication = new ApplicationImpl(abstractSApplication.getToken(),
+                    abstractSApplication.getVersion(),
+                    abstractSApplication.getDescription(),
+                    abstractSApplication.getLayoutId(), abstractSApplication.getThemeId());
+            legacyApplication.setHomePageId(abstractSApplication.getHomePageId());
+            application = legacyApplication;
+        }
         application.setId(abstractSApplication.getId());
         application.setDisplayName(abstractSApplication.getDisplayName());
         application.setCreatedBy(abstractSApplication.getCreatedBy());
@@ -127,7 +138,6 @@ public class ApplicationModelConverter {
         application.setLastUpdateDate(new Date(abstractSApplication.getLastUpdateDate()));
         application.setState(abstractSApplication.getState());
         application.setIconPath(abstractSApplication.getIconPath());
-        application.setHomePageId(abstractSApplication.getHomePageId());
         application.setProfileId(abstractSApplication.getProfileId());
         application.setHasIcon(abstractSApplication.hasIcon());
         application.setEditable(abstractSApplication.isEditable());
@@ -136,8 +146,8 @@ public class ApplicationModelConverter {
         return application;
     }
 
-    public List<Application> toApplication(final List<SApplication> sApplications) {
-        final List<Application> applications = new ArrayList<>(sApplications.size());
+    public List<IApplication> toApplication(final List<SApplication> sApplications) {
+        final List<IApplication> applications = new ArrayList<>(sApplications.size());
         for (final SApplication sApplication : sApplications) {
             applications.add(toApplication(sApplication));
         }

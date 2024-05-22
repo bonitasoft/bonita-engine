@@ -25,7 +25,9 @@ import org.bonitasoft.engine.profile.Profile;
  * @author Elias Ricken de Medeiros
  * @see Application
  * @since 7.0.0
+ * @deprecated This class should no longer be used. Since 9.0.0, Applications should be created at startup.
  */
+@Deprecated(since = "10.2.0")
 public class ApplicationCreator implements Serializable {
 
     private static final long serialVersionUID = -916041825489100271L;
