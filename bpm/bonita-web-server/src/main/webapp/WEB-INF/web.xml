@@ -126,6 +126,11 @@
             <param-value>true</param-value>
         </init-param>
     </filter>
+    <!-- Redirect filter -->
+    <filter>
+        <filter-name>RedirectFilter</filter-name>
+        <filter-class>org.bonitasoft.console.common.server.filter.RedirectFilter</filter-class>
+    </filter>
     <!-- Sanitize filter to prevent code injection -->
     <filter>
         <filter-name>SanitizerFilter</filter-name>
@@ -235,6 +240,12 @@
         <url-pattern>/portal.js/*</url-pattern>
         <url-pattern>/apps/*</url-pattern>
         <url-pattern>/services/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>RedirectFilter</filter-name>
+        <url-pattern>/apps/sendRedirect</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
