@@ -24,6 +24,7 @@ import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +53,13 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         deleteApplication(APP_2_TOKEN);
         deleteApplication(APP_3_TOKEN);
         deleteApplication(APP_4_TOKEN);
+        getTransactionService().executeInTransaction(() -> {
+            SPage page = pageService.getPageByName("custompage_mynewcustompage");
+            if (page != null) {
+                pageService.deletePage(page.getId());
+            }
+            return page;
+        });
     }
 
     private void deleteApplication(String appToken) throws Exception {
@@ -145,6 +153,48 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertAdvancedApp2();
         assertAdvancedApp3();
         assertAdvancedApp4();
+    }
+
+    @Test
+    public void mixed_legacy_and_advanced_applications_should_be_imported_successfully_twice() throws Exception {
+        //given
+        String xmlToImport = "/applications-importer/mixedLegacyAndAdvancedApplications.xml";
+        ApplicationImportStrategy updateStrategy = (a1, a2) -> ApplicationImportStrategy.ImportStrategy.REPLACE;
+
+        // create page mandatory for app3
+        createDummyPage();
+
+        //when
+        List<ImportStatus> importStatuses = importApplicationsFromXml(xmlToImport);
+        assertThat(importStatuses).hasSize(4);
+        // and re-import
+        try (var xmlAsStream = this.getClass().getResourceAsStream(xmlToImport)) {
+            assertThat(xmlAsStream).isNotNull();
+            importStatuses = getTransactionService()
+                    .executeInTransaction(() -> applicationImporter.importApplications(xmlAsStream.readAllBytes(), null,
+                            null, SessionInfos.getUserIdFromSession(), updateStrategy));
+        }
+
+        //then
+        assertThat(importStatuses).hasSize(4);
+        assertThat(importStatuses.get(0).getName()).isEqualTo(APP_1_TOKEN);
+        assertThat(importStatuses.get(0).getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
+        assertThat(importStatuses.get(0).getErrors()).isEmpty();
+        assertThat(importStatuses.get(1).getName()).isEqualTo(APP_2_TOKEN);
+        assertThat(importStatuses.get(1).getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
+        assertThat(importStatuses.get(1).getErrors()).isEmpty();
+        assertThat(importStatuses.get(2).getName()).isEqualTo(APP_3_TOKEN);
+        assertThat(importStatuses.get(2).getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
+        assertThat(importStatuses.get(2).getErrors()).isEmpty();
+        assertThat(importStatuses.get(3).getName()).isEqualTo(APP_4_TOKEN);
+        assertThat(importStatuses.get(3).getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
+        assertThat(importStatuses.get(3).getErrors()).isEmpty();
+
+        assertAdvancedApp1();
+        assertAdvancedApp2();
+        assertAdvancedApp3();
+        assertAdvancedApp4();
+
     }
 
     private List<ImportStatus> importApplicationsFromXml(String xmlToImport) throws Exception {
