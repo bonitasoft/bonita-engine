@@ -61,6 +61,8 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SApplication.class, AbstractSApplication.LAYOUT_ID));
         keys.put(ApplicationSearchDescriptor.THEME_ID,
                 new FieldDescriptor(SApplication.class, AbstractSApplication.THEME_ID));
+        keys.put(ApplicationSearchDescriptor.ADVANCED,
+                new FieldDescriptor(SApplication.class, AbstractSApplication.ADVANCED));
         // internal usage only for now (as it would require a conversion of the Visibility enum):
         keys.put(APPLICATION_VISIBILITY,
                 new FieldDescriptor(SApplication.class, AbstractSApplication.INTERNAL_PROFILE));
