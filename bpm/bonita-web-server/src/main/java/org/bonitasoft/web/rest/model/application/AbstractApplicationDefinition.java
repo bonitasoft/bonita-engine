@@ -66,8 +66,8 @@ public class AbstractApplicationDefinition<ITEM extends AbstractApplicationItem>
 
     @Override
     protected ITEM _createItem() {
-        throw new UnsupportedOperationException(
-                "The _createItem method should not be called for this abstract class. Use subclasses to instantiate.");
+        // this might be called by deprecated PUT and POST methods which work only with legacy applications...
+        return (ITEM) ApplicationDefinition.get()._createItem();
     }
 
 }

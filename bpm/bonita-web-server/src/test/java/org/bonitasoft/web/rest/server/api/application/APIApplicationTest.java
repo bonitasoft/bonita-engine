@@ -41,6 +41,7 @@ import org.bonitasoft.web.rest.server.framework.APIServletCall;
 import org.bonitasoft.web.rest.server.framework.Deployer;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.ItemDefinitionFactory;
+import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.junit.Before;
 import org.junit.Test;
@@ -162,6 +163,21 @@ public class APIApplicationTest {
         assertThat(deployers.get(ApplicationItem.ATTRIBUTE_UPDATED_BY)).isExactlyInstanceOf(UserDeployer.class);
         assertThat(deployers.get(ApplicationItem.ATTRIBUTE_LAYOUT_ID)).isExactlyInstanceOf(PageDeployer.class);
         assertThat(deployers.get(ApplicationItem.ATTRIBUTE_THEME_ID)).isExactlyInstanceOf(PageDeployer.class);
+    }
+
+    @Test
+    public void update_should_return_the_appropriate_application_kind() throws Exception {
+        //given
+        final APIID idToUpdate = mock(APIID.class);
+        final ApplicationItem updatedItem = mock(ApplicationItem.class);
+        Map<String, String> attributes = Collections.emptyMap();
+        given(dataStore.update(idToUpdate, attributes)).willReturn(updatedItem);
+
+        //when
+        final ApplicationItem retrievedItem = apiApplication.update(idToUpdate, attributes);
+
+        //then
+        assertThat(retrievedItem).isEqualTo(updatedItem);
     }
 
 }

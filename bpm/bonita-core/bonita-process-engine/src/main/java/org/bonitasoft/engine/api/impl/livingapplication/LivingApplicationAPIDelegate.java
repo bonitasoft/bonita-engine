@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl.livingapplication;
 
+import java.util.Optional;
+
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.business.application.*;
 import org.bonitasoft.engine.business.application.impl.IconImpl;
@@ -151,6 +153,15 @@ public class LivingApplicationAPIDelegate {
             validateUpdater(updater);
             AbstractSApplication application;
             if (!updater.getFields().isEmpty()) {
+                /*
+                 * This API may be called within our without a transaction.
+                 * So we must check first whether the application is advanced to have a consistent behavior
+                 * and never update the advanced application.
+                 */
+                if (Optional.ofNullable(applicationService.getApplicationWithIcon(applicationId))
+                        .filter(AbstractSApplication::isAdvanced).isPresent()) {
+                    throw new UpdateException("This deprecated API is not supported for advanced applications.");
+                }
                 application = applicationService.updateApplication(applicationId,
                         converter.toApplicationUpdateDescriptor(updater, loggedUserId));
             } else {
@@ -160,8 +171,7 @@ public class LivingApplicationAPIDelegate {
             if (converted instanceof Application res) {
                 return res;
             } else {
-                throw new UpdateException(
-                        "This deprecated API is not supported for advanced applications. The update has been applied nonetheless.");
+                throw new UpdateException("This deprecated API is not supported for advanced applications.");
             }
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
