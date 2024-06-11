@@ -14,8 +14,7 @@
 package org.bonitasoft.web.rest.server.api.application;
 
 import static org.bonitasoft.web.rest.server.api.page.builder.PageItemBuilder.aPageItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
@@ -37,11 +36,7 @@ import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
-import org.bonitasoft.web.rest.model.application.AdvancedApplicationDefinition;
-import org.bonitasoft.web.rest.model.application.AdvancedApplicationItem;
-import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
-import org.bonitasoft.web.rest.model.application.ApplicationItem;
+import org.bonitasoft.web.rest.model.application.*;
 import org.bonitasoft.web.rest.model.portal.page.PageItem;
 import org.bonitasoft.web.rest.server.api.applicationpage.APIApplicationDataStoreFactory;
 import org.bonitasoft.web.rest.server.datastore.application.ApplicationDataStoreCreator;
@@ -127,27 +122,12 @@ public class APIApplicationIT extends AbstractConsoleTest {
     @Test
     public void should_add_LegacyApplication() throws Exception {
         // Given
-        final PageItem pageItem = addPage(HOME_PAGE_ZIP);
-        final PageItem layout = addPage(LAYOUT_ZIP);
-        final PageItem theme = addPage(THEME_ZIP);
-        final ApplicationItem legacyItem = ApplicationDefinition.get().createItem();
-        legacyItem.setToken("tokenLegacy");
-        legacyItem.setDisplayName("Legacy");
-        legacyItem.setVersion("1.0");
-        legacyItem.setProfileId(2L);
-        legacyItem.setState("ACTIVATED");
-        // That's the default and gets saved as -1
-        // legacyItem.setHomePageId(pageItem.getId().toLong());
-        legacyItem.setLayoutId(layout.getId().toLong());
-        legacyItem.setThemeId(theme.getId().toLong());
-
-        // When
-        var createdItem = apiApplication.add(legacyItem);
+        var legacyApp = createLegacyApplication();
 
         // Then
-        Map<String, String> attributes = new HashMap<>(legacyItem.getAttributes().size());
-        legacyItem.getAttributes().keySet().forEach(k -> attributes.put(k, createdItem.getAttributes().get(k)));
-        Assert.assertEquals(new HashMap<>(legacyItem.getAttributes()), attributes);
+        Map<String, String> attributes = new HashMap<>(legacyApp.getAttributes().size());
+        legacyApp.getAttributes().keySet().forEach(k -> attributes.put(k, legacyApp.getAttributes().get(k)));
+        Assert.assertEquals(new HashMap<>(legacyApp.getAttributes()), attributes);
     }
 
     @Test
@@ -171,6 +151,33 @@ public class APIApplicationIT extends AbstractConsoleTest {
     @Test
     public void should_update_LegacyApplication() throws Exception {
         // Given
+        var legacyApp = createLegacyApplication();
+
+        // When
+        Map<String, String> attributes = Map.of(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, "Legacy Updated");
+        var updatedItem = apiApplication.update(legacyApp.getId(), attributes);
+
+        // Then
+        assertEquals("Legacy Updated", updatedItem.getDisplayName());
+    }
+
+    @Test
+    public void should_search_filter_AdvancedApplications() throws Exception {
+        // Given
+        var legacyApp = createLegacyApplication();
+
+        // When
+        final String search = legacyApp.getDisplayName();
+        final String orders = ApplicationItem.ATTRIBUTE_TOKEN + " DESC";
+        final HashMap<String, String> filters = new HashMap<>();
+        filters.put(ApplicationItem.ATTRIBUTE_ADVANCED, "true");
+        var searchResult = apiApplication.search(0, 1, search, orders, filters);
+
+        // Then
+        assertTrue(searchResult.getResults().isEmpty());
+    }
+
+    private AbstractApplicationItem createLegacyApplication() throws Exception {
         final PageItem pageItem = addPage(HOME_PAGE_ZIP);
         final PageItem layout = addPage(LAYOUT_ZIP);
         final PageItem theme = addPage(THEME_ZIP);
@@ -185,14 +192,7 @@ public class APIApplicationIT extends AbstractConsoleTest {
         legacyItem.setLayoutId(layout.getId().toLong());
         legacyItem.setThemeId(theme.getId().toLong());
 
-        var createdItem = apiApplication.add(legacyItem);
-        Map<String, String> attributes = Map.of(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, "Legacy Updated");
-
-        // When
-        var updatedItem = apiApplication.update(createdItem.getId(), attributes);
-
-        // Then
-        assertEquals("Legacy Updated", updatedItem.getDisplayName());
+        return apiApplication.add(legacyItem);
     }
 
 }

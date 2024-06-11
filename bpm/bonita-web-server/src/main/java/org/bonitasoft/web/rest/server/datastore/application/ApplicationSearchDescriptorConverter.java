@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.web.rest.server.datastore.application;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +27,8 @@ public class ApplicationSearchDescriptorConverter implements AttributeConverter 
 
     private final Map<String, String> mapping;
 
+    private final Map<String, ItemAttribute.TYPE> valueTypeMapping = new HashMap<>();
+
     public ApplicationSearchDescriptorConverter() {
         mapping = createMapping();
     }
@@ -36,6 +37,7 @@ public class ApplicationSearchDescriptorConverter implements AttributeConverter 
         final Map<String, String> mapping = new HashMap<>();
         mapping.put(AbstractApplicationItem.ATTRIBUTE_ID, ApplicationSearchDescriptor.ID);
         mapping.put(AbstractApplicationItem.ATTRIBUTE_ADVANCED, ApplicationSearchDescriptor.ADVANCED);
+        valueTypeMapping.put(AbstractApplicationItem.ATTRIBUTE_ADVANCED, ItemAttribute.TYPE.BOOLEAN);
         mapping.put(AbstractApplicationItem.ATTRIBUTE_TOKEN, ApplicationSearchDescriptor.TOKEN);
         mapping.put(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, ApplicationSearchDescriptor.DISPLAY_NAME);
         mapping.put(AbstractApplicationItem.ATTRIBUTE_STATE, ApplicationSearchDescriptor.STATE);
@@ -60,7 +62,7 @@ public class ApplicationSearchDescriptorConverter implements AttributeConverter 
 
     @Override
     public Map<String, ItemAttribute.TYPE> getValueTypeMapping() {
-        return Collections.emptyMap();
+        return valueTypeMapping;
     }
 
 }
