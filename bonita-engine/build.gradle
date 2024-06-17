@@ -51,7 +51,6 @@ dependencyManagement {
         dependency libs.tomcatDbcp.get() as String
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
         dependency libs.jakartaActivation.get() as String
-        dependency libs.snakeyaml.get() as String
         dependency("org.quartz-scheduler:quartz:${Deps.quartzVersion}")
         dependency(libs.eclipseCompiler.get() as String)
         dependency("javax.annotation:javax.annotation-api:$Deps.javaxAnnotationsVersion")

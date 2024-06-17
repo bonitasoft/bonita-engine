@@ -19,7 +19,6 @@ dependencies {
         exclude(module: 'log4j-to-slf4j')
         exclude(module: 'snakeyaml')
     }
-    api libs.snakeyaml
     api libs.springBootStarterJdbc
     api "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     api ("com.mysql:mysql-connector-j:${Deps.mysqlVersion}") {
