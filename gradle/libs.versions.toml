@@ -39,6 +39,7 @@ postgresqlVersion = "42.4.4"
 
 narayanaVersion = "5.10.6.Final"
 logbackVersion = "1.2.13"
+jaxbVersion = "2.3.1"
 
 [libraries]
 springCore = { module = "org.springframework:spring-core", version.ref = "springVersion" }
@@ -122,7 +123,7 @@ micrometerRegistryJmx = { group = "io.micrometer", name = "micrometer-registry-j
 micrometerRegistryPrometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "micrometerVersion" }
 
 narayanaJta = { group = "org.jboss.narayana.jta", name = "narayana-jta", version.ref = "narayanaVersion" }
-logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
+jaxbCodeModel = {group = "org.glassfish.jaxb", name = "codemodel", version.ref = "jaxbVersion" }
 
 h2 = "com.h2database:h2:1.4.200"
 mysql = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysqlVersion" }
@@ -131,6 +132,8 @@ oracle = { group = "com.oracle.database.jdbc", name = "ojdbc8", version.ref = "o
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
 
 lombok = "org.projectlombok:lombok:1.18.32"
+
+logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 
 junit5api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5Version" }
 junitJupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5Version" }
