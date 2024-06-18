@@ -12,7 +12,7 @@ dependencies {
     implementation(project(':platform:platform-resources'))
 
     implementation libs.springContext
-    implementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+    implementation libs.narayanaJta
     implementation libs.tomcatDbcp
     implementation libs.slf4jApi
     runtimeOnly libs.h2

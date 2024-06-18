@@ -49,7 +49,7 @@ dependencyManagement {
         }
         dependency libs.xstream.get() as String
         dependency libs.tomcatDbcp.get() as String
-        dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+        dependency libs.narayanaJta.get() as String
         dependency libs.jakartaActivation.get() as String
         dependency(libs.quartz.get() as String)
         dependency(libs.eclipseCompiler.get() as String)

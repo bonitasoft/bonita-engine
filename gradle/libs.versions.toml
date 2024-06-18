@@ -37,6 +37,8 @@ msSqlServerVersion = "8.4.1.jre8"
 oracleVersion = "19.3.0.0"
 postgresqlVersion = "42.4.4"
 
+narayanaVersion = "5.10.6.Final"
+
 [libraries]
 springCore = { module = "org.springframework:spring-core", version.ref = "springVersion" }
 springBeans = { module = "org.springframework:spring-beans", version.ref = "springVersion" }
@@ -117,6 +119,8 @@ quartz = { group = "org.quartz-scheduler", name = "quartz", version.ref = "quart
 micrometerCore = { group = "io.micrometer", name = "micrometer-core", version.ref = "micrometerVersion" }
 micrometerRegistryJmx = { group = "io.micrometer", name = "micrometer-registry-jmx", version.ref = "micrometerVersion" }
 micrometerRegistryPrometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "micrometerVersion" }
+
+narayanaJta = { group = "org.jboss.narayana.jta", name = "narayana-jta", version.ref = "narayanaVersion" }
 
 h2 = "com.h2database:h2:1.4.200"
 mysql = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysqlVersion" }
