@@ -35,11 +35,6 @@ public class ApplicationSearchDescriptor {
     public static final String ID = "id";
 
     /**
-     * Used to filter or order <code>Application</code> items by legacy or advanced criteria
-     */
-    public static final String ADVANCED = "advanced";
-
-    /**
      * Used to filter or order by the <code>Application</code> token
      */
     public static final String TOKEN = "token";
@@ -123,4 +118,13 @@ public class ApplicationSearchDescriptor {
      * @see Application
      */
     public static final String USER_ID = "userId";
+
+    /**
+     * Used to filter or order <code>Application</code> items by legacy or advanced criteria
+     *
+     * @since 10.2.0 for some Subscription editions only
+     */
+    public static final String ADVANCED = "advanced";
+    // keeping this constant here for convenience reasons
+    // having a subscription descriptor with just this field would not be user-friendly
 }

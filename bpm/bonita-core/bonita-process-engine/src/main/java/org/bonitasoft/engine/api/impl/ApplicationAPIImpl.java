@@ -193,6 +193,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final ServiceAccessor serviceAccessor = getServiceAccessor();
         final SearchApplicationDescriptor appSearchDescriptor = serviceAccessor.getSearchEntitiesDescriptor()
                 .getSearchApplicationDescriptor();
+        return internalSearchIApplications(serviceAccessor, appSearchDescriptor, searchOptions);
+    }
+
+    protected SearchResult<IApplication> internalSearchIApplications(ServiceAccessor serviceAccessor,
+            SearchApplicationDescriptor appSearchDescriptor, SearchOptions searchOptions) throws SearchException {
         final ApplicationModelConverter converter = getApplicationModelConverter(serviceAccessor.getPageService());
         final ApplicationService applicationService = serviceAccessor.getApplicationService();
         final Optional<SearchFilter> filterOnUserId = searchOptions.getFilters().stream()

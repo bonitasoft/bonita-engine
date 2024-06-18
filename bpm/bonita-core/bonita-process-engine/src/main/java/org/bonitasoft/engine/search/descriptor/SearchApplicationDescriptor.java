@@ -33,7 +33,7 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> allFields;
 
-    SearchApplicationDescriptor() {
+    protected SearchApplicationDescriptor() {
         keys = new HashMap<>(13);
         keys.put(ApplicationSearchDescriptor.ID,
                 new FieldDescriptor(SApplication.class, AbstractSApplication.ID));
@@ -61,8 +61,6 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SApplication.class, AbstractSApplication.LAYOUT_ID));
         keys.put(ApplicationSearchDescriptor.THEME_ID,
                 new FieldDescriptor(SApplication.class, AbstractSApplication.THEME_ID));
-        keys.put(ApplicationSearchDescriptor.ADVANCED,
-                new FieldDescriptor(SApplication.class, AbstractSApplication.ADVANCED));
         // internal usage only for now (as it would require a conversion of the Visibility enum):
         keys.put(APPLICATION_VISIBILITY,
                 new FieldDescriptor(SApplication.class, AbstractSApplication.INTERNAL_PROFILE));

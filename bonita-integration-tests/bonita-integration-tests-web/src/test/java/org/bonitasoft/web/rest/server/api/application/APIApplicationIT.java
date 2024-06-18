@@ -17,21 +17,19 @@ import static org.bonitasoft.web.rest.server.api.page.builder.PageItemBuilder.aP
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 
-import java.io.File;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -91,12 +89,8 @@ public class APIApplicationIT extends AbstractConsoleTest {
 
     private PageItem addPage(String pageFileName) throws Exception {
         final PageItem pageItem = aPageItem().build();
-        final URL zipFileUrl = getClass().getResource(pageFileName);
-
-        final File zipFile = new File(zipFileUrl.toURI());
-        FileUtils.copyFileToDirectory(zipFile, WebBonitaConstantsUtils.getTenantInstance().getTempFolder());
-
-        final byte[] pageContent = FileUtils.readFileToByteArray(new File(zipFileUrl.toURI()));
+        final InputStream pageInputStream = getClass().getResourceAsStream(pageFileName);
+        final byte[] pageContent = IOUtils.toByteArray(pageInputStream);
         return addPageItemToRepository(pageItem.getContentName(), pageContent);
     }
 
@@ -162,7 +156,7 @@ public class APIApplicationIT extends AbstractConsoleTest {
     }
 
     @Test
-    public void should_search_filter_AdvancedApplications() throws Exception {
+    public void should_search_not_support_filtering_on_AdvancedApplications() throws Exception {
         // Given
         var legacyApp = createLegacyApplication();
 
@@ -171,14 +165,15 @@ public class APIApplicationIT extends AbstractConsoleTest {
         final String orders = ApplicationItem.ATTRIBUTE_TOKEN + " DESC";
         final HashMap<String, String> filters = new HashMap<>();
         filters.put(ApplicationItem.ATTRIBUTE_ADVANCED, "true");
-        var searchResult = apiApplication.search(0, 1, search, orders, filters);
 
         // Then
-        assertTrue(searchResult.getResults().isEmpty());
+        assertThrows(
+                "Expected exception: The search does not support filtering on advanced applications in this edition.",
+                BonitaRuntimeException.class, () -> apiApplication.search(0, 1, search, orders, filters));
     }
 
     private AbstractApplicationItem createLegacyApplication() throws Exception {
-        final PageItem pageItem = addPage(HOME_PAGE_ZIP);
+        addPage(HOME_PAGE_ZIP);
         final PageItem layout = addPage(LAYOUT_ZIP);
         final PageItem theme = addPage(THEME_ZIP);
         final ApplicationItem legacyItem = ApplicationDefinition.get().createItem();
@@ -187,8 +182,6 @@ public class APIApplicationIT extends AbstractConsoleTest {
         legacyItem.setVersion("1.0");
         legacyItem.setProfileId(2L);
         legacyItem.setState("ACTIVATED");
-        // That's the default and gets saved as -1
-        // legacyItem.setHomePageId(pageItem.getId().toLong());
         legacyItem.setLayoutId(layout.getId().toLong());
         legacyItem.setThemeId(theme.getId().toLong());
 
