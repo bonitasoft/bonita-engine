@@ -45,7 +45,7 @@ dependencies {
     testImplementation(project(":bpm:bonita-server"))
     testImplementation "net.javacrumbs.json-unit:json-unit:${Deps.jsonUnitVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
     testImplementation libs.springTest
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"

@@ -7,7 +7,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 

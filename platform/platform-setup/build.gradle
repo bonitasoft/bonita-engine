@@ -38,7 +38,7 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
     api(project(":platform:platform-resources"))
-    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    runtimeOnly(libs.logback)
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"

@@ -87,7 +87,7 @@ dependencies {
     compileOnly project(':bpm:bonita-common')
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
 }
 
 test {

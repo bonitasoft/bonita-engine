@@ -38,6 +38,7 @@ oracleVersion = "19.3.0.0"
 postgresqlVersion = "42.4.4"
 
 narayanaVersion = "5.10.6.Final"
+logbackVersion = "1.2.13"
 
 [libraries]
 springCore = { module = "org.springframework:spring-core", version.ref = "springVersion" }
@@ -121,6 +122,7 @@ micrometerRegistryJmx = { group = "io.micrometer", name = "micrometer-registry-j
 micrometerRegistryPrometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "micrometerVersion" }
 
 narayanaJta = { group = "org.jboss.narayana.jta", name = "narayana-jta", version.ref = "narayanaVersion" }
+logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 
 h2 = "com.h2database:h2:1.4.200"
 mysql = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysqlVersion" }

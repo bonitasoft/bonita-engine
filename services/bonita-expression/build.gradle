@@ -10,7 +10,7 @@ dependencies {
     api libs.bundles.groovy
     api libs.commonsLang
     testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
 }

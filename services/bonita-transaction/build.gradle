@@ -10,5 +10,5 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation libs.narayanaJta
     testImplementation "org.jboss.logging:jboss-logging:${Deps.jbossLoggingVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
 }

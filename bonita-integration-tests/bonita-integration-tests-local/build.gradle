@@ -10,7 +10,7 @@ dependencies {
     implementation(project(":bpm:bonita-core:bonita-process-engine"))
     api project(':bpm:bonita-server')
     api libs.commonsIO
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
     testAnnotationProcessor libs.lombok
     testImplementation libs.lombok
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"

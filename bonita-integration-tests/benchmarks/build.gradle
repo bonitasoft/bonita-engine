@@ -8,7 +8,7 @@ dependencies {
     api "org.mockito:mockito-core:${Deps.mockitoVersion}"
     api project(':bonita-integration-tests:bonita-integration-tests-client')
     api project(':bpm:bonita-server')
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
 }
 
 jmh {

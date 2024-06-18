@@ -12,7 +12,7 @@ dependencies {
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
 
     annotationProcessor libs.lombok
