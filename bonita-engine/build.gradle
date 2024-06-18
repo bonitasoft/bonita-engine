@@ -51,10 +51,10 @@ dependencyManagement {
         dependency libs.tomcatDbcp.get() as String
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
         dependency libs.jakartaActivation.get() as String
-        dependency("org.quartz-scheduler:quartz:${Deps.quartzVersion}")
+        dependency(libs.quartz.get() as String)
         dependency(libs.eclipseCompiler.get() as String)
         dependency("javax.annotation:javax.annotation-api:$Deps.javaxAnnotationsVersion")
-        dependencySet(group: "io.micrometer", version: Deps.micrometerVersion) {
+        dependencySet(group: "io.micrometer", version: libs.versions.micrometerVersion.get()) {
             entry "micrometer-core"
             entry "micrometer-registry-jmx"
             entry "micrometer-registry-prometheus"

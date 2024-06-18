@@ -26,10 +26,7 @@ dependencies {
     testImplementation libs.springJdbc
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testRuntimeOnly libs.tomcatDbcp
-    testRuntimeOnly libs.h2
-    testRuntimeOnly "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
-    testRuntimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    testRuntimeOnly "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+    testRuntimeOnly(libs.h2)
 
     // Property Based Test framework:
     testImplementation("com.pholser:junit-quickcheck-core:${Deps.junitQuickCheck}")

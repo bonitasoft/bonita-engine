@@ -20,13 +20,13 @@ dependencies {
         exclude(module: 'snakeyaml')
     }
     api libs.springBootStarterJdbc
-    api "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    api ("com.mysql:mysql-connector-j:${Deps.mysqlVersion}") {
+    api(libs.postgresql)
+    api(libs.mysql) {
         exclude(module: 'protobuf-java')
     }
-    api "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
-    api libs.h2
-    api("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
+    api libs.msSqlServer
+    api(libs.h2)
+    api(libs.oracle) {
         exclude(module: "ons")
         exclude(module: "oraclepki")
         exclude(module: "osdt_cert")

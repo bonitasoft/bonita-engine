@@ -24,9 +24,11 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testImplementation "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    testImplementation "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
-    testImplementation libs.h2
+
+    // These 3 drivers are used for some specific tests:
+    testImplementation(libs.postgresql)
+    testImplementation(libs.mysql)
+    testImplementation(libs.h2)
 
 }
 

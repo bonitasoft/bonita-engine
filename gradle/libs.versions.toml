@@ -29,6 +29,13 @@ xstreamVersion = "1.4.20"
 ehCacheVersion = "2.10.10.12.7"
 eclipseCompilerVersion = "3.38.0"
 jakartaActivationVersion = "1.2.2"
+quartzVersion = "2.3.2"
+micrometerVersion = "1.6.1"
+# DB drivers:
+mysqlVersion = "8.2.0"
+msSqlServerVersion = "8.4.1.jre8"
+oracleVersion = "19.3.0.0"
+postgresqlVersion = "42.4.4"
 
 [libraries]
 springCore = { module = "org.springframework:spring-core", version.ref = "springVersion" }
@@ -106,9 +113,16 @@ ehCache = { group = "net.sf.ehcache", name = "ehcache", version.ref = "ehCacheVe
 eclipseCompiler = { group = "org.eclipse.jdt", name = "ecj", version.ref = "eclipseCompilerVersion" }
 jakartaActivation = { group = "com.sun.activation", name = "jakarta.activation", version.ref = "jakartaActivationVersion" }
 
-
+quartz = { group = "org.quartz-scheduler", name = "quartz", version.ref = "quartzVersion" }
+micrometerCore = { group = "io.micrometer", name = "micrometer-core", version.ref = "micrometerVersion" }
+micrometerRegistryJmx = { group = "io.micrometer", name = "micrometer-registry-jmx", version.ref = "micrometerVersion" }
+micrometerRegistryPrometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "micrometerVersion" }
 
 h2 = "com.h2database:h2:1.4.200"
+mysql = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysqlVersion" }
+msSqlServer = { group = "com.microsoft.sqlserver", name = "mssql-jdbc", version.ref = "msSqlServerVersion" }
+oracle = { group = "com.oracle.database.jdbc", name = "ojdbc8", version.ref = "oracleVersion" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
 
 lombok = "org.projectlombok:lombok:1.18.32"
 

@@ -64,7 +64,7 @@ dependencies {
     api libs.springSessionCore
     api libs.springWeb
     api libs.bundles.groovy
-    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    api libs.micrometerCore
 
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
     api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")

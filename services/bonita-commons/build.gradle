@@ -8,7 +8,7 @@ dependencies {
     api libs.jakartaActivation
     api libs.commonsLang
     api(libs.xstream)
-    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    api libs.micrometerCore
     api libs.springContext
     api libs.springBootAutoconfigure
     api libs.slf4jApi
