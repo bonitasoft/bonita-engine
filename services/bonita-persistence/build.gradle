@@ -14,7 +14,7 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-lock')
     api libs.slf4jApi
-    implementation("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
+    implementation(libs.javaxAnnotations)
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

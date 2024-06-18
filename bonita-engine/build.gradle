@@ -53,7 +53,7 @@ dependencyManagement {
         dependency libs.jakartaActivation.get() as String
         dependency(libs.quartz.get() as String)
         dependency(libs.eclipseCompiler.get() as String)
-        dependency("javax.annotation:javax.annotation-api:$Deps.javaxAnnotationsVersion")
+        dependency(libs.javaxAnnotations.get() as String)
         dependencySet(group: "io.micrometer", version: libs.versions.micrometerVersion.get()) {
             entry "micrometer-core"
             entry "micrometer-registry-jmx"

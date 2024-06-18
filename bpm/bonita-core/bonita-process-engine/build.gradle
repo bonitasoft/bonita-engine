@@ -67,7 +67,7 @@ dependencies {
     api libs.micrometerCore
 
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
-    api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
+    api(libs.javaxAnnotations)
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

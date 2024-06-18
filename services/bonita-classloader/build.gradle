@@ -10,7 +10,7 @@ dependencies {
     api project(':services:bonita-log')
     api libs.commonsIO
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
-    api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
+    api(libs.javaxAnnotations)
 
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"

@@ -1,7 +1,5 @@
 class Deps {
 
-    public static String javaxAnnotationsVersion = "1.3.2"
-
     // extensions versions
     public static String hazelcastVersion = "5.3.5"
     public static String jcacheVersion = "1.0.0"
