@@ -1,7 +1,6 @@
 class Deps {
 
     // extensions versions
-    public static String hazelcastVersion = "5.3.5"
     public static String jcacheVersion = "1.0.0"
     // javax.persistence-api used by hibernate
     public static String javaxPersistenceApiVersion = "2.2"

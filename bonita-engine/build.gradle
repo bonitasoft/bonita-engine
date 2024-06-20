@@ -54,15 +54,11 @@ dependencyManagement {
         dependency(libs.quartz.get() as String)
         dependency(libs.eclipseCompiler.get() as String)
         dependency(libs.javaxAnnotations.get() as String)
-        dependencySet(group: "io.micrometer", version: libs.versions.micrometerVersion.get()) {
-            entry "micrometer-core"
-            entry "micrometer-registry-jmx"
-            entry "micrometer-registry-prometheus"
-        }
-        dependencySet(group: 'com.hazelcast', version: Deps.hazelcastVersion) {
-            entry 'hazelcast'
-            entry 'hazelcast-spring'
-        }
+        dependency(libs.micrometerCore.get() as String)
+        dependency(libs.micrometerRegistryJmx.get() as String)
+        dependency(libs.micrometerRegistryPrometheus.get() as String)
+        dependency(libs.hazelcast.get() as String)
+        dependency(libs.hazelcastSpring.get() as String)
         // declared here because it is used by web-extension and by distrib
         dependency(libs.jakartaServletApi.get() as String)
         // To be removed only when client projects (rest api extension) have all moved their deps to jakarta
