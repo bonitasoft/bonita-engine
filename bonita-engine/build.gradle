@@ -32,7 +32,7 @@ dependencyManagement {
         }
         dependency(libs.hibernateJCache.get() as String)
         dependency(libs.jcache.get() as String)
-        dependency "javax.persistence:javax.persistence-api:${Deps.javaxPersistenceApiVersion}"
+        dependency(libs.javaxPersistenceApi.get() as String)
         dependency libs.commonsIO.get() as String
         dependency libs.commonsFileUpload.get() as String
         dependency(libs.commonsBeanUtils.get() as String) {

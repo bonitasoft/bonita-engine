@@ -1,8 +1,5 @@
 class Deps {
 
-    // javax.persistence-api used by hibernate
-    public static String javaxPersistenceApiVersion = "2.2"
-
     public static String guavaVersion = "32.1.2-jre"
     public static String antlr4RuntimeVersion = "4.7.2"
 
