@@ -1,6 +1,5 @@
 class Deps {
 
-    public static String guavaVersion = "32.1.2-jre"
     public static String antlr4RuntimeVersion = "4.7.2"
 
     // bonita-web specific dependencies:
