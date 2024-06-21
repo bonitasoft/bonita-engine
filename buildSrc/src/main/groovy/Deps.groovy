@@ -1,7 +1,5 @@
 class Deps {
 
-    public static String antlr4RuntimeVersion = "4.7.2"
-
     // bonita-web specific dependencies:
     public static String jsonSimpleVersion = "1.1"
     public static String urlrewriteVersion = "4.0.3"
