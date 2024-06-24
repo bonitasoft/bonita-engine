@@ -45,7 +45,7 @@ public class ApplicationItem extends AbstractApplicationItem implements ItemHasU
     }
 
     @Override
-    public boolean isAdvanced() {
+    public boolean isLink() {
         return false;
     }
 

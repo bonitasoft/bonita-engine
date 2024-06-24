@@ -30,7 +30,7 @@ import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
-import org.bonitasoft.engine.business.application.xml.AdvancedApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationLinkNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -152,7 +152,7 @@ public class NodeToApplicationConverterTest {
         assertThat(application.getIconMimeType()).isEqualTo(ICON_MIME_TYPE);
         assertThat(application.getInternalProfile()).isNull();
         assertThat(application.isEditable()).isEqualTo(editable);
-        assertThat(application.isAdvanced()).isFalse();
+        assertThat(application.isLink()).isFalse();
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
@@ -161,10 +161,10 @@ public class NodeToApplicationConverterTest {
     }
 
     @Test
-    public void toSApplication_should_return_ImportResult_with_no_errors_and_advanced_application_with_correct_fields()
+    public void toSApplication_should_return_ImportResult_with_no_errors_and_application_link_with_correct_fields()
             throws Exception {
         //given
-        final AdvancedApplicationNode node = new AdvancedApplicationNode();
+        final ApplicationLinkNode node = new ApplicationLinkNode();
         node.setDisplayName("My app");
         node.setDescription("This is my app");
         node.setVersion("1.0");
@@ -199,7 +199,7 @@ public class NodeToApplicationConverterTest {
         assertThat(application.getIconMimeType()).isNull();
         assertThat(application.getInternalProfile()).isNull();
         assertThat(application.isEditable()).isTrue();
-        assertThat(application.isAdvanced()).isTrue();
+        assertThat(application.isLink()).isTrue();
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");

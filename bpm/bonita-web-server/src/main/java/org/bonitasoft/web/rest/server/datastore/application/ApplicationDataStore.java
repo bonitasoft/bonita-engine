@@ -114,7 +114,7 @@ public class ApplicationDataStore extends CommonDatastore<AbstractApplicationIte
                 return res;
             } else {
                 // should not occur anyway
-                throw new APIException("This deprecated API is not supported for advanced applications.");
+                throw new APIException("This deprecated API is not supported for application links.");
             }
         } catch (final BonitaException e) {
             throw new APIException(e);
@@ -135,7 +135,7 @@ public class ApplicationDataStore extends CommonDatastore<AbstractApplicationIte
                 return res;
             } else {
                 throw new APIException(
-                        "This deprecated API is not supported for advanced applications. The update has been applied nonetheless.");
+                        "This deprecated API is not supported for application links.");
             }
         } catch (final BonitaException e) {
             throw new APIException(e);

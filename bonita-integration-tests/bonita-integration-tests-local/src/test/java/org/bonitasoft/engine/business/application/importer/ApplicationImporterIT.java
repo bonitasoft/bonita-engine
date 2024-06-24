@@ -73,9 +73,9 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
     }
 
     @Test
-    public void one_advanced_application_should_be_imported_successfully() throws Exception {
+    public void one_application_link_should_be_imported_successfully() throws Exception {
         //given
-        String xmlToImport = "/applications-importer/oneAdvancedApplication.xml";
+        String xmlToImport = "/applications-importer/oneApplicationLink.xml";
 
         // ensure applications did not exist initially:
         assertAppNotExists(APP_1_TOKEN);
@@ -89,13 +89,13 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(importStatuses.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatuses.get(0).getErrors()).isEmpty();
 
-        assertAdvancedApp1();
+        assertAppLink1();
     }
 
     @Test
-    public void multiple_advanced_applications_should_be_imported_successfully() throws Exception {
+    public void multiple_application_links_should_be_imported_successfully() throws Exception {
         //given
-        String xmlToImport = "/applications-importer/multipleAdvancedApplications.xml";
+        String xmlToImport = "/applications-importer/multipleApplicationLinks.xml";
 
         // ensure applications did not exist initially:
         assertAppNotExists(APP_1_TOKEN);
@@ -113,14 +113,14 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(importStatuses.get(1).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatuses.get(1).getErrors()).isEmpty();
 
-        assertAdvancedApp1();
-        assertAdvancedApp2();
+        assertAppLink1();
+        assertAppLink2();
     }
 
     @Test
-    public void mixed_legacy_and_advanced_applications_should_be_imported_successfully() throws Exception {
+    public void mixed_legacy_and_application_links_should_be_imported_successfully() throws Exception {
         //given
-        String xmlToImport = "/applications-importer/mixedLegacyAndAdvancedApplications.xml";
+        String xmlToImport = "/applications-importer/mixedLegacyAndApplicationLinks.xml";
 
         // ensure applications did not exist initially:
         assertAppNotExists(APP_1_TOKEN);
@@ -149,16 +149,16 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(importStatuses.get(3).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatuses.get(3).getErrors()).isEmpty();
 
-        assertAdvancedApp1();
-        assertAdvancedApp2();
-        assertAdvancedApp3();
-        assertAdvancedApp4();
+        assertAppLink1();
+        assertAppLink2();
+        assertAppLink3();
+        assertAppLink4();
     }
 
     @Test
-    public void mixed_legacy_and_advanced_applications_should_be_imported_successfully_twice() throws Exception {
+    public void mixed_legacy_and_application_links_should_be_imported_successfully_twice() throws Exception {
         //given
-        String xmlToImport = "/applications-importer/mixedLegacyAndAdvancedApplications.xml";
+        String xmlToImport = "/applications-importer/mixedLegacyAndApplicationLinks.xml";
         ApplicationImportStrategy updateStrategy = (a1, a2) -> ApplicationImportStrategy.ImportStrategy.REPLACE;
 
         // create page mandatory for app3
@@ -190,10 +190,10 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(importStatuses.get(3).getStatus()).isEqualTo(ImportStatus.Status.REPLACED);
         assertThat(importStatuses.get(3).getErrors()).isEmpty();
 
-        assertAdvancedApp1();
-        assertAdvancedApp2();
-        assertAdvancedApp3();
-        assertAdvancedApp4();
+        assertAppLink1();
+        assertAppLink2();
+        assertAppLink3();
+        assertAppLink4();
 
     }
 
@@ -212,7 +212,7 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(existingApp1).isNull();
     }
 
-    private void assertAdvancedApp1() throws Exception {
+    private void assertAppLink1() throws Exception {
         SApplication app = getTransactionService()
                 .executeInTransaction(() -> applicationService.getApplicationByToken(APP_1_TOKEN));
         assertThat(app).isNotNull();
@@ -228,10 +228,10 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(app.getLayoutId()).isNull();
         assertThat(app.getThemeId()).isNull();
         assertThat(app.isEditable()).isTrue();
-        assertThat(app.isAdvanced()).isTrue();
+        assertThat(app.isLink()).isTrue();
     }
 
-    private void assertAdvancedApp2() throws Exception {
+    private void assertAppLink2() throws Exception {
         SApplication app = getTransactionService()
                 .executeInTransaction(() -> applicationService.getApplicationByToken(APP_2_TOKEN));
         assertThat(app).isNotNull();
@@ -247,10 +247,10 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(app.getLayoutId()).isNull();
         assertThat(app.getThemeId()).isNull();
         assertThat(app.isEditable()).isTrue();
-        assertThat(app.isAdvanced()).isTrue();
+        assertThat(app.isLink()).isTrue();
     }
 
-    private void assertAdvancedApp3() throws Exception {
+    private void assertAppLink3() throws Exception {
         SApplication app = getTransactionService()
                 .executeInTransaction(() -> applicationService.getApplicationByToken(APP_3_TOKEN));
         assertThat(app).isNotNull();
@@ -266,10 +266,10 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(app.getLayoutId()).isNotNull();
         assertThat(app.getThemeId()).isNotNull();
         assertThat(app.isEditable()).isTrue();
-        assertThat(app.isAdvanced()).isFalse();
+        assertThat(app.isLink()).isFalse();
     }
 
-    private void assertAdvancedApp4() throws Exception {
+    private void assertAppLink4() throws Exception {
         SApplication app = getTransactionService()
                 .executeInTransaction(() -> applicationService.getApplicationByToken(APP_4_TOKEN));
         assertThat(app).isNotNull();
@@ -285,7 +285,7 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(app.getLayoutId()).isNotNull();
         assertThat(app.getThemeId()).isNotNull();
         assertThat(app.isEditable()).isTrue();
-        assertThat(app.isAdvanced()).isFalse();
+        assertThat(app.isLink()).isFalse();
     }
 
     private void createDummyPage() throws Exception {

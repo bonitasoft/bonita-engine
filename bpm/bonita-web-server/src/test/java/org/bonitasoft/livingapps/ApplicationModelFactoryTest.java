@@ -23,8 +23,8 @@ import static org.mockito.Mockito.verify;
 import java.util.Collections;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
-import org.bonitasoft.engine.business.application.AdvancedApplication;
 import org.bonitasoft.engine.business.application.Application;
+import org.bonitasoft.engine.business.application.ApplicationLink;
 import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
@@ -60,13 +60,13 @@ public class ApplicationModelFactoryTest {
     @Test(expected = CreationException.class)
     public void should_throw_create_error_exception_when_application_is_not_found() throws Exception {
         given(applicationApi.searchIApplications(any(SearchOptions.class))).willReturn(
-                new SearchResultImpl<>(1, asList(mock(AdvancedApplication.class))));
+                new SearchResultImpl<>(1, asList(mock(ApplicationLink.class))));
 
         factory.createApplicationModel("foo");
     }
 
     @Test(expected = CreationException.class)
-    public void should_throw_create_error_exception_when_only_advanced_application_is_found() throws Exception {
+    public void should_throw_create_error_exception_when_only_application_link_is_found() throws Exception {
         given(applicationApi.searchIApplications(any(SearchOptions.class))).willReturn(
                 new SearchResultImpl<>(0, Collections.<IApplication> emptyList()));
 

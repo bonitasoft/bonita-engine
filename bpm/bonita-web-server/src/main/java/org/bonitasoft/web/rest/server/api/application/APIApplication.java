@@ -67,7 +67,7 @@ public class APIApplication extends ConsoleAPI<AbstractApplicationItem>
         if (item instanceof ApplicationItem legacy) {
             return creator.create(getEngineSession()).add(legacy);
         } else {
-            throw new APIException("This deprecated API is not supported for advanced applications.");
+            throw new APIException("This deprecated API is not supported for application links.");
         }
     }
 

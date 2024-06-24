@@ -116,12 +116,12 @@ public class ApplicationModelConverter {
 
     public IApplication toApplication(final AbstractSApplication abstractSApplication) {
         final AbstractApplicationImpl application;
-        if (abstractSApplication.isAdvanced()) {
-            final AdvancedApplicationImpl advancedApplication = new AdvancedApplicationImpl(
+        if (abstractSApplication.isLink()) {
+            final ApplicationLinkImpl applicationLink = new ApplicationLinkImpl(
                     abstractSApplication.getToken(),
                     abstractSApplication.getVersion(),
                     abstractSApplication.getDescription());
-            application = advancedApplication;
+            application = applicationLink;
         } else {
             ApplicationImpl legacyApplication = new ApplicationImpl(abstractSApplication.getToken(),
                     abstractSApplication.getVersion(),

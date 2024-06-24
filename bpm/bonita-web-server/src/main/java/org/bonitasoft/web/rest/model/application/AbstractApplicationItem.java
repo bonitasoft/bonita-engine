@@ -25,10 +25,10 @@ import org.bonitasoft.web.toolkit.client.data.item.template.ItemHasUniqueId;
 public abstract class AbstractApplicationItem extends Item implements ItemHasUniqueId, ItemHasIcon {
 
     /**
-     * This attributes is used to distinguish advanced from legacy applications. It can be used for search, filter or
-     * ordering.
+     * This attributes is used to distinguish application links from legacy
+     * applications. It can be used for search, filter or ordering.
      */
-    public static final String ATTRIBUTE_ADVANCED = "advanced";
+    public static final String ATTRIBUTE_LINK = "link";
 
     public static final String ATTRIBUTE_TOKEN = "token";
 
@@ -60,12 +60,12 @@ public abstract class AbstractApplicationItem extends Item implements ItemHasUni
 
     public AbstractApplicationItem() {
         super();
-        setAttribute(ATTRIBUTE_ADVANCED, isAdvanced());
+        setAttribute(ATTRIBUTE_LINK, isLink());
     }
 
     public AbstractApplicationItem(final IItem item) {
         super(item);
-        setAttribute(ATTRIBUTE_ADVANCED, isAdvanced());
+        setAttribute(ATTRIBUTE_LINK, isLink());
     }
 
     @Override
@@ -84,9 +84,9 @@ public abstract class AbstractApplicationItem extends Item implements ItemHasUni
     }
 
     /*
-     * #isAdvanced should be implemented by subclasses with a static result depending on the application nature.
+     * #isLink should be implemented by subclasses with a static result depending on the application nature.
      */
-    public abstract boolean isAdvanced();
+    public abstract boolean isLink();
 
     public String getToken() {
         return getAttributeValue(ATTRIBUTE_TOKEN);

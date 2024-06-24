@@ -65,7 +65,7 @@ public class LivingApplicationAPIDelegate {
                 return res;
             } else {
                 // should not occur anyway
-                throw new CreationException("This deprecated API is not supported for advanced applications.");
+                throw new CreationException("This deprecated API is not supported for application links.");
             }
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
@@ -155,12 +155,12 @@ public class LivingApplicationAPIDelegate {
             if (!updater.getFields().isEmpty()) {
                 /*
                  * This API may be called within our without a transaction.
-                 * So we must check first whether the application is advanced to have a consistent behavior
-                 * and never update the advanced application.
+                 * So we must check first whether the application is a link to have a consistent behavior
+                 * and never update the application link.
                  */
                 if (Optional.ofNullable(applicationService.getApplicationWithIcon(applicationId))
-                        .filter(AbstractSApplication::isAdvanced).isPresent()) {
-                    throw new UpdateException("This deprecated API is not supported for advanced applications.");
+                        .filter(AbstractSApplication::isLink).isPresent()) {
+                    throw new UpdateException("This deprecated API is not supported for application links.");
                 }
                 application = applicationService.updateApplication(applicationId,
                         converter.toApplicationUpdateDescriptor(updater, loggedUserId));
@@ -171,7 +171,7 @@ public class LivingApplicationAPIDelegate {
             if (converted instanceof Application res) {
                 return res;
             } else {
-                throw new UpdateException("This deprecated API is not supported for advanced applications.");
+                throw new UpdateException("This deprecated API is not supported for application links.");
             }
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());

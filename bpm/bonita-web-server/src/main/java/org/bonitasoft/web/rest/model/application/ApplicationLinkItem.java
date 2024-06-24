@@ -13,27 +13,26 @@
  **/
 package org.bonitasoft.web.rest.model.application;
 
-import org.bonitasoft.web.toolkit.client.data.item.Definitions;
+import org.bonitasoft.web.toolkit.client.data.item.IItem;
+import org.bonitasoft.web.toolkit.client.data.item.template.ItemHasIcon;
+import org.bonitasoft.web.toolkit.client.data.item.template.ItemHasUniqueId;
 
 /**
- * Item definition for an Advanced Bonita Living Application for the REST API.
+ * Contains the meta information of a Bonita Living Application Link for the REST API.
  */
-public class AdvancedApplicationDefinition extends AbstractApplicationDefinition<AdvancedApplicationItem> {
+public class ApplicationLinkItem extends AbstractApplicationItem implements ItemHasUniqueId, ItemHasIcon {
 
-    public static final String TOKEN = "advancedApplication";
+    public ApplicationLinkItem() {
+        super();
+    }
 
-    @Override
-    protected String defineToken() {
-        return TOKEN;
+    public ApplicationLinkItem(final IItem item) {
+        super(item);
     }
 
     @Override
-    protected AdvancedApplicationItem _createItem() {
-        return new AdvancedApplicationItem();
-    }
-
-    public static AdvancedApplicationDefinition get() {
-        return (AdvancedApplicationDefinition) Definitions.get(TOKEN);
+    public boolean isLink() {
+        return true;
     }
 
 }

@@ -22,8 +22,8 @@ import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
-import org.bonitasoft.web.rest.model.application.AdvancedApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
+import org.bonitasoft.web.rest.model.application.ApplicationLinkItem;
 import org.bonitasoft.web.toolkit.client.common.util.MapUtil;
 import org.bonitasoft.web.toolkit.client.data.item.template.ItemHasIcon;
 
@@ -60,7 +60,7 @@ public class ApplicationItemConverter {
                 legacyItem.setThemeId(-1L);
             }
         } else {
-            item = new AdvancedApplicationItem();
+            item = new ApplicationLinkItem();
         }
 
         item.setId(application.getId());

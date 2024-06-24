@@ -19,7 +19,7 @@ import org.bonitasoft.web.toolkit.client.data.item.attribute.ItemAttribute;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.validator.FileIsImageOrServletPathValidator;
 
 /**
- * Item definition for a Bonita Living Application for the REST API (either legacy or advanced).
+ * Item definition for a Bonita Living Application for the REST API (either legacy or link).
  */
 public class AbstractApplicationDefinition<ITEM extends AbstractApplicationItem> extends ItemDefinition<ITEM> {
 
@@ -38,7 +38,7 @@ public class AbstractApplicationDefinition<ITEM extends AbstractApplicationItem>
     @Override
     protected void defineAttributes() {
         createAttribute(AbstractApplicationItem.ATTRIBUTE_ID, ItemAttribute.TYPE.ITEM_ID);
-        createAttribute(AbstractApplicationItem.ATTRIBUTE_ADVANCED, ItemAttribute.TYPE.BOOLEAN);
+        createAttribute(AbstractApplicationItem.ATTRIBUTE_LINK, ItemAttribute.TYPE.BOOLEAN);
         createAttribute(AbstractApplicationItem.ATTRIBUTE_TOKEN, ItemAttribute.TYPE.STRING);
         createAttribute(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, ItemAttribute.TYPE.STRING);
         createAttribute(AbstractApplicationItem.ATTRIBUTE_PROFILE_ID, ItemAttribute.TYPE.ITEM_ID);

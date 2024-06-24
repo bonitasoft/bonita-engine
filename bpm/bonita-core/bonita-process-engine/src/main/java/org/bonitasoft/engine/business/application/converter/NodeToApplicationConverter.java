@@ -21,7 +21,7 @@ import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
-import org.bonitasoft.engine.business.application.xml.AdvancedApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationLinkNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -68,7 +68,7 @@ public class NodeToApplicationConverter {
         application.setDescription(applicationNode.getDescription());
         application.setState(applicationNode.getState());
         application.setEditable(editable);
-        application.setAdvanced(applicationNode instanceof AdvancedApplicationNode);
+        application.setLink(applicationNode instanceof ApplicationLinkNode);
 
         if (applicationNode instanceof ApplicationNode legacy) {
             application.setLayoutId(getLayoutId(getLayoutName(legacy), token, importStatus));

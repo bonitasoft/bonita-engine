@@ -36,8 +36,8 @@ public class ApplicationSearchDescriptorConverter implements AttributeConverter 
     private Map<String, String> createMapping() {
         final Map<String, String> mapping = new HashMap<>();
         mapping.put(AbstractApplicationItem.ATTRIBUTE_ID, ApplicationSearchDescriptor.ID);
-        mapping.put(AbstractApplicationItem.ATTRIBUTE_ADVANCED, ApplicationSearchDescriptor.ADVANCED);
-        valueTypeMapping.put(AbstractApplicationItem.ATTRIBUTE_ADVANCED, ItemAttribute.TYPE.BOOLEAN);
+        mapping.put(AbstractApplicationItem.ATTRIBUTE_LINK, ApplicationSearchDescriptor.LINK);
+        valueTypeMapping.put(AbstractApplicationItem.ATTRIBUTE_LINK, ItemAttribute.TYPE.BOOLEAN);
         mapping.put(AbstractApplicationItem.ATTRIBUTE_TOKEN, ApplicationSearchDescriptor.TOKEN);
         mapping.put(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, ApplicationSearchDescriptor.DISPLAY_NAME);
         mapping.put(AbstractApplicationItem.ATTRIBUTE_STATE, ApplicationSearchDescriptor.STATE);

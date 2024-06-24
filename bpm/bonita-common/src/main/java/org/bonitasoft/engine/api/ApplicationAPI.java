@@ -43,7 +43,7 @@ import org.bonitasoft.engine.search.SearchResult;
  *
  * @author Elias Ricken de Medeiros
  * @see org.bonitasoft.engine.business.application.IApplication
- * @see org.bonitasoft.engine.business.application.AdvancedApplication
+ * @see org.bonitasoft.engine.business.application.ApplicationLink
  * @see org.bonitasoft.engine.business.application.Application
  * @since 6.4
  */
@@ -71,7 +71,7 @@ public interface ApplicationAPI {
      * @return an <code>Application</code> from its identifier.
      * @throws ApplicationNotFoundException if no application is found for the given identifier
      * @see Application
-     * @deprecated as of 10.2.0, use {@link #getIApplication(long)} instead to include advanced applications.
+     * @deprecated as of 10.2.0, use {@link #getIApplication(long)} instead to include application links.
      */
     @Deprecated(since = "10.2.0")
     default Application getApplication(final long applicationId) throws ApplicationNotFoundException {
@@ -100,7 +100,7 @@ public interface ApplicationAPI {
      * @return an <code>Application</code> from its token.
      * @throws ApplicationNotFoundException if no application is found for the given token
      * @see Application
-     * @deprecated as of 10.2.0, use {@link #getIApplicationByToken(String)} instead to include advanced applications.
+     * @deprecated as of 10.2.0, use {@link #getIApplicationByToken(String)} instead to include application links.
      */
     @Deprecated(since = "10.2.0")
     default Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
@@ -164,8 +164,7 @@ public interface ApplicationAPI {
      * @see org.bonitasoft.engine.business.application.ApplicationSearchDescriptor
      * @see SearchOptions
      * @see SearchResult
-     * @deprecated as of 10.2.0, use {@link #searchIApplications(SearchOptions)} instead to include advanced
-     *             applications.
+     * @deprecated as of 10.2.0, use {@link #searchIApplications(SearchOptions)} instead to include application links.
      */
     @Deprecated(since = "10.2.0")
     SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException;

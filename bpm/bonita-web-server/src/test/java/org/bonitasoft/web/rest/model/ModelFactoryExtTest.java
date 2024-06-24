@@ -15,8 +15,8 @@ package org.bonitasoft.web.rest.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.web.rest.model.application.AdvancedApplicationDefinition;
 import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.ApplicationLinkDefinition;
 import org.bonitasoft.web.rest.model.applicationpage.ApplicationPageDefinition;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.junit.Test;
@@ -26,14 +26,14 @@ public class ModelFactoryExtTest {
     private final ModelFactory factory = new ModelFactory();
 
     @Test
-    public void defineItemDefinitions_should_return_instanceOf_AdvancedApplicationDefinition_for_advancedApplication_token()
+    public void defineItemDefinitions_should_return_instanceOf_ApplicationLinkDefinition_for_applicationLink_token()
             throws Exception {
         //when
-        final ItemDefinition<?> definition = factory.defineItemDefinitions(AdvancedApplicationDefinition.TOKEN);
+        final ItemDefinition<?> definition = factory.defineItemDefinitions(ApplicationLinkDefinition.TOKEN);
 
         //then
         assertThat(definition).isNotNull();
-        assertThat(definition).isInstanceOf(AdvancedApplicationDefinition.class);
+        assertThat(definition).isInstanceOf(ApplicationLinkDefinition.class);
     }
 
     @Test

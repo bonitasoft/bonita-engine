@@ -151,8 +151,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     /**
-     * @deprecated as of 10.2.0, use {@link #searchIApplications(SearchOptions)} instead to include advanced
-     *             applications.
+     * @deprecated as of 10.2.0, use {@link #searchIApplications(SearchOptions)} instead to include application links.
      */
     @Deprecated(since = "10.2.0")
     @Override

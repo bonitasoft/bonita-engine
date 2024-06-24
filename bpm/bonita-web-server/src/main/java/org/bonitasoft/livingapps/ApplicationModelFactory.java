@@ -53,7 +53,7 @@ public class ApplicationModelFactory {
             var legacyApplication = result.getResult().stream().filter(Application.class::isInstance)
                     .map(Application.class::cast).findFirst();
             if (legacyApplication.isEmpty()) {
-                throw new CreationException("Only advanced applications were found with name " + name);
+                throw new CreationException("Only application links were found with name " + name);
             }
 
             return new ApplicationModel(

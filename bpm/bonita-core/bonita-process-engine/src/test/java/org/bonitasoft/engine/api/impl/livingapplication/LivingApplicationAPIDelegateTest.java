@@ -23,9 +23,9 @@ import java.nio.charset.StandardCharsets;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
-import org.bonitasoft.engine.business.application.AdvancedApplication;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationLink;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
@@ -343,17 +343,17 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
-    public void updateAdvancedApplication_should_not_return() throws Exception {
+    public void updateApplicationLink_should_not_return() throws Exception {
         //given
         final SApplicationWithIcon sApplicationWithIcon = mock(SApplicationWithIcon.class);
-        final AdvancedApplication advancedApplication = mock(AdvancedApplication.class);
+        final ApplicationLink applicationLink = mock(ApplicationLink.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor))
                 .willReturn(sApplicationWithIcon);
-        given(converter.toApplication(sApplicationWithIcon)).willReturn(advancedApplication);
+        given(converter.toApplication(sApplicationWithIcon)).willReturn(applicationLink);
 
         //when/ then
         assertThrows(UpdateException.class, () -> delegate.updateApplication(APPLICATION_ID, updater));

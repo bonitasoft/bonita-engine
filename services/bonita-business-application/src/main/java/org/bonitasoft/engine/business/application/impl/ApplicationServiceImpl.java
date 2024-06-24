@@ -333,11 +333,11 @@ public class ApplicationServiceImpl implements ApplicationService {
                 && !application.getToken().equals(updateDescriptor.getFields().get(AbstractSApplication.TOKEN))) {
             validateApplicationToken((String) updateDescriptor.getFields().get(AbstractSApplication.TOKEN));
         }
-        if (updateDescriptor.getFields().containsKey(AbstractSApplication.ADVANCED)
-                && !Boolean.valueOf(application.isAdvanced())
-                        .equals(updateDescriptor.getFields().get(AbstractSApplication.ADVANCED))) {
+        if (updateDescriptor.getFields().containsKey(AbstractSApplication.LINK)
+                && !Boolean.valueOf(application.isLink())
+                        .equals(updateDescriptor.getFields().get(AbstractSApplication.LINK))) {
             throw new SObjectModificationException(format(
-                    "The 'advanced' nature of application '%s' is not modifiable. You can not switch between legacy and advanced applications.",
+                    "The 'link' nature of application '%s' is not modifiable. You can not switch between legacy and application links.",
                     application.getDisplayName()));
         }
     }

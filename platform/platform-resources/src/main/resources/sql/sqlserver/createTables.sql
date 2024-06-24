@@ -594,7 +594,7 @@ CREATE TABLE business_app (
   displayName NVARCHAR(255) NOT NULL,
   editable BIT,
   internalProfile NVARCHAR(255),
-  advanced BIT DEFAULT 0
+  isLink BIT DEFAULT 0
 )
 GO
 

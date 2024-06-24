@@ -525,7 +525,7 @@ CREATE TABLE business_app (
   displayName VARCHAR(255) NOT NULL,
   editable BOOLEAN,
   internalProfile VARCHAR(255),
-  advanced BOOLEAN DEFAULT FALSE
+  isLink BOOLEAN DEFAULT FALSE
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);

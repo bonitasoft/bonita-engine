@@ -32,7 +32,7 @@ import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
-import org.bonitasoft.engine.business.application.xml.AdvancedApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationLinkNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
@@ -414,27 +414,27 @@ public class ApplicationImporterTest {
     }
 
     @Test
-    public void importAdvancedApplication_should_create_advanced_application_with_no_menus_and_no_pages_and_no_home_page()
+    public void importApplicationLink_should_create_application_link_with_no_menus_and_no_pages_and_no_home_page()
             throws Exception {
         //given
         long createdBy = SessionService.SYSTEM_ID;
         boolean editable = true;
         SApplicationWithIcon app = new SApplicationWithIcon("app", "app", "1.0", 1L, createdBy, "state", editable);
         app.setId(1);
-        app.setAdvanced(true);
+        app.setLink(true);
         given(importResult.getApplication()).willReturn(app);
         given(importResult.getImportStatus()).willReturn(new ImportStatus(app.getToken()));
 
-        AdvancedApplicationNode advancedApplicationNode = new AdvancedApplicationNode();
-        advancedApplicationNode.setToken("app");
+        ApplicationLinkNode applicationLinkNode = new ApplicationLinkNode();
+        applicationLinkNode.setToken("app");
 
-        given(nodeToApplicationConverter.toSApplication(advancedApplicationNode, null, null, createdBy, editable))
+        given(nodeToApplicationConverter.toSApplication(applicationLinkNode, null, null, createdBy, editable))
                 .willReturn(importResult);
 
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
-        ImportStatus retrievedStatus = applicationImporter.importApplication(advancedApplicationNode, editable,
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationLinkNode, editable,
                 createdBy, null, null, true, strategy);
 
         //then

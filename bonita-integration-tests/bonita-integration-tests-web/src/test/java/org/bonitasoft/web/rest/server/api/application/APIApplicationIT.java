@@ -49,7 +49,7 @@ public class APIApplicationIT extends AbstractConsoleTest {
     public static final String HOME_PAGE_ZIP = "/homePage.zip";
     public static final String LAYOUT_ZIP = "/layout.zip";
     public static final String THEME_ZIP = "/theme.zip";
-    public static final String ADVANCED_APP_DESCRIPTOR = "/advancedAppDescriptor.xml";
+    public static final String APP_LINK_DESCRIPTOR = "/appLinkDescriptor.xml";
     private APIApplication apiApplication;
     private APISession session;
 
@@ -99,18 +99,18 @@ public class APIApplicationIT extends AbstractConsoleTest {
     }
 
     @Test
-    public void add_AdvancedApplication_is_forbidden() {
+    public void add_ApplicationLink_is_forbidden() {
         // Given
-        final AdvancedApplicationItem advancedItem = AdvancedApplicationDefinition.get().createItem();
-        advancedItem.setToken("tokenAdvanced");
-        advancedItem.setDisplayName("Advanced");
-        advancedItem.setVersion("1.0");
-        advancedItem.setProfileId(2L);
-        advancedItem.setState("Activated");
+        final ApplicationLinkItem linkItem = ApplicationLinkDefinition.get().createItem();
+        linkItem.setToken("tokenLink");
+        linkItem.setDisplayName("Link");
+        linkItem.setVersion("1.0");
+        linkItem.setProfileId(2L);
+        linkItem.setState("Activated");
 
         // When, Then exception
-        assertThrows("Expected exception: This deprecated API is not supported for advanced applications.",
-                APIException.class, () -> apiApplication.add(advancedItem));
+        assertThrows("Expected exception: This deprecated API is not supported for application links.",
+                APIException.class, () -> apiApplication.add(linkItem));
     }
 
     @Test
@@ -125,21 +125,21 @@ public class APIApplicationIT extends AbstractConsoleTest {
     }
 
     @Test
-    public void update_AdvancedApplication_is_forbidden_and_not_effective() throws Exception {
+    public void update_ApplicationLink_is_forbidden_and_not_effective() throws Exception {
         // Given
         getApplicationAPI().importApplications(
-                IOUtils.toByteArray(getClass().getResourceAsStream(ADVANCED_APP_DESCRIPTOR)),
+                IOUtils.toByteArray(getClass().getResourceAsStream(APP_LINK_DESCRIPTOR)),
                 ApplicationImportPolicy.REPLACE_DUPLICATES);
-        AdvancedApplicationItem advancedItem = (AdvancedApplicationItem) apiApplication
+        ApplicationLinkItem linkItem = (ApplicationLinkItem) apiApplication
                 .search(0, 1, null, null, Collections.singletonMap("token", "app1")).getResults().get(0);
-        Map<String, String> attributes = Map.of(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, "Advanced Updated");
+        Map<String, String> attributes = Map.of(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, "Link Updated");
 
         // When, Then exception
         assertThrows(
-                "Expected exception: This deprecated API is not supported for advanced applications. The update has been applied nonetheless.",
-                APIException.class, () -> apiApplication.update(advancedItem.getId(), attributes));
+                "Expected exception: This deprecated API is not supported for application links.",
+                APIException.class, () -> apiApplication.update(linkItem.getId(), attributes));
         // Then not updated
-        assertEquals("Application 1", apiApplication.get(advancedItem.getId()).getDisplayName());
+        assertEquals("Application 1", apiApplication.get(linkItem.getId()).getDisplayName());
     }
 
     @Test
@@ -156,7 +156,7 @@ public class APIApplicationIT extends AbstractConsoleTest {
     }
 
     @Test
-    public void should_search_not_support_filtering_on_AdvancedApplications() throws Exception {
+    public void should_search_not_support_filtering_on_ApplicationLinks() throws Exception {
         // Given
         var legacyApp = createLegacyApplication();
 
@@ -164,11 +164,11 @@ public class APIApplicationIT extends AbstractConsoleTest {
         final String search = legacyApp.getDisplayName();
         final String orders = ApplicationItem.ATTRIBUTE_TOKEN + " DESC";
         final HashMap<String, String> filters = new HashMap<>();
-        filters.put(ApplicationItem.ATTRIBUTE_ADVANCED, "true");
+        filters.put(ApplicationItem.ATTRIBUTE_LINK, "true");
 
         // Then
         assertThrows(
-                "Expected exception: The search does not support filtering on advanced applications in this edition.",
+                "Expected exception: The search does not support filtering on application links in this edition.",
                 BonitaRuntimeException.class, () -> apiApplication.search(0, 1, search, orders, filters));
     }
 
