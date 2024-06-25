@@ -32,7 +32,7 @@ ehCacheVersion = "2.10.10.12.7"
 eclipseCompilerVersion = "3.38.0"
 jakartaActivationVersion = "1.2.2"
 quartzVersion = "2.3.2"
-micrometerVersion = "1.6.1"
+micrometerVersion = "1.13.1"
 # DB drivers:
 mysqlVersion = "8.2.0"
 msSqlServerVersion = "8.4.1.jre8"
