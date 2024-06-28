@@ -14,7 +14,6 @@
 package org.bonitasoft.console.common.server.preferences.properties;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.console.common.server.utils.PlatformManagementUtils;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,19 +39,12 @@ public class ConfigurationFilesManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationFilesManager.class.getName());
 
-    /*
-     * Map<realConfigurationFileName, File>
-     */
-    private Map<String, File> tenantsConfigurationFiles = new HashMap<>();
+    private final Map<String, Properties> tenantConfigurations = new HashMap<>();
 
-    /*
-     * Map<propertiesFileName, Properties>
-     */
+    private final Map<String, File> tenantConfigurationFiles = new HashMap<>();
+
     private Map<String, Properties> platformConfigurations = new HashMap<>();
 
-    /*
-     * Map<configurationFileName, File>
-     */
     private final Map<String, File> platformConfigurationFiles = new HashMap<>();
 
     public Properties getPlatformProperties(String propertiesFile) {
@@ -66,27 +57,25 @@ public class ConfigurationFilesManager {
 
     Properties getAlsoCustomAndInternalPropertiesFromFilename(String propertiesFileName) {
         Properties properties = new Properties();
-        try {
-            final Map<String, Properties> propertiesByFilename = getResources();
-            if (propertiesByFilename.containsKey(propertiesFileName)) {
-                properties.putAll(propertiesByFilename.get(propertiesFileName));
-                // if -internal properties also exists, merge key/value pairs:
-                final String internalSuffixedVersion = getSuffixedPropertyFilename(propertiesFileName, "-internal");
-                if (propertiesByFilename.containsKey(internalSuffixedVersion)) {
-                    properties.putAll(propertiesByFilename.get(internalSuffixedVersion));
-                }
-                // if -custom properties also exists, merge key/value pairs (and overwrite previous values if same key name):
-                final String customSuffixedVersion = getSuffixedPropertyFilename(propertiesFileName, "-custom");
-                if (propertiesByFilename.containsKey(customSuffixedVersion)) {
-                    properties.putAll(propertiesByFilename.get(customSuffixedVersion));
-                }
-            } else {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("File " + propertiesFileName + " not found. Returning empty properties object.");
-                }
+        Properties tenantConfiguration = getTenantConfiguration(propertiesFileName);
+        if (tenantConfiguration != null) {
+            properties.putAll(tenantConfiguration);
+            // if -internal properties also exists, merge key/value pairs:
+            final String internalPropertyFilename = getSuffixedPropertyFilename(propertiesFileName, "-internal");
+            final Properties internalConfiguration = getTenantConfiguration(internalPropertyFilename);
+            if (internalConfiguration != null) {
+                properties.putAll(internalConfiguration);
             }
-        } catch (IOException e) {
-            LOGGER.error("Cannot retrieve tenant configurations", e);
+            // if -custom properties also exists, merge key/value pairs (and overwrite previous values if same key name):
+            final String customPropertyFilename = getSuffixedPropertyFilename(propertiesFileName, "-custom");
+            final Properties customConfiguration = getTenantConfiguration(customPropertyFilename);
+            if (customConfiguration != null) {
+                properties.putAll(customConfiguration);
+            }
+        } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("File " + propertiesFileName + " not found. Returning empty properties object.");
+            }
         }
         return properties;
     }
@@ -124,30 +113,15 @@ public class ConfigurationFilesManager {
         }
     }
 
-    public void setTenantConfigurationFiles(Map<String, byte[]> configurationFiles) throws IOException {
-        Map<String, File> tenantFiles = new HashMap<>();
+    public synchronized void setTenantConfigurationFiles(Map<String, byte[]> configurationFiles) throws IOException {
         for (Map.Entry<String, byte[]> entry : configurationFiles.entrySet()) {
             if (!entry.getKey().endsWith(".properties")) {
                 File file = new File(WebBonitaConstantsUtils.getTenantInstance().getTempFolder(), entry.getKey());
                 FileUtils.writeByteArrayToFile(file, entry.getValue());
-                tenantFiles.put(entry.getKey(), file);
+                tenantConfigurationFiles.put(entry.getKey(), file);
             }
-        }
-        tenantsConfigurationFiles = tenantFiles;
-    }
-
-    public void removeProperty(String propertiesFilename, String propertyName) throws IOException {
-        // Now internal behavior stores and removes from -internal file:
-        final String internalFilename = getSuffixedPropertyFilename(propertiesFilename, "-internal");
-        Map<String, Properties> resources = getResources();
-        Properties properties = resources.get(internalFilename);
-        if (properties != null) {
-            properties.remove(propertyName);
-            update(internalFilename, properties);
-        } else {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("File " + internalFilename + " not found. Cannot remove property '" + propertyName + "'.");
-            }
+            tenantConfigurations.put(entry.getKey(),
+                    ConfigurationFilesManager.getProperties(entry.getValue()));
         }
     }
 
@@ -155,44 +129,37 @@ public class ConfigurationFilesManager {
         return propertiesFilename.replaceAll("\\.properties$", suffix + ".properties");
     }
 
-    private void update(String propertiesFilename, Properties properties) throws IOException {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            properties.store(byteArrayOutputStream, "");
-            getPlatformManagementUtils().updateConfigurationFile(propertiesFilename,
-                    byteArrayOutputStream.toByteArray());
-        } catch (BonitaException e) {
-            throw new IOException(e);
-        }
-    }
-
     PlatformManagementUtils getPlatformManagementUtils() {
         return new PlatformManagementUtils();
     }
 
-    Map<String, Properties> getResources() throws IOException {
-        return getPlatformManagementUtils().getTenantConfigurations();
-    }
-
-    public void setProperty(String propertiesFilename, String propertyName, String propertyValue) throws IOException {
-        Map<String, Properties> resources = getResources();
-        // Now internal behavior stores and removes from -internal file:
-        final String internalFilename = getSuffixedPropertyFilename(propertiesFilename, "-internal");
-        Properties properties = resources.get(internalFilename);
-        if (properties != null) {
-            properties.setProperty(propertyName, propertyValue);
-            update(internalFilename, properties);
-        } else {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("File " + internalFilename + " not found. Cannot remove property '" + propertyName + "'.");
+    public File getTenantConfigurationFile(String fileName) {
+        if (tenantConfigurationFiles.isEmpty()) {
+            try {
+                setTenantConfigurationFiles(getPlatformManagementUtils().readTenantConfigurationsFromEngine());
+            } catch (IOException e) {
+                LOGGER.error("Cannot retrieve tenant configuration files", e);
+                throw new RuntimeException(e);
             }
         }
+        return tenantConfigurationFiles.get(fileName);
     }
 
-    public File getTenantConfigurationFile(String fileName) {
-        if (tenantsConfigurationFiles != null) {
-            return tenantsConfigurationFiles.get(fileName);
+    Properties getTenantConfiguration(String propertiesFilename) {
+        if (tenantConfigurations.isEmpty()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Tenant configuration file {} not yet in cache. Adding it.", propertiesFilename);
+            }
+            try {
+                setTenantConfigurationFiles(getPlatformManagementUtils().readTenantConfigurationsFromEngine());
+            } catch (IOException e) {
+                LOGGER.error("Cannot retrieve tenant configuration", e);
+                throw new RuntimeException(e);
+            }
+        } else if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Retrieving tenant configuration file {} from cache.", propertiesFilename);
         }
-        return null;
+        return tenantConfigurations.get(propertiesFilename);
     }
 
     public File getPlatformConfigurationFile(String fileName) {
