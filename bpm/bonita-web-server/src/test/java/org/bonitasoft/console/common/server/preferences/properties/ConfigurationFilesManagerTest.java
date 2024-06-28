@@ -14,21 +14,14 @@
 package org.bonitasoft.console.common.server.preferences.properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.console.common.server.preferences.properties.ConfigurationFilesManager.getProperties;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.bonitasoft.console.common.server.utils.PlatformManagementUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -39,14 +32,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationFilesManagerTest {
 
-    private static final String MY_PROP_PROPERTIES = "myProp.properties";
-    private static final String MY_PROP_INTERNAL_PROPERTIES = "myProp-internal.properties";
     @Mock
     private PlatformManagementUtils platformManagementUtils;
     @Spy
     private ConfigurationFilesManager configurationFilesManager;
-    @Captor
-    private ArgumentCaptor<byte[]> contentCaptor;
 
     @Before
     public void before() throws Exception {
@@ -54,94 +43,47 @@ public class ConfigurationFilesManagerTest {
     }
 
     @Test
-    public void should_removeProperty_call_update_with_new_content() throws Exception {
-        //given
-        final HashMap<String, Properties> configurationFiles = new HashMap<>();
-        configurationFiles.put("configFile1.properties", getProperties("myProp1=authKey\nmyProp2=passHash".getBytes()));
-        configurationFiles.put(MY_PROP_INTERNAL_PROPERTIES,
-                getProperties("testProperty=testValue\npropToRemove=willBeRemoved".getBytes()));
-        doReturn(configurationFiles).when(configurationFilesManager).getResources();
-        //        assertThat(configurationFilesManager.getTenantProperties(MY_PROP_PROPERTIES, TENANT_ID)).contains(entry("propToRemove", "willBeRemoved"));
-        //when
-        configurationFilesManager.removeProperty(MY_PROP_PROPERTIES, "propToRemove");
-        //then
-        //        assertThat(configurationFilesManager.getTenantProperties(MY_PROP_INTERNAL_PROPERTIES, TENANT_ID)).doesNotContainKey("propToRemove");
-        verify(platformManagementUtils).updateConfigurationFile(eq(MY_PROP_INTERNAL_PROPERTIES),
-                contentCaptor.capture());
-        assertThat(new String(contentCaptor.getValue())).doesNotContain("propToRemove").contains("testProperty",
-                "testValue");
-    }
-
-    @Test
-    public void should_setProperty_call_update_with_new_content() throws Exception {
-        //given
-        final HashMap<String, Properties> configurationFiles = new HashMap<>();
-        configurationFiles.put("configFile1.properties", getProperties("myProp1=authKey\nmyProp2=passHash".getBytes()));
-        configurationFiles.put(MY_PROP_INTERNAL_PROPERTIES,
-                getProperties("testProperty=testValue\npropToRemove=willBeRemoved".getBytes()));
-        doReturn(configurationFiles).when(configurationFilesManager).getResources();
-        //when
-        configurationFilesManager.setProperty(MY_PROP_PROPERTIES, "testProperty", "new Value");
-        //then
-        verify(platformManagementUtils).updateConfigurationFile(eq(MY_PROP_INTERNAL_PROPERTIES),
-                contentCaptor.capture());
-        assertThat(new String(contentCaptor.getValue())).doesNotContain("testValue").contains("testProperty",
-                "new Value");
-    }
-
-    @Test
-    public void getAlsoCustomAndInternalPropertiesFromFilename_should_merge_custom_properties_if_exist()
-            throws IOException {
+    public void getAlsoCustomAndInternalPropertiesFromFilename_should_merge_custom_properties_if_exist() {
         // given:
         final Properties defaultProps = new Properties();
         defaultProps.put("defaultKey", "defaultValue");
+        doReturn(defaultProps).when(configurationFilesManager).getTenantConfiguration("toto.properties");
         final Properties customProps = new Properties();
         customProps.put("customKey", "customValue");
-        Map<String, Properties> propertiesMap = new HashMap<>();
-        propertiesMap.put("toto.properties", defaultProps);
-        propertiesMap.put("toto-custom.properties", customProps);
-        doReturn(propertiesMap).when(configurationFilesManager).getResources();
+        doReturn(customProps).when(configurationFilesManager).getTenantConfiguration("toto-custom.properties");
 
         // when:
         final Properties properties = configurationFilesManager
                 .getAlsoCustomAndInternalPropertiesFromFilename("toto.properties");
 
         // then:
-        assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("customKey", "customValue");
+        assertThat(properties)
+                .containsEntry("defaultKey", "defaultValue")
+                .containsEntry("customKey", "customValue");
     }
 
     @Test
-    public void getAlsoCustomAndInternalPropertiesFromFilename_should_merge_internal_properties_if_exist()
-            throws IOException {
+    public void getAlsoCustomAndInternalPropertiesFromFilename_should_merge_internal_properties_if_exist() {
         // given:
         final Properties defaultProps = new Properties();
         defaultProps.put("defaultKey", "defaultValue");
+        doReturn(defaultProps).when(configurationFilesManager).getTenantConfiguration("toto.properties");
         final Properties internalProps = new Properties();
         internalProps.put("internalKey", "internalValue");
-        Map<String, Properties> propertiesMap = new HashMap<>();
-        propertiesMap.put("toto.properties", defaultProps);
-        propertiesMap.put("toto-internal.properties", internalProps);
-        doReturn(propertiesMap).when(configurationFilesManager).getResources();
+        doReturn(internalProps).when(configurationFilesManager).getTenantConfiguration("toto-internal.properties");
 
         // when:
         final Properties properties = configurationFilesManager
                 .getAlsoCustomAndInternalPropertiesFromFilename("toto.properties");
 
         // then:
-        assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("internalKey",
-                "internalValue");
+        assertThat(properties)
+                .containsEntry("defaultKey", "defaultValue")
+                .containsEntry("internalKey", "internalValue");
     }
 
     @Test
-    public void getAlsoCustomAndInternalPropertiesFromFilename_should_not_fail_if_base_file_does_not_exist()
-            throws IOException {
-        // given:
-        final Properties defaultProps = new Properties();
-        defaultProps.put("defaultKey", "defaultValue");
-        Map<String, Properties> propertiesMap = new HashMap<>();
-        propertiesMap.put("toto.properties", defaultProps);
-        doReturn(propertiesMap).when(configurationFilesManager).getResources();
-
+    public void getAlsoCustomAndInternalPropertiesFromFilename_should_not_fail_if_base_file_does_not_exist() {
         // when:
         final Properties properties = configurationFilesManager
                 .getAlsoCustomAndInternalPropertiesFromFilename("non-existing.properties");
@@ -151,23 +93,20 @@ public class ConfigurationFilesManagerTest {
     }
 
     @Test
-    public void custom_properties_should_overwrite_internal_properties() throws IOException {
+    public void custom_properties_should_overwrite_internal_properties() {
         // given:
         final Properties defaultProps = new Properties();
         defaultProps.put("defaultKey", "defaultValue");
+        doReturn(defaultProps).when(configurationFilesManager).getTenantConfiguration("overwrite.properties");
 
         final Properties internalProps = new Properties();
         internalProps.put("otherKey", "someInternallyManagedValue");
+        doReturn(internalProps).when(configurationFilesManager).getTenantConfiguration("overwrite-internal.properties");
 
         final Properties customProps = new Properties();
         final String expectedOverwrittenValue = "custom_changed_value";
         customProps.put("otherKey", expectedOverwrittenValue);
-
-        Map<String, Properties> propertiesMap = new HashMap<>();
-        propertiesMap.put("overwrite.properties", defaultProps);
-        propertiesMap.put("overwrite-internal.properties", internalProps);
-        propertiesMap.put("overwrite-custom.properties", customProps);
-        doReturn(propertiesMap).when(configurationFilesManager).getResources();
+        doReturn(customProps).when(configurationFilesManager).getTenantConfiguration("overwrite-custom.properties");
 
         // when:
         final Properties properties = configurationFilesManager
@@ -176,22 +115,5 @@ public class ConfigurationFilesManagerTest {
         // then:
         assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("otherKey",
                 expectedOverwrittenValue);
-    }
-
-    @Test
-    public void removeProperty_should_remove_value_from_internal_file() throws Exception {
-        // given:
-        Map<String, Properties> propertiesMap = spy(new HashMap<>(1));
-        final Properties internalProps = new Properties();
-        internalProps.put("internalKey", "internalValue");
-        propertiesMap.put("my_resources-internal.properties", internalProps);
-
-        doReturn(propertiesMap).when(configurationFilesManager).getResources();
-
-        // when:
-        configurationFilesManager.removeProperty("my_resources.properties", "toBeRemoved");
-
-        // then:
-        verify(propertiesMap).get("my_resources-internal.properties");
     }
 }
