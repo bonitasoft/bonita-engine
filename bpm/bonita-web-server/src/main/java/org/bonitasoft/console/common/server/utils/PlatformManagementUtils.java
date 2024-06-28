@@ -15,10 +15,8 @@ package org.bonitasoft.console.common.server.utils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 
 import org.bonitasoft.console.common.server.preferences.properties.ConfigurationFilesManager;
 import org.bonitasoft.engine.api.ApiAccessType;
@@ -126,27 +124,20 @@ public class PlatformManagementUtils {
     }
 
     /**
-     * Long => tenantId
      * String => configuration file name
-     * Properties => content of the configuration file
+     * byte[] => content of the configuration file
      */
-    public Map<String, Properties> getTenantConfigurations() throws IOException {
+    public Map<String, byte[]> readTenantConfigurationsFromEngine() {
         try {
             final PlatformSession platformSession = platformLogin();
             try {
-                Map<String, byte[]> clientTenantConfigurations = getPlatformAPI(platformSession)
-                        .getClientTenantConfigurations();
-                Map<String, Properties> clientTenantConfigurationProperties = new HashMap<>();
-                for (Entry<String, byte[]> entry : clientTenantConfigurations.entrySet()) {
-                    clientTenantConfigurationProperties.put(entry.getKey(),
-                            ConfigurationFilesManager.getProperties(entry.getValue()));
-                }
-                return clientTenantConfigurationProperties;
+                return getPlatformAPI(platformSession).getClientTenantConfigurations();
             } finally {
                 platformLogout(platformSession);
             }
-        } catch (BonitaException e) {
-            throw new IOException(e);
+        } catch (BonitaException | IOException e) {
+            LOGGER.error("Cannot retrieve tenant configurations", e);
+            return Collections.emptyMap();
         }
     }
 
