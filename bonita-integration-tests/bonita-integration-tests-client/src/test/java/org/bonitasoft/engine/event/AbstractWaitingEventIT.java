@@ -41,7 +41,7 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, flowNodeName);
 
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         @SuppressWarnings("unchecked")
@@ -55,7 +55,7 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, flowNodeName);
 
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         @SuppressWarnings("unchecked")
@@ -69,7 +69,7 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.PROCESS_NAME, processName);
 
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         @SuppressWarnings("unchecked")
