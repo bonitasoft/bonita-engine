@@ -32,34 +32,30 @@ public abstract class PrintTestsStatusRule extends TestWatcher {
 
     @Override
     public void starting(final Description d) {
-        logger.warn("Starting test: " + d.getClassName() + "." + d.getMethodName());
+        logger.warn("Starting test: {}.{}", d.getClassName(), d.getMethodName());
     }
 
     @Override
     public void failed(final Throwable e, final Description d) {
-        logger.warn("Failed test: " + d.getClassName() + "." + d.getMethodName(), e);
+        logger.warn("Failed test: {}.{}", d.getClassName(), d.getMethodName(), e);
         try {
             clean();
         } catch (final Exception be) {
             logger.error("unable to clean db", be);
         } finally {
-            logger.warn(
-                    "-----------------------------------------------------------------------------------------------");
+            logger.warn("------------------------------------------------------");
         }
     }
 
     @Override
     public void succeeded(final Description d) {
+        logger.warn("Succeeded test: {}.{}", d.getClassName(), d.getMethodName());
         try {
-            try {
-                clean();
-            } catch (final Exception e) {
-                throw new BonitaRuntimeException(e);
-            }
-            logger.warn("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+            clean();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
         } finally {
-            logger.warn(
-                    "-----------------------------------------------------------------------------------------------");
+            logger.warn("------------------------------------------------------");
         }
     }
 
