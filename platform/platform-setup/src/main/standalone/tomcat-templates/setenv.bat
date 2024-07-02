@@ -1,5 +1,25 @@
 @echo on
 
+rem Add the JAVA 9 specific start-up parameters required by Hazelcast
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-modules=java.se"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.base/java.nio=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.management/sun.management=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED"
+
+rem Add the JAVA 9 specific start-up parameters required by Xstream serialization
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.base/java.time=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.base/java.time.chrono=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.base/java.text=ALL-UNNAMED"
+
+rem Add the JAVA 9 specific start-up parameters required by Webservice connector/Xstream serialization
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.xml/com.sun.org.apache.xerces.internal.xni=ALL-UNNAMED"
+
+rem Add the JAVA 9 specific start-up parameters required by Salesforce connector/Xstream serialization
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED"
+
 rem Set some JVM system properties required by Bonita
 
 rem This variable is automatically taken into account by catalina.bat:
