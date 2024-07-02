@@ -23,9 +23,11 @@ import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
@@ -38,7 +40,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
 import org.junit.Test;
 
@@ -104,7 +105,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
                         .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SUB_PROCESS)
                         .filter(ProcessSupervisorSearchDescriptor.USER_ID, user.getId()).done());
 
-        final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(
+        getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10)
                         .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, receiveProcessInstance.getId())
                         .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SUB_PROCESS).done());
@@ -191,14 +192,14 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
                 ACTOR_NAME, user);
 
         // Start and execute the Sender process
-        final ProcessInstance processInstance = getProcessAPI().startProcess(senderProcessDefinition.getId());
-        final long step1Id = waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
+        final ProcessInstance senderProcessInstance = getProcessAPI().startProcess(senderProcessDefinition.getId());
+        final long step1Id = waitForUserTask(senderProcessInstance, PARENT_PROCESS_USER_TASK_NAME);
         waitForPendingTasks(user.getId(), 2);
         checkNumberOfWaitingEventsInProcess(receiverProcessName, 2);
         assignAndExecuteStep(step1Id, user);
-        waitForProcessToFinish(processInstance);
+        waitForProcessToFinish(senderProcessInstance);
         checkNumberOfWaitingEvents(
-                "The parent process instance is supposed to finished, so no more waiting events are expected.",
+                "The parent process instance is supposed to be finished, so no more waiting events are expected.",
                 startName, 1);
 
         // Execute the Receiver process
@@ -207,11 +208,40 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         final ProcessInstance receiverProcessInstance = getProcessAPI()
                 .searchOpenProcessInstances(searchOptionsBuilder.done()).getResult().get(0);
         waitForUserTask(receiverProcessInstance.getId(), SUB_PROCESS_USER_TASK_NAME);
-        assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()));
+        try {
+            assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()));
+        } finally {
+            /*
+             * SELECT a
+             * FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
+             * WHERE a.stable = TRUE
+             * AND a.stateExecuting = FALSE
+             * AND a.terminal = FALSE
+             * AND a.assigneeId = 0
+             * AND EXISTS (SELECT mapping.id
+             * FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
+             * WHERE mapping.activityId=a.id
+             * AND ( mapping.userId = :userId
+             * OR mapping.actorId in (:actorIds)))
+             */
+            var pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+                    ActivityInstanceCriterion.DEFAULT);
+            System.err.println("Too many humanTaskInstances found: " + pendingHumanTaskInstances.size());
+            for (HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
+                System.err.println("humanTaskInstance = " + humanTaskInstance);
+            }
+            Thread.sleep(10_000);
+            pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+                    ActivityInstanceCriterion.DEFAULT);
+            if (pendingHumanTaskInstances.size() == 1) {
+                System.err.println("Waiting longer solved the problem!");
+            }
 
-        // Clean-up
-        disableAndDeleteProcess(senderProcessDefinition.getId());
-        disableAndDeleteProcess(receiverProcessDefinition.getId());
+            // Clean-up
+            disableAndDeleteProcess(senderProcessDefinition.getId());
+            disableAndDeleteProcess(receiverProcessDefinition.getId());
+        }
+
     }
 
     @Test
