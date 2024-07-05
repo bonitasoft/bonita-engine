@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
@@ -208,24 +209,11 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         final ProcessInstance receiverProcessInstance = getProcessAPI()
                 .searchOpenProcessInstances(searchOptionsBuilder.done()).getResult().get(0);
         waitForUserTask(receiverProcessInstance.getId(), SUB_PROCESS_USER_TASK_NAME);
+        var pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+                ActivityInstanceCriterion.DEFAULT);
         try {
-            assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()));
-        } finally {
-            /*
-             * SELECT a
-             * FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
-             * WHERE a.stable = TRUE
-             * AND a.stateExecuting = FALSE
-             * AND a.terminal = FALSE
-             * AND a.assigneeId = 0
-             * AND EXISTS (SELECT mapping.id
-             * FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
-             * WHERE mapping.activityId=a.id
-             * AND ( mapping.userId = :userId
-             * OR mapping.actorId in (:actorIds)))
-             */
-            var pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
-                    ActivityInstanceCriterion.DEFAULT);
+            assertThat(pendingHumanTaskInstances).hasSize(1);
+        } catch (AssertionError e) {
             System.err.println("Too many humanTaskInstances found: " + pendingHumanTaskInstances.size());
             for (HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
                 System.err.println("humanTaskInstance = " + humanTaskInstance);
@@ -237,6 +225,8 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
                 System.err.println("Waiting longer solved the problem!");
             }
 
+            throw e;
+        } finally {
             // Clean-up
             disableAndDeleteProcess(senderProcessDefinition.getId());
             disableAndDeleteProcess(receiverProcessDefinition.getId());
