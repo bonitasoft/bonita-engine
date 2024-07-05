@@ -174,6 +174,7 @@
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 	</query>
 
 	<query name="getPendingUserTasks">
@@ -181,6 +182,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
 		AND EXISTS (SELECT mapping.id
@@ -202,6 +204,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
 		AND EXISTS (
@@ -256,6 +259,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.assigneeId = :assigneeId
 		AND a.stable = TRUE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 	</query>
 	
@@ -264,6 +268,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.assigneeId IN (:assigneeIds)
 		AND a.stable = TRUE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		GROUP BY a.assigneeId
         ORDER BY a.assigneeId ASC
@@ -274,6 +279,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
 		AND EXISTS (SELECT mapping.id
@@ -306,6 +312,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
 		AND EXISTS (SELECT mapping.id
@@ -338,6 +345,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND (
 			(
@@ -376,6 +384,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND (
 			(
@@ -414,6 +423,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND (
 			(
@@ -451,6 +461,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND (
 			(
@@ -488,6 +499,7 @@
         FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
         AND a.assigneeId = :userId
 	</query>
@@ -497,6 +509,7 @@
         FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
         AND a.assigneeId = :userId
 	</query>
@@ -1114,6 +1127,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
@@ -1137,6 +1151,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
@@ -1159,6 +1174,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.terminal = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.assigneeId IN (
 			SELECT u.id
 			FROM org.bonitasoft.engine.identity.model.SUser AS u
@@ -1171,6 +1187,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.terminal = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.assigneeId IN (
 			SELECT u.id
 			FROM org.bonitasoft.engine.identity.model.SUser AS u
@@ -1184,6 +1201,7 @@
 		WHERE a.stateId = 4
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND exists (
     		SELECT mapping.activityId
         		FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
@@ -1226,6 +1244,7 @@
 		WHERE a.stateId = 4
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND exists (
     		SELECT mapping.activityId
        		FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
@@ -1268,6 +1287,7 @@
 		WHERE a.assigneeId IN (:assigneeIds)
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.expectedEndDate &lt; :currentTime
 		GROUP BY a.assigneeId
         ORDER BY a.assigneeId ASC
@@ -1278,6 +1298,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stable = TRUE
 		AND a.terminal = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.assigneeId = 0
 		AND a.expectedEndDate &lt; :currentTime
 		AND EXISTS (SELECT mapping.id 
@@ -1978,6 +1999,7 @@
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND ( 
 			a.assigneeId = :userId
@@ -2023,6 +2045,7 @@
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND ( 
 			a.assigneeId = :userId
@@ -2069,6 +2092,7 @@
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND ( 
 			a.assigneeId = user.id
@@ -2115,6 +2139,7 @@
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
 		AND a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.terminal = FALSE
 		AND ( 
 			a.assigneeId = user.id
@@ -2156,6 +2181,7 @@
 		SELECT COUNT(a.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.stateId = 4
 	</query>
 
@@ -2163,6 +2189,7 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE a.stateExecuting = FALSE
+		AND a.stateCategory = 'NORMAL'
 		AND a.stateId = 4
 	</query>
     
