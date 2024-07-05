@@ -15,6 +15,8 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.Serializable;
+
 import com.thoughtworks.xstream.XStream;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,5 +58,52 @@ public class XStreamFactoryTest {
 
         // then:
         assertThat(systemErrRule.getLog()).doesNotContain("XStream is probably vulnerable");
+    }
+
+    @Test
+    public void xStream_should_ignoreUnknownElements() throws Exception {
+        // given:
+        final XStream xStream = XStreamFactory.getXStream();
+        var myData = new MyDataObject("Romain", "nope");
+        var serialized = xStream.toXML(myData);
+        // Artificially add a field from serialized object
+        serialized = serialized.replace("<password>nope</password>",
+                "<password>nope</password>\n<birthDate>1985-04-02</birthDate>");
+
+        // when:
+        MyDataObject deserialized = (MyDataObject) xStream.fromXML(serialized);
+
+        // then:
+        assertThat(deserialized.getUsername()).isEqualTo("Romain");
+        assertThat(deserialized.getPassword()).isEqualTo("nope");
+    }
+
+    static class MyDataObject implements Serializable {
+
+        private String username;
+
+        private String password;
+
+        public MyDataObject(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
     }
 }
