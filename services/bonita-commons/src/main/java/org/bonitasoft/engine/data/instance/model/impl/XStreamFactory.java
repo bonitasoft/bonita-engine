@@ -25,17 +25,15 @@ public class XStreamFactory {
 
     public static XStream getXStream() {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        XStream xStream = XSTREAM_MAP.get(classLoader);
-        if (xStream == null) {
-            xStream = new XStream();
-            XStream.setupDefaultSecurity(xStream);
+        return XSTREAM_MAP.computeIfAbsent(classLoader, cl -> {
+            var xStream = new XStream();
+            // Make the deserialization loose to avoid issues like in RUNTIME-1884
+            xStream.ignoreUnknownElements();
             xStream.addPermission(AnyTypePermission.ANY);
-            XSTREAM_MAP.put(classLoader, xStream);
             // Even though xStream now supports Java 8 date types, Bonita needs to convert offset date-time to UTC, by contract:
             xStream.registerConverter(new OffsetDateTimeXStreamConverter());
-        }
-
-        return xStream;
+            return xStream;
+        });
     }
 
     /**
