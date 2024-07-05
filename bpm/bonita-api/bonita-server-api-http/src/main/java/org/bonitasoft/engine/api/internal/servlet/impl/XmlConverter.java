@@ -31,7 +31,6 @@ public class XmlConverter {
     private static final XStream XSTREAM;
     static {
         XSTREAM = new XStream();
-        XStream.setupDefaultSecurity(XSTREAM);
         XSTREAM.addPermission(AnyTypePermission.ANY);
         // ignore fields suppressedExceptions causing exceptions in some cases
         XSTREAM.omitField(Throwable.class, "suppressedExceptions");
