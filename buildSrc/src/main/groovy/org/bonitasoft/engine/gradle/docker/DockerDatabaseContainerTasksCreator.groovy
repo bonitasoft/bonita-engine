@@ -53,7 +53,7 @@ class DockerDatabaseContainerTasksCreator {
             [name       : 'sqlserver',
              image      : 'bonitasoft/bonita-sqlserver:2022-CU4',
              portBinding: 1433,
-             uriTemplate: 'jdbc:sqlserver://%s:%s;database=%s',
+             uriTemplate: 'jdbc:sqlserver://%s:%s;database=%s;encrypt=false',
             ]
     ]
 
