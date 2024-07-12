@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.test;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -42,6 +44,10 @@ public class CommonAPILocalIT extends CommonAPIIT {
     protected static void cleanSession() throws Exception {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.deleteSessionId();
+    }
+
+    protected <T> T inTx(Callable<T> callable) throws Exception {
+        return getServiceAccessor().getUserTransactionService().executeInTransaction(callable);
     }
 
 }
