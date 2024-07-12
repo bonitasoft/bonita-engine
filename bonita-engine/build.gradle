@@ -48,7 +48,14 @@ dependencyManagement {
             entry 'httpmime'
         }
         dependency libs.xstream.get() as String
-        dependency libs.tomcatDbcp.get() as String
+        dependencySet(group: 'org.apache.tomcat', version: libs.versions.tomcatVersion.get()) {
+            entry 'tomcat-dbcp'
+            entry 'tomcat'
+            entry 'tomcat-catalina'
+        }
+        dependencySet(group: 'org.apache.tomcat.embed', version: libs.versions.tomcatVersion.get()) {
+            entry 'tomcat-embed-core'
+        }
         dependency libs.narayanaJta.get() as String
         dependency libs.jakartaActivation.get() as String
         dependency(libs.quartz.get() as String)

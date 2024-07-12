@@ -20,6 +20,7 @@ import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
@@ -46,14 +47,27 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
     @Column
     protected long scopeId;
 
-    public SAContractData(long sourceObjectId, String name, Serializable value, long scopeId) {
+    protected SAContractData(long sourceObjectId, String name, Serializable value, long scopeId) {
         super(sourceObjectId);
         this.name = name;
         this.scopeId = scopeId;
-        this.value = value;
+        this.value = clearFileInputContent(value);
     }
 
-    public SAContractData(SContractData contractData) {
+    /**
+     * Remove the {@link FileInputValue} content from Archived Contract Data
+     *
+     * @param value, The contract input value
+     * @return The contract input value without file content in case of a {@link FileInputValue}
+     */
+    private static Serializable clearFileInputContent(Serializable value) {
+        if (value instanceof FileInputValue inputValue) {
+            inputValue.setContent(null);
+        }
+        return value;
+    }
+
+    protected SAContractData(SContractData contractData) {
         this(contractData.getId(), contractData.getName(), contractData.getValue(), contractData.getScopeId());
     }
 

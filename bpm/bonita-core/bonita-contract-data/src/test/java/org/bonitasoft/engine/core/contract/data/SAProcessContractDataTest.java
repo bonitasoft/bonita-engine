@@ -15,12 +15,27 @@ package org.bonitasoft.engine.core.contract.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
+import org.junit.jupiter.api.Test;
 
-public class SAProcessContractDataTest {
+class SAProcessContractDataTest {
 
     @Test
-    public void creatingSAProcessContractDataShouldCopyNonArchivedValues() throws Exception {
+    void clearFileInputContent() {
+        var contractData = new SProcessContractData();
+        contractData.setId(1);
+        contractData.setName("myFile");
+        contractData.setValue(new FileInputValue("theFile", "content".getBytes()));
+
+        var archivedContractData = new SAProcessContractData(contractData);
+
+        assertThat(archivedContractData.getValue()).isInstanceOf(FileInputValue.class)
+                .extracting("content")
+                .isNull();
+    }
+
+    @Test
+    void creatingSAProcessContractDataShouldCopyNonArchivedValues() {
         long processInstanceId = 555L;
         String some_name = "some_name";
         long value = 999999L;
@@ -31,11 +46,11 @@ public class SAProcessContractDataTest {
 
         final SAProcessContractData saProcessContractData = new SAProcessContractData(processContractData);
 
-        assertThat(saProcessContractData.getTenantId()).isEqualTo(0L); // not set yet by Persistence service
-        assertThat(saProcessContractData.getId()).isEqualTo(0L);
+        assertThat(saProcessContractData.getTenantId()).isZero(); // not set yet by Persistence service
+        assertThat(saProcessContractData.getId()).isZero();
         assertThat(saProcessContractData.getName()).isEqualTo(some_name);
         assertThat(saProcessContractData.getScopeId()).isEqualTo(processInstanceId);
-        assertThat(saProcessContractData.getArchiveDate()).isEqualTo(0L);
+        assertThat(saProcessContractData.getArchiveDate()).isZero();
         assertThat(saProcessContractData.getSourceObjectId()).isEqualTo(originalProcessDataId);
         assertThat(saProcessContractData.getValue()).isEqualTo(value);
     }

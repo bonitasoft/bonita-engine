@@ -6,10 +6,14 @@ dependencies {
     api project(':services:bonita-log')
     api project(':services:bonita-archive')
     api project(':services:bonita-persistence')
-    testImplementation "junit:junit:${Deps.junit4Version}"
+    implementation platform(libs.bonitaArtifactsModelBom)
+    implementation 'org.bonitasoft.engine:bonita-process-definition-model'
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-
+    testImplementation libs.junit5api
+    testImplementation libs.junit4
+    testRuntimeOnly(libs.junitJupiterEngine)
+    testRuntimeOnly(libs.junitVintageEngine)
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 }
