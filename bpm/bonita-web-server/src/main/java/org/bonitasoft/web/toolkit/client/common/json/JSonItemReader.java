@@ -16,6 +16,7 @@ package org.bonitasoft.web.toolkit.client.common.json;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.bonitasoft.web.toolkit.client.common.AbstractTreeNode;
 import org.bonitasoft.web.toolkit.client.common.Tree;
@@ -117,7 +118,9 @@ public class JSonItemReader {
      */
     private static <E extends IItem> E parseItem(final TreeIndexed<String> tree, final ItemDefinition<E> itemDefinition,
             final boolean applyValidators) {
-        final E item = itemDefinition.createItem();
+        final Optional<E> discriminatedItem = itemDefinition.getDiscriminatedHelper()
+                .map(h -> h.findItemCreator(tree).get());
+        final E item = discriminatedItem.orElseGet(itemDefinition::createItem);
 
         item.setApplyValidators(applyValidators);
 

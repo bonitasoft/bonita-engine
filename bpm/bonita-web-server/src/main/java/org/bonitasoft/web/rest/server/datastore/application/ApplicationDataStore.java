@@ -21,6 +21,9 @@ import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationLink;
+import org.bonitasoft.engine.business.application.ApplicationLinkCreator;
+import org.bonitasoft.engine.business.application.ApplicationLinkUpdater;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
@@ -33,6 +36,7 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
+import org.bonitasoft.web.rest.model.application.ApplicationLinkItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.datastore.filter.Filters;
 import org.bonitasoft.web.rest.server.datastore.utils.SearchOptionsCreator;
@@ -51,8 +55,8 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
  * @author Elias Ricken de Medeiros
  */
 public class ApplicationDataStore extends CommonDatastore<AbstractApplicationItem, IApplication>
-        implements DatastoreHasAdd<ApplicationItem>,
-        DatastoreHasUpdate<ApplicationItem>,
+        implements DatastoreHasAdd<AbstractApplicationItem>,
+        DatastoreHasUpdate<AbstractApplicationItem>,
         DatastoreHasGet<AbstractApplicationItem>, DatastoreHasSearch<AbstractApplicationItem>, DatastoreHasDelete {
 
     private final ApplicationAPI applicationAPI;
@@ -98,6 +102,21 @@ public class ApplicationDataStore extends CommonDatastore<AbstractApplicationIte
      */
     @Override
     @Deprecated(since = "9.0.0")
+    public AbstractApplicationItem add(final AbstractApplicationItem item) {
+        if (item instanceof ApplicationItem legacy) {
+            return add(legacy);
+        } else if (item instanceof ApplicationLinkItem link) {
+            return add(link);
+        } else {
+            // should not occur anyway
+            throw new APIException("Unknown application type.");
+        }
+    }
+
+    /**
+     * @deprecated as of 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "9.0.0")
     public ApplicationItem add(final ApplicationItem item) {
 
         try {
@@ -114,7 +133,29 @@ public class ApplicationDataStore extends CommonDatastore<AbstractApplicationIte
                 return res;
             } else {
                 // should not occur anyway
-                throw new APIException("This deprecated API is not supported for application links.");
+                throw new APIException("Use dedicated API for application links.");
+            }
+        } catch (final BonitaException e) {
+            throw new APIException(e);
+        }
+    }
+
+    /**
+     * @deprecated as of 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "9.0.0")
+    public ApplicationLinkItem add(final ApplicationLinkItem item) {
+
+        try {
+            final ApplicationLinkCreator creator = converter.toApplicationLinkCreator(item);
+
+            final ApplicationLink application = applicationAPI.createApplicationLink(creator);
+            var converted = converter.toApplicationItem(application);
+            if (converted instanceof ApplicationLinkItem res) {
+                return res;
+            } else {
+                // should not occur anyway
+                throw new APIException("Use dedicated API for legacy applications.");
             }
         } catch (final BonitaException e) {
             throw new APIException(e);
@@ -126,16 +167,21 @@ public class ApplicationDataStore extends CommonDatastore<AbstractApplicationIte
      */
     @Override
     @Deprecated(since = "9.0.0")
-    public ApplicationItem update(final APIID id, final Map<String, String> attributes) {
+    public AbstractApplicationItem update(final APIID id, final Map<String, String> attributes) {
         try {
-            final ApplicationUpdater applicationUpdater = converter.toApplicationUpdater(attributes);
-            final Application application = applicationAPI.updateApplication(id.toLong(), applicationUpdater);
-            var converted = converter.toApplicationItem(application);
-            if (converted instanceof ApplicationItem res) {
-                return res;
+            // no way to know the application type without getting it first
+            IApplication app = applicationAPI.getIApplication(id.toLong());
+            if (app instanceof Application) {
+                final ApplicationUpdater applicationUpdater = converter.toApplicationUpdater(attributes);
+                final Application application = applicationAPI.updateApplication(id.toLong(), applicationUpdater);
+                return converter.toApplicationItem(application);
+            } else if (app instanceof ApplicationLink) {
+                final ApplicationLinkUpdater applicationUpdater = converter.toApplicationLinkUpdater(attributes);
+                final ApplicationLink link = applicationAPI.updateApplicationLink(id.toLong(), applicationUpdater);
+                return converter.toApplicationItem(link);
             } else {
-                throw new APIException(
-                        "This deprecated API is not supported for application links.");
+                // should not occur anyway
+                throw new APIException("Unknown application type.");
             }
         } catch (final BonitaException e) {
             throw new APIException(e);

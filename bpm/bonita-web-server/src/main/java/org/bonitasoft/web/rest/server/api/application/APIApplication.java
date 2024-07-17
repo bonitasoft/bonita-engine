@@ -32,7 +32,6 @@ import org.bonitasoft.web.rest.server.framework.api.APIHasGet;
 import org.bonitasoft.web.rest.server.framework.api.APIHasSearch;
 import org.bonitasoft.web.rest.server.framework.api.APIHasUpdate;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 
@@ -46,7 +45,7 @@ import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
  */
 public class APIApplication extends ConsoleAPI<AbstractApplicationItem>
         implements APIHasAdd<AbstractApplicationItem>, APIHasSearch<AbstractApplicationItem>,
-        APIHasGet<AbstractApplicationItem>, APIHasUpdate<ApplicationItem>, APIHasDelete {
+        APIHasGet<AbstractApplicationItem>, APIHasUpdate<AbstractApplicationItem>, APIHasDelete {
 
     private final ApplicationDataStoreCreator creator;
 
@@ -64,11 +63,7 @@ public class APIApplication extends ConsoleAPI<AbstractApplicationItem>
     @Override
     @Deprecated(since = "9.0.0")
     public AbstractApplicationItem add(final AbstractApplicationItem item) {
-        if (item instanceof ApplicationItem legacy) {
-            return creator.create(getEngineSession()).add(legacy);
-        } else {
-            throw new APIException("This deprecated API is not supported for application links.");
-        }
+        return creator.create(getEngineSession()).add(item);
     }
 
     /**
@@ -76,7 +71,7 @@ public class APIApplication extends ConsoleAPI<AbstractApplicationItem>
      */
     @Override
     @Deprecated(since = "9.0.0")
-    public ApplicationItem update(final APIID id, final Map<String, String> attributes) {
+    public AbstractApplicationItem update(final APIID id, final Map<String, String> attributes) {
         return creator.create(getEngineSession()).update(id, attributes);
     }
 

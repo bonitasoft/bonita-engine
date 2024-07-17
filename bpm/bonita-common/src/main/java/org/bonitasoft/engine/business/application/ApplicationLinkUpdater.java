@@ -13,30 +13,29 @@
  **/
 package org.bonitasoft.engine.business.application;
 
+import java.io.Serializable;
+import java.util.Map;
+
 /**
- * Allows to define which {@link Application} fields will be updated
+ * Allows to define which {@link ApplicationLink} fields will be updated
  *
- * @author Elias Ricken de Medeiros
- * @see Application
- * @since 7.0.0
+ * @see ApplicationLink
+ * @since 10.2.0
  * @deprecated This class should no longer be used. Since 9.0.0, Applications should be updated at startup.
  */
 @Deprecated(since = "10.2.0")
-public class ApplicationUpdater extends AbstractApplicationUpdater<ApplicationUpdater> {
+public class ApplicationLinkUpdater extends AbstractApplicationUpdater<ApplicationLinkUpdater> {
 
-    private static final long serialVersionUID = 4565052647320534796L;
+    private static final long serialVersionUID = 1732835829535757371L;
+    private transient Map<ApplicationField, Serializable> fieldsCheckedMap;
 
-    /**
-     * Defines the identifier of the new {@link org.bonitasoft.engine.business.application.ApplicationPage} defined as
-     * the {@link Application} home page
-     *
-     * @param applicationPageId the identifier of {@code ApplicationPage} associated to the {@code Application}
-     * @return the current {@code ApplicationUpdater}
-     * @see Application
-     * @see org.bonitasoft.engine.business.application.ApplicationPage
-     */
-    public ApplicationUpdater setHomePageId(final Long applicationPageId) {
-        getFields().put(ApplicationField.HOME_PAGE_ID, applicationPageId);
-        return this;
+    @Override
+    public Map<ApplicationField, Serializable> getFields() {
+        // make sure no field for Legacy Application and not suitable for Application Link will get inserted there
+        if (fieldsCheckedMap == null) {
+            fieldsCheckedMap = new CheckedApplicationFieldMap(super.getFields(),
+                    k -> k.isForClass(ApplicationLink.class));
+        }
+        return fieldsCheckedMap;
     }
 }

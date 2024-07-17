@@ -19,6 +19,8 @@ import java.util.List;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationLinkNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -56,21 +58,28 @@ public class ApplicationToNodeConverter {
         this.pageService = pageService;
     }
 
-    public ApplicationNode toNode(final SApplication application) throws ExportException {
+    public AbstractApplicationNode toNode(final SApplication application) throws ExportException {
         try {
-            final ApplicationNode applicationNode = new ApplicationNode();
+            final AbstractApplicationNode applicationNode;
+            if (application.isLink()) {
+                applicationNode = new ApplicationLinkNode();
+            } else {
+                ApplicationNode legacyApplicationNode = new ApplicationNode();
+                setLayout(application, legacyApplicationNode);
+                setTheme(application, legacyApplicationNode);
+                setHomePage(application, legacyApplicationNode);
+                setPages(application.getId(), legacyApplicationNode);
+                applicationMenuToNodeConverter.addMenusToApplicationNode(application.getId(), null,
+                        legacyApplicationNode, null);
+                applicationNode = legacyApplicationNode;
+            }
             applicationNode.setToken(application.getToken());
             applicationNode.setDisplayName(application.getDisplayName());
             applicationNode.setVersion(application.getVersion());
             applicationNode.setDescription(application.getDescription());
             applicationNode.setState(application.getState());
             applicationNode.setIconPath(application.getIconPath());
-            setLayout(application, applicationNode);
-            setTheme(application, applicationNode);
             setProfile(application, applicationNode);
-            setHomePage(application, applicationNode);
-            setPages(application.getId(), applicationNode);
-            applicationMenuToNodeConverter.addMenusToApplicationNode(application.getId(), null, applicationNode, null);
             return applicationNode;
         } catch (SBonitaException e) {
             throw new ExportException(e);
@@ -125,7 +134,7 @@ public class ApplicationToNodeConverter {
         }
     }
 
-    private void setProfile(final SApplication application, final ApplicationNode applicationNode)
+    private void setProfile(final SApplication application, final AbstractApplicationNode applicationNode)
             throws SProfileNotFoundException {
         if (application.getProfileId() != null) {
             final SProfile profile = profileService.getProfile(application.getProfileId());

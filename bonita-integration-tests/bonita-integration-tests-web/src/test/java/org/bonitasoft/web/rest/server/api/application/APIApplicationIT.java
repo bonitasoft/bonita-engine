@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.web.rest.server.api.page.builder.PageItemBuilder.aPageItem;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ApplicationAPI;
@@ -39,7 +41,6 @@ import org.bonitasoft.web.rest.model.portal.page.PageItem;
 import org.bonitasoft.web.rest.server.api.applicationpage.APIApplicationDataStoreFactory;
 import org.bonitasoft.web.rest.server.datastore.application.ApplicationDataStoreCreator;
 import org.bonitasoft.web.test.AbstractConsoleTest;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -99,33 +100,41 @@ public class APIApplicationIT extends AbstractConsoleTest {
     }
 
     @Test
-    public void add_ApplicationLink_is_forbidden() {
+    public void should_add_ApplicationLink() {
         // Given
         final ApplicationLinkItem linkItem = ApplicationLinkDefinition.get().createItem();
         linkItem.setToken("tokenLink");
         linkItem.setDisplayName("Link");
         linkItem.setVersion("1.0");
         linkItem.setProfileId(2L);
-        linkItem.setState("Activated");
+        linkItem.setState("ACTIVATED");
 
-        // When, Then exception
-        assertThrows("Expected exception: This deprecated API is not supported for application links.",
-                APIException.class, () -> apiApplication.add(linkItem));
+        // When
+        var createdLink = apiApplication.add(linkItem);
+
+        // Then
+        Map<String, String> attributes = new HashMap<>(linkItem.getAttributes().size());
+        linkItem.getAttributes().keySet().forEach(k -> attributes.put(k, createdLink.getAttributes().get(k)));
+        Assert.assertEquals(new HashMap<>(linkItem.getAttributes()), attributes);
+        assertThat(createdLink.isLink()).isTrue();
     }
 
     @Test
     public void should_add_LegacyApplication() throws Exception {
         // Given
-        var legacyApp = createLegacyApplication();
+        var pair = createLegacyApplicationWithOriginal();
+        var original = pair.getKey();
+        var legacyApp = pair.getValue();
 
         // Then
-        Map<String, String> attributes = new HashMap<>(legacyApp.getAttributes().size());
-        legacyApp.getAttributes().keySet().forEach(k -> attributes.put(k, legacyApp.getAttributes().get(k)));
-        Assert.assertEquals(new HashMap<>(legacyApp.getAttributes()), attributes);
+        Map<String, String> attributes = new HashMap<>(original.getAttributes().size());
+        original.getAttributes().keySet().forEach(k -> attributes.put(k, legacyApp.getAttributes().get(k)));
+        Assert.assertEquals(new HashMap<>(original.getAttributes()), attributes);
+        assertThat(legacyApp.isLink()).isFalse();
     }
 
     @Test
-    public void update_ApplicationLink_is_forbidden_and_not_effective() throws Exception {
+    public void should_update_ApplicationLink() throws Exception {
         // Given
         getApplicationAPI().importApplications(
                 IOUtils.toByteArray(getClass().getResourceAsStream(APP_LINK_DESCRIPTOR)),
@@ -134,12 +143,13 @@ public class APIApplicationIT extends AbstractConsoleTest {
                 .search(0, 1, null, null, Collections.singletonMap("token", "app1")).getResults().get(0);
         Map<String, String> attributes = Map.of(AbstractApplicationItem.ATTRIBUTE_DISPLAY_NAME, "Link Updated");
 
-        // When, Then exception
-        assertThrows(
-                "Expected exception: This deprecated API is not supported for application links.",
-                APIException.class, () -> apiApplication.update(linkItem.getId(), attributes));
-        // Then not updated
-        assertEquals("Application 1", apiApplication.get(linkItem.getId()).getDisplayName());
+        // When
+        var updatedLink = apiApplication.update(linkItem.getId(), attributes);
+
+        // Then updated
+        assertEquals("Link Updated", updatedLink.getDisplayName());
+        assertEquals("Link Updated", apiApplication.get(linkItem.getId()).getDisplayName());
+        assertThat(linkItem.isLink()).isTrue();
     }
 
     @Test
@@ -153,6 +163,7 @@ public class APIApplicationIT extends AbstractConsoleTest {
 
         // Then
         assertEquals("Legacy Updated", updatedItem.getDisplayName());
+        assertThat(updatedItem.isLink()).isFalse();
     }
 
     @Test
@@ -172,7 +183,17 @@ public class APIApplicationIT extends AbstractConsoleTest {
                 BonitaRuntimeException.class, () -> apiApplication.search(0, 1, search, orders, filters));
     }
 
-    private AbstractApplicationItem createLegacyApplication() throws Exception {
+    private ApplicationItem createLegacyApplication() throws Exception {
+        return createLegacyApplicationWithOriginal().getValue();
+    }
+
+    /**
+     * Create a legacy application.
+     *
+     * @return a pair with the constructed item as key and the api call result as value.
+     * @throws Exception exception during creation
+     */
+    private Entry<ApplicationItem, ApplicationItem> createLegacyApplicationWithOriginal() throws Exception {
         addPage(HOME_PAGE_ZIP);
         final PageItem layout = addPage(LAYOUT_ZIP);
         final PageItem theme = addPage(THEME_ZIP);
@@ -185,7 +206,8 @@ public class APIApplicationIT extends AbstractConsoleTest {
         legacyItem.setLayoutId(layout.getId().toLong());
         legacyItem.setThemeId(theme.getId().toLong());
 
-        return apiApplication.add(legacyItem);
+        return Collections.singletonMap(legacyItem, (ApplicationItem) apiApplication.add(legacyItem)).entrySet()
+                .iterator().next();
     }
 
 }

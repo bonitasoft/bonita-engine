@@ -72,6 +72,16 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getLivingApplicationAPIDelegate().createApplication(applicationCreator);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated(since = "10.2.0")
+    public ApplicationLink createApplicationLink(final ApplicationLinkCreator applicationLinkCreator)
+            throws CreationException {
+        return getLivingApplicationAPIDelegate().createApplicationLink(applicationLinkCreator);
+    }
+
     private LivingApplicationAPIDelegate getLivingApplicationAPIDelegate() {
         return new LivingApplicationAPIDelegate(getServiceAccessor(),
                 getApplicationModelConverter(getServiceAccessor().getPageService()),
@@ -140,6 +150,17 @@ public class ApplicationAPIImpl implements ApplicationAPI {
             throws ApplicationNotFoundException, UpdateException,
             AlreadyExistsException {
         return getLivingApplicationAPIDelegate().updateApplication(applicationId, updater);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated(since = "10.2.0")
+    public ApplicationLink updateApplicationLink(final long applicationId, final ApplicationLinkUpdater updater)
+            throws ApplicationNotFoundException, UpdateException,
+            AlreadyExistsException {
+        return getLivingApplicationAPIDelegate().updateApplicationLink(applicationId, updater);
     }
 
     protected ServiceAccessor getServiceAccessor() {

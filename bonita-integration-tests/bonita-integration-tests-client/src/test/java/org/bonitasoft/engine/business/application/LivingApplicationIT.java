@@ -64,6 +64,35 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     }
 
     @Test
+    public void createApplicationLink_returns_application_based_on_ApplicationCreator_information() throws Exception {
+        //given
+        final Profile profile = getProfileUser();
+        final ApplicationLinkCreator creator = new ApplicationLinkCreator("My-Application",
+                "My application display name",
+                "1.0");
+        creator.setDescription("This is my application");
+        creator.setIconPath("/icon.jpg");
+        creator.setProfileId(profile.getId());
+
+        //when
+        final ApplicationLink application = getLivingApplicationAPI().createApplicationLink(creator);
+
+        //then
+        assertThat(application).isNotNull();
+        assertThat(application.getToken()).isEqualTo("My-Application");
+        assertThat(application.getDisplayName()).isEqualTo("My application display name");
+        assertThat(application.getVersion()).isEqualTo("1.0");
+        assertThat(application.getId()).isGreaterThan(0);
+        assertThat(application.getDescription()).isEqualTo("This is my application");
+        assertThat(application.getIconPath()).isEqualTo("/icon.jpg");
+        assertThat(application.getCreatedBy()).isEqualTo(getUser().getId());
+        assertThat(application.getUpdatedBy()).isEqualTo(getUser().getId());
+        assertThat(application.getProfileId()).isEqualTo(profile.getId());
+
+        getLivingApplicationAPI().deleteApplication(application.getId());
+    }
+
+    @Test
     public void createApplication_without_profile_should_have_null_profileId() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name",
@@ -108,6 +137,42 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
         assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
         assertThat(updatedApplication).isEqualTo(getLivingApplicationAPI().getApplication(application.getId()));
+
+        getLivingApplicationAPI().deleteApplication(application.getId());
+    }
+
+    @Test
+    public void updateApplicationLink_should_return_application_up_to_date() throws Exception {
+        //given
+        final Profile profile = getProfileUser();
+        final ApplicationLinkCreator creator = new ApplicationLinkCreator("My-Application",
+                "My application display name",
+                "1.0");
+        final ApplicationLink application = getLivingApplicationAPI().createApplicationLink(creator);
+
+        final ApplicationLinkUpdater updater = new ApplicationLinkUpdater();
+        updater.setToken("My-updated-app");
+        updater.setDisplayName("Updated display name");
+        updater.setVersion("1.1");
+        updater.setDescription("Up description");
+        updater.setIconPath("/newIcon.jpg");
+        updater.setProfileId(profile.getId());
+        updater.setState(ApplicationState.ACTIVATED.name());
+
+        //when
+        final ApplicationLink updatedApplication = getLivingApplicationAPI().updateApplicationLink(application.getId(),
+                updater);
+
+        //then
+        assertThat(updatedApplication).isNotNull();
+        assertThat(updatedApplication.getToken()).isEqualTo("My-updated-app");
+        assertThat(updatedApplication.getDisplayName()).isEqualTo("Updated display name");
+        assertThat(updatedApplication.getVersion()).isEqualTo("1.1");
+        assertThat(updatedApplication.getDescription()).isEqualTo("Up description");
+        assertThat(updatedApplication.getIconPath()).isEqualTo("/newIcon.jpg");
+        assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
+        assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
+        assertThat(updatedApplication).isEqualTo(getLivingApplicationAPI().getIApplication(application.getId()));
 
         getLivingApplicationAPI().deleteApplication(application.getId());
     }
