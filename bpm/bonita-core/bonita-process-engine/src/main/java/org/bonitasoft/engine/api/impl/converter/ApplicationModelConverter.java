@@ -47,14 +47,16 @@ public class ApplicationModelConverter {
         this.pageService = pageService;
     }
 
-    public SApplicationWithIcon buildSApplication(final ApplicationCreator creator, final long creatorUserId)
+    public SApplicationWithIcon buildSApplication(final AbstractApplicationCreator<?> creator, final long creatorUserId)
             throws CreationException {
         final Map<ApplicationField, Serializable> fields = creator.getFields();
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
         final long now = System.currentTimeMillis();
+        final boolean isLink = creator.isLink();
         SApplicationWithIcon application = new SApplicationWithIcon();
+        application.setLink(isLink);
         application.setToken((String) fields.get(ApplicationField.TOKEN));
         application.setDisplayName((String) fields.get(ApplicationField.DISPLAY_NAME));
         application.setVersion((String) fields.get(ApplicationField.VERSION));
@@ -62,8 +64,10 @@ public class ApplicationModelConverter {
         application.setLastUpdateDate(now);
         application.setCreatedBy(creatorUserId);
         application.setState(SApplicationState.ACTIVATED.name());
-        application.setLayoutId(getLayoutId(creator));
-        application.setThemeId(getThemeId(creator));
+        if (creator instanceof ApplicationCreator) {
+            application.setLayoutId(getLayoutId((ApplicationCreator) creator));
+            application.setThemeId(getThemeId((ApplicationCreator) creator));
+        }
         application.setUpdatedBy(creatorUserId);
         byte[] iconContent = (byte[]) fields.get(ApplicationField.ICON_CONTENT);
         String iconFileName = (String) fields.get(ApplicationField.ICON_FILE_NAME);
@@ -154,7 +158,7 @@ public class ApplicationModelConverter {
         return applications;
     }
 
-    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater,
+    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final AbstractApplicationUpdater<?> updater,
             final long updaterUserId) {
         final SApplicationUpdateBuilder builder = new SApplicationUpdateBuilder(updaterUserId);
         updateFields(updater, builder);
@@ -162,7 +166,7 @@ public class ApplicationModelConverter {
         return builder.done();
     }
 
-    protected void updateFields(final ApplicationUpdater updater, final SApplicationUpdateBuilder builder) {
+    protected void updateFields(final AbstractApplicationUpdater<?> updater, final SApplicationUpdateBuilder builder) {
         for (final Entry<ApplicationField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {
                 case TOKEN:

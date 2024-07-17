@@ -28,6 +28,7 @@ import org.bonitasoft.web.rest.model.ModelFactory;
 import org.bonitasoft.web.rest.model.application.AbstractApplicationDefinition;
 import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
+import org.bonitasoft.web.rest.model.application.ApplicationLinkItem;
 import org.bonitasoft.web.rest.model.portal.profile.ProfileItem;
 import org.bonitasoft.web.rest.server.api.applicationpage.APIApplicationDataStoreFactory;
 import org.bonitasoft.web.rest.server.api.deployer.DeployerFactory;
@@ -97,14 +98,26 @@ public class APIApplicationTest {
     }
 
     @Test
-    public void add_should_return_the_result_of_dataStore_add() throws Exception {
+    public void add_legacy_should_return_the_result_of_dataStore_add() throws Exception {
         //given
         final ApplicationItem itemToCreate = mock(ApplicationItem.class);
         final ApplicationItem createdItem = mock(ApplicationItem.class);
-        given(dataStore.add(itemToCreate)).willReturn(createdItem);
-        given(dataStore.add(itemToCreate)).willReturn(createdItem);
+        given(dataStore.add((AbstractApplicationItem) itemToCreate)).willReturn(createdItem);
         //when
         final ApplicationItem retrievedItem = (ApplicationItem) apiApplication.add(itemToCreate);
+
+        //then
+        assertThat(retrievedItem).isEqualTo(createdItem);
+    }
+
+    @Test
+    public void add_link_should_return_the_result_of_dataStore_add() throws Exception {
+        //given
+        final ApplicationLinkItem itemToCreate = mock(ApplicationLinkItem.class);
+        final ApplicationLinkItem createdItem = mock(ApplicationLinkItem.class);
+        given(dataStore.add((AbstractApplicationItem) itemToCreate)).willReturn(createdItem);
+        //when
+        final ApplicationLinkItem retrievedItem = (ApplicationLinkItem) apiApplication.add(itemToCreate);
 
         //then
         assertThat(retrievedItem).isEqualTo(createdItem);
@@ -174,7 +187,7 @@ public class APIApplicationTest {
         given(dataStore.update(idToUpdate, attributes)).willReturn(updatedItem);
 
         //when
-        final ApplicationItem retrievedItem = apiApplication.update(idToUpdate, attributes);
+        final AbstractApplicationItem retrievedItem = apiApplication.update(idToUpdate, attributes);
 
         //then
         assertThat(retrievedItem).isEqualTo(updatedItem);

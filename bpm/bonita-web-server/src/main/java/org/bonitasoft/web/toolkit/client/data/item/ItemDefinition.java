@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.ItemAttribute;
@@ -232,6 +233,15 @@ public abstract class ItemDefinition<E extends IItem> {
     // ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * This helps Items definitions which needs an attribute value to determine their concrete implementation.
+     *
+     * @return helper for discriminating and find the concrete implementation
+     */
+    public Optional<DiscriminatedItemDefinitionHelper<E>> getDiscriminatedHelper() {
+        return Optional.empty();
+    }
+
+    /**
      * This function create a new empty Item
      *
      * @return This function returns the new Item
@@ -248,7 +258,8 @@ public abstract class ItemDefinition<E extends IItem> {
     }
 
     public final E createItem(final Map<String, String> attributes) throws ValidationException {
-        final E item = _createItem();
+        final Optional<E> discriminatedItem = getDiscriminatedHelper().map(h -> h.findItemCreator(attributes).get());
+        final E item = discriminatedItem.orElseGet(this::_createItem);
 
         if (attributes != null) {
             item.setAttributes(attributes);

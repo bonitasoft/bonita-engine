@@ -26,11 +26,14 @@ import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationLink;
+import org.bonitasoft.engine.business.application.ApplicationLinkCreator;
+import org.bonitasoft.engine.business.application.ApplicationLinkUpdater;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import org.bonitasoft.engine.business.application.impl.ApplicationLinkImpl;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.business.application.importer.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -129,6 +132,26 @@ public class LivingApplicationAPIDelegateTest {
 
         //then
         assertThat(createdApplication).isEqualTo(application);
+    }
+
+    @Test
+    public void createApplicationLink_should_call_applicationService_createApplication_and_return_created_application()
+            throws Exception {
+        //given
+        final ApplicationLinkCreator creator = new ApplicationLinkCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
+        creator.setDescription(DESCRIPTION);
+        final SApplicationWithIcon sApp = buildDefaultApplicationWithMetadata();
+        sApp.setDescription(DESCRIPTION);
+        final ApplicationLinkImpl applicationLink = new ApplicationLinkImpl(APP_TOKEN, VERSION, DESCRIPTION);
+        given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        given(converter.toApplication(sApp)).willReturn(applicationLink);
+        given(applicationService.createApplication(sApp)).willReturn(sApp);
+
+        //when
+        final ApplicationLink createdApplication = delegate.createApplicationLink(creator);
+
+        //then
+        assertThat(createdApplication).isEqualTo(applicationLink);
     }
 
     private SApplication buildDefaultApplication() {
@@ -343,7 +366,27 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
-    public void updateApplicationLink_should_not_return() throws Exception {
+    public void updateApplicationLink_should_return_result_of_applicationservice_updateApplication() throws Exception {
+        //given
+        final SApplicationWithIcon sApplicationWithIcon = mock(SApplicationWithIcon.class);
+        final ApplicationLink applicationLink = mock(ApplicationLink.class);
+        final ApplicationLinkUpdater updater = new ApplicationLinkUpdater();
+        updater.setToken("newToken");
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor))
+                .willReturn(sApplicationWithIcon);
+        given(converter.toApplication(sApplicationWithIcon)).willReturn(applicationLink);
+
+        //when
+        final ApplicationLink updatedApplication = delegate.updateApplicationLink(APPLICATION_ID, updater);
+
+        //then
+        assertThat(updatedApplication).isEqualTo(applicationLink);
+    }
+
+    @Test
+    public void updateApplicationLink_should_not_return_when_using_ApplicationUpdater() throws Exception {
         //given
         final SApplicationWithIcon sApplicationWithIcon = mock(SApplicationWithIcon.class);
         final ApplicationLink applicationLink = mock(ApplicationLink.class);

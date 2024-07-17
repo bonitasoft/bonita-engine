@@ -13,9 +13,19 @@
  **/
 package org.bonitasoft.web.rest.model.application;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import org.bonitasoft.web.toolkit.client.common.TreeIndexed;
+import org.bonitasoft.web.toolkit.client.common.TreeLeaf;
 import org.bonitasoft.web.toolkit.client.data.item.Definitions;
+import org.bonitasoft.web.toolkit.client.data.item.DiscriminatedItemDefinitionHelper;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.ItemAttribute;
+import org.bonitasoft.web.toolkit.client.data.item.attribute.ValidationError;
+import org.bonitasoft.web.toolkit.client.data.item.attribute.ValidationException;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.validator.FileIsImageOrServletPathValidator;
 
 /**
@@ -66,8 +76,44 @@ public class AbstractApplicationDefinition<ITEM extends AbstractApplicationItem>
 
     @Override
     protected ITEM _createItem() {
-        // this might be called by deprecated PUT and POST methods which work only with legacy applications...
-        return (ITEM) ApplicationDefinition.get()._createItem();
+        // this must not be called by deprecated PUT and POST methods which need to discriminate on "link".
+        throw new ValidationException(Collections.singletonList(
+                new ValidationError("link", "%attribute% is mandatory to discriminate the application type")));
+    }
+
+    @Override
+    public Optional<DiscriminatedItemDefinitionHelper<ITEM>> getDiscriminatedHelper() {
+        if (AbstractApplicationDefinition.class.equals(getClass())) {
+            return Optional.of(new DiscriminatedItemDefinitionHelper<ITEM>() {
+
+                @Override
+                @SuppressWarnings("unchecked")
+                public Supplier<ITEM> findItemCreator(Map<String, String> attributes) {
+                    // We need the "link" attribute to discriminate between legacy application and application link.
+                    boolean isLink = attributes != null
+                            && Boolean.parseBoolean(attributes.get(AbstractApplicationItem.ATTRIBUTE_LINK));
+                    return isLink ? () -> (ITEM) ApplicationLinkDefinition.get()._createItem()
+                            : () -> (ITEM) ApplicationDefinition.get()._createItem();
+                }
+
+                @Override
+                public Supplier<? extends ITEM> findItemCreator(TreeIndexed<String> tree) {
+                    // We need the "link" attribute to discriminate between legacy application and application link.
+                    boolean isLink;
+                    if (tree != null && tree.get(AbstractApplicationItem.ATTRIBUTE_LINK)instanceof TreeLeaf<?> v) {
+                        isLink = Optional.ofNullable(v.getValue()).map(Object::toString).map(Boolean::parseBoolean)
+                                .orElse(Boolean.FALSE);
+                    } else {
+                        isLink = false;
+                    }
+                    return isLink ? () -> (ITEM) ApplicationLinkDefinition.get()._createItem()
+                            : () -> (ITEM) ApplicationDefinition.get()._createItem();
+                }
+            });
+        } else {
+            // subclasses do not need the helper and use a concrete implementation
+            return Optional.empty();
+        }
     }
 
 }

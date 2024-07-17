@@ -18,6 +18,9 @@ import java.util.List;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
+import org.bonitasoft.engine.business.application.ApplicationLink;
+import org.bonitasoft.engine.business.application.ApplicationLinkCreator;
+import org.bonitasoft.engine.business.application.ApplicationLinkUpdater;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
@@ -62,6 +65,22 @@ public interface ApplicationAPI {
      */
     @Deprecated(since = "9.0.0")
     Application createApplication(ApplicationCreator applicationCreator)
+            throws AlreadyExistsException, CreationException;
+
+    /**
+     * Creates a new {@link ApplicationLink} based on the supplied {@link ApplicationLinkCreator}
+     *
+     * @param applicationLinkCreator creator describing characteristics of application link to be created
+     * @return the created <code>ApplicationLink</code>
+     * @throws AlreadyExistsException if an application already exists with the same name
+     * @throws CreationException if an error occurs during the creation
+     * @see ApplicationLink
+     * @see ApplicationLinkCreator
+     * @deprecated as of 9.0.0, Applications should be created at startup. This also concerns application links
+     *             introduced in 10.2.0.
+     */
+    @Deprecated(since = "10.2.0")
+    ApplicationLink createApplicationLink(ApplicationLinkCreator applicationLinkCreator)
             throws AlreadyExistsException, CreationException;
 
     /**
@@ -142,7 +161,7 @@ public interface ApplicationAPI {
      * @param updater an <code>ApplicationUpdater</code> describing the fields to be updated.
      * @return the <code>Application</code> as it is after the update.
      * @throws ApplicationNotFoundException if no <code>Application</code> is found for the given id
-     * @throws AlreadyExistsException if another <code>Application</code> already exists with the new name value
+     * @throws AlreadyExistsException if another <code>IApplication</code> already exists with the new name value
      * @throws UpdateException if an error occurs during the update
      * @see Application
      * @see ApplicationUpdater
@@ -150,6 +169,24 @@ public interface ApplicationAPI {
      */
     @Deprecated(since = "9.0.0")
     Application updateApplication(long applicationId, ApplicationUpdater updater)
+            throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
+
+    /**
+     * Updates an {@link ApplicationLink} based on the information supplied by the {@link ApplicationLinkUpdater}
+     *
+     * @param applicationId a long representing the application identifier
+     * @param updater an <code>ApplicationLinkUpdater</code> describing the fields to be updated.
+     * @return the <code>ApplicationLink</code> as it is after the update.
+     * @throws ApplicationNotFoundException if no <code>ApplicationLink</code> is found for the given id
+     * @throws AlreadyExistsException if another <code>IApplication</code> already exists with the new name value
+     * @throws UpdateException if an error occurs during the update
+     * @see ApplicationLink
+     * @see ApplicationLinkUpdater
+     * @deprecated as of 9.0.0, Applications should be updated at startup. This also concerns application links
+     *             introduced in 10.2.0.
+     */
+    @Deprecated(since = "10.2.0")
+    ApplicationLink updateApplicationLink(long applicationId, ApplicationLinkUpdater updater)
             throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
 
     /**

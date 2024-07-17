@@ -19,6 +19,8 @@ import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.console.common.server.utils.IconDescriptor;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationLinkCreator;
+import org.bonitasoft.engine.business.application.ApplicationLinkUpdater;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
@@ -99,6 +101,19 @@ public class ApplicationItemConverter {
     }
 
     /**
+     * @deprecated ApplicationCreator should no longer be used. Since 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "10.2.0")
+    public ApplicationLinkCreator toApplicationLinkCreator(final ApplicationLinkItem appLinkItem) {
+        final ApplicationLinkCreator creator = new ApplicationLinkCreator(appLinkItem.getToken(),
+                appLinkItem.getDisplayName(),
+                appLinkItem.getVersion());
+        creator.setDescription(appLinkItem.getDescription());
+        creator.setProfileId(appLinkItem.getProfileId().toLong());
+        return creator;
+    }
+
+    /**
      * @deprecated ApplicationUpdater should no longer be used. Since 9.0.0, Applications should be created at startup.
      */
     @Deprecated(since = "10.2.0")
@@ -146,8 +161,53 @@ public class ApplicationItemConverter {
      * @deprecated ApplicationUpdater should no longer be used. Since 9.0.0, Applications should be created at startup.
      */
     @Deprecated(since = "10.2.0")
+    public ApplicationLinkUpdater toApplicationLinkUpdater(final Map<String, String> attributes) {
+        final ApplicationLinkUpdater applicationUpdater = getApplicationLinkUpdater();
+
+        if (attributes.containsKey(ApplicationItem.ATTRIBUTE_TOKEN)) {
+            applicationUpdater.setToken(attributes.get(ApplicationItem.ATTRIBUTE_TOKEN));
+        }
+        if (attributes.containsKey(ApplicationItem.ATTRIBUTE_DISPLAY_NAME)) {
+            applicationUpdater.setDisplayName(attributes.get(ApplicationItem.ATTRIBUTE_DISPLAY_NAME));
+        }
+        if (attributes.containsKey(ApplicationItem.ATTRIBUTE_DESCRIPTION)) {
+            applicationUpdater.setDescription(attributes.get(ApplicationItem.ATTRIBUTE_DESCRIPTION));
+        }
+        if (attributes.containsKey(ApplicationItem.ATTRIBUTE_PROFILE_ID)) {
+            applicationUpdater.setProfileId(Long.parseLong(attributes.get(ApplicationItem.ATTRIBUTE_PROFILE_ID)));
+        }
+
+        if (attributes.containsKey(ApplicationItem.ATTRIBUTE_STATE)) {
+            applicationUpdater.setState(attributes.get(ApplicationItem.ATTRIBUTE_STATE));
+        }
+        if (attributes.containsKey(ApplicationItem.ATTRIBUTE_VERSION)) {
+            applicationUpdater.setVersion(attributes.get(ApplicationItem.ATTRIBUTE_VERSION));
+        }
+        if (!MapUtil.isBlank(attributes, ItemHasIcon.ATTRIBUTE_ICON)
+                && !attributes.get(ItemHasIcon.ATTRIBUTE_ICON).startsWith(ApplicationItem.ICON_PATH_API_PREFIX)) {
+            IconDescriptor iconDescriptor = bonitaHomeFolderAccessor
+                    .getIconFromFileSystem(attributes.get(ItemHasIcon.ATTRIBUTE_ICON));
+            applicationUpdater.setIcon(iconDescriptor.getFilename(), iconDescriptor.getContent());
+        }
+
+        return applicationUpdater;
+
+    }
+
+    /**
+     * @deprecated ApplicationUpdater should no longer be used. Since 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "10.2.0")
     protected ApplicationUpdater getApplicationUpdater() {
         return new ApplicationUpdater();
+    }
+
+    /**
+     * @deprecated ApplicationUpdater should no longer be used. Since 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "10.2.0")
+    protected ApplicationLinkUpdater getApplicationLinkUpdater() {
+        return new ApplicationLinkUpdater();
     }
 
 }
