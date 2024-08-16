@@ -19,7 +19,7 @@ import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AbortingBoundaryAndIntermediateCatchEventState extends EndingIntermediateCatchEventExceptionState {
+public class AbortingBoundaryAndIntermediateCatchEventState extends InterruptingBoundaryAndIntermediateCatchEventState {
 
     public AbortingBoundaryAndIntermediateCatchEventState(WaitingEventsInterrupter waitingEventsInterrupter) {
         super(waitingEventsInterrupter);
@@ -47,7 +47,7 @@ public class AbortingBoundaryAndIntermediateCatchEventState extends EndingInterm
 
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
-        return "Aborting intermediate catch event";
+        return "Aborting boundary or intermediate catch event";
     }
 
 }
