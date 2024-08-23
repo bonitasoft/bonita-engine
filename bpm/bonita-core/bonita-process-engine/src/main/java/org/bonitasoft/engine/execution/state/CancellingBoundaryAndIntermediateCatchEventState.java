@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CancellingBoundaryAndIntermediateCatchEventState
-        extends EndingIntermediateCatchEventExceptionState {
+        extends InterruptingBoundaryAndIntermediateCatchEventState {
 
     public CancellingBoundaryAndIntermediateCatchEventState(WaitingEventsInterrupter waitingEventsInterrupter) {
         super(waitingEventsInterrupter);
@@ -48,7 +48,7 @@ public class CancellingBoundaryAndIntermediateCatchEventState
 
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
-        return "Canceling intermediate catch event";
+        return "Canceling boundary or intermediate catch event";
     }
 
 }
