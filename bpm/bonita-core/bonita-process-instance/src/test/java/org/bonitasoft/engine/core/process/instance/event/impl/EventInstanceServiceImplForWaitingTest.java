@@ -52,19 +52,20 @@ public class EventInstanceServiceImplForWaitingTest {
     }
 
     @Test
-    public final void deleteWaitingEvents_should_delete_waiting_events_and_associated_timers() throws Exception {
+    public final void deleteWaitingEvents_should_delete_waiting_events() throws Exception {
         // Given
         final SIntermediateCatchEventInstance sIntermediateCatchEventInstance = new SIntermediateCatchEventInstance();
         final SWaitingMessageEvent waitingMessageEventImpl = new SWaitingMessageEvent();
-        doReturn(Collections.singletonList(waitingMessageEventImpl))
+        doReturn(Collections.singletonList(waitingMessageEventImpl)).doReturn(Collections.emptyList())
                 .when(instanceRepository)
                 .getWaitingEventsForFlowNodeId(anyLong());
+        doNothing().when(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
+
         // When
         eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstance);
 
         // Then
         verify(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
-        verify(eventInstanceServiceImpl).deleteEventTriggerInstanceOfFlowNode(waitingMessageEventImpl.getId());
     }
 
     @Test(expected = SWaitingEventModificationException.class)
