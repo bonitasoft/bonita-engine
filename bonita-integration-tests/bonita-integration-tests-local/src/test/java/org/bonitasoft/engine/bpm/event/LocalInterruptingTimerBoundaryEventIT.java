@@ -63,7 +63,6 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
     protected TenantServiceAccessor getServiceAccessor() {
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
