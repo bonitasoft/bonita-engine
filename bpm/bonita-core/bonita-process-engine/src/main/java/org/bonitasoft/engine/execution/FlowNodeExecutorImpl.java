@@ -16,9 +16,6 @@ package org.bonitasoft.engine.execution;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -30,17 +27,13 @@ import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -48,14 +41,11 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
-import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.persistence.*;
-import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.slf4j.Logger;
@@ -85,8 +75,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private final BPMWorkFactory workFactory;
     private final ProcessInstanceInterruptor processInstanceInterruptor;
     private final BPMArchiverService bpmArchiverService;
-    private final EventInstanceService eventInstanceService;
-    private final SchedulerService schedulerService;
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager,
             final ActivityInstanceService activityInstanceManager,
@@ -96,8 +84,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final ClassLoaderService classLoaderService,
             final WorkService workService, BPMWorkFactory workFactory,
             final ProcessInstanceInterruptor processInstanceInterruptor,
-            final BPMArchiverService bpmArchiverService, EventInstanceService eventInstanceService,
-            SchedulerService schedulerService) {
+            final BPMArchiverService bpmArchiverService) {
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
         this.containerRegistry = containerRegistry;
@@ -109,8 +96,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         this.processDefinitionService = processDefinitionService;
         this.commentService = commentService;
         this.bpmArchiverService = bpmArchiverService;
-        this.eventInstanceService = eventInstanceService;
-        this.schedulerService = schedulerService;
 
     }
 
@@ -297,7 +282,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         final FlowNodeState state = flowNodeStateManager.getState(activityInstanceParent.getStateId());
         final boolean shouldContinueParent = state.notifyChildFlowNodeHasFinished(sProcessDefinition,
                 activityInstanceParent, childFlowNode);
-        deleteTimerJobsOnFlownode(childFlowNode);
         if (shouldContinueParent) {
             // it should never happen, because the terminal state never waits children to finish
             if (activityInstanceParent.isTerminal()) {
@@ -308,58 +292,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         } else {
             LOG.debug("the child flownode {} of parent flownode {} finished, but there are other children remaining",
                     childFlowNode, activityInstanceParent);
-        }
-    }
-
-    private void deleteTimerJobsOnFlownode(SFlowNodeInstance flowNodeInstance)
-            throws SProcessDefinitionNotFoundException, SBonitaReadException {
-        // We have no way of going from flownodeInst -> boundary timer of flownode, so we have to do a search
-        SProcessDefinition processDefinition = processDefinitionService
-                .getProcessDefinition(flowNodeInstance.getProcessDefinitionId());
-        List<SBoundaryEventDefinition> processBoundaryEventDefinitions = processDefinition.getProcessContainer()
-                .getBoundaryEvents();
-        for (SBoundaryEventDefinition sBoundaryEventDefinition : processBoundaryEventDefinitions) {
-            final List<OrderByOption> orderByOptions = Collections
-                    .singletonList(new OrderByOption(SCatchEventInstance.class, "id", OrderByType.ASC));
-            final FilterOption filterOption = new FilterOption(SCatchEventInstance.class, "activityInstanceId",
-                    flowNodeInstance.getId());
-            QueryOptions queryOptions = new QueryOptions(0, 100, orderByOptions,
-                    Collections.singletonList(filterOption), null);
-            List<SCatchEventInstance> sBoundaryEventInstances = activityInstanceService
-                    .searchFlowNodeInstances(SCatchEventInstance.class, queryOptions);
-            for (SCatchEventInstance sCatchEventInstance : sBoundaryEventInstances) {
-                deleteJobsOnFlowNodeInstance(processDefinition, sBoundaryEventDefinition, sCatchEventInstance);
-            }
-        }
-    }
-
-    private void deleteJobsOnFlowNodeInstance(final SProcessDefinition processDefinition,
-            final SCatchEventDefinition sCatchEventDefinition,
-            final SCatchEventInstance sCatchEventInstance) {
-        try {
-            if (!sCatchEventDefinition.getTimerEventTriggerDefinitions().isEmpty()) {
-                final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(),
-                        sCatchEventDefinition, sCatchEventInstance);
-                final boolean delete = schedulerService.delete(jobName);
-                try {
-                    eventInstanceService.deleteEventTriggerInstanceOfFlowNode(sCatchEventInstance.getId());
-                } catch (SEventTriggerInstanceDeletionException e) {
-                    LOG.warn(
-                            "Unable to delete event trigger of flow node instance {}: {}", sCatchEventInstance,
-                            e.getMessage());
-                }
-                if (!delete && schedulerService.isExistingJob(jobName)) {
-                    LOG.warn(
-                            "No job found with name '{}' when interrupting timer catch event named '{}' and id '{}'. It was probably already triggered.",
-                            jobName,
-                            sCatchEventDefinition.getName(),
-                            sCatchEventInstance.getId());
-
-                }
-            }
-        } catch (final Exception e) {
-            LOG.error("An error occurred while deleting jobs attached to catch event instance '{}'.",
-                    sCatchEventDefinition, e);
         }
     }
 
