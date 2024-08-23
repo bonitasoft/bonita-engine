@@ -14,12 +14,7 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
-import org.bonitasoft.engine.execution.state.CompletedActivityState;
-import org.bonitasoft.engine.execution.state.ExecutingBoundaryEventState;
-import org.bonitasoft.engine.execution.state.InitializingBoundaryEventState;
-import org.bonitasoft.engine.execution.state.WaitingFlowNodeState;
+import org.bonitasoft.engine.execution.state.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,15 +25,17 @@ public class BoundaryEventStates extends FlowNodeStateSequences {
     }
 
     public BoundaryEventStates(CompletedActivityState completed,
+            AbortingBoundaryAndIntermediateCatchEventState aborting,
             AbortedFlowNodeState aborted,
+            CancellingBoundaryAndIntermediateCatchEventState cancelling,
             CancelledFlowNodeState cancelled,
             WaitingFlowNodeState waiting,
             InitializingBoundaryEventState initializingBoundaryEvent,
             ExecutingBoundaryEventState executingBoundaryEvent) {
 
         defineNormalSequence(initializingBoundaryEvent, waiting, executingBoundaryEvent, completed);
-        defineAbortSequence(aborted);
-        defineCancelSequence(cancelled);
+        defineAbortSequence(aborting, aborted);
+        defineCancelSequence(cancelling, cancelled);
     }
 
 }
