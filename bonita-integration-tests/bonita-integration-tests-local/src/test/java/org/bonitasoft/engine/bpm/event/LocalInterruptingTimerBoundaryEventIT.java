@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
@@ -26,6 +27,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.event.AbstractEventIT;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
@@ -334,6 +336,43 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         processDefBuilder.addTransition(callActivityName, userTaskName);
         processDefBuilder.addTransition(userTaskName, "end");
         return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, user);
+    }
+
+    @Test
+    public void timerBoundaryEvent_should_not_trigger_and_be_deleted_at_flownode_abortion() throws Exception {
+        final int timerDuration = 20_000;//long enough not to trigger
+        SchedulerService schedulerService = getServiceAccessor().getSchedulerService();
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("pTimerBoundary", "2.0");
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addStartEvent("start");
+        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1",
+                ACTOR_NAME);
+        userTaskDefinitionBuilder.addBoundaryEvent("Boundary timer").addTimerEventTriggerDefinition(TimerType.DURATION,
+                new ExpressionBuilder().createConstantLongExpression(timerDuration));
+        userTaskDefinitionBuilder.addUserTask("exceptionStep", ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addEndEvent("end").addTerminateEventTrigger();
+        processDefinitionBuilder.addEndEvent("end2").addTerminateEventTrigger();
+        processDefinitionBuilder.addTransition("start", "step1");
+        processDefinitionBuilder.addTransition("start", "step2");
+        processDefinitionBuilder.addTransition("step1", "end");
+        processDefinitionBuilder.addTransition("step2", "end2");
+        processDefinitionBuilder.addTransition("Boundary timer", "exceptionStep");
+        processDefinitionBuilder.addTransition("exceptionStep", "end");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, user);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForUserTask(processInstance.getId(), "step1");
+        waitForUserTaskAssignAndExecuteIt(processInstance, "step2", user, Map.of());
+        waitForProcessToFinish(processInstance);
+        List<String> allJobs = schedulerService.getAllJobs();
+        assertThat(allJobs).isEmpty();
+        disableAndDeleteProcess(processDefinition);
     }
 
 }
