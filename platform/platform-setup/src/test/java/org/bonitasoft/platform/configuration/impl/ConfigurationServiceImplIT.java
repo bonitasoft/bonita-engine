@@ -282,7 +282,7 @@ public class ConfigurationServiceImplIT {
         try (Connection connection = getConnection()) {
             ScriptUtils.executeSqlScript(connection,
                     new EncodedResource(new InputStreamResource(createTableResource)), false, false,
-                    DEFAULT_COMMENT_PREFIX, getDefaultStatementSeparator(),
+                    DEFAULT_COMMENT_PREFIX, DEFAULT_STATEMENT_SEPARATOR,
                     DEFAULT_BLOCK_COMMENT_START_DELIMITER, DEFAULT_BLOCK_COMMENT_END_DELIMITER);
         }
     }
@@ -293,17 +293,8 @@ public class ConfigurationServiceImplIT {
         try (Connection connection = getConnection()) {
             ScriptUtils.executeSqlScript(connection,
                     new EncodedResource(new InputStreamResource(dropTablesResource)), true, true,
-                    DEFAULT_COMMENT_PREFIX, getDefaultStatementSeparator(),
+                    DEFAULT_COMMENT_PREFIX, DEFAULT_STATEMENT_SEPARATOR,
                     DEFAULT_BLOCK_COMMENT_START_DELIMITER, DEFAULT_BLOCK_COMMENT_END_DELIMITER);
-        }
-    }
-
-    private String getDefaultStatementSeparator() {
-        switch (dbVendor) {
-            case "sqlserver":
-                return "GO";
-            default:
-                return DEFAULT_STATEMENT_SEPARATOR;
         }
     }
 

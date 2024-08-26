@@ -3,12 +3,9 @@ CREATE TABLE configuration (
   content_type  NVARCHAR(50) NOT NULL,
   resource_name  NVARCHAR(120) NOT NULL,
   resource_content  VARBINARY(MAX) NOT NULL
-)
-GO
-ALTER TABLE configuration ADD CONSTRAINT pk_configuration PRIMARY KEY (tenant_id, content_type, resource_name)
-GO
-CREATE INDEX idx_configuration ON configuration (tenant_id, content_type)
-GO
+);
+ALTER TABLE configuration ADD CONSTRAINT pk_configuration PRIMARY KEY (tenant_id, content_type, resource_name);
+CREATE INDEX idx_configuration ON configuration (tenant_id, content_type);
 
 CREATE TABLE contract_data (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -17,14 +14,10 @@ CREATE TABLE contract_data (
   scopeId NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL,
   val NVARCHAR(MAX)
-)
-GO
-ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id, scopeId)
-GO
-ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (kind, scopeId, name, tenantid)
-GO
-CREATE INDEX idx_cd_scope_name ON contract_data (kind, scopeId, name, tenantid)
-GO
+);
+ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id, scopeId);
+ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (kind, scopeId, name, tenantid);
+CREATE INDEX idx_cd_scope_name ON contract_data (kind, scopeId, name, tenantid);
 
 CREATE TABLE arch_contract_data (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -35,14 +28,10 @@ CREATE TABLE arch_contract_data (
   val NVARCHAR(MAX),
   archiveDate NUMERIC(19, 0) NOT NULL,
   sourceObjectId NUMERIC(19, 0) NOT NULL
-)
-GO
-ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id, scopeId)
-GO
-ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (kind, scopeId, name, tenantid)
-GO
-CREATE INDEX idx_acd_scope_name ON arch_contract_data (kind, scopeId, name, tenantid)
-GO
+);
+ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id, scopeId);
+ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (kind, scopeId, name, tenantid);
+CREATE INDEX idx_acd_scope_name ON arch_contract_data (kind, scopeId, name, tenantid);
 
 CREATE TABLE actor (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -54,8 +43,7 @@ CREATE TABLE actor (
   initiator BIT,
   UNIQUE (tenantid, id, scopeId, name),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
 CREATE TABLE actormember (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -66,8 +54,7 @@ CREATE TABLE actormember (
   roleId NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantid, actorid, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 CREATE TABLE category (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -78,8 +65,7 @@ CREATE TABLE category (
   lastUpdateDate NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
 CREATE TABLE processcategorymapping (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -88,11 +74,9 @@ CREATE TABLE processcategorymapping (
   processid NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantid, categoryid, processid),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-ALTER TABLE processcategorymapping ADD CONSTRAINT fk_catmapping_catid FOREIGN KEY (tenantid, categoryid) REFERENCES category(tenantid, id) ON DELETE CASCADE
-GO
+ALTER TABLE processcategorymapping ADD CONSTRAINT fk_catmapping_catid FOREIGN KEY (tenantid, categoryid) REFERENCES category(tenantid, id) ON DELETE CASCADE;
 CREATE TABLE arch_process_comment(
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -103,13 +87,10 @@ CREATE TABLE arch_process_comment(
   archiveDate NUMERIC(19, 0) NOT NULL,
   sourceObjectId NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-CREATE INDEX idx1_arch_process_comment on arch_process_comment (sourceobjectid, tenantid)
-GO
-CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate, tenantid)
-GO
+CREATE INDEX idx1_arch_process_comment on arch_process_comment (sourceobjectid, tenantid);
+CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate, tenantid);
 CREATE TABLE process_comment (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -119,10 +100,8 @@ CREATE TABLE process_comment (
   postDate NUMERIC(19, 0) NOT NULL,
   content NVARCHAR(512) NOT NULL,
   PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx1_process_comment on process_comment (processInstanceId, tenantid)
-GO
+);
+CREATE INDEX idx1_process_comment on process_comment (processInstanceId, tenantid);
 CREATE TABLE process_definition (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -143,15 +122,13 @@ CREATE TABLE process_definition (
   content_id NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
-)
-GO
+);
 CREATE TABLE process_content (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   content NVARCHAR(MAX) NOT NULL,
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 CREATE TABLE arch_document_mapping (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -164,10 +141,8 @@ CREATE TABLE arch_document_mapping (
   index_ INT NOT NULL,
   archiveDate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, ID)
-)
-GO
-CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid)
-GO
+);
+CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid);
 CREATE TABLE document (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -179,8 +154,7 @@ CREATE TABLE document (
   url NVARCHAR(1024),
   content VARBINARY(MAX),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 CREATE TABLE document_mapping (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -191,8 +165,7 @@ CREATE TABLE document_mapping (
   version NVARCHAR(50) NOT NULL,
   index_ INT NOT NULL,
   PRIMARY KEY (tenantid, ID)
-)
-GO
+);
 CREATE TABLE arch_process_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -215,14 +188,10 @@ CREATE TABLE arch_process_instance (
   stringIndex4 NVARCHAR(255),
   stringIndex5 NVARCHAR(255),
   PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId)
-GO
-CREATE INDEX idx2_arch_process_instance ON arch_process_instance (tenantId, processDefinitionId, archiveDate)
-GO
-CREATE INDEX idx3_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, callerId, stateId)
-GO
+);
+CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId);
+CREATE INDEX idx2_arch_process_instance ON arch_process_instance (tenantId, processDefinitionId, archiveDate);
+CREATE INDEX idx3_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, callerId, stateId);
 
 CREATE TABLE arch_flownode_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -272,20 +241,13 @@ CREATE TABLE arch_flownode_instance (
   triggeredByEvent BIT,
   interrupting BIT,
   PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(logicalGroup2, tenantId, kind, executedBy)
-GO
-CREATE INDEX idx_afi_kind_lg3 ON arch_flownode_instance(tenantId, kind, logicalGroup3)
-GO
-CREATE INDEX idx_afi_kind_lg4 ON arch_flownode_instance(tenantId, logicalGroup4)
-GO
-CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind)
-GO
-CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId, rootContainerId, parentContainerId)
-GO
+);
+CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(logicalGroup2, tenantId, kind, executedBy);
+CREATE INDEX idx_afi_kind_lg3 ON arch_flownode_instance(tenantId, kind, logicalGroup3);
+CREATE INDEX idx_afi_kind_lg4 ON arch_flownode_instance(tenantId, logicalGroup4);
+CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind);
+CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId, rootContainerId, parentContainerId);
 CREATE INDEX idx_lg4_lg2 on arch_flownode_instance(tenantid, logicalGroup4, logicalGroup2);
-GO
 
 CREATE TABLE arch_connector_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -300,11 +262,9 @@ CREATE TABLE arch_connector_instance (
   sourceObjectId NUMERIC(19, 0),
   archiveDate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (tenantId, containerId, containerType)
-GO
+CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (tenantId, containerId, containerType);
 CREATE TABLE process_instance (
   id NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(75) NOT NULL,
@@ -328,11 +288,9 @@ CREATE TABLE process_instance (
   stringIndex4 NVARCHAR(255),
   stringIndex5 NVARCHAR(255),
   PRIMARY KEY (id)
-)
-GO
+);
 
-CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (processdefinitionid, stateid)
-GO
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (processdefinitionid, stateid);
 
 CREATE TABLE flownode_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -384,18 +342,12 @@ CREATE TABLE flownode_instance (
   interrupting BIT,
   tokenCount INT NOT NULL,
   PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId)
-GO
-CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
-GO
-CREATE INDEX idx_fni_loggroup3_terminal ON flownode_instance(logicalgroup3, terminal, tenantid)
-GO
-CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid)
-GO
-CREATE INDEX idx_fni_activity_instance_id_kind ON flownode_instance(activityInstanceId, kind, tenantid)
-GO
+);
+CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
+CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
+CREATE INDEX idx_fni_loggroup3_terminal ON flownode_instance(logicalgroup3, terminal, tenantid);
+CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid);
+CREATE INDEX idx_fni_activity_instance_id_kind ON flownode_instance(activityInstanceId, kind, tenantid);
 
 CREATE TABLE connector_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -411,10 +363,8 @@ CREATE TABLE connector_instance (
   exceptionMessage NVARCHAR(255),
   stackTrace NVARCHAR(MAX),
   PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, containerId, containerType, activationEvent)
-GO
+);
+CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, containerId, containerType, activationEvent);
 
 CREATE TABLE event_trigger_instance (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -424,8 +374,7 @@ CREATE TABLE event_trigger_instance (
   	executionDate NUMERIC(19, 0),
   	jobTriggerName NVARCHAR(255),
   	PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
 CREATE TABLE waiting_event (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -453,12 +402,9 @@ CREATE TABLE waiting_event (
   	correlation4 NVARCHAR(128),
   	correlation5 NVARCHAR(128),
   	PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active)
-GO
-CREATE INDEX idx_waiting_event_correl ON waiting_event (correlation1, correlation2, correlation3, correlation4, correlation5)
-GO
+);
+CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active);
+CREATE INDEX idx_waiting_event_correl ON waiting_event (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE message_instance (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -477,12 +423,9 @@ CREATE TABLE message_instance (
   	correlation5 NVARCHAR(128),
   	creationDate NUMERIC(19, 0) NOT NULL,
   	PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3)
-GO
-CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5)
-GO
+);
+CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
+CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE pending_mapping (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -491,10 +434,8 @@ CREATE TABLE pending_mapping (
   	actorId NUMERIC(19, 0),
   	userId NUMERIC(19, 0),
   	PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId)
-GO
+);
+CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
 
 CREATE TABLE ref_biz_data_inst (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -505,21 +446,14 @@ CREATE TABLE ref_biz_data_inst (
   	fn_inst_id NUMERIC(19, 0),
   	data_id NUMERIC(19, 0),
   	data_classname NVARCHAR(255) NOT NULL
-)
-GO
+);
 
-CREATE INDEX idx_biz_data_inst1 ON ref_biz_data_inst (tenantid, proc_inst_id)
-GO
-CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (tenantid, fn_inst_id)
-GO
-CREATE INDEX idx_biz_data_inst3 ON ref_biz_data_inst (proc_inst_id)
-GO
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data PRIMARY KEY (tenantid, id)
-GO
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE
-GO
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE
-GO
+CREATE INDEX idx_biz_data_inst1 ON ref_biz_data_inst (tenantid, proc_inst_id);
+CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (tenantid, fn_inst_id);
+CREATE INDEX idx_biz_data_inst3 ON ref_biz_data_inst (proc_inst_id);
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data PRIMARY KEY (tenantid, id);
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE;
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE multi_biz_data (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -527,11 +461,9 @@ CREATE TABLE multi_biz_data (
   	idx NUMERIC(19, 0) NOT NULL,
   	data_id NUMERIC(19, 0) NOT NULL,
   	PRIMARY KEY (tenantid, id, data_id)
-)
-GO
+);
 
-ALTER TABLE multi_biz_data ADD CONSTRAINT fk_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES ref_biz_data_inst(tenantid, id) ON DELETE CASCADE
-GO
+ALTER TABLE multi_biz_data ADD CONSTRAINT fk_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE arch_ref_biz_data_inst (
     tenantid NUMERIC(19, 0) NOT NULL,
@@ -542,26 +474,19 @@ CREATE TABLE arch_ref_biz_data_inst (
     orig_fn_inst_id NUMERIC(19, 0),
     data_id NUMERIC(19, 0),
     data_classname NVARCHAR(255) NOT NULL
-)
-GO
-CREATE INDEX idx_arch_biz_data_inst1 ON arch_ref_biz_data_inst (tenantid, orig_proc_inst_id)
-GO
-CREATE INDEX idx_arch_biz_data_inst2 ON arch_ref_biz_data_inst (tenantid, orig_fn_inst_id)
-GO
-ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT pk_arch_ref_biz_data_inst PRIMARY KEY (tenantid, id)
-GO
+);
+CREATE INDEX idx_arch_biz_data_inst1 ON arch_ref_biz_data_inst (tenantid, orig_proc_inst_id);
+CREATE INDEX idx_arch_biz_data_inst2 ON arch_ref_biz_data_inst (tenantid, orig_fn_inst_id);
+ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT pk_arch_ref_biz_data_inst PRIMARY KEY (tenantid, id);
 
 CREATE TABLE arch_multi_biz_data (
     tenantid NUMERIC(19, 0) NOT NULL,
     id NUMERIC(19, 0) NOT NULL,
     idx NUMERIC(19, 0) NOT NULL,
     data_id NUMERIC(19, 0) NOT NULL
-)
-GO
-ALTER TABLE arch_multi_biz_data ADD CONSTRAINT pk_arch_rbdi_mbd PRIMARY KEY (tenantid, id, data_id)
-GO
-ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE
-GO
+);
+ALTER TABLE arch_multi_biz_data ADD CONSTRAINT pk_arch_rbdi_mbd PRIMARY KEY (tenantid, id, data_id);
+ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE processsupervisor (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -572,8 +497,7 @@ CREATE TABLE processsupervisor (
   roleId NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantid, processDefId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
 CREATE TABLE business_app (
   tenantId NUMERIC(19, 0) NOT NULL,
@@ -597,20 +521,14 @@ CREATE TABLE business_app (
   editable BIT,
   internalProfile NVARCHAR(255),
   isLink BIT DEFAULT 0
-)
-GO
+);
 
-ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id)
-GO
-ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version)
-GO
+ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
+ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version);
 
-CREATE INDEX idx_app_token ON business_app (token, tenantid)
-GO
-CREATE INDEX idx_app_profile ON business_app (profileId, tenantid)
-GO
-CREATE INDEX idx_app_homepage ON business_app (homePageId, tenantid)
-GO
+CREATE INDEX idx_app_token ON business_app (token, tenantid);
+CREATE INDEX idx_app_profile ON business_app (profileId, tenantid);
+CREATE INDEX idx_app_homepage ON business_app (homePageId, tenantid);
 
 CREATE TABLE business_app_page (
   tenantId NUMERIC(19, 0) NOT NULL,
@@ -618,18 +536,13 @@ CREATE TABLE business_app_page (
   applicationId NUMERIC(19, 0) NOT NULL,
   pageId NUMERIC(19, 0) NOT NULL,
   token NVARCHAR(255) NOT NULL
-)
-GO
+);
 
-ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id)
-GO
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token)
-GO
+ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id);
+ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token);
 
-CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token, tenantid)
-GO
-CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid)
-GO
+CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token, tenantid);
+CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid);
 
 CREATE TABLE business_app_menu (
   tenantId NUMERIC(19, 0) NOT NULL,
@@ -639,18 +552,13 @@ CREATE TABLE business_app_menu (
   applicationPageId NUMERIC(19, 0),
   parentId NUMERIC(19, 0),
   index_ NUMERIC(19, 0)
-)
-GO
+);
 
-ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id)
-GO
+ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id);
 
-CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId, tenantid)
-GO
-CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid)
-GO
-CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid)
-GO
+CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId, tenantid);
+CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid);
+CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid);
 
 CREATE TABLE command (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -661,8 +569,7 @@ CREATE TABLE command (
   isSystem BIT,
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 CREATE TABLE arch_data_instance (
     tenantId NUMERIC(19, 0) NOT NULL,
 	id NUMERIC(19, 0) NOT NULL,
@@ -686,13 +593,10 @@ CREATE TABLE arch_data_instance (
 	archiveDate NUMERIC(19, 0) NOT NULL,
 	sourceObjectId NUMERIC(19, 0) NOT NULL,
 	PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId)
-GO
-CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId)
-GO
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId);
+CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId);
 
 CREATE TABLE data_instance (
     tenantId NUMERIC(19, 0) NOT NULL,
@@ -715,10 +619,8 @@ CREATE TABLE data_instance (
 	clobValue NVARCHAR(MAX),
 	discriminant NVARCHAR(50) NOT NULL,
 	PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_datai_container ON data_instance (tenantId, containerId, containerType, name)
-GO
+);
+CREATE INDEX idx_datai_container ON data_instance (tenantId, containerId, containerType, name);
 
 CREATE TABLE dependency (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -729,10 +631,8 @@ CREATE TABLE dependency (
   value_ VARBINARY(MAX) NOT NULL,
   UNIQUE (tenantId, name),
   PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_dependency_name ON dependency (name, id)
-GO
+);
+CREATE INDEX idx_dependency_name ON dependency (name, id);
 
 CREATE TABLE dependencymapping (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -742,12 +642,9 @@ CREATE TABLE dependencymapping (
   dependencyid NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantid, dependencyid, artifactid, artifacttype),
   PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid, id)
-GO
-ALTER TABLE dependencymapping ADD CONSTRAINT fk_depmapping_depid FOREIGN KEY (tenantid, dependencyid) REFERENCES dependency(tenantid, id) ON DELETE CASCADE
-GO
+);
+CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid, id);
+ALTER TABLE dependencymapping ADD CONSTRAINT fk_depmapping_depid FOREIGN KEY (tenantid, dependencyid) REFERENCES dependency(tenantid, id) ON DELETE CASCADE;
 CREATE TABLE pdependency (
   id NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL UNIQUE,
@@ -755,10 +652,8 @@ CREATE TABLE pdependency (
   filename NVARCHAR(255) NOT NULL,
   value_ VARBINARY(MAX) NOT NULL,
   PRIMARY KEY (id)
-)
-GO
-CREATE INDEX idx_pdependency_name ON pdependency (name, id)
-GO
+);
+CREATE INDEX idx_pdependency_name ON pdependency (name, id);
 
 CREATE TABLE pdependencymapping (
   id NUMERIC(19, 0) NOT NULL,
@@ -767,12 +662,9 @@ CREATE TABLE pdependencymapping (
   dependencyid NUMERIC(19, 0) NOT NULL,
   UNIQUE (dependencyid, artifactid, artifacttype),
   PRIMARY KEY (id)
-)
-GO
-CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid, id)
-GO
-ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE
-GO
+);
+CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid, id);
+ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;
 CREATE TABLE external_identity_mapping (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -783,8 +675,7 @@ CREATE TABLE external_identity_mapping (
   roleId NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 CREATE TABLE group_ (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -797,10 +688,8 @@ CREATE TABLE group_ (
   lastUpdate NUMERIC(19, 0),
   iconid NUMERIC(19, 0),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 CREATE INDEX idx_group_name ON group_ (tenantid, parentPath, name);
-GO
 CREATE TABLE role (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -813,11 +702,9 @@ CREATE TABLE role (
   iconid NUMERIC(19, 0),
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-CREATE INDEX idx_role_name ON role (tenantid, name)
-GO
+CREATE INDEX idx_role_name ON role (tenantid, name);
 
 CREATE TABLE user_ (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -836,19 +723,16 @@ CREATE TABLE user_ (
   iconid NUMERIC(19, 0),
   UNIQUE (tenantid, userName),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-CREATE INDEX idx_user_name ON user_ (tenantid, userName)
-GO
+CREATE INDEX idx_user_name ON user_ (tenantid, userName);
 
 CREATE TABLE user_login (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   lastConnection NUMERIC(19, 0),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
 CREATE TABLE user_contactinfo (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -869,12 +753,9 @@ CREATE TABLE user_contactinfo (
   personal BIT NOT NULL,
   UNIQUE (tenantid, userId, personal),
   PRIMARY KEY (tenantid, id)
-)
-GO
-ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE
-GO
-CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, personal)
-GO
+);
+ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
+CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, personal);
 
 
 CREATE TABLE custom_usr_inf_def (
@@ -884,11 +765,9 @@ CREATE TABLE custom_usr_inf_def (
   description NVARCHAR(MAX),
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (tenantid, name)
-GO
+CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (tenantid, name);
 
 CREATE TABLE custom_usr_inf_val (
   id NUMERIC(19, 0) NOT NULL,
@@ -898,12 +777,9 @@ CREATE TABLE custom_usr_inf_val (
   value NVARCHAR(255),
   UNIQUE (tenantid, definitionId, userId),
   PRIMARY KEY (tenantid, id)
-)
-GO
-ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE
-GO
-ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_definition_id FOREIGN KEY (tenantid, definitionId) REFERENCES custom_usr_inf_def (tenantid, id) ON DELETE CASCADE
-GO
+);
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_definition_id FOREIGN KEY (tenantid, definitionId) REFERENCES custom_usr_inf_def (tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE user_membership (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -915,8 +791,7 @@ CREATE TABLE user_membership (
   assignedDate NUMERIC(19, 0),
   UNIQUE (tenantid, userId, roleId, groupId),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 CREATE TABLE queriable_log (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -942,8 +817,7 @@ CREATE TABLE queriable_log (
   numericIndex4 NUMERIC(19, 0),
   numericIndex5 NUMERIC(19, 0),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
 CREATE TABLE queriablelog_p (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -954,13 +828,10 @@ CREATE TABLE queriablelog_p (
   blobId NUMERIC(19, 0),
   valueType NVARCHAR(30),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId, id)
-GO
-ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id)
-GO
+CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId, id);
+ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id);
 CREATE TABLE page (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -979,29 +850,24 @@ CREATE TABLE page (
   contentType NVARCHAR(50) NOT NULL,
   processDefinitionId NUMERIC(19,0) NOT NULL,
   pageHash NVARCHAR(32)
-)
-GO
+);
 
-ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id)
-GO
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
 
-ALTER TABLE page ADD CONSTRAINT  uk_page UNIQUE  (tenantId, name, processDefinitionId)
-GO
+ALTER TABLE page ADD CONSTRAINT  uk_page UNIQUE  (tenantId, name, processDefinitionId);
 
 CREATE TABLE sequence (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   nextid NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 CREATE TABLE blob_ (
     tenantId NUMERIC(19, 0) NOT NULL,
 	id NUMERIC(19, 0) NOT NULL,
 	blobValue VARBINARY(MAX),
 	PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
 CREATE TABLE platform (
   id NUMERIC(19, 0) NOT NULL,
@@ -1014,8 +880,7 @@ CREATE TABLE platform (
   created_by NVARCHAR(50) NOT NULL,
   information NVARCHAR(MAX),
   PRIMARY KEY (id)
-)
-GO
+);
 
 CREATE TABLE tenant (
   id NUMERIC(19, 0) NOT NULL,
@@ -1028,15 +893,13 @@ CREATE TABLE tenant (
   name NVARCHAR(50) NOT NULL,
   status NVARCHAR(15) NOT NULL,
   PRIMARY KEY (id)
-)
-GO
+);
 CREATE TABLE platformCommand (
   id NUMERIC(19, 0) PRIMARY KEY,
   name NVARCHAR(50) NOT NULL UNIQUE,
   description NVARCHAR(MAX),
   IMPLEMENTATION NVARCHAR(100) NOT NULL
-)
-GO
+);
 CREATE TABLE profile (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -1049,8 +912,7 @@ CREATE TABLE profile (
   lastUpdatedBy NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
-)
-GO
+);
 
 CREATE TABLE profilemember (
   tenantId NUMERIC(19, 0) NOT NULL,
@@ -1061,8 +923,7 @@ CREATE TABLE profilemember (
   roleId NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantId, profileId, userId, groupId, roleId),
   PRIMARY KEY (tenantId, id)
-)
-GO
+);
 CREATE TABLE job_desc (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -1070,8 +931,7 @@ CREATE TABLE job_desc (
   jobname NVARCHAR(100) NOT NULL,
   description NVARCHAR(50),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
 CREATE TABLE job_param (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -1080,10 +940,8 @@ CREATE TABLE job_param (
   key_ NVARCHAR(50) NOT NULL,
   value_ VARBINARY(MAX) NOT NULL,
   PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId)
-GO
+);
+CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId);
 
 
 CREATE TABLE job_log (
@@ -1095,13 +953,10 @@ CREATE TABLE job_log (
   lastMessage NVARCHAR(MAX),
   UNIQUE (tenantId, jobDescriptorId),
   PRIMARY KEY (tenantid, id)
-)
-GO
+);
 
-ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE
-GO
-ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE
-GO
+ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
 CREATE TABLE form_mapping (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -1114,8 +969,7 @@ CREATE TABLE form_mapping (
   lastUpdatedBy NUMERIC(19, 0),
   target NVARCHAR(16) NOT NULL,
   PRIMARY KEY (tenantId, id)
-)
-GO
+);
 CREATE TABLE page_mapping (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -1128,10 +982,8 @@ CREATE TABLE page_mapping (
   lastUpdatedBy NUMERIC(19, 0) NULL,
   CONSTRAINT UK_page_mapping UNIQUE (tenantId, key_),
   PRIMARY KEY (tenantId, id)
-)
-GO
-ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id)
-GO
+);
+ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id);
 CREATE TABLE proc_parameter (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -1139,8 +991,7 @@ CREATE TABLE proc_parameter (
   name NVARCHAR(255) NOT NULL,
   value NVARCHAR(MAX) NULL,
   PRIMARY KEY (tenantId, id)
-)
-GO
+);
 CREATE TABLE bar_resource (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -1150,10 +1001,8 @@ CREATE TABLE bar_resource (
   content VARBINARY(MAX) NOT NULL,
   UNIQUE (tenantId, process_id, name, type),
   PRIMARY KEY (tenantId, id)
-)
-GO
-CREATE INDEX idx_bar_resource ON bar_resource (tenantId, process_id, type, name)
-GO
+);
+CREATE INDEX idx_bar_resource ON bar_resource (tenantId, process_id, type, name);
 CREATE TABLE temporary_content (
   id NUMERIC(19, 0) NOT NULL,
   creationDate NUMERIC(19, 0) NOT NULL,
@@ -1164,9 +1013,7 @@ CREATE TABLE temporary_content (
   UNIQUE (key_),
   PRIMARY KEY (id)
 );
-GO
 CREATE INDEX idx_temporary_content ON temporary_content (key_);
-GO
 CREATE TABLE tenant_resource (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -1178,15 +1025,12 @@ CREATE TABLE tenant_resource (
   state NVARCHAR(50) NOT NULL,
   CONSTRAINT UK_tenant_resource UNIQUE (tenantId, name, type),
   PRIMARY KEY (tenantId, id)
-)
-GO
-CREATE INDEX idx_tenant_resource ON tenant_resource (tenantId, type, name)
-GO
+);
+CREATE INDEX idx_tenant_resource ON tenant_resource (tenantId, type, name);
 CREATE TABLE icon (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   mimetype NVARCHAR(255) NOT NULL,
   content VARBINARY(MAX) NOT NULL,
   CONSTRAINT pk_icon PRIMARY KEY (tenantId, id)
-)
-GO
+);
