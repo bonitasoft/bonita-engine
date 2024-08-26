@@ -204,17 +204,8 @@ public class ScriptExecutor {
         populate.setContinueOnError(shouldContinueOnError);
         populate.setIgnoreFailedDrops(true);
         populate.addScript(sqlResource);
-        populate.setSeparator(getSeparator());
         populate.execute(datasource);
         log.info("Executed SQL script " + sqlResource.getURL().getFile());
-    }
-
-    private String getSeparator() {
-        if ("sqlserver".equals(dbVendor)) {
-            return "GO";
-        } else {
-            return ";";
-        }
     }
 
     public void initializePlatformStructure() throws PlatformException {

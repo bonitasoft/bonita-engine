@@ -1,136 +1,68 @@
-DROP TABLE configuration
-GO
-DROP TABLE arch_contract_data
-GO
-DROP TABLE contract_data
-GO
-DROP TABLE actormember
-GO
-DROP TABLE actor
-GO
-DROP TABLE processcategorymapping
-GO
-DROP TABLE category
-GO
-DROP TABLE arch_process_comment
-GO
-DROP TABLE process_comment
-GO
-DROP TABLE process_definition
-GO
-DROP TABLE arch_document_mapping
-GO
-DROP TABLE document_mapping
-GO
-DROP TABLE document
-GO
-DROP TABLE arch_flownode_instance
-GO
-DROP TABLE arch_process_instance
-GO
-DROP TABLE arch_connector_instance
-GO
-DROP TABLE arch_multi_biz_data
-GO
-DROP TABLE arch_ref_biz_data_inst
-GO
-DROP TABLE multi_biz_data
-GO
-DROP TABLE ref_biz_data_inst
-GO
-DROP TABLE pending_mapping
-GO
-DROP TABLE connector_instance
-GO
-DROP TABLE flownode_instance
-GO
-DROP TABLE process_instance
-GO
-DROP TABLE event_trigger_instance
-GO
-DROP TABLE waiting_event
-GO
-DROP TABLE message_instance
-GO
-DROP TABLE processsupervisor
-GO
-DROP TABLE business_app_menu
-GO
-DROP TABLE business_app_page
-GO
-DROP TABLE business_app
-GO
-DROP TABLE command
-GO
-DROP TABLE arch_data_instance
-GO
-DROP TABLE data_instance
-GO
-DROP TABLE dependencymapping
-GO
-DROP TABLE dependency
-GO
-DROP TABLE pdependencymapping
-GO
-DROP TABLE pdependency
-GO
-DROP TABLE external_identity_mapping
-GO
-DROP TABLE user_membership
-GO
-DROP TABLE custom_usr_inf_val
-GO
-DROP TABLE custom_usr_inf_def
-GO
-DROP TABLE user_contactinfo
-GO
-DROP TABLE user_login
-GO
-DROP TABLE user_
-GO
-DROP TABLE role
-GO
-DROP TABLE group_
-GO
-DROP TABLE queriablelog_p
-GO
-DROP TABLE queriable_log
-GO
-DROP TABLE page
-GO
-DROP TABLE blob_
-GO
-DROP TABLE profilemember
-GO
-DROP TABLE profile
-GO
-DROP TABLE job_log
-GO
-DROP TABLE job_param
-GO
-DROP TABLE job_desc
-GO
-DROP TABLE sequence
-GO
-DROP TABLE tenant
-GO
-DROP TABLE platform
-GO
-DROP TABLE platformCommand
-GO
-DROP TABLE form_mapping
-GO
-DROP TABLE page_mapping
-GO
-DROP TABLE process_content
-GO
-DROP TABLE proc_parameter
-GO
-DROP TABLE bar_resource
-GO
-DROP TABLE temporary_content
-GO
-DROP TABLE tenant_resource
-GO
-DROP TABLE icon
-GO
+DROP TABLE configuration;
+DROP TABLE arch_contract_data;
+DROP TABLE contract_data;
+DROP TABLE actormember;
+DROP TABLE actor;
+DROP TABLE processcategorymapping;
+DROP TABLE category;
+DROP TABLE arch_process_comment;
+DROP TABLE process_comment;
+DROP TABLE process_definition;
+DROP TABLE arch_document_mapping;
+DROP TABLE document_mapping;
+DROP TABLE document;
+DROP TABLE arch_flownode_instance;
+DROP TABLE arch_process_instance;
+DROP TABLE arch_connector_instance;
+DROP TABLE arch_multi_biz_data;
+DROP TABLE arch_ref_biz_data_inst;
+DROP TABLE multi_biz_data;
+DROP TABLE ref_biz_data_inst;
+DROP TABLE pending_mapping;
+DROP TABLE connector_instance;
+DROP TABLE flownode_instance;
+DROP TABLE process_instance;
+DROP TABLE event_trigger_instance;
+DROP TABLE waiting_event;
+DROP TABLE message_instance;
+DROP TABLE processsupervisor;
+DROP TABLE business_app_menu;
+DROP TABLE business_app_page;
+DROP TABLE business_app;
+DROP TABLE command;
+DROP TABLE arch_data_instance;
+DROP TABLE data_instance;
+DROP TABLE dependencymapping;
+DROP TABLE dependency;
+DROP TABLE pdependencymapping;
+DROP TABLE pdependency;
+DROP TABLE external_identity_mapping;
+DROP TABLE user_membership;
+DROP TABLE custom_usr_inf_val;
+DROP TABLE custom_usr_inf_def;
+DROP TABLE user_contactinfo;
+DROP TABLE user_login;
+DROP TABLE user_;
+DROP TABLE role;
+DROP TABLE group_;
+DROP TABLE queriablelog_p;
+DROP TABLE queriable_log;
+DROP TABLE page;
+DROP TABLE blob_;
+DROP TABLE profilemember;
+DROP TABLE profile;
+DROP TABLE job_log;
+DROP TABLE job_param;
+DROP TABLE job_desc;
+DROP TABLE sequence;
+DROP TABLE tenant;
+DROP TABLE platform;
+DROP TABLE platformCommand;
+DROP TABLE form_mapping;
+DROP TABLE page_mapping;
+DROP TABLE process_content;
+DROP TABLE proc_parameter;
+DROP TABLE bar_resource;
+DROP TABLE temporary_content;
+DROP TABLE tenant_resource;
+DROP TABLE icon;
