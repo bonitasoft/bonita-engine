@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.cache;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -161,19 +163,19 @@ public class CacheServiceIT {
         assertEquals("Object should still be in cache", value, object);
     }
 
-    @Test(expected = SCacheException.class)
-    public void cacheNotDefined() throws Exception {
+    @Test
+    public void cache_store_should_log_when_cache_not_found() throws Exception {
+        // given
         final String key = "defaultTimeout";
         final String anotherCacheName = "Should_use_default_config";
-        cacheService.store(anotherCacheName, key, new String());
-    }
 
-    @Test(expected = SCacheException.class)
-    public void defaultConfigNotSerializablePutObject() throws SCacheException {
-        final String cacheName = "Should_use_default_config";
-        final String key = "someObjectCacheKey";
-        // We cannot store non-Serializable objects if copyOnRead or copyOnWrite is set to true:
-        cacheService.store(cacheName, key, new Object());
+        // when
+        final String log = tapSystemOut(() -> cacheService.store(anotherCacheName, key, ""));
+
+        // then
+        assertThat(log)
+                .containsPattern("WARN.*No specific cache configuration found for cache 'Should_use_default_config'");
+
     }
 
     @Test
