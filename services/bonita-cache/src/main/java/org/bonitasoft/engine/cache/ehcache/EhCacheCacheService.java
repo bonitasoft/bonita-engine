@@ -14,12 +14,9 @@
 package org.bonitasoft.engine.cache.ehcache;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -43,6 +40,7 @@ import org.springframework.stereotype.Component;
 @Order(2)
 @Component
 @ConditionalOnSingleCandidate(CacheService.class)
+@Slf4j
 public class EhCacheCacheService implements CacheService, PlatformLifecycleService {
 
     protected CacheManager cacheManager;
@@ -114,22 +112,25 @@ public class EhCacheCacheService implements CacheService, PlatformLifecycleServi
         }
     }
 
-    protected synchronized Cache createCache(final String cacheName, final String internalCacheName)
+    protected synchronized Cache createCache(final String cacheName)
             throws SCacheException {
         if (cacheManager == null) {
             throw new SCacheException("The cache is not started, call start() on the cache service");
         }
-        Cache cache = cacheManager.getCache(internalCacheName);
+        Cache cache = cacheManager.getCache(cacheName);
         if (cache == null) {
             final CacheConfiguration cacheConfiguration = cacheConfigurations.get(cacheName);
+            final CacheConfiguration newCacheConfig;
             if (cacheConfiguration != null) {
-                final CacheConfiguration newCacheConfig = cacheConfiguration.clone();
-                newCacheConfig.setName(internalCacheName);
-                cache = new Cache(newCacheConfig);
-                cacheManager.addCache(cache);
+                newCacheConfig = cacheConfiguration.clone();
             } else {
-                throw new SCacheException("No configuration found for the cache " + cacheName);
+                log.warn("No specific cache configuration found for cache '{}'. Using default configuration",
+                        cacheName);
+                newCacheConfig = defaultCacheConfiguration.clone();
             }
+            newCacheConfig.setName(cacheName);
+            cache = new Cache(newCacheConfig);
+            cacheManager.addCache(cache);
         }
         return cache;
     }
@@ -142,7 +143,7 @@ public class EhCacheCacheService implements CacheService, PlatformLifecycleServi
         try {
             Cache cache = cacheManager.getCache(cacheName);
             if (cache == null) {
-                cache = createCache(cacheName, cacheName);
+                cache = createCache(cacheName);
             }
             if (value instanceof Serializable) {
                 cache.put(new Element(key, (Serializable) value));
