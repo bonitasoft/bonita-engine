@@ -5,6 +5,10 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-session')
     api libs.springContext
+
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
+
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation libs.logback
