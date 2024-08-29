@@ -14,6 +14,7 @@ dependencies {
     testAnnotationProcessor libs.lombok
     testImplementation libs.lombok
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"
 }
 
 tasks.register("testsJar", Jar) {
