@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,23 @@ class SAProcessContractDataTest {
         assertThat((Collection<?>) archivedContractData.getValue())
                 .extracting("content")
                 .containsNull();
+    }
+
+    @Test
+    void clearComplexInputWithFileInputContent() {
+        var contractData = new SProcessContractData();
+        contractData.setId(1);
+        contractData.setName("parent");
+        contractData.setValue(
+                (Serializable) Map.ofEntries(Map.entry("myFile", new FileInputValue("theFile", "content".getBytes()))));
+
+        var archivedContractData = new SAProcessContractData(contractData);
+
+        assertThat(archivedContractData.getValue()).isInstanceOf(Map.class);
+        assertThat((Map) archivedContractData.getValue())
+                .hasEntrySatisfying("myFile", value -> assertThat(value).isInstanceOf(FileInputValue.class)
+                        .extracting("content")
+                        .isNull());
     }
 
     @Test

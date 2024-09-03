@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.persistence.*;
 
@@ -64,11 +65,16 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
     private static Serializable clearFileInputContent(Serializable value) {
         if (value instanceof FileInputValue inputValue) {
             inputValue.setContent(null);
+        } else if (value instanceof Map<?, ?>) {
+            ((Map<?, ?>) value).values().stream()
+                    .filter(Serializable.class::isInstance)
+                    .map(Serializable.class::cast)
+                    .forEach(v -> clearFileInputContent(v));
         } else if (value instanceof Collection<?>) {
             ((Collection<?>) value).stream()
-                    .filter(FileInputValue.class::isInstance)
-                    .map(FileInputValue.class::cast)
-                    .forEach(v -> v.setContent(null));
+                    .filter(Serializable.class::isInstance)
+                    .map(Serializable.class::cast)
+                    .forEach(v -> clearFileInputContent(v));
         }
         return value;
     }
