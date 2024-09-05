@@ -215,7 +215,7 @@ public class ApplicationModelConverterTest {
         sApp.setInternalProfile(internalProfileAll.getProfileName());
 
         //when
-        final Application application = converter.toApplication(sApp);
+        final Application application = (Application) converter.toApplication(sApp);
 
         //then
         assertThat(application).isNotNull();
@@ -249,7 +249,7 @@ public class ApplicationModelConverterTest {
                 state);
 
         //when
-        final Application application = converter.toApplication(sApp);
+        final Application application = (Application) converter.toApplication(sApp);
 
         //then
         assertThat(application.hasIcon()).isFalse();
@@ -266,7 +266,7 @@ public class ApplicationModelConverterTest {
                 CREATOR_ID, SApplicationState.DEACTIVATED.name());
 
         //when
-        final List<Application> applications = converter.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));
+        final List<IApplication> applications = converter.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));
 
         //then
         assertThat(applications).extracting("token").containsExactly(APP_NAME, APP_NAME2);

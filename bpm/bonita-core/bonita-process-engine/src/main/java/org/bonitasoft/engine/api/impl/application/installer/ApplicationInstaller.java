@@ -56,7 +56,7 @@ import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
-import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
 import org.bonitasoft.engine.business.data.*;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.*;
@@ -511,7 +511,7 @@ public class ApplicationInstaller {
                 log.info("Installing Living Application from file '{}'", livingApplicationFile.getName());
                 var appContainer = appXmlConverter
                         .unmarshallFromXML(Files.readAllBytes(livingApplicationFile.toPath()));
-                for (var application : appContainer.getApplications()) {
+                for (var application : appContainer.getAllApplications()) {
                     var status = importApplication(application,
                             getIconContent(application, applicationArchive), policy);
                     final Map<String, Serializable> context = new HashMap<>();
@@ -545,7 +545,7 @@ public class ApplicationInstaller {
         }
     }
 
-    private IconContent getIconContent(ApplicationNode application, ApplicationArchive applicationArchive) {
+    private IconContent getIconContent(AbstractApplicationNode application, ApplicationArchive applicationArchive) {
         var iconPath = application.getIconPath();
         if (iconPath != null && !iconPath.isBlank()) {
             var icon = applicationArchive.getApplicationIcons().stream()
@@ -601,7 +601,7 @@ public class ApplicationInstaller {
                 context);
     }
 
-    ImportStatus importApplication(final ApplicationNode application, IconContent iconContent,
+    ImportStatus importApplication(final AbstractApplicationNode application, IconContent iconContent,
             ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException {
         return applicationImporter.importApplication(application, true, SessionService.SYSTEM_ID,

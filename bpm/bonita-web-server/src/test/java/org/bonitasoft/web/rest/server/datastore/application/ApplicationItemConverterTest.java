@@ -77,7 +77,7 @@ public class ApplicationItemConverterTest extends APITestWithMock {
         application.setEditable(true);
 
         //when
-        ApplicationItem item = converter.toApplicationItem(application);
+        ApplicationItem item = (ApplicationItem) converter.toApplicationItem(application);
 
         //then
         assertThat(item).isNotNull();
@@ -100,7 +100,7 @@ public class ApplicationItemConverterTest extends APITestWithMock {
 
         application.setHasIcon(false);
 
-        item = converter.toApplicationItem(application);
+        item = (ApplicationItem) converter.toApplicationItem(application);
         assertThat(item.getIcon()).isEmpty();
     }
 
@@ -121,7 +121,7 @@ public class ApplicationItemConverterTest extends APITestWithMock {
         application.setVisibility(APPLICATION_VISIBILITY);
 
         //when
-        final ApplicationItem item = converter.toApplicationItem(application);
+        final ApplicationItem item = (ApplicationItem) converter.toApplicationItem(application);
 
         //then
         assertThat(item).isNotNull();
@@ -144,7 +144,7 @@ public class ApplicationItemConverterTest extends APITestWithMock {
         application.setVisibility(APPLICATION_VISIBILITY);
 
         //when
-        final ApplicationItem item = converter.toApplicationItem(application);
+        final ApplicationItem item = (ApplicationItem) converter.toApplicationItem(application);
 
         //then
         assertThat(item).isNotNull();
@@ -167,7 +167,7 @@ public class ApplicationItemConverterTest extends APITestWithMock {
         application.setVisibility(APPLICATION_VISIBILITY);
 
         //when
-        final ApplicationItem item = converter.toApplicationItem(application);
+        final ApplicationItem item = (ApplicationItem) converter.toApplicationItem(application);
 
         //then
         assertThat(item).isNotNull();

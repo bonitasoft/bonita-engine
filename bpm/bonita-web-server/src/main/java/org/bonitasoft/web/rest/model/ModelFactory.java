@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.web.rest.model;
 
+import org.bonitasoft.web.rest.model.application.AbstractApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.ApplicationLinkDefinition;
 import org.bonitasoft.web.rest.model.applicationmenu.ApplicationMenuDefinition;
 import org.bonitasoft.web.rest.model.applicationpage.ApplicationPageDefinition;
 import org.bonitasoft.web.rest.model.bpm.cases.ArchivedCaseDefinition;
@@ -190,7 +193,11 @@ public class ModelFactory extends ItemDefinitionFactory {
             return new PageDefinition();
         }
         //Applications
-        else if (ApplicationDefinition.TOKEN.equals(token)) {
+        else if (AbstractApplicationDefinition.TOKEN.equals(token)) {
+            return new AbstractApplicationDefinition<AbstractApplicationItem>();
+        } else if (ApplicationLinkDefinition.TOKEN.equals(token)) {
+            return new ApplicationLinkDefinition();
+        } else if (ApplicationDefinition.TOKEN.equals(token)) {
             return new ApplicationDefinition();
         } else if (ApplicationPageDefinition.TOKEN.equals(token)) {
             return new ApplicationPageDefinition();

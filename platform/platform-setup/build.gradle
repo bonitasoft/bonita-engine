@@ -19,15 +19,14 @@ dependencies {
         exclude(module: 'log4j-to-slf4j')
         exclude(module: 'snakeyaml')
     }
-    api libs.snakeyaml
     api libs.springBootStarterJdbc
-    api "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    api ("com.mysql:mysql-connector-j:${Deps.mysqlVersion}") {
+    api(libs.postgresql)
+    api(libs.mysql) {
         exclude(module: 'protobuf-java')
     }
-    api "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
-    api libs.h2
-    api("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
+    api libs.msSqlServer
+    api(libs.h2)
+    api(libs.oracle) {
         exclude(module: "ons")
         exclude(module: "oraclepki")
         exclude(module: "osdt_cert")
@@ -39,7 +38,7 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
     api(project(":platform:platform-resources"))
-    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    runtimeOnly(libs.logback)
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"

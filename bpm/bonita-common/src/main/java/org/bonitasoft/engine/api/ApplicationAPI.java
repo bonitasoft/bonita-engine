@@ -18,6 +18,9 @@ import java.util.List;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
+import org.bonitasoft.engine.business.application.ApplicationLink;
+import org.bonitasoft.engine.business.application.ApplicationLinkCreator;
+import org.bonitasoft.engine.business.application.ApplicationLinkUpdater;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
@@ -26,6 +29,7 @@ import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.business.application.Icon;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -38,9 +42,11 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 /**
- * This API allows to list and manage Bonita Living Applications ({@link Application}).
+ * This API allows to list and manage Bonita Living Applications ({@link IApplication}).
  *
  * @author Elias Ricken de Medeiros
+ * @see org.bonitasoft.engine.business.application.IApplication
+ * @see org.bonitasoft.engine.business.application.ApplicationLink
  * @see org.bonitasoft.engine.business.application.Application
  * @since 6.4
  */
@@ -62,14 +68,49 @@ public interface ApplicationAPI {
             throws AlreadyExistsException, CreationException;
 
     /**
+     * Creates a new {@link ApplicationLink} based on the supplied {@link ApplicationLinkCreator}
+     *
+     * @param applicationLinkCreator creator describing characteristics of application link to be created
+     * @return the created <code>ApplicationLink</code>
+     * @throws AlreadyExistsException if an application already exists with the same name
+     * @throws CreationException if an error occurs during the creation
+     * @see ApplicationLink
+     * @see ApplicationLinkCreator
+     * @deprecated as of 9.0.0, Applications should be created at startup. This also concerns application links
+     *             introduced in 10.2.0.
+     */
+    @Deprecated(since = "10.2.0")
+    ApplicationLink createApplicationLink(ApplicationLinkCreator applicationLinkCreator)
+            throws AlreadyExistsException, CreationException;
+
+    /**
      * Retrieves an {@link Application} from its identifier.
      *
      * @param applicationId the application identifier
      * @return an <code>Application</code> from its identifier.
      * @throws ApplicationNotFoundException if no application is found for the given identifier
      * @see Application
+     * @deprecated as of 10.2.0, use {@link #getIApplication(long)} instead to include application links.
      */
-    Application getApplication(final long applicationId) throws ApplicationNotFoundException;
+    @Deprecated(since = "10.2.0")
+    default Application getApplication(final long applicationId) throws ApplicationNotFoundException {
+        var res = getIApplication(applicationId);
+        if (res instanceof Application legacy) {
+            return legacy;
+        } else {
+            throw new ApplicationNotFoundException(applicationId);
+        }
+    };
+
+    /**
+     * Retrieves an {@link IApplication} from its identifier.
+     *
+     * @param applicationId the application identifier
+     * @return an <code>Application</code> from its identifier.
+     * @throws ApplicationNotFoundException if no application is found for the given identifier
+     * @see IApplication
+     */
+    IApplication getIApplication(final long applicationId) throws ApplicationNotFoundException;
 
     /**
      * Retrieves an {@link Application} from its token.
@@ -78,17 +119,36 @@ public interface ApplicationAPI {
      * @return an <code>Application</code> from its token.
      * @throws ApplicationNotFoundException if no application is found for the given token
      * @see Application
+     * @deprecated as of 10.2.0, use {@link #getIApplicationByToken(String)} instead to include application links.
      */
-    Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException;
+    @Deprecated(since = "10.2.0")
+    default Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
+        var app = getIApplicationByToken(applicationToken);
+        if (app instanceof Application legacy) {
+            return legacy;
+        } else {
+            throw new ApplicationNotFoundException(applicationToken);
+        }
+    }
 
     /**
-     * Deletes an {@link Application} by its identifier. All related
+     * Retrieves an {@link IApplication} from its token.
+     *
+     * @param applicationToken the application token used in the URL
+     * @return an <code>Application</code> from its token.
+     * @throws ApplicationNotFoundException if no application is found for the given token
+     * @see IApplication
+     */
+    IApplication getIApplicationByToken(final String applicationToken) throws ApplicationNotFoundException;
+
+    /**
+     * Deletes an {@link IApplication} by its identifier. All related
      * {@link org.bonitasoft.engine.business.application.ApplicationPage}s and
      * {@link org.bonitasoft.engine.business.application.ApplicationMenu}s will be automatically deleted.
      *
      * @param applicationId the <code>Application</code> identifier
      * @throws DeletionException if an error occurs during the deletion
-     * @see Application
+     * @see IApplication
      * @see org.bonitasoft.engine.business.application.ApplicationPage
      * @see org.bonitasoft.engine.business.application.ApplicationMenu
      */
@@ -101,7 +161,7 @@ public interface ApplicationAPI {
      * @param updater an <code>ApplicationUpdater</code> describing the fields to be updated.
      * @return the <code>Application</code> as it is after the update.
      * @throws ApplicationNotFoundException if no <code>Application</code> is found for the given id
-     * @throws AlreadyExistsException if another <code>Application</code> already exists with the new name value
+     * @throws AlreadyExistsException if another <code>IApplication</code> already exists with the new name value
      * @throws UpdateException if an error occurs during the update
      * @see Application
      * @see ApplicationUpdater
@@ -109,6 +169,24 @@ public interface ApplicationAPI {
      */
     @Deprecated(since = "9.0.0")
     Application updateApplication(long applicationId, ApplicationUpdater updater)
+            throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
+
+    /**
+     * Updates an {@link ApplicationLink} based on the information supplied by the {@link ApplicationLinkUpdater}
+     *
+     * @param applicationId a long representing the application identifier
+     * @param updater an <code>ApplicationLinkUpdater</code> describing the fields to be updated.
+     * @return the <code>ApplicationLink</code> as it is after the update.
+     * @throws ApplicationNotFoundException if no <code>ApplicationLink</code> is found for the given id
+     * @throws AlreadyExistsException if another <code>IApplication</code> already exists with the new name value
+     * @throws UpdateException if an error occurs during the update
+     * @see ApplicationLink
+     * @see ApplicationLinkUpdater
+     * @deprecated as of 9.0.0, Applications should be updated at startup. This also concerns application links
+     *             introduced in 10.2.0.
+     */
+    @Deprecated(since = "10.2.0")
+    ApplicationLink updateApplicationLink(long applicationId, ApplicationLinkUpdater updater)
             throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
@@ -123,8 +201,25 @@ public interface ApplicationAPI {
      * @see org.bonitasoft.engine.business.application.ApplicationSearchDescriptor
      * @see SearchOptions
      * @see SearchResult
+     * @deprecated as of 10.2.0, use {@link #searchIApplications(SearchOptions)} instead to include application links.
      */
+    @Deprecated(since = "10.2.0")
     SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Searches for {@link IApplication}s with specific search criteria. Use
+     * {@link org.bonitasoft.engine.business.application.ApplicationSearchDescriptor} to
+     * know the available filters.
+     *
+     * @param searchOptions the search criteria. See {@link SearchOptions} for details.
+     * @return a {@link SearchResult} containing the number and the list of applications matching the search criteria.
+     * @throws SearchException if an error occurs during search
+     * @see IApplication
+     * @see org.bonitasoft.engine.business.application.ApplicationSearchDescriptor
+     * @see SearchOptions
+     * @see SearchResult
+     */
+    SearchResult<IApplication> searchIApplications(final SearchOptions searchOptions) throws SearchException;
 
     /**
      * Creates an {@link ApplicationPage}
@@ -341,13 +436,13 @@ public interface ApplicationAPI {
     List<String> getAllPagesForProfile(String profile);
 
     /**
-     * Exports the {@link org.bonitasoft.engine.business.application.Application}s which identifier is in
+     * Exports the {@link IApplication}s which identifier is in
      * {@code applicationIds}
      *
      * @param applicationIds the identifiers of {@code Application}s to be exported
      * @return a byte array representing the content of XML file containing the exported {@code Application}s
      * @throws ExportException if an exception occurs during the export.
-     * @see org.bonitasoft.engine.business.application.Application
+     * @see org.bonitasoft.engine.business.application.IApplication
      */
     byte[] exportApplications(long... applicationIds) throws ExportException;
 

@@ -12,7 +12,6 @@ dependencies {
     api(libs.springBootStarter) {
         exclude(module: 'snakeyaml')
     }
-    api(libs.snakeyaml)
 
     implementation(project(":bonita-engine-standalone"))
     implementation(project(":bpm:bonita-server"))

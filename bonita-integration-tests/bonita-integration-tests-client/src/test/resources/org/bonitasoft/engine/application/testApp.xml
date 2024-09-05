@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.1">
     <application token="testAppBonita" version="1.0" profile="User" state="ACTIVATED"
                  layout="custompage_layoutBonita">
         <displayName>Test App</displayName>

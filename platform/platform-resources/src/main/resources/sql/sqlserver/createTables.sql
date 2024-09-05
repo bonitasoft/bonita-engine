@@ -595,7 +595,8 @@ CREATE TABLE business_app (
   iconContent VARBINARY(MAX),
   displayName NVARCHAR(255) NOT NULL,
   editable BIT,
-  internalProfile NVARCHAR(255)
+  internalProfile NVARCHAR(255),
+  isLink BIT DEFAULT 0
 )
 GO
 

@@ -47,6 +47,7 @@ public abstract class AbstractSApplication implements PersistentObject {
     public static final String ICON_MIME_TYPE = "iconMimeType";
     public static final String EDITABLE = "editable";
     public static final String INTERNAL_PROFILE = "internalProfile";
+    public static final String LINK = "isLink";
 
     @Id
     private long tenantId;
@@ -87,6 +88,9 @@ public abstract class AbstractSApplication implements PersistentObject {
     private boolean editable = true;
     @Column
     private String internalProfile;
+    // "link" is a reserved keyword in some databases
+    @Column
+    private boolean isLink;
 
     public AbstractSApplication(String token, String displayName, String version, long creationDate,
             long createdBy, String state, boolean editable) {

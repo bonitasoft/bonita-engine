@@ -13,24 +13,18 @@
  **/
 package org.bonitasoft.engine.business.application;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bonitasoft.engine.profile.Profile;
-
 /**
- * Describes the information about an {@link Application} to be created
+ * Describes the information about a Legacy {@link Application} to be created
  *
  * @author Elias Ricken de Medeiros
  * @see Application
  * @since 7.0.0
+ * @deprecated This class should no longer be used. Since 9.0.0, Applications should be created at startup.
  */
-public class ApplicationCreator implements Serializable {
+@Deprecated(since = "10.2.0")
+public class ApplicationCreator extends AbstractApplicationCreator<ApplicationCreator> {
 
     private static final long serialVersionUID = -916041825489100271L;
-
-    private final Map<ApplicationField, Serializable> fields;
 
     /**
      * Creates an instance of <code>ApplicationCreator</code> containing mandatory information.
@@ -46,115 +40,12 @@ public class ApplicationCreator implements Serializable {
      * @see Application
      */
     public ApplicationCreator(final String token, final String displayName, final String version) {
-        fields = new HashMap<>(3);
-        fields.put(ApplicationField.TOKEN, token);
-        fields.put(ApplicationField.VERSION, version);
-        fields.put(ApplicationField.DISPLAY_NAME, displayName);
-    }
-
-    /**
-     * Retrieves the {@link Application} token
-     *
-     * @return the <code>Application</code> token
-     * @see Application
-     */
-    public String getToken() {
-        return (String) fields.get(ApplicationField.TOKEN);
-    }
-
-    /**
-     * Defines the {@link Application} description and returns the current <code>ApplicationCreator</code>
-     *
-     * @param description the <code>Application</code> description
-     * @return the current <code>ApplicationCreator</code>
-     * @see Application
-     */
-    public ApplicationCreator setDescription(final String description) {
-        fields.put(ApplicationField.DESCRIPTION, description);
-        return this;
-    }
-
-    /**
-     * Defines the {@link Application} icon path and returns the current <code>ApplicationCreator</code>
-     *
-     * @param iconPath the <code>Application</code> icon path
-     * @return the current <code>ApplicationCreator</code>
-     * @see Application
-     * @deprecated since 7.13.0, use {@link #setIcon(String, byte[])}
-     */
-    @Deprecated(since = "7.13.0")
-    public ApplicationCreator setIconPath(final String iconPath) {
-        fields.put(ApplicationField.ICON_PATH, iconPath);
-        return this;
-    }
-
-    /**
-     * Defines the icon for the {@link Application}.
-     *
-     * @param fileName of the icon
-     * @param content of the icon
-     * @return the current builder
-     * @since 7.13.0
-     */
-    public ApplicationCreator setIcon(String fileName, byte[] content) {
-        fields.put(ApplicationField.ICON_FILE_NAME, fileName);
-        fields.put(ApplicationField.ICON_CONTENT, content);
-        return this;
-    }
-
-    /**
-     * Defines the identifier of the {@link Profile} related to this {@link Application} and returns the current
-     * <code>ApplicationCreator</code>
-     *
-     * @param profileId the <code>Profile</code> identifier
-     * @return the current <code>ApplicationCreator</code>
-     * @see Application
-     * @see Profile
-     */
-    public ApplicationCreator setProfileId(final Long profileId) {
-        fields.put(ApplicationField.PROFILE_ID, profileId);
-        return this;
-    }
-
-    /**
-     * Retrieves all fields defined in this <code>ApplicationCreator</code>
-     *
-     * @return a {@link Map}<{@link ApplicationField}, {@link Serializable}> containing all fields defined in this
-     *         <code>ApplicationCreator</code>
-     * @see ApplicationField
-     */
-    public Map<ApplicationField, Serializable> getFields() {
-        return fields;
+        super(token, displayName, version);
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (fields == null ? 0 : fields.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ApplicationCreator other = (ApplicationCreator) obj;
-        if (fields == null) {
-            if (other.fields != null) {
-                return false;
-            }
-        } else if (!fields.equals(other.fields)) {
-            return false;
-        }
-        return true;
+    public boolean isLink() {
+        return false;
     }
 
 }

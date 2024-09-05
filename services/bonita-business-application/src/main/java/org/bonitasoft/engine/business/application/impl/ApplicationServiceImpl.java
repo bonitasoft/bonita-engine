@@ -327,10 +327,18 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor,
-            final SApplicationWithIcon application) throws SBonitaReadException, SObjectAlreadyExistsException {
+            final SApplicationWithIcon application)
+            throws SBonitaReadException, SObjectAlreadyExistsException, SObjectModificationException {
         if (updateDescriptor.getFields().containsKey(AbstractSApplication.TOKEN)
                 && !application.getToken().equals(updateDescriptor.getFields().get(AbstractSApplication.TOKEN))) {
             validateApplicationToken((String) updateDescriptor.getFields().get(AbstractSApplication.TOKEN));
+        }
+        if (updateDescriptor.getFields().containsKey(AbstractSApplication.LINK)
+                && !Boolean.valueOf(application.isLink())
+                        .equals(updateDescriptor.getFields().get(AbstractSApplication.LINK))) {
+            throw new SObjectModificationException(format(
+                    "The 'link' nature of application '%s' is not modifiable. You can not switch between legacy and application links.",
+                    application.getDisplayName()));
         }
     }
 
