@@ -1,7 +1,7 @@
 [versions]
 # The groovy version must be in synch with the bonita-project-parent POM (bonita-project repository):
 groovyVersion = "3.0.21"
-springVersion = "5.3.37"
+springVersion = "5.3.39"
 springSessionVersion = "2.7.4"
 springBootVersion = "2.7.18"
 commonsLangVersion = "3.14.0"
