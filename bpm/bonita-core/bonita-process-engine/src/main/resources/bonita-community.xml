@@ -1226,12 +1226,12 @@
         <constructor-arg name="containerRegistry" ref="containerRegistry" />
         <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
         <constructor-arg name="eventsHandler" ref="eventsHandler" />
-        <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
         <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
         <constructor-arg name="contractDataService" ref="contractDataService" />
         <constructor-arg name="bpmArchiverService" ref="bpmArchiverService" />
+        <constructor-arg name="processStarterVerifier" ref="processStarterVerifierImpl" />
     </bean>
 
     <bean id="documentReferenceExpressionExecutorStrategy"

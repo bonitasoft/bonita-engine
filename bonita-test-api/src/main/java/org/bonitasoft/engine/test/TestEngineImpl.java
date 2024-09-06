@@ -16,15 +16,20 @@ package org.bonitasoft.engine.test;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.BonitaDatabaseConfiguration;
+import org.bonitasoft.engine.execution.ProcessStarterVerifier;
 import org.bonitasoft.engine.test.http.BonitaHttpServer;
 import org.bonitasoft.engine.test.internal.EngineCommander;
 import org.bonitasoft.engine.test.internal.EngineStarter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Baptiste Mesta
  */
 @Getter
 @Slf4j
+@ContextConfiguration(classes = TestEngineImpl.TestConfiguration.class)
 public class TestEngineImpl implements TestEngine {
 
     private static TestEngineImpl INSTANCE = createTestEngine();
@@ -129,4 +134,17 @@ public class TestEngineImpl implements TestEngine {
         this.businessDataDatabaseConfiguration = database;
     }
 
+    /**
+     * Configuration class used to override bean definitions for test purposes.
+     */
+    @Configuration
+    static class TestConfiguration {
+
+        @Bean
+        ProcessStarterVerifier processStarterVerifierImpl() {
+            return processInstance -> {
+                // Override this bean to disable the process starter verifier
+            };
+        }
+    }
 }

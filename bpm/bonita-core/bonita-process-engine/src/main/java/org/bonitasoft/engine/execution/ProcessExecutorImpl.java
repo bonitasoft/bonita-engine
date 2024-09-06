@@ -16,8 +16,14 @@ package org.bonitasoft.engine.execution;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.SArchivingException;
@@ -56,15 +62,38 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.*;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.*;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.*;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
@@ -78,7 +107,6 @@ import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.flowmerger.FlowNodeTransitionsWrapper;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -120,7 +148,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final ProcessDefinitionService processDefinitionService;
     private final GatewayInstanceService gatewayInstanceService;
     private final OperationService operationService;
-    private ProcessResourcesService processResourcesService;
+    private final ProcessResourcesService processResourcesService;
     private final ConnectorInstanceService connectorInstanceService;
     private final TransitionEvaluator transitionEvaluator;
     private final ContractDataService contractDataService;
@@ -129,6 +157,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final DocumentHelper documentHelper;
     private final BPMWorkFactory workFactory;
     private final BPMArchiverService bpmArchiverService;
+    private final ProcessStarterVerifier processStarterVerifier;
 
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final FlowNodeExecutor flowNodeExecutor,
@@ -142,11 +171,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
+            final EventsHandler eventsHandler,
             final BusinessDataRepository businessDataRepository,
             final RefBusinessDataService refBusinessDataService, final TransitionEvaluator transitionEvaluator,
             final ContractDataService contractDataService, BPMWorkFactory workFactory,
-            BPMArchiverService bpmArchiverService) {
+            BPMArchiverService bpmArchiverService, final ProcessStarterVerifier processStarterVerifier) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -169,6 +198,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.contractDataService = contractDataService;
         this.workFactory = workFactory;
         this.bpmArchiverService = bpmArchiverService;
+        this.processStarterVerifier = processStarterVerifier;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
         //FIXME There is responsibility issue the circular dependencies must be fixed next time.
         eventsHandler.setProcessExecutor(this);
@@ -914,8 +944,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectors,
             final long callerId, final FlowNodeSelector selector, final Map<String, Serializable> processInputs)
-            throws SProcessInstanceCreationException,
-            SContractViolationException {
+            throws SProcessInstanceCreationException, SContractViolationException {
 
         final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
 
@@ -945,7 +974,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 // we stop execution here
                 return sProcessInstance;
             }
-            return startElements(sProcessInstance, selector);
+            final SProcessInstance processInstance = startElements(sProcessInstance, selector);
+            processStarterVerifier.verify(processInstance);
+            return processInstance;
         } catch (final SProcessInstanceCreationException e) {
             throw e;
         } catch (final SBonitaException e) {

@@ -37,7 +37,7 @@ public class PlatformRetrieverImpl implements PlatformRetriever {
     public SPlatform getPlatform() throws SPlatformNotFoundException {
         try {
             SPlatform platform = platformPersistenceService
-                    .selectOne(new SelectOneDescriptor<SPlatform>(QUERY_GET_PLATFORM, null, SPlatform.class));
+                    .selectOne(new SelectOneDescriptor<>(QUERY_GET_PLATFORM, null, SPlatform.class));
             if (platform == null) {
                 throw new SPlatformNotFoundException("No platform found");
             }

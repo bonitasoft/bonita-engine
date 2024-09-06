@@ -47,7 +47,7 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @SpringBootApplication
 @ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration",
-        "org.bonitasoft.platform.version" })
+        "org.bonitasoft.platform.version", "com.bonitasoft.platform.setup" })
 public class PlatformSetupApplication {
 
     // /!\ Leave this logger NON-STATIC, so that DEBUG property may be set before it is initialized:

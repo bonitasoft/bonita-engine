@@ -6,6 +6,9 @@ dependencies {
     api libs.commonsIO
     api "xmlunit:xmlunit:${Deps.xmlunitVersion}"
     api "org.assertj:assertj-core:${Deps.assertjVersion}"
+
+    implementation project(':bpm:bonita-core:bonita-process-engine')
+    implementation libs.springTest
 }
 
 publishing {

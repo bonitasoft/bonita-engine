@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SynchroServiceImpl extends AbstractSynchroService {
 
-    private Logger logger = LoggerFactory.getLogger(SynchroServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(SynchroServiceImpl.class);
     private final Map<Map<String, Serializable>, String> waiters;
 
     private final Map<String, Serializable> eventKeyAndIdMap;
@@ -49,9 +49,9 @@ public class SynchroServiceImpl extends AbstractSynchroService {
      */
     private SynchroServiceImpl(final int initialCapacity, final CacheService cacheService) {
         super(cacheService);
-        waiters = new HashMap<Map<String, Serializable>, String>(initialCapacity);
-        eventKeyAndIdMap = new HashMap<String, Serializable>(initialCapacity);
-        eventSemaphores = new HashMap<String, Semaphore>();
+        waiters = new HashMap<>(initialCapacity);
+        eventKeyAndIdMap = new HashMap<>(initialCapacity);
+        eventSemaphores = new HashMap<>();
     }
 
     private static final class SynchroServiceImplReentrantLock extends ReentrantLock {
@@ -89,7 +89,7 @@ public class SynchroServiceImpl extends AbstractSynchroService {
     @Override
     public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout)
             throws InterruptedException, TimeoutException {
-        Serializable id = null;
+        Serializable id;
         String semaphoreKey = null;
         Semaphore semaphore = null;
         getServiceLock().lock();
@@ -122,7 +122,7 @@ public class SynchroServiceImpl extends AbstractSynchroService {
 
     private String getSemaphoreKey(final Map<String, Serializable> event) {
         final StringBuilder sb = new StringBuilder();
-        final TreeMap<String, Serializable> orderedMap = new TreeMap<String, Serializable>(event);
+        final TreeMap<String, Serializable> orderedMap = new TreeMap<>(event);
         boolean first = true;
         for (final Map.Entry<String, Serializable> entry : orderedMap.entrySet()) {
             if (!first) {

@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.api.internal.servlet;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.bonitasoft.engine.EngineInitializer;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +58,7 @@ public class EngineInitializerListener implements ServletContextListener {
 
     AnnotationConfigWebApplicationContext initializeWebApplicationContext(ServletContextEvent event,
             EngineInitializer engineInitializer) throws Exception {
-        PlatformSetupAccessor.getPlatformSetup().init(); // init tables and default configuration
+        getPlatformSetup().init(); // init tables and default configuration
         engineInitializer.initializeEngine();
         ApplicationContext engineContext = ServiceAccessorFactory.getInstance()
                 .createServiceAccessor()
@@ -65,6 +67,10 @@ public class EngineInitializerListener implements ServletContextListener {
         AnnotationConfigWebApplicationContext webApplicationContext = initializeWebContext(event, engineContext);
         webApplicationContext.refresh();
         return webApplicationContext;
+    }
+
+    protected PlatformSetup getPlatformSetup() throws NamingException {
+        return PlatformSetupAccessor.getInstance().getPlatformSetup();
     }
 
     void exit(int code) {

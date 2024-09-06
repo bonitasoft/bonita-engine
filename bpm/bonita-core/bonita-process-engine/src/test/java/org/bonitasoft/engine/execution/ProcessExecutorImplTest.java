@@ -173,6 +173,9 @@ public class ProcessExecutorImplTest {
     @Mock
     private SFlowElementContainerDefinition processContainer;
 
+    @Mock
+    private ProcessStarterVerifier processStarterVerifier;
+
     @InjectMocks
     private ProcessExecutorImpl processExecutorImpl;
 
@@ -244,6 +247,7 @@ public class ProcessExecutorImplTest {
         when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, -1))
                 .thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.startElements(eq(sProcessInstance), eq(selector))).thenReturn(sProcessInstance);
+        doNothing().when(processStarterVerifier).verify(sProcessInstance);
 
         // Let's call it for real:
         doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, operations, context,
@@ -284,8 +288,8 @@ public class ProcessExecutorImplTest {
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
         when(mockedProcessExecutorImpl.startElements(sProcessInstance, selector)).thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId,
-                subProcessDefinitionId)).thenReturn(
-                        sProcessInstance);
+                subProcessDefinitionId)).thenReturn(sProcessInstance);
+        doNothing().when(processStarterVerifier).verify(sProcessInstance);
 
         final Map<String, Serializable> processInputs = new HashMap<>(0);
 
@@ -334,8 +338,8 @@ public class ProcessExecutorImplTest {
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
         when(mockedProcessExecutorImpl.startElements(eq(sProcessInstance), eq(selector))).thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, 1L))
-                .thenReturn(
-                        sProcessInstance);
+                .thenReturn(sProcessInstance);
+        doNothing().when(processStarterVerifier).verify(sProcessInstance);
 
         final Map<String, Serializable> processInputs = new HashMap<>(0);
         doNothing().when(mockedProcessExecutorImpl).validateContractInputs(processInputs, sProcessDefinition);
