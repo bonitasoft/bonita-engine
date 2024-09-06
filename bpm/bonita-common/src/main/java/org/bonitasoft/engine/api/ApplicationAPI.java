@@ -100,7 +100,7 @@ public interface ApplicationAPI {
         } else {
             throw new ApplicationNotFoundException(applicationId);
         }
-    };
+    }
 
     /**
      * Retrieves an {@link IApplication} from its identifier.

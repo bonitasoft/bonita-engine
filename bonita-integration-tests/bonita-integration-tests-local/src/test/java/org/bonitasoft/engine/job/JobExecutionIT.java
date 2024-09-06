@@ -19,9 +19,7 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 
-import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -147,13 +145,12 @@ public class JobExecutionIT extends CommonAPILocalIT {
     public void retryAJob_should_update_job_log_when_execution_fails_again() throws Exception {
         //given
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
-        final Map<String, Serializable> parameters = new HashMap<>();
         try {
-            getCommandAPI().execute("except", parameters);
+            getCommandAPI().execute("except", Map.of());
             FailedJob failedJob = await().until(() -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
 
             //when
-            getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(), emptyMap());
+            getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId());
 
             //then
             failedJob = await().until(() -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);

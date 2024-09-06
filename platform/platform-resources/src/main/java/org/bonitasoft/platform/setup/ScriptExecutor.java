@@ -16,22 +16,28 @@ package org.bonitasoft.platform.setup;
 import static java.util.Arrays.asList;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.bonitasoft.platform.setup.PlatformSetup.PLATFORM_CONF_FOLDER_NAME;
+import static org.bonitasoft.platform.setup.SimpleEncryptor.encrypt;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.version.VersionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -46,6 +52,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@ConditionalOnSingleCandidate(ScriptExecutor.class)
 @PropertySource("classpath:/application.properties")
 public class ScriptExecutor {
 
@@ -59,7 +66,7 @@ public class ScriptExecutor {
 
     private final String dbVendor;
 
-    private VersionService versionService;
+    private final VersionService versionService;
 
     @Autowired
     public ScriptExecutor(@Value("${db.vendor}") String dbVendor, DataSource datasource,
@@ -69,7 +76,7 @@ public class ScriptExecutor {
         }
         this.dbVendor = dbVendor;
         this.datasource = datasource;
-        log.info("configuration for Database vendor: " + dbVendor);
+        log.info("configuration for Database vendor: {}", dbVendor);
         this.sqlFolder = "/sql/" + dbVendor;
         this.versionService = versionService;
     }
@@ -104,11 +111,21 @@ public class ScriptExecutor {
         String version = versionService.getPlatformSetupVersion();
         String databaseSchemaVersion = versionService.getSupportedDatabaseSchemaVersion();
 
-        final String sql = "INSERT INTO platform (id, version, initial_bonita_version, application_version, maintenance_message_active, created, created_by) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO platform (id, version, initial_bonita_version, application_version, " +
+                "maintenance_message_active, created, created_by, information) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         new JdbcTemplate(datasource).update(sql, 1L, databaseSchemaVersion, version, "0.0.0", false,
-                System.currentTimeMillis(), "platformAdmin");
+                System.currentTimeMillis(), "platformAdmin", getInformationInitialValue());
+    }
+
+    protected String getInformationInitialValue() {
+        try {
+            return encrypt(new ObjectMapper().writeValueAsBytes(new ArrayList<Long>()));
+        } catch (GeneralSecurityException | JsonProcessingException e) {
+            log.debug(e.getMessage(), e);
+            throw new IllegalStateException("Cannot properly setup Bonita platform");
+        }
     }
 
     private void insertTenant() {
