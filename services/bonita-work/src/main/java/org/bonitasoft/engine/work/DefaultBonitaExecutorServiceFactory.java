@@ -13,12 +13,7 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
@@ -45,83 +40,55 @@ import org.springframework.stereotype.Component;
 @Component("bonitaExecutorServiceFactory")
 public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
 
-    private Logger logger = LoggerFactory.getLogger(DefaultBonitaExecutorServiceFactory.class);
-    private final int corePoolSize;
-    private final int queueCapacity;
-    private final int maximumPoolSize;
-    private final long keepAliveTimeSeconds;
-    private final EngineClock engineClock;
-    private final WorkFactory workFactory;
+    private static final String BONITA_WORK_EXECUTOR = "bonita-work-executor";
+    private final Logger logger = LoggerFactory.getLogger(DefaultBonitaExecutorServiceFactory.class);
+
     private final long tenantId;
-    private final WorkExecutionAuditor workExecutionAuditor;
     private final MeterRegistry meterRegistry;
     private final ExecutorServiceMetricsProvider executorServiceMetricsProvider;
+    private final BonitaThreadPoolExecutorFactory bonitaThreadPoolExecutorFactory;
+    private final EngineClock engineClock;
+    private final WorkFactory workFactory;
+    private final WorkExecutionAuditor workExecutionAuditor;
 
-    public DefaultBonitaExecutorServiceFactory(
-            WorkFactory workFactory,
-            @Value("${tenantId}") long tenantId,
-            @Value("${bonita.tenant.work.corePoolSize}") int corePoolSize,
-            @Value("${bonita.tenant.work.queueCapacity}") int queueCapacity,
-            @Value("${bonita.tenant.work.maximumPoolSize}") int maximumPoolSize,
-            @Value("${bonita.tenant.work.keepAliveTimeSeconds}") long keepAliveTimeSeconds,
-            EngineClock engineClock,
-            WorkExecutionAuditor workExecutionAuditor,
+    public DefaultBonitaExecutorServiceFactory(@Value("${tenantId}") long tenantId,
             MeterRegistry meterRegistry,
-            ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
-        this.workFactory = workFactory;
+            EngineClock engineClock,
+            WorkFactory workFactory,
+            WorkExecutionAuditor workExecutionAuditor,
+            ExecutorServiceMetricsProvider executorServiceMetricsProvider,
+            BonitaThreadPoolExecutorFactory bonitaThreadPoolExecutorFactory) {
         this.tenantId = tenantId;
-        this.corePoolSize = corePoolSize;
-        this.queueCapacity = queueCapacity;
-        this.maximumPoolSize = maximumPoolSize;
-        this.keepAliveTimeSeconds = keepAliveTimeSeconds;
-        this.engineClock = engineClock;
-        this.workExecutionAuditor = workExecutionAuditor;
         this.meterRegistry = meterRegistry;
+        this.workFactory = workFactory;
+        this.workExecutionAuditor = workExecutionAuditor;
+        this.engineClock = engineClock;
         this.executorServiceMetricsProvider = executorServiceMetricsProvider;
+        this.bonitaThreadPoolExecutorFactory = bonitaThreadPoolExecutorFactory;
     }
 
     @Override
     public BonitaExecutorService createExecutorService(WorkExecutionCallback workExecutionCallback) {
-        final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(queueCapacity);
-        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
-
-        final BonitaThreadPoolExecutor bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(corePoolSize,
-                maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
-                workQueue, threadFactory, handler, workFactory, engineClock, workExecutionCallback,
-                workExecutionAuditor, meterRegistry, tenantId);
+        final ThreadPoolExecutor bonitaThreadPoolExecutor = bonitaThreadPoolExecutorFactory.create();
+        final BonitaExecutorService bonitaExecutorService = new DefaultBonitaExecutorService(bonitaThreadPoolExecutor,
+                workFactory,
+                engineClock,
+                workExecutionCallback,
+                workExecutionAuditor,
+                meterRegistry,
+                tenantId);
         logger.info(
-                "Creating a new Thread pool to handle works: " + bonitaThreadPoolExecutor);
+                "Creating a new Thread pool to handle works: {}", bonitaThreadPoolExecutor);
 
         //TODO this returns the timed executor service, this should be used instead of the BonitaExecutorService but we should change it everywhere
         executorServiceMetricsProvider
-                .bindMetricsOnly(meterRegistry, bonitaThreadPoolExecutor, "bonita-work-executor", tenantId);
-        return bonitaThreadPoolExecutor;
+                .bindMetricsOnly(meterRegistry, bonitaThreadPoolExecutor, BONITA_WORK_EXECUTOR, tenantId);
+        return bonitaExecutorService;
     }
 
     @Override
     public void unbind() {
-        executorServiceMetricsProvider.unbind(meterRegistry, "bonita-work-executor", tenantId);
-    }
-
-    private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
-
-        public QueueRejectedExecutionHandler() {
-        }
-
-        @Override
-        public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
-            if (executor.isShutdown()) {
-                logger.info("Tried to run work " + task
-                        + " but the work service is shutdown. work will be restarted with the node");
-            } else {
-                throw new RejectedExecutionException(
-                        "Unable to run the task "
-                                + task
-                                + "\n your work queue is full you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
-            }
-        }
-
+        executorServiceMetricsProvider.unbind(meterRegistry, BONITA_WORK_EXECUTOR, tenantId);
     }
 
 }
