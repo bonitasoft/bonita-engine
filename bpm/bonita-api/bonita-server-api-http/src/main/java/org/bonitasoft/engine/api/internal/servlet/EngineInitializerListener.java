@@ -30,6 +30,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 public class EngineInitializerListener implements ServletContextListener {
 
     static final String UPDATE_ONLY_STARTUP_PROPERTY = "bonita.runtime.startup.update-only";
+
     private static final Logger log = LoggerFactory.getLogger(EngineInitializerListener.class);
 
     @Override
@@ -63,7 +64,6 @@ public class EngineInitializerListener implements ServletContextListener {
         ApplicationContext engineContext = ServiceAccessorFactory.getInstance()
                 .createServiceAccessor()
                 .getContext();
-
         AnnotationConfigWebApplicationContext webApplicationContext = initializeWebContext(event, engineContext);
         webApplicationContext.refresh();
         return webApplicationContext;
@@ -93,7 +93,7 @@ public class EngineInitializerListener implements ServletContextListener {
     }
 
     @Override
-    public void contextDestroyed(final ServletContextEvent arg0) {
+    public void contextDestroyed(final ServletContextEvent event) {
         try {
             getEngineInitializer().unloadEngine();
         } catch (final Throwable e) {
