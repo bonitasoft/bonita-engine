@@ -17,6 +17,7 @@ import java.lang.reflect.Proxy;
 
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.internal.ServerAPI;
+import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -131,5 +132,10 @@ public final class TenantAPIAccessor {
     public static MaintenanceAPI getMaintenanceAPI(final APISession session)
             throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(MaintenanceAPI.class, session);
+    }
+
+    public static PlatformInformationAPI getPlatformInformationAPI()
+            throws ServerAPIException, BonitaHomeNotSetException, UnknownAPITypeException {
+        return getAPI(PlatformInformationAPI.class);
     }
 }
