@@ -397,6 +397,15 @@ public interface ProcessInstanceService {
             QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
+     * Get the list of all archived process instance start dates since the given date
+     *
+     * @param sinceDateInMillis the date since when we want to get the list of start dates (in milliseconds)
+     * @return the list of all archived process instance start dates, expressed in millis since EPOCH.
+     * @throws SProcessInstanceReadException if an exception occurs while reading the process instances
+     */
+    List<Long> getLastArchivedProcessInstanceStartDates(long sinceDateInMillis) throws SProcessInstanceReadException;
+
+    /**
      * Get the list of sourceObjectIds for archived process instances children of process instance identified by
      * rootProcessIntanceId
      *
