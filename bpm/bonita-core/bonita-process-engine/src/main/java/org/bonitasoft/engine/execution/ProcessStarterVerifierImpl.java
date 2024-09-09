@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution;
 
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -26,6 +27,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.platform.PlatformRetriever;
@@ -51,21 +53,30 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
 
     private final PlatformRetriever platformRetriever;
     private final PlatformInformationService platformInformationService;
+    private final TransactionService transactionService;
+    private final ProcessInstanceService processInstanceService;
 
     private final List<Long> counters = Collections.synchronizedList(new ArrayList<>());
-
-    ProcessStarterVerifierImpl(PlatformRetriever platformRetriever,
-            PlatformInformationService platformInformationService) {
-        this.platformRetriever = platformRetriever;
-        this.platformInformationService = platformInformationService;
-    }
 
     @Autowired
     ProcessStarterVerifierImpl(PlatformRetriever platformRetriever,
             PlatformInformationService platformInformationService,
-            TransactionService transactionService) throws Exception {
-        this(platformRetriever, platformInformationService);
-        counters.addAll(transactionService.executeInTransaction(this::readCounters));
+            TransactionService transactionService,
+            ProcessInstanceService processInstanceService) throws Exception {
+        this.platformRetriever = platformRetriever;
+        this.platformInformationService = platformInformationService;
+        this.transactionService = transactionService;
+        this.processInstanceService = processInstanceService;
+        counters.addAll(setupCounters(transactionService));
+        // clean up old values:
+        final long oldestValidDate = currentTimeMillis() - PERIOD_IN_MILLIS;
+        cleanupOldValues(oldestValidDate);
+        // then check database integrity:
+        verifyCountersCoherence(counters, oldestValidDate);
+    }
+
+    List<Long> setupCounters(TransactionService transactionService) throws Exception {
+        return transactionService.executeInTransaction(this::readCounters);
     }
 
     protected List<Long> getCounters() {
@@ -80,8 +91,9 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
 
     @Override
     public void verify(SProcessInstance processInstance) throws SProcessInstanceCreationException {
-        log.debug("Verifying process instance {}", processInstance.getId());
-        cleanupOldValues();
+        log.debug("Verifying the possibility to create process instance {}", processInstance.getId());
+        final long processStartDate = processInstance.getStartDate();
+        cleanupOldValues(processStartDate - PERIOD_IN_MILLIS);
         log.debug("Found {} cases already started in the last {} days", counters.size(), PERIOD_IN_DAYS);
         if (counters.size() >= LIMIT) {
             final String nextValidTime = getStringRepresentation(getNextResetTimestamp(counters));
@@ -91,7 +103,7 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
         }
         try {
             synchronized (counters) {
-                counters.add(System.currentTimeMillis());
+                counters.add(processStartDate);
             }
             final String information = encryptDataBeforeSendingToDatabase(counters);
             // store in database:
@@ -104,11 +116,10 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
         }
     }
 
-    void cleanupOldValues() {
+    void cleanupOldValues(long olderThanInMilliseconds) {
         log.trace("Cleaning up old values for the last {} days", PERIOD_IN_DAYS);
-        final long oldestValidTimestamp = System.currentTimeMillis() - PERIOD_IN_MILLIS;
         synchronized (counters) {
-            counters.removeIf(timestamp -> timestamp < oldestValidTimestamp);
+            counters.removeIf(timestamp -> timestamp < olderThanInMilliseconds);
         }
     }
 
@@ -150,6 +161,24 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
             return SimpleEncryptor.decrypt(information);
         } catch (GeneralSecurityException e) {
             throw new IllegalStateException("Cannot decipher information", e);
+        }
+    }
+
+    List<Long> fetchLastArchivedProcessInstanceStartDates(Long oldestValidDate) throws Exception {
+        final List<Long> startDates = transactionService.executeInTransaction(
+                () -> processInstanceService.getLastArchivedProcessInstanceStartDates(oldestValidDate));
+        // print the start dates to the log:
+        log.debug("Last archived process instance start dates: {}", startDates);
+        return startDates;
+    }
+
+    public void verifyCountersCoherence(List<Long> counters, Long oldestValidDate) throws Exception {
+        final List<Long> lastArchivedProcessInstanceStartDates = fetchLastArchivedProcessInstanceStartDates(
+                oldestValidDate);
+        for (Long startDate : lastArchivedProcessInstanceStartDates) {
+            if (!counters.contains(startDate)) {
+                throw new IllegalStateException("Invalid database. Please reset it and restart.");
+            }
         }
     }
 
