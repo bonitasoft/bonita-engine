@@ -15,7 +15,8 @@ package org.bonitasoft.engine.connector.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -72,9 +73,12 @@ public class ConnectorExecutorImplTest {
                 // So that micrometer updates its counters every 1 ms:
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
                 Clock.SYSTEM);
-        connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, 1, 1, sessionAccessor, sessionService,
+        connectorExecutorImpl = new ConnectorExecutorImpl(sessionAccessor, sessionService,
                 timeTracker,
-                meterRegistry, TENANT_ID, new DefaultExecutorServiceMetricsProvider());
+                meterRegistry,
+                TENANT_ID,
+                new DefaultExecutorServiceMetricsProvider(),
+                new ConnectorSingleThreadExecutorFactory(1));
 
         connectorExecutorImpl.start();
     }

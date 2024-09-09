@@ -22,13 +22,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandi
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnSingleCandidate(BonitaThreadPoolExecutorFactory.class)
-public class SingleThreadPoolExecutorFactory implements BonitaThreadPoolExecutorFactory {
+@ConditionalOnSingleCandidate(BonitaWorkExecutorFactory.class)
+public class WorkSingleThreadPoolExecutorFactory implements BonitaWorkExecutorFactory {
 
     private final int queueCapacity;
     private final long tenantId;
 
-    public SingleThreadPoolExecutorFactory(@Value("${tenantId}") long tenantId,
+    public WorkSingleThreadPoolExecutorFactory(@Value("${tenantId}") long tenantId,
             @Value("${bonita.tenant.work.queueCapacity}") int queueCapacity) {
         this.queueCapacity = queueCapacity;
         this.tenantId = tenantId;

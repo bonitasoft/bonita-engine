@@ -1036,9 +1036,15 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state)
             throws Exception {
+        waitForProcessToBeInState(processInstanceId, state, DEFAULT_TIMEOUT);
+    }
+
+    public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state,
+            final int timeoutInMillis)
+            throws Exception {
         ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
                 ClientEventUtil.getProcessInstanceInState(processInstanceId, state.getId()),
-                DEFAULT_TIMEOUT);
+                timeoutInMillis);
     }
 
     public void waitForInitializingProcess() throws Exception {
@@ -1049,7 +1055,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName,
             final boolean useRootProcessInstance,
-            final int timeout) throws Exception {
+            final int timeoutInMillis) throws Exception {
         Map<String, Serializable> params;
         if (useRootProcessInstance) {
             params = ClientEventUtil.getFlowNodeInState(processInstanceId, state.getStateName(), flowNodeName);
@@ -1057,7 +1063,7 @@ public class APITestUtil extends PlatformTestUtil {
             params = ClientEventUtil.getFlowNodeInStateWithParentId(processInstanceId, state.getStateName(),
                     flowNodeName);
         }
-        return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
+        return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeoutInMillis);
     }
 
     public FlowNodeInstance waitForFlowNodeInReadyState(final ProcessInstance processInstance,

@@ -56,7 +56,7 @@ public class DefaultBonitaExecutorServiceTest {
 
     @Before
     public void before() {
-        var threadPoolExecutor = new SingleThreadPoolExecutorFactory.SingleThreadPoolExecutor(
+        var threadPoolExecutor = new WorkSingleThreadPoolExecutorFactory.SingleThreadPoolExecutor(
                 new LinkedBlockingQueue<>(10),
                 new WorkerThreadFactory("test-worker", 1, 1));
         bonitaExecutorService = new DefaultBonitaExecutorService(threadPoolExecutor, workFactory, engineClock,

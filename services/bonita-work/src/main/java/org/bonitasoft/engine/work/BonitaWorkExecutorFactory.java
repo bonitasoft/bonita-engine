@@ -15,7 +15,7 @@ package org.bonitasoft.engine.work;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-public interface BonitaThreadPoolExecutorFactory {
+public interface BonitaWorkExecutorFactory {
 
     ThreadPoolExecutor create();
 
