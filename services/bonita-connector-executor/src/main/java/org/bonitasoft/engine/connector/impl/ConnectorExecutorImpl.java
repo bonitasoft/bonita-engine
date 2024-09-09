@@ -18,14 +18,9 @@ import static org.bonitasoft.engine.connector.ConnectorExecutionResult.result;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -36,6 +31,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.connector.BonitaConnectorExecutorFactory;
 import org.bonitasoft.engine.connector.ConnectorExecutionResult;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
@@ -47,6 +43,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
 /**
  * Execute connectors directly
@@ -56,72 +55,44 @@ import org.bonitasoft.engine.tracking.TimeTrackerRecords;
  * @author Matthieu Chaffotte
  */
 @Slf4j
+@Component
+@ConditionalOnSingleCandidate(ConnectorExecutor.class)
 public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     public static final String NUMBER_OF_CONNECTORS_PENDING = "bonita.bpmengine.connector.pending";
     public static final String NUMBER_OF_CONNECTORS_RUNNING = "bonita.bpmengine.connector.running";
     public static final String NUMBER_OF_CONNECTORS_EXECUTED = "bonita.bpmengine.connector.executed";
+    public static final String CONNECTORS_UNIT = "connectors";
 
     private ExecutorService executorService;
-
+    private final BonitaConnectorExecutorFactory bonitaConnectorExecutorFactory;
     private final SessionAccessor sessionAccessor;
-
     private final SessionService sessionService;
 
-    private final int queueCapacity;
-
-    private final int corePoolSize;
-
-    private final int maximumPoolSize;
-
-    private final long keepAliveTimeSeconds;
-
     private final TimeTracker timeTracker;
-    private MeterRegistry meterRegistry;
-    private long tenantId;
-    private ExecutorServiceMetricsProvider executorServiceMetricsProvider;
+    private final MeterRegistry meterRegistry;
+    private final long tenantId;
+    private final ExecutorServiceMetricsProvider executorServiceMetricsProvider;
 
     private final AtomicLong runningWorks = new AtomicLong();
     private Counter executedWorkCounter;
     private Gauge numberOfConnectorsPending;
     private Gauge numberOfConnectorsRunning;
 
-    /**
-     * The handling of threads relies on the JVM
-     * The rules to create new thread are:
-     * - If the number of threads is less than the corePoolSize, create a new Thread to run a new task.
-     * - If the number of threads is equal (or greater than) the corePoolSize, put the task into the queue.
-     * - If the queue is full, and the number of threads is less than the maxPoolSize, create a new thread to run tasks
-     * in.
-     * - If the queue is full, and the number of threads is greater than or equal to maxPoolSize, reject the task.
-     *
-     * @param queueCapacity
-     *        The maximum number of execution of connector to queue for each thread
-     * @param corePoolSize
-     *        the number of threads to keep in the pool, even
-     *        if they are idle, unless {@code allowCoreThreadTimeOut} is set
-     * @param maximumPoolSize
-     *        the maximum number of threads to allow in the
-     *        pool
-     * @param keepAliveTimeSeconds
-     *        when the number of threads is greater than
-     *        the core, this is the maximum time that excess idle threads
-     *        will wait for new tasks before terminating. (in seconds)
-     */
-    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize,
-            final int maximumPoolSize, final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor,
-            final SessionService sessionService, final TimeTracker timeTracker, final MeterRegistry meterRegistry,
-            long tenantId, ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
-        this.queueCapacity = queueCapacity;
-        this.corePoolSize = corePoolSize;
-        this.maximumPoolSize = maximumPoolSize;
-        this.keepAliveTimeSeconds = keepAliveTimeSeconds;
+    public ConnectorExecutorImpl(final SessionAccessor sessionAccessor,
+            final SessionService sessionService,
+            final TimeTracker timeTracker,
+            final MeterRegistry meterRegistry,
+            @Value("${tenantId}") long tenantId,
+            ExecutorServiceMetricsProvider executorServiceMetricsProvider,
+            BonitaConnectorExecutorFactory bonitaConnectorExecutorFactory) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.timeTracker = timeTracker;
         this.meterRegistry = meterRegistry;
         this.tenantId = tenantId;
         this.executorServiceMetricsProvider = executorServiceMetricsProvider;
+        this.bonitaConnectorExecutorFactory = bonitaConnectorExecutorFactory;
     }
 
     @Override
@@ -187,7 +158,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         try {
             sConnector.disconnect();
         } catch (final Exception t) {
-            log.warn("An error occurred while disconnecting the connector: " + sConnector, t);
+            log.warn("An error occurred while disconnecting the connector: {}", sConnector, t);
         }
     }
 
@@ -283,46 +254,26 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
-    private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
-
-        public QueueRejectedExecutionHandler() {
-
-        }
-
-        @Override
-        public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
-            log.warn("The work was rejected. Requeue work : {}", task.toString());
-            try {
-                executor.getQueue().put(task);
-            } catch (final InterruptedException e) {
-                throw new RejectedExecutionException("Queuing " + task + " got interrupted.", e);
-            }
-        }
-
-    }
-
     @Override
     public void start() {
         if (executorService == null) {
-            final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(queueCapacity);
-            final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-            final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory(
-                    "ConnectorExecutor");
+            var threadPoolExecutor = bonitaConnectorExecutorFactory.create();
             executorService = executorServiceMetricsProvider
                     .bind(meterRegistry,
-                            new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
-                                    TimeUnit.SECONDS,
-                                    workQueue, threadFactory, handler),
-                            "bonita-connector-executor", tenantId);
+                            threadPoolExecutor,
+                            "bonita-connector-executor",
+                            tenantId);
             Tags tags = Tags.of("tenant", String.valueOf(tenantId));
-            numberOfConnectorsPending = Gauge.builder(NUMBER_OF_CONNECTORS_PENDING, workQueue, Collection::size)
-                    .tags(tags).baseUnit("connectors").description("Connectors pending in the execution queue")
+            numberOfConnectorsPending = Gauge
+                    .builder(NUMBER_OF_CONNECTORS_PENDING, threadPoolExecutor.getQueue(), Collection::size)
+                    .tags(tags).baseUnit(CONNECTORS_UNIT).description("Connectors pending in the execution queue")
                     .register(meterRegistry);
             numberOfConnectorsRunning = Gauge.builder(NUMBER_OF_CONNECTORS_RUNNING, runningWorks, AtomicLong::get)
-                    .tags(tags).baseUnit("connectors").description("Connectors currently executing")
+                    .tags(tags).baseUnit(CONNECTORS_UNIT).description("Connectors currently executing")
                     .register(meterRegistry);
             executedWorkCounter = Counter.builder(NUMBER_OF_CONNECTORS_EXECUTED)
-                    .tags(tags).baseUnit("connectors").description("Total connectors executed since last server start")
+                    .tags(tags).baseUnit(CONNECTORS_UNIT)
+                    .description("Total connectors executed since last server start")
                     .register(meterRegistry);
         }
     }

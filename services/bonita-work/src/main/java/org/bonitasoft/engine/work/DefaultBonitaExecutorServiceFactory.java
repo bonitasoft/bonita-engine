@@ -46,7 +46,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     private final long tenantId;
     private final MeterRegistry meterRegistry;
     private final ExecutorServiceMetricsProvider executorServiceMetricsProvider;
-    private final BonitaThreadPoolExecutorFactory bonitaThreadPoolExecutorFactory;
+    private final BonitaWorkExecutorFactory bonitaWorkExecutorFactory;
     private final EngineClock engineClock;
     private final WorkFactory workFactory;
     private final WorkExecutionAuditor workExecutionAuditor;
@@ -57,19 +57,19 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
             WorkFactory workFactory,
             WorkExecutionAuditor workExecutionAuditor,
             ExecutorServiceMetricsProvider executorServiceMetricsProvider,
-            BonitaThreadPoolExecutorFactory bonitaThreadPoolExecutorFactory) {
+            BonitaWorkExecutorFactory bonitaWorkExecutorFactory) {
         this.tenantId = tenantId;
         this.meterRegistry = meterRegistry;
         this.workFactory = workFactory;
         this.workExecutionAuditor = workExecutionAuditor;
         this.engineClock = engineClock;
         this.executorServiceMetricsProvider = executorServiceMetricsProvider;
-        this.bonitaThreadPoolExecutorFactory = bonitaThreadPoolExecutorFactory;
+        this.bonitaWorkExecutorFactory = bonitaWorkExecutorFactory;
     }
 
     @Override
     public BonitaExecutorService createExecutorService(WorkExecutionCallback workExecutionCallback) {
-        final ThreadPoolExecutor bonitaThreadPoolExecutor = bonitaThreadPoolExecutorFactory.create();
+        final ThreadPoolExecutor bonitaThreadPoolExecutor = bonitaWorkExecutorFactory.create();
         final BonitaExecutorService bonitaExecutorService = new DefaultBonitaExecutorService(bonitaThreadPoolExecutor,
                 workFactory,
                 engineClock,

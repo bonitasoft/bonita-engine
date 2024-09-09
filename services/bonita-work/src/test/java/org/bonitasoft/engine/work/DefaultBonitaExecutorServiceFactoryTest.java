@@ -43,7 +43,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
                 workFactory,
                 mock(WorkExecutionAuditor.class),
                 new DefaultExecutorServiceMetricsProvider(),
-                new SingleThreadPoolExecutorFactory(tenantId, 10));
+                new WorkSingleThreadPoolExecutorFactory(tenantId, 10));
 
         BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory
                 .createExecutorService(workExecutionCallback);
@@ -66,7 +66,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
                 workFactory,
                 mock(WorkExecutionAuditor.class),
                 new DefaultExecutorServiceMetricsProvider(),
-                new SingleThreadPoolExecutorFactory(tenantId, 10));
+                new WorkSingleThreadPoolExecutorFactory(tenantId, 10));
 
         // when:
         defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
@@ -91,7 +91,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
                 workFactory,
                 mock(WorkExecutionAuditor.class),
                 new DefaultExecutorServiceMetricsProvider(),
-                new SingleThreadPoolExecutorFactory(tenantId, 10));
+                new WorkSingleThreadPoolExecutorFactory(tenantId, 10));
 
         // when:
         defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);

@@ -45,6 +45,9 @@ public class SpringBeanAccessor {
     private static final String WORK_CORE_POOL_SIZE = "bonita.tenant.work.corePoolSize";
     private static final String WORK_MAX_POOL_SIZE = "bonita.tenant.work.maximumPoolSize";
     private static final String WORK_KEEP_ALIVE_IN_SECONDS = "bonita.tenant.work.keepAliveTimeSeconds";
+    private static final String CONNECTOR_CORE_POOL_SIZE = "bonita.tenant.connector.corePoolSize";
+    private static final String CONNECTOR_MAX_POOL_SIZE = "bonita.tenant.connector.maximumPoolSize";
+    private static final String CONNECTOR_KEEP_ALIVE_IN_SECONDS = "bonita.tenant.connector.keepAliveTimeSeconds";
 
     private BonitaSpringContext context;
 
@@ -117,6 +120,9 @@ public class SpringBeanAccessor {
         warnIfPropertyIsDeprecated(propertySources, WORK_CORE_POOL_SIZE);
         warnIfPropertyIsDeprecated(propertySources, WORK_MAX_POOL_SIZE);
         warnIfPropertyIsDeprecated(propertySources, WORK_KEEP_ALIVE_IN_SECONDS);
+        warnIfPropertyIsDeprecated(propertySources, CONNECTOR_CORE_POOL_SIZE);
+        warnIfPropertyIsDeprecated(propertySources, CONNECTOR_MAX_POOL_SIZE);
+        warnIfPropertyIsDeprecated(propertySources, CONNECTOR_KEEP_ALIVE_IN_SECONDS);
     }
 
     private void warnIfPropertyIsDeprecated(MutablePropertySources propertySources, String property) {
