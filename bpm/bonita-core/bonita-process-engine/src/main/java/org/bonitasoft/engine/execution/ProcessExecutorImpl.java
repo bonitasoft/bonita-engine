@@ -962,6 +962,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             setProcessClassloader(sProcessDefinition);
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId,
                     starterSubstituteId, callerId);
+            processStarterVerifier.verify(sProcessInstance);
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance,
                     expressionContextToEvaluateOperations,
                     operations, context, selector.getContainer(), connectors,
@@ -974,9 +975,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 // we stop execution here
                 return sProcessInstance;
             }
-            final SProcessInstance processInstance = startElements(sProcessInstance, selector);
-            processStarterVerifier.verify(processInstance);
-            return processInstance;
+            return startElements(sProcessInstance, selector);
         } catch (final SProcessInstanceCreationException e) {
             throw e;
         } catch (final SBonitaException e) {
