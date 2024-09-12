@@ -21,7 +21,12 @@ import java.time.Duration;
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.PrintTestsStatusRule;
-import org.bonitasoft.engine.api.*;
+import org.bonitasoft.engine.api.APIClient;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -137,7 +142,7 @@ public class PlatformIT extends CommonAPIIT {
             apiClient.getProcessAPI().startProcess(wait2Sec.getId());
         }
 
-        Thread.sleep(800);
+        await().until(() -> apiClient.getProcessAPI().getNumberOfProcessInstances(), nb -> nb > 0L);
         Assertions.assertThat(apiClient.getProcessAPI().getNumberOfProcessInstances()).isGreaterThan(0);
         restartPlatform();
         apiClient.login("install", "install");
