@@ -23,12 +23,13 @@ import java.util.Map;
 public class VariableStorage implements Serializable {
 
     private static final long serialVersionUID = -4195221111626812999L;
+
     private final Object lock = new Object();
     private final Map<String, Object> variables;
     public static final VariableStorage INSTANCE = new VariableStorage();
 
     private VariableStorage() {
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
     }
 
     public static VariableStorage getInstance() {

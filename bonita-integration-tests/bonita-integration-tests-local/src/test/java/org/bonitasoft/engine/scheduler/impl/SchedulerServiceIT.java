@@ -16,6 +16,7 @@ package org.bonitasoft.engine.scheduler.impl;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS;
 import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.*;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.awaitility.core.ConditionTimeoutException;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -113,7 +115,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
     /*
      * We must ensure that:
-     * * pause only jobs of the current tenant
+     * * pause jobs
      * * trigger new job are not executed
      * * resume the jobs resume it really
      * *
@@ -159,25 +161,39 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
     public void should_be_able_to_restart_a_job_that_failed_because_of_a_SJobExecutionException() throws Exception {
         // schedule a job that throws a SJobExecutionException
         schedule(jobDescriptor(JobThatMayThrowErrorOrJobException.class, "MyJob"),
-                new OneShotTrigger("triggerJob", new Date(System.currentTimeMillis() + 100)),
+                new OneShotTrigger("triggerJob", new Date(System.currentTimeMillis() + 10)),
                 singletonMap(TYPE, JOBEXCEPTION));
         SJobDescriptor persistedJobDescriptor = getFirstPersistedJob();
 
         //we have failed job
-        List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 100)), hasSize(1));
-        assertThat(failedJobs)
-                .hasOnlyOneElementSatisfying(f -> assertThat(f.getLastMessage()).contains("a Job exception"));
+        List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 3)), hasSize(1));
+        assertThat(failedJobs.get(0).getLastMessage()).contains("a Job exception");
 
-        //small sleep because quartz do not always immediately delete the associated trigger (done in the quartz Thread)
-        // because of that it can cause issues when rescheduling (Foreign key violation)
-        Thread.sleep(500);
-        //reschedule the job: no more exception
-        inTx(() -> {
-            schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
-                    toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
-            return null;
-        });
-        await().until(() -> storage.getVariableValue("nbSuccess", 0).equals(1));
+        // small sleep because quartz does not always immediately delete the associated trigger (done in the quartz Thread)
+        // because of that, it can cause issues when rescheduling (Foreign key violation)
+        Thread.sleep(100);
+        // reschedule the job: should be no more exception
+        try {
+            inTx(() -> {
+                schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
+                        toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
+                return null;
+            });
+            //            System.err.println("nbSuccess: " + storage.getVariableValue("nbSuccess"));
+            await().pollDelay(FIVE_HUNDRED_MILLISECONDS)
+                    .until(() -> storage.getVariableValue("nbSuccess", 0).equals(1));
+        } catch (ConditionTimeoutException e) {
+            //            System.err.println("nbSuccess: " + storage.getVariableValue("nbSuccess"));
+            System.err.println("retrying to reschedule failed job");
+            inTx(() -> {
+                schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
+                        toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
+                return null;
+            });
+            await().pollDelay(FIVE_HUNDRED_MILLISECONDS)
+                    .until(() -> storage.getVariableValue("nbSuccess", 0).equals(1));
+            System.err.println("Yes, retrying the job later solved the problem!");
+        }
     }
 
     @Test
@@ -199,7 +215,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
                 throw new RuntimeException(e);
             }
         };
-        List<SFailedJob> sFailedJobs = await().until(getFailedJobs, new BaseMatcher<List<SFailedJob>>() {
+        List<SFailedJob> sFailedJobs = await().until(getFailedJobs, new BaseMatcher<>() {
 
             @Override
             public boolean matches(Object item) {

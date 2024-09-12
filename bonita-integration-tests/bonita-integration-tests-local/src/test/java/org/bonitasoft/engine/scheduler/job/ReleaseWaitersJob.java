@@ -50,7 +50,7 @@ public class ReleaseWaitersJob extends GroupJob {
     }
 
     /*
-     * create a new semphore and wait for the release to be called
+     * create a new semaphore and wait for the release to be called
      */
     public static void waitForJobToExecuteOnce() throws Exception {
         semaphore = new JobSemaphore(1);
