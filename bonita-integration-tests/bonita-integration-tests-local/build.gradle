@@ -33,5 +33,7 @@ publishing {
     }
 }
 
-databaseIntegrationTest { include "**/BDRepositoryLocalIT.class" }
-databaseIntegrationTest { include "**/TemporaryContentAPILocalIT.class" }
+databaseIntegrationTest {
+    include "**/*IT.class"
+}
+

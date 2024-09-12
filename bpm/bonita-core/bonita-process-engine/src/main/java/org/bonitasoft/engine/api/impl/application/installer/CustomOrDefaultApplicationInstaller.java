@@ -54,7 +54,7 @@ public class CustomOrDefaultApplicationInstaller {
     @Getter
     protected String applicationInstallFolder;
 
-    protected final ApplicationInstaller applicationInstaller;
+    protected final ApplicationInstallerImpl applicationInstaller;
 
     private final DefaultLivingApplicationImporter defaultLivingApplicationImporter;
     private final MandatoryLivingApplicationImporter mandatoryLivingApplicationImporter;
