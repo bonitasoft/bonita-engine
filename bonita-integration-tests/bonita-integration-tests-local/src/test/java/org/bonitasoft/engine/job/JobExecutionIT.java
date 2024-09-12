@@ -13,14 +13,12 @@
  **/
 package org.bonitasoft.engine.job;
 
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,65 +86,51 @@ public class JobExecutionIT extends CommonAPILocalIT {
             assertThat(failedJob.getRetryNumber()).isEqualTo(0);
             assertThat(failedJob.getDescription()).isEqualTo("Throw an exception when 'throwException'=true");
 
-            final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(1);
-            final long jobDescriptorId = jobDescriptors.get(0).getId();
-            try {
-                searchJobLogs(jobDescriptorId, 1);
-            } catch (final AssertionError e) {
-                Thread.sleep(800);
-                searchJobLogs(jobDescriptorId, 1);
-            }
+            final List<SJobDescriptor> jobDescriptors = waitForJobDescriptorsToHaveSize(1);
+            waitForJobLogsToHaveSize(jobDescriptors.get(0).getId(), 1);
 
             //when
             getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(),
-                    Collections.singletonMap("throwException", Boolean.FALSE));
+                    singletonMap("throwException", Boolean.FALSE));
 
             //then
             assertJobWasExecutedWithSuccess();
 
-            try {
-                searchJobDescriptors(0);
-            } catch (final AssertionError e) {
-                Thread.sleep(800);
-                searchJobDescriptors(0);
-            }
-            searchJobLogs(jobDescriptorId, 0);
+            waitForJobDescriptorsToHaveSize(0);
+            waitForJobLogsToHaveSize(jobDescriptors.get(0).getId(), 0);
 
+            // clean up:
+            deleteJobLogsAndDescriptors(failedJob.getJobDescriptorId());
         } finally {
             getCommandAPI().unregister("except");
         }
     }
 
-    private void searchJobLogs(final long jobDescriptorId, final int nbOfExpectedJobLogs) throws Exception {
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
-        final JobService jobService = tenantAccessor.getJobService();
-
+    private void waitForJobLogsToHaveSize(final long jobDescriptorId, final int nbOfExpectedJobLogs) {
         final QueryOptions options = new QueryOptions(0, 1, null,
-                Collections.singletonList(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId)), null);
+                singletonList(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId)), null);
 
-        final Callable<List<SJobLog>> searchJobLogs = () -> jobService.searchJobLogs(options);
-        final List<SJobLog> jobLogs = transactionService.executeInTransaction(searchJobLogs);
-        assertEquals(nbOfExpectedJobLogs, jobLogs.size());
+        await().until(() -> {
+            setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+            final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
+            final JobService jobService = tenantAccessor.getJobService();
+            return transactionService.executeInTransaction(() -> jobService.searchJobLogs(options));
+        }, hasSize(nbOfExpectedJobLogs));
     }
 
-    private List<SJobDescriptor> searchJobDescriptors(final int nbOfExpectedJobDescriptors) throws Exception {
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final JobService jobService = tenantAccessor.getJobService();
-        final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
-
-        final List<FilterOption> filters = Collections
-                .singletonList(
-                        new FilterOption(SJobDescriptor.class, "jobClassName", ThrowsExceptionJob.class.getName()));
+    private List<SJobDescriptor> waitForJobDescriptorsToHaveSize(final int nbOfExpectedJobDescriptors) {
+        final List<FilterOption> filters = singletonList(
+                new FilterOption(SJobDescriptor.class, "jobClassName", ThrowsExceptionJob.class.getName()));
         final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
 
-        final Callable<List<SJobDescriptor>> searchJobLogs = () -> jobService.searchJobDescriptors(queryOptions);
-        final List<SJobDescriptor> jobDescriptors = transactionService.executeInTransaction(searchJobLogs);
-
-        assertEquals(nbOfExpectedJobDescriptors, jobDescriptors.size());
-        return jobDescriptors;
+        return await().until(() -> {
+            setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+            final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
+            final JobService jobService = tenantAccessor.getJobService();
+            return transactionService.executeInTransaction(() -> jobService.searchJobDescriptors(queryOptions));
+        }, hasSize(nbOfExpectedJobDescriptors));
     }
 
     @Test
@@ -168,9 +152,23 @@ public class JobExecutionIT extends CommonAPILocalIT {
             assertThat(failedJob.getLastMessage()).contains(
                     "org.bonitasoft.engine.scheduler.exception.SJobExecutionException: This job throws an arbitrary exception");
             assertThat(failedJob.getNumberOfFailures()).isEqualTo(1);
+
+            deleteJobLogsAndDescriptors(failedJob.getJobDescriptorId());
         } finally {
             getCommandAPI().unregister("except");
         }
+    }
+
+    private void deleteJobLogsAndDescriptors(final long jobDescriptorId) throws Exception {
+        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final UserTransactionService transactionService = serviceAccessor.getUserTransactionService();
+        final JobService jobService = serviceAccessor.getJobService();
+        transactionService.executeInTransaction((Callable) () -> {
+            jobService.deleteJobLogs(jobDescriptorId);
+            jobService.deleteJobDescriptor(jobDescriptorId);
+            return null;
+        });
     }
 
     private FailedJob waitForFailedJob() throws Exception {

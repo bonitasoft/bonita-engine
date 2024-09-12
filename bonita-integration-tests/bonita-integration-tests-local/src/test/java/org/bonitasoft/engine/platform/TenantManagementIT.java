@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -315,11 +316,8 @@ public class TenantManagementIT extends CommonBPMServicesTest {
         // delete tenant objects
         getTransactionService().begin();
         platformService.deleteTenantObjects(id);
-        getTransactionService().complete();
-
-        // delete tenant
-        getTransactionService().begin();
         platformService.deleteTenant(id);
+        BonitaHomeServer.getInstance().deleteTenant(id);
         getTransactionService().complete();
     }
 
