@@ -69,7 +69,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
         applicationInstaller = ServiceAccessorSingleton.getInstance()
-                .lookup(ApplicationInstaller.class);;
+                .lookup(ApplicationInstaller.class);
         applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
                         new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
@@ -90,10 +90,10 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
                 .isThrownBy(() -> getApplicationAPI().getIApplicationByToken("appsManagerBonita"));
 
         // given:
-        final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
-
-        // when:
-        applicationInstaller.install(applicationArchiveReader.read(applicationAsStream));
+        try (final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip")) {
+            // when:
+            applicationInstaller.install(applicationArchiveReader.read(applicationAsStream));
+        }
 
         // then:
 

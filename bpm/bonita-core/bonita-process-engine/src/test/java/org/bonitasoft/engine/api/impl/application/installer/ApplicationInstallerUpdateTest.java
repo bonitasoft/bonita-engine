@@ -81,7 +81,7 @@ public class ApplicationInstallerUpdateTest {
 
     @InjectMocks
     @Spy
-    private ApplicationInstaller applicationInstaller;
+    private ApplicationInstallerImpl applicationInstaller;
 
     @Before
     public void before() throws Exception {

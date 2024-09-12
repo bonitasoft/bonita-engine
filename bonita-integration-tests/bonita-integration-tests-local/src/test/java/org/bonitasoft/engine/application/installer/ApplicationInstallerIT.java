@@ -65,7 +65,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
                 .isThrownBy(() -> getApplicationAPI().getIApplicationByToken("appsManagerBonita"));
 
         // given:
-        ApplicationInstaller applicationInstallerImpl = ServiceAccessorSingleton.getInstance()
+        ApplicationInstaller applicationInstaller = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
@@ -76,7 +76,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         // when:
         try (var applicationAsStream = ApplicationInstallerIT.class.getResourceAsStream("/customer-application.zip")) {
             var applicationArchive = applicationArchiveReader.read(applicationAsStream);
-            applicationInstallerImpl.install(applicationArchive);
+            applicationInstaller.install(applicationArchive);
         }
 
         // then:
@@ -107,7 +107,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
     @Test
     public void custom_application_should_be_installed_with_configuration() throws Exception {
         // given:
-        ApplicationInstaller applicationInstallerImpl = ServiceAccessorSingleton.getInstance()
+        ApplicationInstaller applicationInstaller = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
@@ -121,7 +121,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
             var applicationArchive = applicationArchiveReader.read(applicationAsStream);
             applicationArchive.setConfigurationFile(new File(ApplicationInstallerIT.class
                     .getResource("/simple-app-1.0.0-SNAPSHOT-local.bconf").getFile()));
-            applicationInstallerImpl.install(applicationArchive);
+            applicationInstaller.install(applicationArchive);
         }
 
         final long processDefinitionId = getProcessAPI().getProcessDefinitionId("Pool", "1.0");

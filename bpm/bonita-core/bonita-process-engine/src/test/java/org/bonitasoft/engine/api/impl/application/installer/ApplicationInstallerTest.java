@@ -96,7 +96,7 @@ class ApplicationInstallerTest {
 
     @InjectMocks
     @Spy
-    private ApplicationInstaller applicationInstaller;
+    private ApplicationInstallerImpl applicationInstaller;
 
     @BeforeEach
     void before() throws Exception {
@@ -412,7 +412,8 @@ class ApplicationInstallerTest {
 
         // when:
         applicationInstaller.installConfiguration(
-                new File(ApplicationInstaller.class.getResource("/RequestLoan_conf_with_null_params.bconf").getFile()),
+                new File(ApplicationInstallerImpl.class.getResource("/RequestLoan_conf_with_null_params.bconf")
+                        .getFile()),
                 executionResult);
 
         // then:
