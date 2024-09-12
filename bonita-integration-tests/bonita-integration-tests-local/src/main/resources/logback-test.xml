@@ -19,6 +19,7 @@
 
     <!-- Show stack traces when there is error on jobs -->
     <!-- <logger name="org.bonitasoft.engine.scheduler.impl.JobWrapper" level="DEBUG" /> -->
+     <logger name="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor" level="DEBUG" />
 
     <!-- Show lock acquire/release -->
     <!--<logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="TRACE" />-->
