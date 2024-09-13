@@ -16,6 +16,8 @@ package org.bonitasoft.engine.job;
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.awaitility.Durations.ONE_MINUTE;
+import static org.awaitility.Durations.ONE_SECOND;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 import java.io.Serializable;
@@ -134,13 +136,17 @@ public class JobExecutionIT extends CommonAPILocalIT {
         final Map<String, Serializable> parameters = new HashMap<>();
         try {
             getCommandAPI().execute("except", parameters);
-            FailedJob failedJob = await().until(() -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
+            // Job can trigger in up to 'org.quartz.scheduler.idleWaitTime' milliseconds, so better wait long enough:
+            FailedJob failedJob = await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(
+                    () -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
 
             //when
             getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(), emptyMap());
 
             //then
-            failedJob = await().until(() -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
+            // Job can trigger in up to 'org.quartz.scheduler.idleWaitTime' milliseconds, so better wait long enough:
+            failedJob = await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND)
+                    .until(() -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
             assertThat(failedJob.getJobName()).isEqualTo(THROWS_EXCEPTION_JOB);
             assertThat(failedJob.getDescription()).isEqualTo("Throw an exception when 'throwException'=true");
             assertThat(failedJob.getLastMessage()).contains(
