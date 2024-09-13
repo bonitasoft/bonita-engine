@@ -16,11 +16,6 @@ package org.bonitasoft.web.rest.server.api;
 import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.utils.SessionUtil;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,8 +33,4 @@ public abstract class AbstractRESTController {
         return apiSession;
     }
 
-    protected PlatformInformationAPI getPlatformInformationAPI()
-            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return TenantAPIAccessor.getPlatformInformationAPI();
-    }
 }

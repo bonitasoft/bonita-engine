@@ -59,6 +59,7 @@ import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.ProcessStarterVerifier;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -311,4 +312,6 @@ public interface ServiceAccessor {
     PlatformRetriever getPlatformRetriever();
 
     InstallationService getInstallationService();
+
+    ProcessStarterVerifier getProcessStarterVerifier();
 }

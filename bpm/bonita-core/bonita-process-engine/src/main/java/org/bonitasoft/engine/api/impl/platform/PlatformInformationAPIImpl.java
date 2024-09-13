@@ -13,10 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl.platform;
 
+import static java.lang.String.valueOf;
+import static org.bonitasoft.engine.execution.ProcessStarterVerifierImpl.LIMIT;
+
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.AvailableInMaintenanceMode;
 import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
+import org.bonitasoft.engine.execution.ProcessStarterVerifier;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * Provides runtime information about the platform.
@@ -28,12 +33,21 @@ import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
 @AvailableInMaintenanceMode
 public class PlatformInformationAPIImpl implements PlatformInformationAPI {
 
+    private final ProcessStarterVerifier processStarterVerifier;
+
+    public PlatformInformationAPIImpl() {
+        this.processStarterVerifier = ServiceAccessorSingleton.getInstance().getProcessStarterVerifier();
+    }
+
+    protected PlatformInformationAPIImpl(ProcessStarterVerifier processStarterVerifier) {
+        this.processStarterVerifier = processStarterVerifier;
+    }
+
     @Override
     public Map<String, String> getPlatformInformation() {
         return Map.of(
-                "edition", "subscription",
-                "caseCounterLimit", "75",
-                "caseCounter", "68",
-                "subscriptionStartTimestamp", "1440806400000");
+                "edition", "community",
+                "caseCounter", valueOf(processStarterVerifier.getCurrentNumberOfStartedProcessInstances()),
+                "caseCounterLimit", valueOf(LIMIT));
     }
 }
