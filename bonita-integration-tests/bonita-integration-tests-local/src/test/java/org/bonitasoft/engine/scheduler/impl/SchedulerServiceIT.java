@@ -16,7 +16,7 @@ package org.bonitasoft.engine.scheduler.impl;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS;
+import static org.awaitility.Durations.*;
 import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.*;
@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import org.awaitility.core.ConditionTimeoutException;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -118,7 +117,6 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
      * * pause jobs
      * * trigger new job are not executed
      * * resume the jobs resume it really
-     * *
      */
     @Test
     public void pause_and_resume_jobs_of_a_tenant() throws Exception {
@@ -153,7 +151,8 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
                 singletonMap(TYPE, ERROR));
 
         //we have failed job
-        List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 100)), hasSize(1));
+        List<SFailedJob> failedJobs = await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND)
+                .until(() -> inTx(() -> jobService.getFailedJobs(0, 100)), hasSize(1));
         assertThat(failedJobs).hasOnlyOneElementSatisfying(f -> assertThat(f.getLastMessage()).contains("an Error"));
     }
 
@@ -165,35 +164,25 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
                 singletonMap(TYPE, JOBEXCEPTION));
         SJobDescriptor persistedJobDescriptor = getFirstPersistedJob();
 
-        //we have failed job
-        List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 3)), hasSize(1));
+        // we should have a failed job:
+        // Job can trigger in up to 'org.quartz.scheduler.idleWaitTime' milliseconds, so better wait long enough:
+        List<SFailedJob> failedJobs = await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(() -> {
+            System.out.println("condition not here yet. Waiting again...");
+            return inTx(() -> jobService.getFailedJobs(0, 3));
+        }, hasSize(1));
         assertThat(failedJobs.get(0).getLastMessage()).contains("a Job exception");
 
         // small sleep because quartz does not always immediately delete the associated trigger (done in the quartz Thread)
         // because of that, it can cause issues when rescheduling (Foreign key violation)
         Thread.sleep(100);
         // reschedule the job: should be no more exception
-        try {
-            inTx(() -> {
-                schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
-                        toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
-                return null;
-            });
-            //            System.err.println("nbSuccess: " + storage.getVariableValue("nbSuccess"));
-            await().pollDelay(FIVE_HUNDRED_MILLISECONDS)
-                    .until(() -> storage.getVariableValue("nbSuccess", 0).equals(1));
-        } catch (ConditionTimeoutException e) {
-            //            System.err.println("nbSuccess: " + storage.getVariableValue("nbSuccess"));
-            System.err.println("retrying to reschedule failed job");
-            inTx(() -> {
-                schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
-                        toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
-                return null;
-            });
-            await().pollDelay(FIVE_HUNDRED_MILLISECONDS)
-                    .until(() -> storage.getVariableValue("nbSuccess", 0).equals(1));
-            System.err.println("Yes, retrying the job later solved the problem!");
-        }
+        inTx(() -> {
+            schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
+                    toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
+            return null;
+        });
+        await().pollDelay(FIVE_HUNDRED_MILLISECONDS).atMost(ONE_MINUTE).pollInterval(ONE_SECOND)
+                .until(() -> storage.getVariableValue("nbSuccess", 0).equals(1));
     }
 
     @Test
@@ -206,7 +195,8 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         SJobDescriptor persistedJobDescriptor = getFirstPersistedJob();
 
         //ensure there is more than one failure: i.e. cron is still triggering new jobs
-        await().until(() -> storage.getVariableValue("nbJobException", 0), isGreaterThan(1));
+        await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(() -> storage.getVariableValue("nbJobException", 0),
+                isGreaterThan(1));
         //wait a little because the failure is registered later...
         Callable<List<SFailedJob>> getFailedJobs = () -> {
             try {
@@ -241,7 +231,8 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         });
 
         //ensure there is more than one success: i.e. cron is still triggering new jobs
-        await().until(() -> storage.getVariableValue("nbSuccess", 0), isGreaterThan(1));
+        await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(() -> storage.getVariableValue("nbSuccess", 0),
+                isGreaterThan(1));
         //ensure no more failed job is present
         assertThat(inTx(() -> jobService.getFailedJobs(0, 100))).isEmpty();
     }
@@ -255,8 +246,10 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         SJobDescriptor persistedJobDescriptor = getFirstPersistedJob();
 
         //this job fail only the first time
-        await().until(() -> storage.getVariableValue("nbJobException", 0), isGreaterThan(0));
-        await().until(() -> storage.getVariableValue("nbSuccess", 0), isGreaterThan(0));
+        await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(() -> storage.getVariableValue("nbJobException", 0),
+                isGreaterThan(0));
+        await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(() -> storage.getVariableValue("nbSuccess", 0),
+                isGreaterThan(0));
 
         List<SFailedJob> sFailedJobs = inTx(() -> jobService.getFailedJobs(0, 100));
 
@@ -272,7 +265,8 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         });
 
         //ensure there is more than one success: i.e. cron is still triggering new jobs
-        await().until(() -> storage.getVariableValue("nbSuccess", 0), isGreaterThan(1));
+        await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(() -> storage.getVariableValue("nbSuccess", 0),
+                isGreaterThan(1));
         //ensure no more failed job is present
         assertThat(inTx(() -> jobService.getFailedJobs(0, 100))).isEmpty();
     }
@@ -286,8 +280,10 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         SJobDescriptor persistedJobDescriptor = getFirstPersistedJob();
 
         //this job fail once and is immediately retried, even if its a one shot job
-        await().until(() -> storage.getVariableValue("nbJobException", 0), isGreaterThan(0));
-        await().until(() -> storage.getVariableValue("nbSuccess", 0), isGreaterThan(0));
+        await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(() -> storage.getVariableValue("nbJobException", 0),
+                isGreaterThan(0));
+        await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(() -> storage.getVariableValue("nbSuccess", 0),
+                isGreaterThan(0));
 
         List<SFailedJob> sFailedJobs = inTx(() -> jobService.getFailedJobs(0, 100));
 
