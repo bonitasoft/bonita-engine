@@ -52,12 +52,6 @@ public class JobThatMayThrowErrorOrJobException extends GroupJob {
 
     @Override
     public void execute() throws SJobExecutionException {
-        System.err.println(
-                "Executing job:"
-                        + failOnce + ", "
-                        + failOnceWithRetryable + ", "
-                        + throwsError + ", "
-                        + throwsJobExecutionException);
         if (failOnce) {
             if (variableStorage.getVariableValue("nbJobException", 0) == 0) {
                 variableStorage.setVariable("nbJobException", 1);
