@@ -134,8 +134,8 @@ public final class TenantAPIAccessor {
         return getAPI(MaintenanceAPI.class, session);
     }
 
-    public static PlatformInformationAPI getPlatformInformationAPI()
+    public static PlatformInformationAPI getPlatformInformationAPI(final APISession session)
             throws ServerAPIException, BonitaHomeNotSetException, UnknownAPITypeException {
-        return getAPI(PlatformInformationAPI.class);
+        return getAPI(PlatformInformationAPI.class, session);
     }
 }

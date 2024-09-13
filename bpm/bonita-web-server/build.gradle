@@ -51,10 +51,14 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation libs.junit5api
+    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
+    testRuntimeOnly libs.junitJupiterEngine
+    testRuntimeOnly libs.junitVintageEngine
 }
 
 configurations {
-    all {
+    configureEach {
         // Specify woodstox version to override the version pulled by jackson-dataformat-xml (transitive dep of restlet)
         resolutionStrategy.force "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
         // Specify Guava version to override the version pulled by owasp-java-html-sanitizer
@@ -88,14 +92,15 @@ tasks.named("build") {
     dependsOn tasks.named("buildZip")
 }
 
-tasks.named("test") {
-    dependsOn tasks.named("testsJar")
-}
-
 tasks.register('testsJar', Jar) {
     dependsOn testClasses
     archiveClassifier = 'tests'
     from(sourceSets.test.output)
+}
+
+test {
+    useJUnitPlatform { includeEngines 'junit-jupiter', 'junit-vintage' }
+    dependsOn tasks.named("testsJar")
 }
 
 artifacts {

@@ -59,7 +59,7 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
     private final List<Long> counters = Collections.synchronizedList(new ArrayList<>());
 
     @Autowired
-    ProcessStarterVerifierImpl(PlatformRetriever platformRetriever,
+    public ProcessStarterVerifierImpl(PlatformRetriever platformRetriever,
             PlatformInformationService platformInformationService,
             TransactionService transactionService,
             ProcessInstanceService processInstanceService) throws Exception {
@@ -137,6 +137,11 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
         } catch (SPlatformNotFoundException | IOException e) {
             throw new IllegalStateException("Cannot read from database table 'platform'", e);
         }
+    }
+
+    @Override
+    public long getCurrentNumberOfStartedProcessInstances() {
+        return counters.size();
     }
 
     String encryptDataBeforeSendingToDatabase(List<Long> counters) throws IOException {

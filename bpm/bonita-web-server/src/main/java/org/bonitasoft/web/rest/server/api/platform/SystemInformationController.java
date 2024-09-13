@@ -15,8 +15,16 @@ package org.bonitasoft.web.rest.server.api.platform;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.springframework.http.MediaType;
@@ -27,14 +35,20 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/API/system/information")
-public class PlatformInformationController extends AbstractRESTController {
+public class SystemInformationController extends AbstractRESTController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, String> getPlatformInfo() {
+    public Map<String, String> getPlatformInfo(HttpSession session) {
         try {
-            return getPlatformInformationAPI().getPlatformInformation();
+            return getPlatformInformationAPI(getApiSession(session)).getPlatformInformation();
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
+
+    protected PlatformInformationAPI getPlatformInformationAPI(APISession apiSession)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getPlatformInformationAPI(apiSession);
+    }
+
 }

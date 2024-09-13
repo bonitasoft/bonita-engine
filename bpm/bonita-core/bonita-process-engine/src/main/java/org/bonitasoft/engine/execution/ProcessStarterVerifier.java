@@ -28,4 +28,13 @@ public interface ProcessStarterVerifier {
      * @throws SProcessInstanceCreationException if the process is not in a valid state to start
      */
     void verify(SProcessInstance processInstance) throws SProcessInstanceCreationException;
+
+    /**
+     * Get the current number of started process instances.
+     *
+     * @return -1 if non relevant in this context
+     */
+    default long getCurrentNumberOfStartedProcessInstances() {
+        return -1;
+    }
 }

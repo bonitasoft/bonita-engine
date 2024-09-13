@@ -15,11 +15,10 @@ package org.bonitasoft.engine.api.platform;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.api.NoSessionRequired;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
 
-@NoSessionRequired
 public interface PlatformInformationAPI {
 
-    Map<String, String> getPlatformInformation();
+    Map<String, String> getPlatformInformation() throws PlatformNotFoundException;
 
 }
