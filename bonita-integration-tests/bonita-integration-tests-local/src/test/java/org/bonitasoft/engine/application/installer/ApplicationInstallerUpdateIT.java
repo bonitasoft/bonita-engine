@@ -26,14 +26,23 @@ import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchiveReader;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationInstaller;
-import org.bonitasoft.engine.api.impl.application.installer.detector.*;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.BdmDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.CustomPageDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.IconDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.LayoutDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.LivingApplicationDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.OrganizationDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.PageAndFormDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ProcessDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ThemeDetector;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationPage;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.User;
@@ -60,7 +69,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
         applicationInstaller = ServiceAccessorSingleton.getInstance()
-                .lookup(ApplicationInstaller.class);;
+                .lookup(ApplicationInstaller.class);
         applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
                         new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
@@ -78,13 +87,13 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
     private void initFirstInstall() throws Exception {
         // ensure application did not exist initially:
         assertThatExceptionOfType(ApplicationNotFoundException.class)
-                .isThrownBy(() -> getApplicationAPI().getApplicationByToken("appsManagerBonita"));
+                .isThrownBy(() -> getApplicationAPI().getIApplicationByToken("appsManagerBonita"));
 
         // given:
-        final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
-
-        // when:
-        applicationInstaller.install(applicationArchiveReader.read(applicationAsStream));
+        try (final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip")) {
+            // when:
+            applicationInstaller.install(applicationArchiveReader.read(applicationAsStream));
+        }
 
         // then:
 
@@ -94,7 +103,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         assertThat(getIdentityAPI().getRoleByName("appsManager")).isNotNull();
         assertThat(getIdentityAPI().getGroupByPath("/appsManagement")).isNotNull();
 
-        assertThat(getApplicationAPI().getApplicationByToken("appsManagerBonita").getDisplayName())
+        assertThat(getApplicationAPI().getIApplicationByToken("appsManagerBonita").getDisplayName())
                 .isEqualTo("Application manager");
         final long processDefinitionId = getProcessAPI().getProcessDefinitionId("CallHealthCheck", "1.0");
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
@@ -130,7 +139,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         // given:
         //installed resources
         TenantResource bdm = getTenantAdministrationAPI().getBusinessDataModelResource();
-        Application application = getApplicationAPI().getApplicationByToken("appsManagerBonita");
+        IApplication application = getApplicationAPI().getIApplicationByToken("appsManagerBonita");
         Page processStarterAPI = getPageAPI().getPageByName("custompage_processStarter");
         Page healthPage = getPageAPI().getPageByName("custompage_HealthPage");
         Page pmLayout = getPageAPI().getPageByName("custompage_pmLayout");
@@ -145,7 +154,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         }
         // then:
         TenantResource updatedBdm = getTenantAdministrationAPI().getBusinessDataModelResource();
-        Application updatedApplication = getApplicationAPI().getApplicationByToken("appsManagerBonita");
+        IApplication updatedApplication = getApplicationAPI().getIApplicationByToken("appsManagerBonita");
         Page updatedProcessStarterAPI = getPageAPI().getPageByName("custompage_processStarter");
         Page updatedHealthPage = getPageAPI().getPageByName("custompage_HealthPage");
         Page updatedPmLayout = getPageAPI().getPageByName("custompage_pmLayout");
@@ -173,7 +182,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         // given:
         //installed resources
         TenantResource bdm = getTenantAdministrationAPI().getBusinessDataModelResource();
-        Application application = getApplicationAPI().getApplicationByToken("appsManagerBonita");
+        IApplication application = getApplicationAPI().getIApplicationByToken("appsManagerBonita");
         Page processStarterAPI = getPageAPI().getPageByName("custompage_processStarter");
         Page healthPage = getPageAPI().getPageByName("custompage_HealthPage");
         Page pmLayout = getPageAPI().getPageByName("custompage_pmLayout");
@@ -186,7 +195,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
 
         // then:
         TenantResource updatedBdm = getTenantAdministrationAPI().getBusinessDataModelResource();
-        Application updatedApplication = getApplicationAPI().getApplicationByToken("appsManagerBonita");
+        IApplication updatedApplication = getApplicationAPI().getIApplicationByToken("appsManagerBonita");
         Page updatedProcessStarterAPI = getPageAPI().getPageByName("custompage_processStarter");
         Page updatedHealthPage = getPageAPI().getPageByName("custompage_HealthPage");
         Page updatedPmLayout = getPageAPI().getPageByName("custompage_pmLayout");

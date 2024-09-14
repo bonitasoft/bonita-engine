@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api.deployer;
 
-import org.bonitasoft.web.rest.model.application.ApplicationItem;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.server.framework.Deployer;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
 import org.bonitasoft.web.toolkit.client.data.item.IItem;
@@ -23,11 +23,11 @@ import org.bonitasoft.web.toolkit.client.data.item.IItem;
  */
 public class ApplicationDeployer implements Deployer {
 
-    private final DatastoreHasGet<ApplicationItem> getter;
+    private final DatastoreHasGet<AbstractApplicationItem> getter;
 
     private final String attribute;
 
-    public ApplicationDeployer(final DatastoreHasGet<ApplicationItem> getter, final String attribute) {
+    public ApplicationDeployer(final DatastoreHasGet<AbstractApplicationItem> getter, final String attribute) {
         this.getter = getter;
         this.attribute = attribute;
     }

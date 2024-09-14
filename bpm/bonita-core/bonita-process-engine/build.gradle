@@ -64,10 +64,10 @@ dependencies {
     api libs.springSessionCore
     api libs.springWeb
     api libs.bundles.groovy
-    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    api libs.micrometerCore
 
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
-    api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
+    api(libs.javaxAnnotations)
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok
@@ -87,7 +87,7 @@ dependencies {
     compileOnly project(':bpm:bonita-common')
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
 }
 
 test {

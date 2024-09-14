@@ -8,6 +8,8 @@ group = 'org.bonitasoft.platform'
 description = ''
 
 dependencies {
+    implementation platform(libs.jacksonBom)
+
     annotationProcessor libs.lombok
     compileOnly libs.lombok
     api libs.springTx
@@ -15,11 +17,13 @@ dependencies {
     api libs.springContext
     api libs.slf4jApi
     api libs.commonsIO
+    api libs.springBootAutoconfigure
+    implementation "com.fasterxml.jackson.core:jackson-databind"
 
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
 }
 
 

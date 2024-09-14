@@ -1,34 +1,52 @@
 [versions]
 # The groovy version must be in synch with the bonita-project-parent POM (bonita-project repository):
-groovyVersion = "3.0.19"
+groovyVersion = "3.0.21"
 springVersion = "5.3.39"
 springSessionVersion = "2.7.4"
 springBootVersion = "2.7.18"
-commonsLangVersion = "3.11"
+commonsLangVersion = "3.14.0"
 junit5Version = "5.10.2"
-bonitaArtifactsModelVersion = "1.0.0"
-commonsIOVersion = "2.8.0"
+bonitaArtifactsModelVersion = "1.1.1"
+commonsIOVersion = "2.16.1"
 commonsFileUploadVersion = "1.5"
 commonsBeanutilsVersion = "1.9.4"
 commonsCollectionsVersion = "4.4"
 tomcatDbcpVersion = "9.0.93"
-commonsCLIVersion = "1.4"
+commonsCLIVersion = "1.8.0"
 semver4jVersion = '3.1.0'
 slf4jVersion = "1.7.36"
 # Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
-hibernateVersion = "5.4.32.Final"
-# version used by hibernate 5.4.32.Final (MUST BE REMOVED WHEN HIBERNATE IS UPGRADED to 5.6+):
+hibernateVersion = "5.4.33"
+# version used by hibernate 5.4.33 (MUST BE REMOVED WHEN HIBERNATE IS UPGRADED to 5.6+):
 javassistVersion = "3.27.0-GA"
-jacksonBomVersion = "2.15.3"
+# javax.persistence-api is used by hibernate:
+javaxPersistenceApiVersion = "2.2"
+jacksonBomVersion = "2.17.1"
 jakartaTransactionVersion = "1.3.3"
 jakartaServletVersion = "4.0.4"
 # Keep this until all client projects have migrated to jakarta or it will break their builds !
 javaxServletVersion = "4.0.1"
-httpComponentsVersion = "4.5.13"
+httpComponentsVersion = "4.5.14"
 xstreamVersion = "1.4.20"
 ehCacheVersion = "2.10.10.12.7"
-eclipseCompilerVersion = "3.20.0"
+eclipseCompilerVersion = "3.38.0"
 jakartaActivationVersion = "1.2.2"
+quartzVersion = "2.3.2"
+micrometerVersion = "1.13.1"
+# DB drivers:
+mysqlVersion = "8.2.0"
+msSqlServerVersion = "8.4.1.jre8"
+oracleVersion = "19.3.0.0"
+postgresqlVersion = "42.4.4"
+
+narayanaVersion = "5.10.6.Final"
+logbackVersion = "1.2.13"
+jaxbVersion = "2.3.1"
+javaxAnnotationsVersion = "1.3.2"
+hazelcastVersion = "5.4.0" # Also update http://www.hazelcast.com/schema/config/hazelcast-config-<VERSION>.xsd if needed
+jcacheVersion = "1.0.0"
+guavaVersion = "32.1.2-jre"
+antlr4RuntimeVersion = "4.7.2"
 
 [libraries]
 springCore = { module = "org.springframework:spring-core", version.ref = "springVersion" }
@@ -78,8 +96,9 @@ bonitaOrganizationModel = { module = "org.bonitasoft.engine:bonita-organization-
 bonitaApplicationModel = { module = "org.bonitasoft.engine:bonita-application-model", version.ref = "bonitaArtifactsModelVersion" }
 bonitaConnectorModel = { module = "org.bonitasoft.engine:bonita-connector-model", version.ref = "bonitaArtifactsModelVersion" }
 
+guava = { group = "com.google.guava", name = "guava", version.ref = "guavaVersion" }
+antlr4Runtime = { group = "org.antlr", name = "antlr4-runtime", version.ref = "antlr4RuntimeVersion" }
 commonsLang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLangVersion" }
-snakeyaml = "org.yaml:snakeyaml:1.32"
 commonsIO = { group = "commons-io", name = "commons-io", version.ref = "commonsIOVersion" }
 commonsFileUpload = { group = "commons-fileupload", name = "commons-fileupload", version.ref = "commonsFileUploadVersion" }
 commonsBeanUtils = { group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutilsVersion" }
@@ -90,7 +109,9 @@ semver4j = { group = "com.vdurmont", name = "semver4j", version.ref = "semver4jV
 slf4jApi = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jVersion" }
 
 hibernateCore = { group = "org.hibernate", name = "hibernate-core", version.ref = "hibernateVersion" }
+javaxPersistenceApi = { group = "javax.persistence", name = "javax.persistence-api", version.ref = "javaxPersistenceApiVersion" }
 hibernateJCache = { group = "org.hibernate", name = "hibernate-jcache", version.ref = "hibernateVersion" }
+jcache = { group = "javax.cache", name = "cache-api", version.ref = "jcacheVersion" }
 javassist = { group = "org.javassist", name = "javassist", version.ref = "javassistVersion" }
 
 jacksonBom = { group = "com.fasterxml.jackson", name = "jackson-bom", version.ref = "jacksonBomVersion" }
@@ -106,12 +127,28 @@ xstream = { group = "com.thoughtworks.xstream", name = "xstream", version.ref = 
 ehCache = { group = "net.sf.ehcache", name = "ehcache", version.ref = "ehCacheVersion" }
 eclipseCompiler = { group = "org.eclipse.jdt", name = "ecj", version.ref = "eclipseCompilerVersion" }
 jakartaActivation = { group = "com.sun.activation", name = "jakarta.activation", version.ref = "jakartaActivationVersion" }
+javaxAnnotations = { group = "javax.annotation", name = "javax.annotation-api", version.ref = "javaxAnnotationsVersion" }
 
+hazelcast = { group = "com.hazelcast", name = "hazelcast", version.ref = "hazelcastVersion" }
+hazelcastSpring = { group = "com.hazelcast", name = "hazelcast-spring", version.ref = "hazelcastVersion" }
 
+quartz = { group = "org.quartz-scheduler", name = "quartz", version.ref = "quartzVersion" }
+micrometerCore = { group = "io.micrometer", name = "micrometer-core", version.ref = "micrometerVersion" }
+micrometerRegistryJmx = { group = "io.micrometer", name = "micrometer-registry-jmx", version.ref = "micrometerVersion" }
+micrometerRegistryPrometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "micrometerVersion" }
 
-h2 = "com.h2database:h2:1.4.199"
+narayanaJta = { group = "org.jboss.narayana.jta", name = "narayana-jta", version.ref = "narayanaVersion" }
+jaxbCodeModel = { group = "org.glassfish.jaxb", name = "codemodel", version.ref = "jaxbVersion" }
 
-lombok = "org.projectlombok:lombok:1.18.30"
+h2 = "com.h2database:h2:1.4.200"
+mysql = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysqlVersion" }
+msSqlServer = { group = "com.microsoft.sqlserver", name = "mssql-jdbc", version.ref = "msSqlServerVersion" }
+oracle = { group = "com.oracle.database.jdbc", name = "ojdbc8", version.ref = "oracleVersion" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
+
+lombok = "org.projectlombok:lombok:1.18.32"
+
+logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 
 junit5api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5Version" }
 junitJupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5Version" }

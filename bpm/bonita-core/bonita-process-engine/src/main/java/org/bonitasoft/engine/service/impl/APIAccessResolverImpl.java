@@ -18,6 +18,8 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.*;
 import org.bonitasoft.engine.api.impl.*;
+import org.bonitasoft.engine.api.impl.platform.PlatformInformationAPIImpl;
+import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
 
@@ -45,6 +47,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(BusinessDataAPI.class.getName(), new BusinessDataAPIImpl());
         apis.put(TemporaryContentAPI.class.getName(), new TemporaryContentAPIImpl());
         apis.put(MaintenanceAPI.class.getName(), new MaintenanceAPIImpl());
+        apis.put(PlatformInformationAPI.class.getName(), new PlatformInformationAPIImpl());
     }
 
     @Override

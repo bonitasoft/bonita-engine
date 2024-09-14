@@ -7,16 +7,16 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-transaction')
     api project(':services:bonita-incident')
-    api("org.quartz-scheduler:quartz:${Deps.quartzVersion}") {
+    api(libs.quartz) {
         exclude(group: "com.mchange") // c3p0 + transitive dep mchange-commons-java, because we do not use
         // default Quartz connection provider, as we have our own
         exclude(module: "HikariCP-java7") // Same reason
     }
-    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    api libs.micrometerCore
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

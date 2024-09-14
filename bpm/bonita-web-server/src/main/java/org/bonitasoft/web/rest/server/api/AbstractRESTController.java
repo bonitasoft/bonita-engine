@@ -28,9 +28,9 @@ public abstract class AbstractRESTController {
     public APISession getApiSession(HttpSession session) {
         APISession apiSession = (APISession) session.getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
         if (apiSession == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "Not authenticated");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
         }
         return apiSession;
     }
+
 }

@@ -72,6 +72,16 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getLivingApplicationAPIDelegate().createApplication(applicationCreator);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated(since = "10.2.0")
+    public ApplicationLink createApplicationLink(final ApplicationLinkCreator applicationLinkCreator)
+            throws CreationException {
+        return getLivingApplicationAPIDelegate().createApplicationLink(applicationLinkCreator);
+    }
+
     private LivingApplicationAPIDelegate getLivingApplicationAPIDelegate() {
         return new LivingApplicationAPIDelegate(getServiceAccessor(),
                 getApplicationModelConverter(getServiceAccessor().getPageService()),
@@ -117,13 +127,13 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
-        return getLivingApplicationAPIDelegate().getApplication(applicationId);
+    public IApplication getIApplication(final long applicationId) throws ApplicationNotFoundException {
+        return getLivingApplicationAPIDelegate().getIApplication(applicationId);
     }
 
     @Override
-    public Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
-        return getLivingApplicationAPIDelegate().getApplicationByToken(applicationToken);
+    public IApplication getIApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
+        return getLivingApplicationAPIDelegate().getIApplicationByToken(applicationToken);
     }
 
     @Override
@@ -142,6 +152,17 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getLivingApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated(since = "10.2.0")
+    public ApplicationLink updateApplicationLink(final long applicationId, final ApplicationLinkUpdater updater)
+            throws ApplicationNotFoundException, UpdateException,
+            AlreadyExistsException {
+        return getLivingApplicationAPIDelegate().updateApplicationLink(applicationId, updater);
+    }
+
     protected ServiceAccessor getServiceAccessor() {
         try {
             return ServiceAccessorFactory.getInstance().createServiceAccessor();
@@ -150,6 +171,10 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         }
     }
 
+    /**
+     * @deprecated as of 10.2.0, use {@link #searchIApplications(SearchOptions)} instead to include application links.
+     */
+    @Deprecated(since = "10.2.0")
     @Override
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
         final ServiceAccessor serviceAccessor = getServiceAccessor();
@@ -165,20 +190,62 @@ public class ApplicationAPIImpl implements ApplicationAPI {
                             .collect(Collectors.toList()));
             final String userId = String.valueOf(filterOnUserId.get().getValue());
             if (String.valueOf(SessionService.SYSTEM_ID).equals(userId)) { // It's the tenant admin user
-                return getLivingApplicationAPIDelegate().searchApplications(new SearchApplications(
+                return getLivingApplicationAPIDelegate().searchIApplications(new SearchApplications(
+                        Application.class,
                         applicationService, appSearchDescriptor,
                         searchOptionsWithoutUserId
                                 .filter(APPLICATION_VISIBILITY, INTERNAL_PROFILE_SUPER_ADMIN.getProfileName()).done(),
                         converter));
             } else {
-                return getLivingApplicationAPIDelegate().searchApplications(new SearchApplicationsOfUser(
+                return getLivingApplicationAPIDelegate().searchIApplications(new SearchApplicationsOfUser(
+                        Application.class,
                         Long.parseLong(userId), applicationService, appSearchDescriptor,
                         searchOptionsWithoutUserId.done(), converter));
             }
         }
         return getLivingApplicationAPIDelegate()
-                .searchApplications(new SearchApplications(applicationService, appSearchDescriptor,
+                .searchIApplications(new SearchApplications(Application.class, applicationService, appSearchDescriptor,
                         searchOptions, converter));
+    }
+
+    @Override
+    public SearchResult<IApplication> searchIApplications(final SearchOptions searchOptions) throws SearchException {
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final SearchApplicationDescriptor appSearchDescriptor = serviceAccessor.getSearchEntitiesDescriptor()
+                .getSearchApplicationDescriptor();
+        return internalSearchIApplications(serviceAccessor, appSearchDescriptor, searchOptions);
+    }
+
+    protected SearchResult<IApplication> internalSearchIApplications(ServiceAccessor serviceAccessor,
+            SearchApplicationDescriptor appSearchDescriptor, SearchOptions searchOptions) throws SearchException {
+        final ApplicationModelConverter converter = getApplicationModelConverter(serviceAccessor.getPageService());
+        final ApplicationService applicationService = serviceAccessor.getApplicationService();
+        final Optional<SearchFilter> filterOnUserId = searchOptions.getFilters().stream()
+                .filter(s -> s.getField().equals(USER_ID)).findFirst();
+        if (filterOnUserId.isPresent()) {
+            final SearchOptionsBuilder searchOptionsWithoutUserId = new SearchOptionsBuilder(searchOptions)
+                    .setFilters(searchOptions.getFilters().stream().filter(s -> !s.getField().equals(USER_ID))
+                            .collect(Collectors.toList()));
+            final String userId = String.valueOf(filterOnUserId.get().getValue());
+            if (String.valueOf(SessionService.SYSTEM_ID).equals(userId)) { // It's the tenant admin user
+                return getLivingApplicationAPIDelegate()
+                        .searchIApplications(SearchApplications.defaultSearchApplications(
+                                applicationService, appSearchDescriptor,
+                                searchOptionsWithoutUserId
+                                        .filter(APPLICATION_VISIBILITY, INTERNAL_PROFILE_SUPER_ADMIN.getProfileName())
+                                        .done(),
+                                converter));
+            } else {
+                return getLivingApplicationAPIDelegate()
+                        .searchIApplications(SearchApplicationsOfUser.defaultSearchApplicationsOfUser(
+                                Long.parseLong(userId), applicationService, appSearchDescriptor,
+                                searchOptionsWithoutUserId.done(), converter));
+            }
+        }
+        return getLivingApplicationAPIDelegate()
+                .searchIApplications(
+                        SearchApplications.defaultSearchApplications(applicationService, appSearchDescriptor,
+                                searchOptions, converter));
     }
 
     /**

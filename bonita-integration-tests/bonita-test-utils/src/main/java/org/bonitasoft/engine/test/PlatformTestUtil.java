@@ -23,11 +23,16 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.execution.ProcessStarterVerifier;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Celine Souchet
  */
+@ContextConfiguration(classes = PlatformTestUtil.TestConfiguration.class)
 public class PlatformTestUtil {
 
     public static final String DEFAULT_TECHNICAL_LOGGER_USERNAME = "install";
@@ -72,4 +77,17 @@ public class PlatformTestUtil {
         apiClient.logout();
     }
 
+    /**
+     * Configuration class used to override bean definitions for test purposes.
+     */
+    @Configuration
+    static class TestConfiguration {
+
+        @Bean
+        ProcessStarterVerifier processStarterVerifierImpl() {
+            return processInstance -> {
+                // Override this bean to disable the process starter verifier
+            };
+        }
+    }
 }

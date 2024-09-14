@@ -29,6 +29,8 @@ import java.util.List;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationLinkNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
@@ -69,6 +71,22 @@ public class ApplicationToNodeConverterTest {
     private ApplicationToNodeConverter converter;
 
     @Test
+    public void toNode_should_return_application_link() throws Exception {
+        //given
+        final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L,
+                "enabled");
+        application.setLink(true);
+
+        //when
+        final AbstractApplicationNode applicationNode = converter.toNode(application);
+
+        //then
+        assertThat(applicationNode).isNotNull();
+        assertThat(applicationNode).isInstanceOf(ApplicationLinkNode.class);
+
+    }
+
+    @Test
     public void toNode_should_return_convert_all_string_fields() throws Exception {
         //given
         long createdBy = 11L;
@@ -78,7 +96,7 @@ public class ApplicationToNodeConverterTest {
         application.setIconPath("/icon.jpg");
 
         //when
-        final ApplicationNode applicationNode = converter.toNode(application);
+        final ApplicationNode applicationNode = (ApplicationNode) converter.toNode(application);
 
         //then
         assertThat(applicationNode).isNotNull();
@@ -104,7 +122,7 @@ public class ApplicationToNodeConverterTest {
         given(profileService.getProfile(7L)).willReturn(profile);
 
         //when
-        final ApplicationNode applicationNode = converter.toNode(application);
+        final ApplicationNode applicationNode = (ApplicationNode) converter.toNode(application);
 
         //then
         assertThat(applicationNode).isNotNull();
@@ -136,7 +154,7 @@ public class ApplicationToNodeConverterTest {
         given(applicationService.getApplicationPage(8L)).willReturn(homePage);
 
         //when
-        final ApplicationNode applicationNode = converter.toNode(application);
+        final ApplicationNode applicationNode = (ApplicationNode) converter.toNode(application);
 
         //then
         assertThat(applicationNode).isNotNull();
@@ -168,7 +186,7 @@ public class ApplicationToNodeConverterTest {
         given(pageService.getPage(9L)).willReturn(layout);
 
         //when
-        final ApplicationNode applicationNode = converter.toNode(application);
+        final ApplicationNode applicationNode = (ApplicationNode) converter.toNode(application);
 
         //then
         assertThat(applicationNode).isNotNull();
@@ -186,7 +204,7 @@ public class ApplicationToNodeConverterTest {
         given(pageService.getPage(20L)).willReturn(layout);
 
         //when
-        final ApplicationNode applicationNode = converter.toNode(application);
+        final ApplicationNode applicationNode = (ApplicationNode) converter.toNode(application);
 
         //then
         assertThat(applicationNode).isNotNull();
@@ -247,7 +265,7 @@ public class ApplicationToNodeConverterTest {
                 .willReturn(Collections.emptyList());
 
         //when
-        final ApplicationNode applicationNode = converter.toNode(application);
+        final ApplicationNode applicationNode = (ApplicationNode) converter.toNode(application);
 
         //then
         assertThat(applicationNode.getApplicationPages().size()).isEqualTo(1);

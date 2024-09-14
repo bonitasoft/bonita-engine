@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2018 Bonitasoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2024 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,14 +11,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+package org.bonitasoft.engine.business.application;
 
-package org.bonitasoft.engine.gradle.docker
+import static org.junit.Assert.assertThrows;
 
-class JdbcDriverDependencies {
+import org.junit.Test;
 
-    final static String mysql = "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
-    final static String oracle = "com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}"
-    final static String postgres = "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    final static String sqlserver = "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+public class ApplicationLinkUpdaterTest {
 
+    @Test
+    public void should_not_update_home_page_field() {
+        ApplicationLinkUpdater linkUpdater = new ApplicationLinkUpdater();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> linkUpdater.getFields().put(ApplicationField.HOME_PAGE_ID, 2L));
+    }
 }

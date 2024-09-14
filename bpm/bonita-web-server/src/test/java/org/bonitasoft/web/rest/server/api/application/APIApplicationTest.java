@@ -25,8 +25,10 @@ import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.ModelFactory;
-import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationDefinition;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
+import org.bonitasoft.web.rest.model.application.ApplicationLinkItem;
 import org.bonitasoft.web.rest.model.portal.profile.ProfileItem;
 import org.bonitasoft.web.rest.server.api.applicationpage.APIApplicationDataStoreFactory;
 import org.bonitasoft.web.rest.server.api.deployer.DeployerFactory;
@@ -40,6 +42,7 @@ import org.bonitasoft.web.rest.server.framework.APIServletCall;
 import org.bonitasoft.web.rest.server.framework.Deployer;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.ItemDefinitionFactory;
+import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,14 +98,26 @@ public class APIApplicationTest {
     }
 
     @Test
-    public void add_should_return_the_result_of_dataStore_add() throws Exception {
+    public void add_legacy_should_return_the_result_of_dataStore_add() throws Exception {
         //given
         final ApplicationItem itemToCreate = mock(ApplicationItem.class);
         final ApplicationItem createdItem = mock(ApplicationItem.class);
-        given(dataStore.add(itemToCreate)).willReturn(createdItem);
-        given(dataStore.add(itemToCreate)).willReturn(createdItem);
+        given(dataStore.add((AbstractApplicationItem) itemToCreate)).willReturn(createdItem);
         //when
-        final ApplicationItem retrievedItem = apiApplication.add(itemToCreate);
+        final ApplicationItem retrievedItem = (ApplicationItem) apiApplication.add(itemToCreate);
+
+        //then
+        assertThat(retrievedItem).isEqualTo(createdItem);
+    }
+
+    @Test
+    public void add_link_should_return_the_result_of_dataStore_add() throws Exception {
+        //given
+        final ApplicationLinkItem itemToCreate = mock(ApplicationLinkItem.class);
+        final ApplicationLinkItem createdItem = mock(ApplicationLinkItem.class);
+        given(dataStore.add((AbstractApplicationItem) itemToCreate)).willReturn(createdItem);
+        //when
+        final ApplicationLinkItem retrievedItem = (ApplicationLinkItem) apiApplication.add(itemToCreate);
 
         //then
         assertThat(retrievedItem).isEqualTo(createdItem);
@@ -112,11 +127,12 @@ public class APIApplicationTest {
     public void search_should_return_the_result_of_dataStore_search() throws Exception {
         //given
         @SuppressWarnings("unchecked")
-        final ItemSearchResult<ApplicationItem> result = mock(ItemSearchResult.class);
+        final ItemSearchResult<AbstractApplicationItem> result = mock(ItemSearchResult.class);
         given(dataStore.search(0, 10, "request", "default", Collections.singletonMap("name", "hr"))).willReturn(result);
 
         //when
-        final ItemSearchResult<ApplicationItem> retrievedResult = apiApplication.search(0, 10, "request", "default",
+        final ItemSearchResult<AbstractApplicationItem> retrievedResult = apiApplication.search(0, 10, "request",
+                "default",
                 Collections.singletonMap("name", "hr"));
 
         //then
@@ -133,12 +149,12 @@ public class APIApplicationTest {
     }
 
     @Test
-    public void defineItemDefinition_return_an_instance_of_ApplicationDefinition() throws Exception {
+    public void defineItemDefinition_return_an_instance_of_AbstractApplicationDefinition() throws Exception {
         //when
-        final ItemDefinition<ApplicationItem> itemDefinition = apiApplication.defineItemDefinition();
+        final ItemDefinition<AbstractApplicationItem> itemDefinition = apiApplication.defineItemDefinition();
 
         //then
-        assertThat(itemDefinition).isExactlyInstanceOf(ApplicationDefinition.class);
+        assertThat(itemDefinition).isExactlyInstanceOf(AbstractApplicationDefinition.class);
     }
 
     @Test
@@ -160,6 +176,21 @@ public class APIApplicationTest {
         assertThat(deployers.get(ApplicationItem.ATTRIBUTE_UPDATED_BY)).isExactlyInstanceOf(UserDeployer.class);
         assertThat(deployers.get(ApplicationItem.ATTRIBUTE_LAYOUT_ID)).isExactlyInstanceOf(PageDeployer.class);
         assertThat(deployers.get(ApplicationItem.ATTRIBUTE_THEME_ID)).isExactlyInstanceOf(PageDeployer.class);
+    }
+
+    @Test
+    public void update_should_return_the_appropriate_application_kind() throws Exception {
+        //given
+        final APIID idToUpdate = mock(APIID.class);
+        final ApplicationItem updatedItem = mock(ApplicationItem.class);
+        Map<String, String> attributes = Collections.emptyMap();
+        given(dataStore.update(idToUpdate, attributes)).willReturn(updatedItem);
+
+        //when
+        final AbstractApplicationItem retrievedItem = apiApplication.update(idToUpdate, attributes);
+
+        //then
+        assertThat(retrievedItem).isEqualTo(updatedItem);
     }
 
 }

@@ -56,9 +56,13 @@ public class ConnectorExecutorImplIT {
 
     @Before
     public void setUp() {
-        connectorExecutor = new ConnectorExecutorImpl(10, 5, 100, 100, sessionAccessor,
+        connectorExecutor = new ConnectorExecutorImpl(sessionAccessor,
                 sessionService,
-                timeTracker, new SimpleMeterRegistry(), 12L, new DefaultExecutorServiceMetricsProvider());
+                timeTracker,
+                new SimpleMeterRegistry(),
+                12L,
+                new DefaultExecutorServiceMetricsProvider(),
+                new ConnectorSingleThreadExecutorFactory(10));
         connectorExecutor.start();
     }
 

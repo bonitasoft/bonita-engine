@@ -64,7 +64,7 @@ public class LivingApplicationPageIT extends TestWithCustomPage {
         getLivingApplicationAPI().setApplicationHomePage(application.getId(), appPage.getId());
 
         //then
-        final Application upToDateApp = getLivingApplicationAPI().getApplication(application.getId());
+        final Application upToDateApp = (Application) getLivingApplicationAPI().getApplication(application.getId());
         assertThat(upToDateApp.getHomePageId()).isEqualTo(appPage.getId());
 
         getLivingApplicationAPI().deleteApplication(application.getId());

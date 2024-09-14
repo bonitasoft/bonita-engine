@@ -18,10 +18,7 @@ import static org.bonitasoft.engine.Profiles.CLUSTER;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -44,6 +41,14 @@ public class SpringBeanAccessor {
     private static final String HAZELCAST_CONFIG_FILENAME = "hazelcast.xml";
 
     static final BonitaHomeServer BONITA_HOME_SERVER = BonitaHomeServer.getInstance();
+
+    private static final String WORK_CORE_POOL_SIZE = "bonita.tenant.work.corePoolSize";
+    private static final String WORK_MAX_POOL_SIZE = "bonita.tenant.work.maximumPoolSize";
+    private static final String WORK_KEEP_ALIVE_IN_SECONDS = "bonita.tenant.work.keepAliveTimeSeconds";
+    private static final String CONNECTOR_CORE_POOL_SIZE = "bonita.tenant.connector.corePoolSize";
+    private static final String CONNECTOR_MAX_POOL_SIZE = "bonita.tenant.connector.maximumPoolSize";
+    private static final String CONNECTOR_KEEP_ALIVE_IN_SECONDS = "bonita.tenant.connector.keepAliveTimeSeconds";
+
     private BonitaSpringContext context;
 
     private boolean contextFinishedInitialized = false;
@@ -108,6 +113,27 @@ public class SpringBeanAccessor {
             propertySources.addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
                     new PropertiesPropertySource("contextProperties", getProperties()));
         }
+        warnDeprecatedProperties(propertySources);
+    }
+
+    protected void warnDeprecatedProperties(MutablePropertySources propertySources) {
+        warnIfPropertyIsDeprecated(propertySources, WORK_CORE_POOL_SIZE);
+        warnIfPropertyIsDeprecated(propertySources, WORK_MAX_POOL_SIZE);
+        warnIfPropertyIsDeprecated(propertySources, WORK_KEEP_ALIVE_IN_SECONDS);
+        warnIfPropertyIsDeprecated(propertySources, CONNECTOR_CORE_POOL_SIZE);
+        warnIfPropertyIsDeprecated(propertySources, CONNECTOR_MAX_POOL_SIZE);
+        warnIfPropertyIsDeprecated(propertySources, CONNECTOR_KEEP_ALIVE_IN_SECONDS);
+    }
+
+    private void warnIfPropertyIsDeprecated(MutablePropertySources propertySources, String property) {
+        propertySources.stream()
+                .filter(ps -> ps.containsProperty(property))
+                .map(ps -> ps.getProperty(property))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .ifPresent(value -> log.warn(
+                        "{} property is not supported in community edition anymore. It will be ignored.",
+                        property));
     }
 
     protected BonitaSpringContext createContext() {

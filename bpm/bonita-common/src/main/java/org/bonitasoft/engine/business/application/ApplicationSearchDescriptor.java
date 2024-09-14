@@ -118,4 +118,13 @@ public class ApplicationSearchDescriptor {
      * @see Application
      */
     public static final String USER_ID = "userId";
+
+    /**
+     * Used to filter or order <code>Application</code> items by legacy or link criteria
+     *
+     * @since 10.2.0 for some Subscription editions only
+     */
+    public static final String LINK = "link";
+    // keeping this constant here for convenience reasons
+    // having a subscription descriptor with just this field would not be user-friendly
 }

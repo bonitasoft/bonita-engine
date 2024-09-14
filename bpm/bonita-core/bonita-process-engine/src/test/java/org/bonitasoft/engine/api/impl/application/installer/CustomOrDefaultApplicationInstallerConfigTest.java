@@ -45,7 +45,7 @@ public class CustomOrDefaultApplicationInstallerConfigTest {
 
             @Bean
             public CustomOrDefaultApplicationInstaller installer() {
-                return new CustomOrDefaultApplicationInstaller(mock(ApplicationInstaller.class),
+                return new CustomOrDefaultApplicationInstaller(mock(ApplicationInstallerImpl.class),
                         mock(DefaultLivingApplicationImporter.class), mock(MandatoryLivingApplicationImporter.class),
                         mock(TenantServicesManager.class), mock(ApplicationArchiveReader.class),
                         mock(PlatformService.class));

@@ -8,7 +8,7 @@ dependencies {
     api libs.jakartaActivation
     api libs.commonsLang
     api(libs.xstream)
-    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    api libs.micrometerCore
     api libs.springContext
     api libs.springBootAutoconfigure
     api libs.slf4jApi
@@ -20,7 +20,7 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: Deps.junit5Version
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: Deps.junit5Version
     testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: Deps.junit5Version
 

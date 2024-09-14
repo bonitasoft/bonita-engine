@@ -520,7 +520,8 @@ CREATE TABLE business_app (
   iconContent BLOB,
   displayName VARCHAR2(255 CHAR) NOT NULL,
   editable NUMBER(1),
-  internalProfile VARCHAR2(255 CHAR)
+  internalProfile VARCHAR2(255 CHAR),
+  isLink NUMBER(1) DEFAULT 0
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);

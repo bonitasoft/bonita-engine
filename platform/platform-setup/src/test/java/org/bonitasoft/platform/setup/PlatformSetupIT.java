@@ -109,8 +109,9 @@ public class PlatformSetupIT {
         //then
         final Integer sequences = jdbcTemplate.queryForObject("select count(*) from sequence", Integer.class);
         assertThat(sequences).isGreaterThan(1);
-        final int platformRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "platform");
-        assertThat(platformRows).isEqualTo(1);
+        final List<String> platformRows = jdbcTemplate.queryForList("SELECT information FROM platform", String.class);
+        assertThat(platformRows).hasSize(1);
+        assertThat(platformRows.get(0)).isNotBlank(); // In Community, should contain the initial case counter value for information
         final int tenantRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "tenant");
         assertThat(tenantRows).isEqualTo(1);
         final int configurationFiles = JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration");

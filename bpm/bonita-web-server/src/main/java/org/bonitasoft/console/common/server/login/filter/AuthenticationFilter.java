@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerFactory;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
@@ -259,7 +260,10 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
     }
 
     protected RedirectUrl makeRedirectUrl(final HttpServletRequestAccessor httpRequest) {
-        final RedirectUrlBuilder builder = new RedirectUrlBuilder(httpRequest.getRequestedUri());
+        // if the request has a redirection URL, we use it, otherwise we use the requested URI
+        boolean hasRedirectionURL = StringUtils.isNotBlank(httpRequest.getRedirectUrl());
+        final RedirectUrlBuilder builder = new RedirectUrlBuilder(
+                hasRedirectionURL ? httpRequest.getRedirectUrl() : httpRequest.getRequestedUri());
         builder.appendParameters(httpRequest.getParameterMap());
         return builder.build();
     }

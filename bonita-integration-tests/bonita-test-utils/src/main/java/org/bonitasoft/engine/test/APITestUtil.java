@@ -15,7 +15,10 @@ package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder.aBusinessArchive;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -94,7 +97,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
-import org.bonitasoft.engine.business.application.Application;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -1033,9 +1036,15 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state)
             throws Exception {
+        waitForProcessToBeInState(processInstanceId, state, DEFAULT_TIMEOUT);
+    }
+
+    public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state,
+            final int timeoutInMillis)
+            throws Exception {
         ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
                 ClientEventUtil.getProcessInstanceInState(processInstanceId, state.getId()),
-                DEFAULT_TIMEOUT);
+                timeoutInMillis);
     }
 
     public void waitForInitializingProcess() throws Exception {
@@ -1046,7 +1055,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName,
             final boolean useRootProcessInstance,
-            final int timeout) throws Exception {
+            final int timeoutInMillis) throws Exception {
         Map<String, Serializable> params;
         if (useRootProcessInstance) {
             params = ClientEventUtil.getFlowNodeInState(processInstanceId, state.getStateName(), flowNodeName);
@@ -1054,7 +1063,7 @@ public class APITestUtil extends PlatformTestUtil {
             params = ClientEventUtil.getFlowNodeInStateWithParentId(processInstanceId, state.getStateName(),
                     flowNodeName);
         }
-        return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
+        return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeoutInMillis);
     }
 
     public FlowNodeInstance waitForFlowNodeInReadyState(final ProcessInstance processInstance,
@@ -1378,9 +1387,9 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     protected void cleanApplications() throws SearchException, DeletionException {
-        final SearchResult<Application> applications = getApplicationAPI()
-                .searchApplications(new SearchOptionsBuilder(0, 100).done());
-        for (Application application : applications.getResult()) {
+        final SearchResult<IApplication> applications = getApplicationAPI()
+                .searchIApplications(new SearchOptionsBuilder(0, 100).done());
+        for (IApplication application : applications.getResult()) {
             if (application.isEditable()) {
                 getApplicationAPI().deleteApplication(application.getId());
             }

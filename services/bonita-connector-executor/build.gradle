@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    runtimeOnly libs.logback
     api project(':services:bonita-commons')
     api project(':services:bonita-time-tracker')
     api project(':services:bonita-session')

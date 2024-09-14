@@ -60,10 +60,6 @@ public abstract class CommonAPIIT extends APITestUtil {
         }
     };
 
-    /**
-     * @return warning list of unclean elements
-     * @throws BonitaException
-     */
     private void clean() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         cleanCommands();

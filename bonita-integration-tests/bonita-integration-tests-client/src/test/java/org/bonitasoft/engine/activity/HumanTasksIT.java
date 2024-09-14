@@ -54,7 +54,7 @@ import org.junit.Test;
 
 public class HumanTasksIT extends TestWithUser {
 
-    final static int INTIALIZING_STATE_ID = 32;
+    final static int INITIALIZING_STATE_ID = 32;
 
     @Test
     public void cannotGetHumanTaskInstances() throws Exception {
@@ -433,7 +433,7 @@ public class HumanTasksIT extends TestWithUser {
         HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
 
         final long activityInstanceId = step1.getId();
-        getProcessAPI().setActivityStateById(activityInstanceId, INTIALIZING_STATE_ID);
+        getProcessAPI().setActivityStateById(activityInstanceId, INITIALIZING_STATE_ID);
         step1 = getProcessAPI().getHumanTaskInstance(activityInstanceId);
         assertEquals(ActivityStates.INITIALIZING_STATE, step1.getState());
 
@@ -472,7 +472,7 @@ public class HumanTasksIT extends TestWithUser {
         assertThat(eventInstances.size()).isEqualTo(1);
 
         final long activityInstanceId = step1.getId();
-        getProcessAPI().setActivityStateById(activityInstanceId, INTIALIZING_STATE_ID);
+        getProcessAPI().setActivityStateById(activityInstanceId, INITIALIZING_STATE_ID);
         step1 = getProcessAPI().getHumanTaskInstance(activityInstanceId);
         assertEquals(ActivityStates.INITIALIZING_STATE, step1.getState());
 

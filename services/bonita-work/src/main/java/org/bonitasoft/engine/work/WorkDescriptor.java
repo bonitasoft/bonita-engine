@@ -30,10 +30,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class WorkDescriptor implements Serializable {
 
-    private String uuid = UUID.randomUUID().toString();
-    private String type;
+    private final String uuid = UUID.randomUUID().toString();
+    private final String type;
     private Long tenantId;
-    private Map<String, Serializable> parameters;
+    private final Map<String, Serializable> parameters;
     private int retryCount = 0;
     private Instant executionThreshold;
     private int executionCount = 0;

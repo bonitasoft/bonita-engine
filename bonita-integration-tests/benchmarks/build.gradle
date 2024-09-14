@@ -8,10 +8,7 @@ dependencies {
     api "org.mockito:mockito-core:${Deps.mockitoVersion}"
     api project(':bonita-integration-tests:bonita-integration-tests-client')
     api project(':bpm:bonita-server')
-    runtimeOnly "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
-    runtimeOnly "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
-    runtimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
 }
 
 jmh {

@@ -33,7 +33,7 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> allFields;
 
-    SearchApplicationDescriptor() {
+    protected SearchApplicationDescriptor() {
         keys = new HashMap<>(13);
         keys.put(ApplicationSearchDescriptor.ID,
                 new FieldDescriptor(SApplication.class, AbstractSApplication.ID));

@@ -115,7 +115,7 @@ public class BonitaEngine {
 
     public void start() throws Exception {
         initializeEnvironment();
-        PlatformSetup platformSetup = PlatformSetupAccessor.getPlatformSetup();
+        PlatformSetup platformSetup = getPlatformSetup();
         platformSetup.init();
 
         PlatformSession platformSession = loginOnPlatform();
@@ -124,6 +124,10 @@ public class BonitaEngine {
 
         platformAPI.startNode();
         logoutFromPlatform(platformSession);
+    }
+
+    protected PlatformSetup getPlatformSetup() throws NamingException {
+        return PlatformSetupAccessor.getInstance().getPlatformSetup();
     }
 
     private void logoutFromPlatform(PlatformSession platformSession)

@@ -372,6 +372,14 @@ public class AuthenticationFilterTest {
     }
 
     @Test
+    public void testMakeRedirectUrlWithRedirectUrlIncluded() {
+        when(httpRequest.getRequestURI()).thenReturn("/apps/appDirectoryBonita");
+        when(request.getRedirectUrl()).thenReturn("/redirectLink");
+        final RedirectUrl redirectUrl = authenticationFilter.makeRedirectUrl(request);
+        assertThat(redirectUrl.getUrl()).isEqualToIgnoringCase("/redirectLink");
+    }
+
+    @Test
     public void testCompileNullPattern() {
         assertThat(authenticationFilter.compilePattern(null)).isNull();
     }

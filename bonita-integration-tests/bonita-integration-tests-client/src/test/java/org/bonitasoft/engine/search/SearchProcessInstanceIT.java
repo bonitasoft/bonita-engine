@@ -144,13 +144,13 @@ public class SearchProcessInstanceIT extends TestWithUser {
                 TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
 
         final ProcessInstance instance1 = getProcessAPI().startProcess(processDefinitionWithFailedConnector.getId());
-        waitForProcessToBeInState(instance1, ProcessInstanceState.ERROR);
+        waitForProcessToBeInState(instance1.getId(), ProcessInstanceState.ERROR);
 
         final ProcessInstance instance2 = getProcessAPI().startProcess(processDefinitionWithFailedTask.getId());
         waitForFlowNodeInFailedState(instance2);
 
         final ProcessInstance instance3 = getProcessAPI().startProcess(processDefinitionWithFailedConnector.getId());
-        waitForProcessToBeInState(instance3, ProcessInstanceState.ERROR);
+        waitForProcessToBeInState(instance3.getId(), ProcessInstanceState.ERROR);
 
         // search and check result ASC
         final SearchOptionsBuilder searchOptions1 = BuildTestUtil.buildSearchOptions(0, 2,

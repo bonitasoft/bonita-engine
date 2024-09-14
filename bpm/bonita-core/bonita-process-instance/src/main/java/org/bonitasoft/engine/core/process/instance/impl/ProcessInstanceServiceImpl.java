@@ -862,6 +862,21 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
+    @Override
+    public List<Long> getLastArchivedProcessInstanceStartDates(final long sinceDateInMillis)
+            throws SProcessInstanceReadException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("sinceDateInMillis", sinceDateInMillis);
+            final SelectListDescriptor<Long> saProcessInstances = new SelectListDescriptor<>(
+                    "getLastArchivedProcessInstanceStartDates", parameters, SAProcessInstance.class,
+                    QueryOptions.countQueryOptions());
+            return persistenceService.selectList(saProcessInstances);
+        } catch (final SBonitaReadException e) {
+            throw new SProcessInstanceReadException(e);
+        }
+    }
+
     protected Set<Integer> getStateIdsFromStates(final ProcessInstanceState... states) {
         if (states.length < 1) {
             throw new IllegalArgumentException(

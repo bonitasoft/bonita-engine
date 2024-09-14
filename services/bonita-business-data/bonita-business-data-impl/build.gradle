@@ -20,16 +20,13 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testImplementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+    testImplementation libs.logback
+    testImplementation libs.narayanaJta
     testImplementation libs.springTest
     testImplementation libs.springJdbc
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testRuntimeOnly libs.tomcatDbcp
-    testRuntimeOnly libs.h2
-    testRuntimeOnly "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
-    testRuntimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    testRuntimeOnly "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+    testRuntimeOnly(libs.h2)
 
     // Property Based Test framework:
     testImplementation("com.pholser:junit-quickcheck-core:${Deps.junitQuickCheck}")

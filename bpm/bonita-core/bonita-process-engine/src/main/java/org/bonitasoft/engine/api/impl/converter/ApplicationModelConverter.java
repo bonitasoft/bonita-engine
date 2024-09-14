@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.business.application.*;
-import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import org.bonitasoft.engine.business.application.impl.*;
 import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
@@ -47,14 +47,16 @@ public class ApplicationModelConverter {
         this.pageService = pageService;
     }
 
-    public SApplicationWithIcon buildSApplication(final ApplicationCreator creator, final long creatorUserId)
+    public SApplicationWithIcon buildSApplication(final AbstractApplicationCreator<?> creator, final long creatorUserId)
             throws CreationException {
         final Map<ApplicationField, Serializable> fields = creator.getFields();
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
         final long now = System.currentTimeMillis();
+        final boolean isLink = creator.isLink();
         SApplicationWithIcon application = new SApplicationWithIcon();
+        application.setLink(isLink);
         application.setToken((String) fields.get(ApplicationField.TOKEN));
         application.setDisplayName((String) fields.get(ApplicationField.DISPLAY_NAME));
         application.setVersion((String) fields.get(ApplicationField.VERSION));
@@ -62,8 +64,10 @@ public class ApplicationModelConverter {
         application.setLastUpdateDate(now);
         application.setCreatedBy(creatorUserId);
         application.setState(SApplicationState.ACTIVATED.name());
-        application.setLayoutId(getLayoutId(creator));
-        application.setThemeId(getThemeId(creator));
+        if (creator instanceof ApplicationCreator) {
+            application.setLayoutId(getLayoutId((ApplicationCreator) creator));
+            application.setThemeId(getThemeId((ApplicationCreator) creator));
+        }
         application.setUpdatedBy(creatorUserId);
         byte[] iconContent = (byte[]) fields.get(ApplicationField.ICON_CONTENT);
         String iconFileName = (String) fields.get(ApplicationField.ICON_FILE_NAME);
@@ -114,11 +118,22 @@ public class ApplicationModelConverter {
         }
     }
 
-    public Application toApplication(final AbstractSApplication abstractSApplication) {
-        final ApplicationImpl application = new ApplicationImpl(abstractSApplication.getToken(),
-                abstractSApplication.getVersion(),
-                abstractSApplication.getDescription(),
-                abstractSApplication.getLayoutId(), abstractSApplication.getThemeId());
+    public IApplication toApplication(final AbstractSApplication abstractSApplication) {
+        final AbstractApplicationImpl application;
+        if (abstractSApplication.isLink()) {
+            final ApplicationLinkImpl applicationLink = new ApplicationLinkImpl(
+                    abstractSApplication.getToken(),
+                    abstractSApplication.getVersion(),
+                    abstractSApplication.getDescription());
+            application = applicationLink;
+        } else {
+            ApplicationImpl legacyApplication = new ApplicationImpl(abstractSApplication.getToken(),
+                    abstractSApplication.getVersion(),
+                    abstractSApplication.getDescription(),
+                    abstractSApplication.getLayoutId(), abstractSApplication.getThemeId());
+            legacyApplication.setHomePageId(abstractSApplication.getHomePageId());
+            application = legacyApplication;
+        }
         application.setId(abstractSApplication.getId());
         application.setDisplayName(abstractSApplication.getDisplayName());
         application.setCreatedBy(abstractSApplication.getCreatedBy());
@@ -127,7 +142,6 @@ public class ApplicationModelConverter {
         application.setLastUpdateDate(new Date(abstractSApplication.getLastUpdateDate()));
         application.setState(abstractSApplication.getState());
         application.setIconPath(abstractSApplication.getIconPath());
-        application.setHomePageId(abstractSApplication.getHomePageId());
         application.setProfileId(abstractSApplication.getProfileId());
         application.setHasIcon(abstractSApplication.hasIcon());
         application.setEditable(abstractSApplication.isEditable());
@@ -136,15 +150,15 @@ public class ApplicationModelConverter {
         return application;
     }
 
-    public List<Application> toApplication(final List<SApplication> sApplications) {
-        final List<Application> applications = new ArrayList<>(sApplications.size());
+    public List<IApplication> toApplication(final List<SApplication> sApplications) {
+        final List<IApplication> applications = new ArrayList<>(sApplications.size());
         for (final SApplication sApplication : sApplications) {
             applications.add(toApplication(sApplication));
         }
         return applications;
     }
 
-    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater,
+    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final AbstractApplicationUpdater<?> updater,
             final long updaterUserId) {
         final SApplicationUpdateBuilder builder = new SApplicationUpdateBuilder(updaterUserId);
         updateFields(updater, builder);
@@ -152,7 +166,7 @@ public class ApplicationModelConverter {
         return builder.done();
     }
 
-    protected void updateFields(final ApplicationUpdater updater, final SApplicationUpdateBuilder builder) {
+    protected void updateFields(final AbstractApplicationUpdater<?> updater, final SApplicationUpdateBuilder builder) {
         for (final Entry<ApplicationField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {
                 case TOKEN:
