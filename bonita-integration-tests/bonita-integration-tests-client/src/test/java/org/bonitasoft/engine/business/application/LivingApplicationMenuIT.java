@@ -63,9 +63,9 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
         assertThat(createdAppMenu.getDisplayName()).isEqualTo("Main");
         assertThat(createdAppMenu.getApplicationId()).isEqualTo(application.getId());
         assertThat(createdAppMenu.getApplicationPageId()).isNull();
-        assertThat(createdAppMenu.getIndex()).isGreaterThan(1);
+        assertThat(createdAppMenu.getIndex()).isEqualTo(1);
         assertThat(createdAppMenu.getParentId()).isNull();
-        assertThat(createdAppMenu.getId()).isGreaterThan(0);
+        assertThat(createdAppMenu.getId()).isPositive();
 
         //when
         //create a second menu
@@ -166,7 +166,7 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
         // updated:
         assertThat(updatedChildMenu.getApplicationPageId()).isNull();
         assertThat(updatedChildMenu.getParentId()).isNull();
-        assertThat(updatedChildMenu.getIndex()).isEqualTo(3); //because parent changed
+        assertThat(updatedChildMenu.getIndex()).isEqualTo(2); //because parent changed
         //not changed:
         assertThat(updatedChildMenu.getDisplayName()).isEqualTo("Updated child");
         assertThat(updatedChildMenu.getApplicationId()).isEqualTo(application.getId());

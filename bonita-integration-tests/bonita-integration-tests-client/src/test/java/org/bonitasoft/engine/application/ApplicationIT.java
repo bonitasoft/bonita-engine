@@ -21,11 +21,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.permission.APICallContext;
-import org.bonitasoft.engine.business.application.Application;
-import org.bonitasoft.engine.business.application.ApplicationCreator;
-import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
-import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
-import org.bonitasoft.engine.business.application.IApplication;
+import org.bonitasoft.engine.business.application.*;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.Order;
@@ -147,9 +143,14 @@ public class ApplicationIT extends TestWithTechnicalUser {
 
     @Test
     public void should_access_identity_api_using_default_application_permissions() throws Exception {
-
+        // Given
+        var testPage = getPageAPI().createPage("page-to-test-permissions.zip",
+                IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("/page-to-test-permissions.zip")));
+        var testApp = getApplicationAPI().importApplications(
+                IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("/application-to-test-permissions.xml")),
+                ApplicationImportPolicy.FAIL_ON_DUPLICATES);
         // Uses page-to-test-permissions.zip
-        // Uses application-to-test-permissions.zip
+        // Uses application-to-test-permissions.xml
         User user = createUser("baptiste", "bpm");
         loginOnDefaultTenantWith("baptiste", "bpm");
 

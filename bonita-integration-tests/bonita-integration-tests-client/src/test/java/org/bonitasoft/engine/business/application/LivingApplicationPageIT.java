@@ -368,10 +368,10 @@ public class LivingApplicationPageIT extends TestWithCustomPage {
 
         //then
         assertThat(allPagesForProfile1).containsExactlyInAnyOrder("custompage_themeBonita", "custompage_layoutBonita",
-                "custompage_page1", "custompage_page2", "custompage_page3", "custompage_pageToTestPermissions");
+                "custompage_page1", "custompage_page2", "custompage_page3");
         assertThat(getLivingApplicationAPI().getAllPagesForProfile(profile1.getName())).containsExactlyInAnyOrder(
                 "custompage_themeBonita", "custompage_layoutBonita", "custompage_page1", "custompage_page2",
-                "custompage_page3", "custompage_pageToTestPermissions");
+                "custompage_page3");
         assertThat(allPagesForProfile2).containsExactlyInAnyOrder("custompage_themeBonita", "custompage_layoutBonita",
                 "custompage_page4");
         assertThat(getLivingApplicationAPI().getAllPagesForProfile(profile2.getName()))

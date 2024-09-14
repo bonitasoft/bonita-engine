@@ -13,20 +13,11 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.impl.SProfileLogBuilderImpl;
 import org.bonitasoft.engine.profile.builder.impl.SProfileMemberLogBuilderImpl;
@@ -48,11 +39,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
-import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
-import org.bonitasoft.engine.recorder.model.DeleteRecord;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.recorder.model.InsertRecord;
-import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.recorder.model.*;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
@@ -359,7 +346,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<SProfileMember> getProfileMembers(final List<Long> profileIds) throws SBonitaReadException {
-        if (profileIds == null || profileIds.size() == 0) {
+        if (profileIds == null || profileIds.isEmpty()) {
             return Collections.emptyList();
         }
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS,

@@ -110,6 +110,11 @@ public class PageAPIIT extends CommonAPIIT {
 
     @Test
     public void updatePage_should_set_provided_field_to_false_if_provided_pages_are_modified() throws Exception {
+        //given:
+        try (var is = PageAPIIT.class.getResourceAsStream("/provided_page_ready_to_update.zip")) {
+            getPageAPI().createPage("provided_page_ready_to_update.zip", is.readAllBytes());
+        }
+
         // when
         final PageUpdater pageUpdater = new PageUpdater();
         final String newDisplayName = "new display name";

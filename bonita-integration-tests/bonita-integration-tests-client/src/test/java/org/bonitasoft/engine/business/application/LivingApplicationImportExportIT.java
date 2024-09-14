@@ -162,7 +162,7 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
                 .searchIApplications(buildSearchOptions(0, 10)).getCount();
         //given
         final byte[] applicationsByteArray = IOUtils.toByteArray(LivingApplicationIT.class
-                .getResourceAsStream("applicationWithUnavailableInfo.xml"));
+                .getResourceAsStream("/org/bonitasoft/engine/business/application/applicationWithUnavailableInfo.xml"));
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
@@ -214,11 +214,11 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
                 .searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
         assertThat(menuSearchResult.getResult().get(0).getDisplayName()).isEqualTo("HR follow-up");
-        assertThat(menuSearchResult.getResult().get(0).getIndex()).isEqualTo(2);
+        assertThat(menuSearchResult.getResult().get(0).getIndex()).isEqualTo(1);
         assertThat(menuSearchResult.getResult().get(1).getDisplayName()).isEqualTo("Daily HR follow-up");
         assertThat(menuSearchResult.getResult().get(1).getIndex()).isEqualTo(1);
         assertThat(menuSearchResult.getResult().get(2).getDisplayName()).isEqualTo("Empty menu");
-        assertThat(menuSearchResult.getResult().get(2).getIndex()).isEqualTo(3);
+        assertThat(menuSearchResult.getResult().get(2).getIndex()).isEqualTo(2);
 
         getLivingApplicationAPI().deleteApplication(app1.getId());
         getPageAPI().deletePage(myPage.getId());
