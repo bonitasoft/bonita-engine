@@ -57,9 +57,7 @@ public class TestWithLivingApplication extends CommonAPIIT {
         final SearchResult<IApplication> searchResult = getLivingApplicationAPI()
                 .searchIApplications(new SearchOptionsBuilder(0, 1000).done());
         for (final IApplication app : searchResult.getResult()) {
-            if (app.isEditable()) {
-                getLivingApplicationAPI().deleteApplication(app.getId());
-            }
+            getLivingApplicationAPI().deleteApplication(app.getId());
         }
         logoutThenlogin();
         deleteUser(user);

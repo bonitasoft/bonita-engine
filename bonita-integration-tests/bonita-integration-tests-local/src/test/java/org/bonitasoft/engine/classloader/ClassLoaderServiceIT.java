@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.CallableWithException;
 import org.bonitasoft.engine.RunnableWithException;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
@@ -79,10 +80,11 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws SBonitaException {
         classLoaderService = getServiceAccessor().getClassLoaderService();
         dependencyService = getServiceAccessor().getDependencyService();
         platformDependencyService = getServiceAccessor().getPlatformDependencyService();
+        classLoaderService.start();
     }
 
     private <T> T inTx(CallableWithException<T> runnable) throws Exception {
