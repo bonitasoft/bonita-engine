@@ -133,7 +133,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
         try {
             getCommandAPI().execute("except", Map.of());
-               // Job can trigger in up to 'org.quartz.scheduler.idleWaitTime' milliseconds, so better wait long enough:
+            // Job can trigger in up to 'org.quartz.scheduler.idleWaitTime' milliseconds, so better wait long enough:
             FailedJob failedJob = await().atMost(ONE_MINUTE).pollInterval(ONE_SECOND).until(
                     () -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
 
