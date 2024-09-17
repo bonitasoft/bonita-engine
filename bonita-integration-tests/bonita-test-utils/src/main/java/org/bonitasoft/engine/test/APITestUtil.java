@@ -23,7 +23,13 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -31,7 +37,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.api.*;
+import org.bonitasoft.engine.api.APIClient;
+import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
+import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.PageAPI;
+import org.bonitasoft.engine.api.PermissionAPI;
+import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
+import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.Query;
@@ -50,18 +66,59 @@ import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentCriterion;
-import org.bonitasoft.engine.bpm.flownode.*;
-import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ActivityStates;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.business.application.IApplication;
-import org.bonitasoft.engine.command.*;
+import org.bonitasoft.engine.command.CommandDescriptor;
+import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
+import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.identity.*;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.GroupCreator;
+import org.bonitasoft.engine.identity.GroupCriterion;
+import org.bonitasoft.engine.identity.Role;
+import org.bonitasoft.engine.identity.RoleCriterion;
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.identity.UserCreator;
+import org.bonitasoft.engine.identity.UserCriterion;
+import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
@@ -71,8 +128,17 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
-import org.bonitasoft.engine.test.check.*;
-import org.bonitasoft.engine.test.wait.*;
+import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
+import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivityInstances;
+import org.bonitasoft.engine.test.check.CheckNbOfOpenActivities;
+import org.bonitasoft.engine.test.check.CheckNbOfProcessInstances;
+import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
+import org.bonitasoft.engine.test.check.CheckProcessInstanceIsArchived;
+import org.bonitasoft.engine.test.wait.WaitForArchivedActivity;
+import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
+import org.bonitasoft.engine.test.wait.WaitForEvent;
+import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
+import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
@@ -1401,6 +1467,10 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
+    public PlatformInformationAPI getPlatformInformationAPI() {
+        return getApiClient().getPlatformInformationAPI();
+    }
+
     public ProcessAPI getProcessAPI() {
         return getApiClient().getProcessAPI();
     }
@@ -1794,10 +1864,8 @@ public class APITestUtil extends PlatformTestUtil {
 
     protected boolean isCommunityEdition() {
         try {
-            var api = TenantAPIAccessor.getPlatformInformationAPI(getApiClient().getSession());
-            return "commnuity".equalsIgnoreCase(api.getPlatformInformation().get("edition"));
-        } catch (ServerAPIException | BonitaHomeNotSetException | UnknownAPITypeException
-                | PlatformNotFoundException e) {
+            return "community".equalsIgnoreCase(getPlatformInformationAPI().getPlatformInformation().get("edition"));
+        } catch (PlatformNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
