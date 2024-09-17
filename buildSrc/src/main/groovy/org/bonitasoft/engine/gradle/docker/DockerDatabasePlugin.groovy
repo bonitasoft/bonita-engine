@@ -14,28 +14,34 @@ class DockerDatabasePlugin implements Plugin<Project> {
         project.configurations {
             drivers
         }
-
-        project.dependencies {
-            // the following jdbc drivers are available for integration tests
-            drivers(project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
-                    .findLibrary("mysql").get())
-            drivers(project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
-                    .findLibrary("oracle").get())
-            drivers(project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
-                    .findLibrary("postgresql").get())
-            drivers(project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
-                    .findLibrary("msSqlServer").get())
-        }
-
+        driversConfiguration(project)
         def databaseIntegrationTest = project.extensions.create("databaseIntegrationTest", DatabasePluginExtension)
 
-        DockerDatabaseContainerTasksCreator.createTasks(project, databaseIntegrationTest)
+        DockerDatabaseContainerTasksCreator.createTasks(project, databaseIntegrationTest, getVendors())
 
         project.afterEvaluate {
             if (!databaseIntegrationTest.includes) {
                 println "No databaseIntegrationTest.include found. No tests to run!"
             }
         }
+    }
+
+    def driversConfiguration(project) {
+        project.dependencies {
+            // the following jdbc drivers are available for integration tests
+            drivers(project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
+                    .findLibrary("postgresql").get())
+        }
+    }
+
+    List getVendors() {
+        return [
+                [name       : 'postgres',
+                 image      : 'bonitasoft/bonita-postgres:15.3',
+                 portBinding: 5432,
+                 uriTemplate: 'jdbc:postgresql://%s:%s/%s',
+                ]
+        ]
     }
 
 }

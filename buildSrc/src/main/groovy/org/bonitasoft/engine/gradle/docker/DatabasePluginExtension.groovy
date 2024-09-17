@@ -13,12 +13,28 @@
  **/
 package org.bonitasoft.engine.gradle.docker
 
-/**
- * @author Baptiste Mesta
- */
 class DatabasePluginExtension {
 
+    /**
+     * Include test class patterns
+     */
     List<String> includes
+    /**
+     * Extra configuration for the postgres database
+     */
+    DatabaseExtraConfiguration postgres = new DatabaseExtraConfiguration(enabled: true)
+    /**
+     * Extra configuration for the mysql database
+     */
+    DatabaseExtraConfiguration mysql = new DatabaseExtraConfiguration()
+    /**
+     * Extra configuration for the oracle database
+     */
+    DatabaseExtraConfiguration oracle = new DatabaseExtraConfiguration()
+    /**
+     * Extra configuration for the sqlserver database
+     */
+    DatabaseExtraConfiguration sqlserver = new DatabaseExtraConfiguration()
 
     def includes(String... includes) {
         this.includes = []
@@ -30,6 +46,30 @@ class DatabasePluginExtension {
             this.includes = []
         }
         this.includes.add(include)
+    }
+
+    def postgres(Closure closure) {
+        closure.delegate = postgres
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure()
+    }
+
+    def mysql(Closure closure) {
+        closure.delegate = mysql
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure()
+    }
+
+    def oracle(Closure closure) {
+        closure.delegate = oracle
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure()
+    }
+
+    def sqlserver(Closure closure) {
+        closure.delegate = sqlserver
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure()
     }
 
 }
