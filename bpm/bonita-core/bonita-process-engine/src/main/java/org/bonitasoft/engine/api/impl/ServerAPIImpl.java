@@ -135,17 +135,21 @@ public class ServerAPIImpl implements ServerAPI {
             }
         } catch (final BonitaRuntimeException | BonitaException bre) {
             fillGlobalContextForException(session, bre);
+            // reset class loader
+            Thread.currentThread().setContextClassLoader(baseClassLoader);
             throw createServerWrappedException(bre);
         } catch (final UndeclaredThrowableException ute) {
+            // reset class loader
+            Thread.currentThread().setContextClassLoader(baseClassLoader);
             throw createServerWrappedException(ute);
         } catch (final Throwable cause) {
             final BonitaRuntimeException throwableToWrap = wrapThrowable(cause);
             fillGlobalContextForException(session, throwableToWrap);
+            // reset class loader
+            Thread.currentThread().setContextClassLoader(baseClassLoader);
             throw createServerWrappedException(throwableToWrap);
         } finally {
             cleanSessionIfNeeded(sessionAccessor);
-            // reset class loader
-            Thread.currentThread().setContextClassLoader(baseClassLoader);
             logger.trace("End Server API call {} {}", apiInterfaceName, methodName);
         }
     }

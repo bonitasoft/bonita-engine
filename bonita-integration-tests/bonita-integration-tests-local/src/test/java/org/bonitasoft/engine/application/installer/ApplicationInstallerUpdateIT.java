@@ -75,12 +75,16 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
                         new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
                         new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector(),
                         new IconDetector()));
-
         initFirstInstall();
     }
 
     @After
     public void after() throws Exception {
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            getTenantAdministrationAPI().resume();
+        }
         logoutOnTenant();
     }
 

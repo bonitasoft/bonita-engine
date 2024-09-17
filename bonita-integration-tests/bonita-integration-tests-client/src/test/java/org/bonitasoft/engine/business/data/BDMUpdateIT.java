@@ -32,17 +32,15 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 /**
- * Those tests fail because after installing the second BDM version, Hibernate is not aware of
+ * Those tests fail on MySQL and SQLServer because after installing the second BDM version, Hibernate is not aware of
  * previous FK_ that stay in database, so it does not drop them, and then the 'drop table' fails on test cleanup.
  * Those cases should be handled when we support more "BDM update" scenarios, leveraging Hibernate poor level of
  * support on HBM2DDL.
  */
-@Ignore("FIXME: Not working on mysql and sql server")
 public class BDMUpdateIT extends CommonAPIIT {
 
     public static final String DOT = ".";

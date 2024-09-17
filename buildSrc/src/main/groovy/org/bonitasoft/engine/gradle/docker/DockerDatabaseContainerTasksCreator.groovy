@@ -20,8 +20,6 @@ import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.container.extras.DockerWaitHealthyContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.UnknownTaskException
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.testing.Test
@@ -30,32 +28,6 @@ import org.gradle.api.tasks.testing.Test
  * Gradle plugin to start docker database containers and perform tests against them
  */
 class DockerDatabaseContainerTasksCreator {
-
-    def static vendors = [
-            [name               : 'oracle',
-             image              : 'bonitasoft.jfrog.io/docker-releases/bonita-oracle-19c-ee:0.0.2',
-             registryUrlEnv     : 'DOCKER_BONITASOFT_REGISTRY',
-             registryUsernameEnv: 'REGISTRY_USERNAME',
-             registryPasswordEnv: 'REGISTRY_TOKEN',
-             portBinding        : 1521,
-             uriTemplate        : 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1?oracle.net.disableOob=true',
-            ],
-            [name       : 'postgres',
-             image      : 'bonitasoft/bonita-postgres:15.3',
-             portBinding: 5432,
-             uriTemplate: 'jdbc:postgresql://%s:%s/%s',
-            ],
-            [name       : 'mysql',
-             image      : 'bonitasoft/bonita-mysql:8.0.33',
-             portBinding: 3306,
-             uriTemplate: 'jdbc:mysql://%s:%s/%s?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
-            ],
-            [name       : 'sqlserver',
-             image      : 'bonitasoft/bonita-sqlserver:2022-CU13',
-             portBinding: 1433,
-             uriTemplate: 'jdbc:sqlserver://%s:%s;database=%s',
-            ]
-    ]
 
     private static String getDockerHost(def project) {
         def dockerHost = System.getenv('DOCKER_HOST')
@@ -70,7 +42,7 @@ class DockerDatabaseContainerTasksCreator {
     private static final String SYS_PROP_DB_USER = 'db.user'
     private static final String SYS_PROP_DB_PASSWORD = 'db.password'
 
-    def static createTasks(Project project, DatabasePluginExtension extension) {
+    def static createTasks(Project project, DatabasePluginExtension extension, List vendors) {
         // required to have the environment correctly setup: see https://github.com/bmuschko/gradle-docker-plugin/issues/575#issuecomment-383704012
         if (!project.rootProject.plugins.hasPlugin('com.bmuschko.docker-remote-api')) {
             project.rootProject.plugins.apply('com.bmuschko.docker-remote-api')
@@ -81,10 +53,8 @@ class DockerDatabaseContainerTasksCreator {
 
             DbParser.DbConnectionSettings dbConnectionSettings = new DbParser.DbConnectionSettings()
             DbParser.DbConnectionSettings bdmDbConnectionSettings = new DbParser.DbConnectionSettings()
-            TaskProvider<DockerInspectContainer> inspectContainer
-            TaskProvider<DockerRemoveContainer> removeContainer
 
-            TaskProvider<DockerPullImage> pullImage = registerTaskInRootProject(project, "pull${uniqueName}Image", DockerPullImage) {
+            def pullImage = project.tasks.register("pull${uniqueName}Image", DockerPullImage) {
                 description "Pull docker image for $uniqueName db vendor"
                 group null // do not show task when running `gradle tasks`
 
@@ -99,7 +69,7 @@ class DockerDatabaseContainerTasksCreator {
                 }
             }
 
-            TaskProvider<DockerCreateContainer> createContainer = registerTaskInRootProject(project, "create${uniqueName}Container", DockerCreateContainer) {
+            def createContainer = project.tasks.register("create${uniqueName}Container", DockerCreateContainer) {
                 description "Create a docker container for $uniqueName db vendor"
                 group null // do not show task when running `gradle tasks`
 
@@ -115,14 +85,14 @@ class DockerDatabaseContainerTasksCreator {
                 hostConfig.autoRemove = true
             }
 
-            TaskProvider<DockerStartContainer> startContainer = registerTaskInRootProject(project, "start${uniqueName}Container", DockerStartContainer) {
+            def startContainer = project.tasks.register("start${uniqueName}Container", DockerStartContainer) {
                 description "Start a docker container for $uniqueName db vendor"
                 group "docker"
 
                 targetContainerId createContainer.get().getContainerId()
             }
 
-            def waitForContainerStartup = registerTaskInRootProject(project, "waitFor${uniqueName}ContainerStartup", DockerWaitHealthyContainer) {
+            def waitForContainerStartup = project.tasks.register("waitFor${uniqueName}ContainerStartup", DockerWaitHealthyContainer) {
                 description "Wait for a started docker container for $vendor.name db vendor to be healthy"
                 group null // do not show task when running `gradle tasks`
 
@@ -130,7 +100,7 @@ class DockerDatabaseContainerTasksCreator {
                 awaitStatusTimeout = 360
             }
 
-            inspectContainer = project.tasks.register("inspect${uniqueName}ContainerUrl", DockerInspectContainer) {
+            def inspectContainer = project.tasks.register("inspect${uniqueName}ContainerUrl", DockerInspectContainer) {
                 description = "Get url of a docker container for $uniqueName db vendor"
                 group = null // do not show task when running `gradle tasks`
 
@@ -153,7 +123,7 @@ class DockerDatabaseContainerTasksCreator {
                 }
             }
 
-            removeContainer = registerTaskInRootProject(project, "remove${uniqueName}Container", DockerRemoveContainer) {
+            def removeContainer = project.tasks.register("remove${uniqueName}Container", DockerRemoveContainer) {
                 description "Remove a docker container for $uniqueName db vendor"
                 group "docker"
 
@@ -166,8 +136,16 @@ class DockerDatabaseContainerTasksCreator {
                 group = "Verification"
                 description = "Runs slow integration test suite on $vendor.name database."
                 systemProperty "bonita.version", project.version
-                jvmArgs += ['--add-opens','java.base/java.util=ALL-UNNAMED','--add-opens','java.base/java.lang=ALL-UNNAMED','-Dfile.encoding=UTF-8']
+                jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.lang=ALL-UNNAMED', '-Dfile.encoding=UTF-8']
+                if (extension."${vendor.name}"?.includeTestModule) {
+                    testClassesDirs += extension."${vendor.name}".includeTestModule.sourceSets.test.output.classesDirs
+                    classpath += extension."${vendor.name}".includeTestModule.sourceSets.test.runtimeClasspath
+                }
                 classpath += project.files(project.configurations.drivers)
+                if(extension."${vendor.name}"?.excludes) {
+                    exclude(extension."${vendor.name}".excludes)
+                }
+                onlyIf { extension."${vendor.name}"?.enabled }
 
                 doFirst {
                     String dbUrl = project.hasProperty(SYS_PROP_DB_URL) ? project.property(SYS_PROP_DB_URL) : dbConnectionSettings.dbUrl
@@ -205,8 +183,13 @@ class DockerDatabaseContainerTasksCreator {
             }
             project.afterEvaluate {
                 databaseTestTask.configure { includes = extension.includes }
+                pullImage.configure { onlyIf { extension."${vendor.name}"?.enabled } }
+                createContainer.configure { onlyIf { extension."${vendor.name}"?.enabled } }
+                startContainer.configure { onlyIf { extension."${vendor.name}"?.enabled } }
+                waitForContainerStartup.configure { onlyIf { extension."${vendor.name}"?.enabled } }
+                inspectContainer.configure { onlyIf { extension."${vendor.name}"?.enabled } }
+                removeContainer.configure { onlyIf { extension."${vendor.name}"?.enabled } }
             }
-
 
             if (createContainer) {
                 createContainer.configure { dependsOn(pullImage) }
@@ -235,11 +218,4 @@ class DockerDatabaseContainerTasksCreator {
         }
     }
 
-    static TaskProvider registerTaskInRootProject(Project project, String taskName, Class<? extends Task> taskType, Closure configuration) {
-        try {
-            project.rootProject.tasks.named(taskName)
-        } catch (UnknownTaskException ignored) {
-            project.rootProject.tasks.register(taskName, taskType, configuration)
-        }
-    }
 }

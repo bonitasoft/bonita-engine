@@ -25,6 +25,8 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.model.SProfile;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +36,7 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
     private ApplicationImporter applicationImporter;
     private ApplicationService applicationService;
     private PageService pageService;
+    private ProfileService profileService;
 
     private static final String APP_1_TOKEN = "app1";
     private static final String APP_2_TOKEN = "app2";
@@ -45,6 +48,7 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         applicationImporter = getServiceAccessor().getApplicationImporter();
         applicationService = getServiceAccessor().getApplicationService();
         pageService = getServiceAccessor().getPageService();
+        profileService = getServiceAccessor().getProfileService();
     }
 
     @After
@@ -222,13 +226,17 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(app.getIconPath()).isEqualTo("/app1.jpg");
         assertThat(app.getCreatedBy()).isEqualTo(-1L);
         assertThat(app.getState()).isEqualTo(SApplicationState.ACTIVATED.name());
-        assertThat(app.getProfileId()).isEqualTo(1L);
+        assertThat(getProfile(app.getProfileId()).getName()).isEqualTo("User");
         assertThat(app.getInternalProfile()).isNull();
         assertThat(app.getHomePageId()).isNull();
         assertThat(app.getLayoutId()).isNull();
         assertThat(app.getThemeId()).isNull();
         assertThat(app.isEditable()).isTrue();
         assertThat(app.isLink()).isTrue();
+    }
+
+    private SProfile getProfile(Long profileId) throws Exception {
+        return getTransactionService().executeInTransaction(() -> profileService.getProfile(profileId));
     }
 
     private void assertAppLink2() throws Exception {
@@ -261,7 +269,7 @@ public class ApplicationImporterIT extends CommonBPMServicesTest {
         assertThat(app.getCreatedBy()).isEqualTo(-1L);
         assertThat(app.getState()).isEqualTo(SApplicationState.ACTIVATED.name());
         assertThat(app.getHomePageId()).isNotNull();
-        assertThat(app.getProfileId()).isEqualTo(1L);
+        assertThat(getProfile(app.getProfileId()).getName()).isEqualTo("User");
         assertThat(app.getInternalProfile()).isNull();
         assertThat(app.getLayoutId()).isNotNull();
         assertThat(app.getThemeId()).isNotNull();

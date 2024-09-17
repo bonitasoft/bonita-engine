@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.test.junit;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.bonitasoft.engine.test.TestEngine;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.junit.rules.MethodRule;
@@ -32,6 +34,16 @@ public class BonitaEngineRule implements MethodRule {
     }
 
     public static BonitaEngineRule create() {
+        try {
+            var testEngineSpClazz = BonitaEngineRule.class.getClassLoader()
+                    .loadClass("com.bonitasoft.engine.test.TestEngineSP");
+            TestEngine testEngineSpInstance = (TestEngine) testEngineSpClazz.getMethod("getInstance").invoke(null);
+            return new BonitaEngineRule(testEngineSpInstance);
+        } catch (ClassNotFoundException e) {
+            // Use Community TestEngine
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
         return new BonitaEngineRule(TestEngineImpl.getInstance());
     }
 
