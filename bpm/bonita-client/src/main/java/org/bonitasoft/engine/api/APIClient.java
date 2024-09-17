@@ -22,6 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
+import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
 import org.bonitasoft.engine.bdm.BusinessObjectDaoCreationException;
 import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import org.bonitasoft.engine.exception.ServerAPIException;
@@ -135,12 +136,10 @@ public class APIClient {
     /**
      * Connects a user, identified by his (her) username and password, in order to use API methods of a tenant.
      *
-     * @param username
-     *        the user name
-     * @param password
-     *        the password
-     * @throws LoginException
-     *         occurs when an exception is thrown during the login (userName does not exist, or couple (userName,
+     * @param username the user name
+     * @param password the password
+     * @throws LoginException occurs when an exception is thrown during the login (userName does not exist, or couple
+     *         (userName,
      *         password) is incorrect)
      * @since 7.2
      */
@@ -324,5 +323,15 @@ public class APIClient {
      */
     public MaintenanceAPI getMaintenanceAPI() {
         return getAPI(MaintenanceAPI.class);
+    }
+
+    /**
+     * Get API that retrieves information on the platform: basic information in a Community edition,
+     * More detailed information on license in a Subscription edition.
+     *
+     * @since 10.2.0
+     */
+    public PlatformInformationAPI getPlatformInformationAPI() {
+        return getAPI(PlatformInformationAPI.class);
     }
 }
