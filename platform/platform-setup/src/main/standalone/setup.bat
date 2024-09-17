@@ -18,8 +18,8 @@ set LIB_FOLDER=%BASEDIR%\lib
 FOR /F "tokens=1,* delims== eol=#" %%A IN (database.properties) DO (set %%A=%%B)
 set BONITA_DATABASE=%db.vendor%
 
-IF NOT "%BONITA_DATABASE%" == "h2" IF NOT "%BONITA_DATABASE%" == "postgres" IF NOT "%BONITA_DATABASE%" == "sqlserver" IF NOT "%BONITA_DATABASE%" == "oracle" IF NOT "%BONITA_DATABASE%" == "mysql"  (
-    echo Cannot determine database vendor valid values are [h2, postgres, sqlserver, oracle, mysql].
+IF NOT "%BONITA_DATABASE%" == "h2" IF NOT "%BONITA_DATABASE%" == "postgres" (
+    echo Cannot determine database vendor valid values are [h2, postgres].
     echo Please configure file %BASEDIR%database.properties properly.
     exit /b 1
 )

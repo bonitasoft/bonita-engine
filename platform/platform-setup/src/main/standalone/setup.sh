@@ -16,8 +16,8 @@ done
 
 BONITA_DATABASE=$(grep '^db.vendor=' database.properties | sed -e 's/db.vendor=//g')
 
-if [ "$BONITA_DATABASE" != "h2" -a "$BONITA_DATABASE" != "postgres" -a "$BONITA_DATABASE" != "sqlserver" -a "$BONITA_DATABASE" != "oracle" -a "$BONITA_DATABASE" != "mysql" ]; then
-  echo "Cannot determine database vendor (valid values are h2, postgres, sqlserver, oracle, mysql)."
+if [ "$BONITA_DATABASE" != "h2" ] && [ "$BONITA_DATABASE" != "postgres" ]; then
+  echo "Cannot determine database vendor (valid values are h2, postgres)."
   echo "Please configure file ${BASEDIR}/database.properties properly."
   exit 1
 fi
