@@ -70,8 +70,9 @@ import org.slf4j.LoggerFactory;
  * valid, is on the right scope (tenant or platform), and renew it</li>
  * <li>When the method is <b>NOT</b> annotated with {@link CustomTransactions}, it opens a transaction</li>
  * <li>When the method is deprecated, it print a warning</li>
- * <li>When the method or class is annotated with {@link AvailableInMaintenanceMode}, it verifies the maintenance mode
- * is enabled</li>
+ * <li>When the method or class is <b>NOT</b> annotated with {@link AvailableInMaintenanceMode}, it verifies the
+ * maintenance mode
+ * is disabled</li>
  * <li>When the method or class is annotated with {@link AvailableInMaintenanceMode} and onlyAvailableInMaintenanceMode
  * is set
  * to true, it verifies the maintenance mode is enabled</li>
