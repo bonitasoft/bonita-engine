@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.platform.setup;
 
+import static java.lang.System.lineSeparator;
 import static org.bonitasoft.platform.configuration.type.ConfigurationType.*;
 
 import java.io.File;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
@@ -38,12 +40,13 @@ import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
 import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
+import org.bonitasoft.platform.database.DatabaseVendor;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.version.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -57,33 +60,33 @@ import org.springframework.stereotype.Component;
  * @author Baptiste Mesta
  */
 @Component
+@ConditionalOnSingleCandidate(PlatformSetup.class)
 public class PlatformSetup {
 
     public static final long DEFAULT_TENANT_ID = 1L;
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     public static final String BONITA_SETUP_FOLDER = "org.bonitasoft.platform.setup.folder";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlatformSetup.class);
 
     public static final String PLATFORM_CONF_FOLDER_NAME = "platform_conf";
 
     public static final String BONITA_CLIENT_HOME_FOLDER = "bonita.client.home";
 
-    @Autowired
-    private ScriptExecutor scriptExecutor;
+    public static final String BONITA_DB_VENDOR_PROPERTY = "sysprop.bonita.db.vendor";
+    public static final String BONITA_BDM_DB_VENDOR_PROPERTY = "sysprop.bonita.bdm.db.vendor";
 
-    @Autowired
-    private ConfigurationService configurationService;
+    protected static final Logger LOGGER = LoggerFactory.getLogger(PlatformSetup.class);
 
-    @Autowired
-    private VersionService versionService;
+    private final ScriptExecutor scriptExecutor;
+
+    @Getter // Used by distrib bundle tests
+    private final ConfigurationService configurationService;
+
+    private final VersionService versionService;
+
+    private final DataSource dataSource;
 
     @Value("${db.vendor}")
-    private String dbVendor;
-
-    @Autowired
-    private DataSource dataSource;
+    protected String dbVendor;
 
     private Path initialConfigurationFolder;
     private Path currentConfigurationFolder;
@@ -93,13 +96,30 @@ public class PlatformSetup {
     private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
             PlatformSetup.class.getClassLoader());
 
-    @Autowired
-    PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService,
+    public PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService,
             VersionService versionService, DataSource dataSource) {
         this.scriptExecutor = scriptExecutor;
         this.configurationService = configurationService;
         this.versionService = versionService;
         this.dataSource = dataSource;
+    }
+
+    /**
+     * Gets the value of the system property indicated by the key {@link PlatformSetup#BONITA_DB_VENDOR_PROPERTY}
+     *
+     * @return the string value of the system property, or null if there is no property with that key
+     */
+    public static String getPropertyBonitaDbVendor() {
+        return System.getProperty(BONITA_DB_VENDOR_PROPERTY);
+    }
+
+    /**
+     * Gets the value of the system property indicated by the key {@link PlatformSetup#BONITA_BDM_DB_VENDOR_PROPERTY}
+     *
+     * @return the string value of the system property, or null if there is no property with that key
+     */
+    public static String getPropertyBonitaBdmDbVendor() {
+        return System.getProperty(BONITA_BDM_DB_VENDOR_PROPERTY);
     }
 
     /**
@@ -110,8 +130,7 @@ public class PlatformSetup {
         if (isPlatformAlreadyCreated()) {
             LOGGER.info("Platform is already created.");
             if (Files.isDirectory(initialConfigurationFolder)) {
-                LOGGER.info("Upgrading default configuration with files from folder: "
-                        + initialConfigurationFolder.toString());
+                LOGGER.info("Upgrading default configuration with files from folder: {}", initialConfigurationFolder);
                 updateDefaultConfigurationFromFolder(initialConfigurationFolder);
             } else {
                 LOGGER.info("Upgrading default configuration with files from classpath");
@@ -124,8 +143,8 @@ public class PlatformSetup {
         initializePlatform();
         LOGGER.info("Platform created.");
         if (Files.isDirectory(initialConfigurationFolder)) {
-            LOGGER.info("Database will be initialized with configuration files from folder: "
-                    + initialConfigurationFolder.toString());
+            LOGGER.info("Database will be initialized with configuration files from folder: {}",
+                    initialConfigurationFolder);
             pushFromFolder(initialConfigurationFolder);
         } else {
             LOGGER.warn("Database will be initialized with configuration files from classpath");
@@ -191,11 +210,11 @@ public class PlatformSetup {
         preventFromPushingZeroLicense();
         checkPlatformVersion();
         checkPushFolderExists(currentConfigurationFolder);
-        LOGGER.info("Configuration currently in database will be replaced by configuration from folder: "
-                + currentConfigurationFolder.toString());
+        LOGGER.info("Configuration currently in database will be replaced by configuration from folder: {}",
+                currentConfigurationFolder);
         ensureNoCriticalFoldersAreDeleted(forcePush);
         pull(backupConfigurationFolder, backupLicensesFolder);
-        LOGGER.info("Backup directory created: {}", backupConfigurationFolder.toString());
+        LOGGER.info("Backup directory created: {}", backupConfigurationFolder);
         clean();
         pushFromFolder(currentConfigurationFolder);
         pushLicenses();
@@ -211,7 +230,7 @@ public class PlatformSetup {
             final Path folder = getFolderFromConfiguration(configuration);
             if (!Files.isDirectory(folder)) {
                 if (forcePush) {
-                    LOGGER.warn("Force-pushing the deletion of folder {}", folder.toString());
+                    LOGGER.warn("Force-pushing the deletion of folder {}", folder);
                 } else {
                     throw new PlatformException("You are trying to remove a protected folder from configuration: " +
                             getSpecificErrorMessage(configuration, folder));
@@ -238,7 +257,7 @@ public class PlatformSetup {
                     ". To remove a tenant, please search for 'Platform API' on https://documentation.bonitasoft.com";
         }
         return message
-                + LINE_SEPARATOR
+                + lineSeparator()
                 + "To restore the deleted folders, run 'setup pull'. You will lose the locally modified configuration.";
     }
 
@@ -318,7 +337,7 @@ public class PlatformSetup {
             //do nothing in community
             return;
         }
-        LOGGER.info("Pushing license files from folder:{}", licensesFolder.toString());
+        LOGGER.info("Pushing license files from folder: {}", licensesFolder);
         configurationService.storeLicenses(licensesFolder.toFile());
     }
 
@@ -326,10 +345,11 @@ public class PlatformSetup {
         scriptExecutor.createAndInitializePlatformIfNecessary();
     }
 
-    void initProperties() {
+    void initProperties() throws PlatformException {
         if (dbVendor == null) {
-            dbVendor = System.getProperty("sysprop.bonita.db.vendor");
+            dbVendor = getPropertyBonitaDbVendor();
         }
+        checkSupportedVendor(dbVendor);
         String setupFolderPath = System.getProperty(BONITA_SETUP_FOLDER);
         Path platformConfFolder;
         if (setupFolderPath != null) {
@@ -339,6 +359,21 @@ public class PlatformSetup {
             platformConfFolder = Paths.get(PLATFORM_CONF_FOLDER_NAME);
         }
         initializeFoldersPaths(platformConfFolder);
+    }
+
+    /**
+     * Check that the given `databaseVendor` is supported using the community edition.
+     *
+     * @param databaseVendor database vendor to check
+     * @throws PlatformException if the given database vendor is not supported
+     * @throws IllegalArgumentException if `databaseVendor` is null or is not a recognized database vendor
+     */
+    protected void checkSupportedVendor(String databaseVendor) throws PlatformException, IllegalArgumentException {
+        DatabaseVendor vendor = DatabaseVendor.parseValue(databaseVendor);
+        if (vendor != DatabaseVendor.H2 && vendor != DatabaseVendor.POSTGRES) {
+            throw new PlatformException("Database vendor '" + vendor + "' is not supported with the community edition");
+        }
+        LOGGER.debug("Database vendor '{}' is supported", vendor);
     }
 
     private void initializeFoldersPaths(Path platformConfFolder) {
@@ -453,17 +488,6 @@ public class PlatformSetup {
         }
     }
 
-    private void addConfigurationFromClassPathToList(ArrayList<FullBonitaConfiguration> configurations,
-            ConfigurationType type, String resourceName, Long tenantId) throws IOException {
-        try (InputStream resourceAsStream = this.getClass()
-                .getResourceAsStream("/" + type.name().toLowerCase() + "/" + resourceName)) {
-            if (resourceAsStream != null) {
-                configurations.add(new FullBonitaConfiguration(resourceName, IOUtils.toByteArray(resourceAsStream),
-                        type.name().toUpperCase(), tenantId));
-            }
-        }
-    }
-
     public void destroy() throws PlatformException {
         initPlatformSetup();
         if (isPlatformAlreadyCreated()) {
@@ -476,17 +500,12 @@ public class PlatformSetup {
         initDataSource();
     }
 
-    // Used by distrib bundle tests
-    public ConfigurationService getConfigurationService() {
-        return configurationService;
-    }
-
     void preventFromPushingZeroLicense() throws PlatformException {
         if (Files.isDirectory(licensesFolder)) {
             final String[] licenseFiles = licensesFolder.toFile().list(new RegexFileFilter(".*\\.lic"));
-            if (licenseFiles.length == 0) {
-                throw new PlatformException("No license (.lic file) found." + LINE_SEPARATOR
-                        + "This would prevent Bonita Platform subscription edition to start normally." + LINE_SEPARATOR
+            if (licenseFiles == null || licenseFiles.length == 0) {
+                throw new PlatformException("No license (.lic file) found." + lineSeparator()
+                        + "This would prevent Bonita Platform subscription edition to start normally." + lineSeparator()
                         + "Place your license file in '" + licensesFolder.toAbsolutePath().toString()
                         + "' and then try again.");
             }

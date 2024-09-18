@@ -64,7 +64,7 @@ public class ConfigurationCheckerTest {
     @Test
     public void validate_should_fail_mandatory_property_is_not_set() throws Exception {
         final String dbVendor = "dbVendor";
-        System.setProperty("sysprop.bonita.db.vendor", dbVendor);
+        System.setProperty(PlatformSetup.BONITA_DB_VENDOR_PROPERTY, dbVendor);
         final Properties propertiesWithMissingServerName = new PropertyLoader("/incomplete_database.properties")
                 .loadProperties();
 

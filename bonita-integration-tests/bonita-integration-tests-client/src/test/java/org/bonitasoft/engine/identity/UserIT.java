@@ -35,6 +35,7 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.platform.setup.PlatformSetup;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -734,7 +735,7 @@ public class UserIT extends TestWithTechnicalUser {
     @Test
     public void should_search_user_case_insensitively() throws BonitaException {
         Assume.assumeTrue("Search is case sensitive on our docker oracle",
-                !System.getProperty("sysprop.bonita.bdm.db.vendor").equals("oracle"));
+                !PlatformSetup.getPropertyBonitaBdmDbVendor().equals("oracle"));
         List<User> users = asList(
                 getIdentityAPI().createUser("Jean_Michel", "bpm", "Jean Michel", "Jarre"),
                 getIdentityAPI().createUser("michel.mimi", "bpm", "Michel", "Mimi"));

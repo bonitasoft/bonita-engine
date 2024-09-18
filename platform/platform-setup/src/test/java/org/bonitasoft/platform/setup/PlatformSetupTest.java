@@ -14,7 +14,8 @@
 package org.bonitasoft.platform.setup;
 
 import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_DB_VENDOR_PROPERTY;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.mockito.Mockito.*;
 
@@ -29,6 +30,7 @@ import javax.sql.DataSource;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
+import org.bonitasoft.platform.database.DatabaseVendor;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.util.ConfigurationFolderUtil;
 import org.bonitasoft.platform.version.VersionService;
@@ -36,13 +38,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Baptiste Mesta
@@ -65,10 +67,8 @@ public class PlatformSetupTest {
     @InjectMocks
     private PlatformSetup platformSetup;
 
-    private ConfigurationFolderUtil configurationFolderUtil = new ConfigurationFolderUtil();
+    private final ConfigurationFolderUtil configurationFolderUtil = new ConfigurationFolderUtil();
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     @Rule
@@ -76,6 +76,7 @@ public class PlatformSetupTest {
 
     @Before
     public void before() throws Exception {
+        ReflectionTestUtils.setField(platformSetup, "dbVendor", DatabaseVendor.H2.getValue());
         doReturn(connection).when(dataSource).getConnection();
         doReturn(metaData).when(connection).getMetaData();
     }
@@ -84,26 +85,73 @@ public class PlatformSetupTest {
     public void should_not_check_license_if_platform_already_init() throws Exception {
         final Path setupFolder = temporaryFolder.newFolder().toPath();
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
-        final Path platform_conf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
-        final Path licenseFolder = platform_conf.resolve("licenses");
+        final Path platformConf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
+        final Path licenseFolder = platformConf.resolve("licenses");
         Files.createDirectories(licenseFolder);
         doReturn(true).when(scriptExecutor).isPlatformAlreadyCreated();
 
         //no exception
-        platformSetup.init();
+        assertThatNoException().isThrownBy(platformSetup::init);
     }
 
     @Test
     public void should_fail_if_init_with_no_license() throws Exception {
         final Path setupFolder = temporaryFolder.newFolder().toPath();
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
-        final Path platform_conf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
-        final Path licenseFolder = platform_conf.resolve("licenses");
+        final Path platformConf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
+        final Path licenseFolder = platformConf.resolve("licenses");
         Files.createDirectories(licenseFolder);
 
-        expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("No license (.lic file) found");
-        platformSetup.init();
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::init)
+                .withMessageStartingWith("No license (.lic file) found.");
+    }
+
+    @Test
+    public void should_fail_if_init_with_incorrect_database_vendor() {
+        //given
+        String dbVendor = "foobar";
+        ReflectionTestUtils.setField(platformSetup, "dbVendor", dbVendor);
+
+        //when - then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(platformSetup::init)
+                .withMessage("Unknown database vendor: %s", dbVendor);
+    }
+
+    @Test
+    public void should_fail_if_init_with_unsupported_database_vendor() {
+        //given
+        DatabaseVendor dbVendor = DatabaseVendor.ORACLE;
+        ReflectionTestUtils.setField(platformSetup, "dbVendor", dbVendor.getValue());
+
+        //when - then
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::init)
+                .withMessage("Database vendor '%s' is not supported with the community edition", dbVendor);
+    }
+
+    @Test
+    public void should_not_fail_if_init_with_postgres_database_vendor() {
+        //given
+        ReflectionTestUtils.setField(platformSetup, "dbVendor", DatabaseVendor.POSTGRES.getValue());
+
+        //when - then
+        assertThatNoException().isThrownBy(platformSetup::init);
+    }
+
+    @Test
+    public void should_init_dbVendor_with_system_prop_if_null() throws Exception {
+        //given
+        ReflectionTestUtils.setField(platformSetup, "dbVendor", null);
+        DatabaseVendor dbVendor = DatabaseVendor.POSTGRES;
+        System.setProperty(BONITA_DB_VENDOR_PROPERTY, dbVendor.getValue());
+
+        //when
+        platformSetup.initProperties();
+
+        //then
+        assertThat(platformSetup.dbVendor).isEqualTo(dbVendor.getValue());
     }
 
     @Test
@@ -150,8 +198,7 @@ public class PlatformSetupTest {
         final Path folder = platformSetup.getFolderFromConfiguration(configuration);
 
         // then:
-        assertThat(folder.toString())
-                .isEqualTo(separatorsToSystem(setupFolder.toString() + "/platform_conf/current/some_folder"));
+        assertThat(folder).hasToString(separatorsToSystem(setupFolder + "/platform_conf/current/some_folder"));
     }
 
     @Test
@@ -167,7 +214,7 @@ public class PlatformSetupTest {
         final Path folder = platformSetup.getFolderFromConfiguration(configuration);
 
         // then:
-        assertThat(folder.toString()).isEqualTo(separatorsToSystem(setupFolder.toString() +
-                "/platform_conf/current/tenants/2/tenant-level-folder"));
+        assertThat(folder)
+                .hasToString(separatorsToSystem(setupFolder + "/platform_conf/current/tenants/2/tenant-level-folder"));
     }
 }

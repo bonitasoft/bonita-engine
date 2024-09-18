@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import org.bonitasoft.platform.exception.PlatformException;
+import org.bonitasoft.platform.setup.PlatformSetup;
 
 /**
  * @author Emmanuel Duchastenier
@@ -55,16 +56,16 @@ class TomcatBundleConfigurator extends BundleConfigurator {
 
             // 1. update setenv(.sh|.bat):
             String newContent = readContentFromFile(getTemplateFolderPath("setenv.bat"));
-            newContent = updateSetEnvFile(newContent, dbVendor, "sysprop.bonita.db.vendor");
-            newContent = updateSetEnvFile(newContent, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
+            newContent = updateSetEnvFile(newContent, dbVendor, PlatformSetup.BONITA_DB_VENDOR_PROPERTY);
+            newContent = updateSetEnvFile(newContent, bdmDbVendor, PlatformSetup.BONITA_BDM_DB_VENDOR_PROPERTY);
             backupAndReplaceContentIfNecessary(setEnvWindowsFile, newContent,
                     "Setting Bonita internal database vendor to '" + dbVendor
                             + "' and Business Data database vendor to '" + bdmDbVendor
                             + "' in 'setenv.bat' file");
 
             newContent = readContentFromFile(getTemplateFolderPath("setenv.sh"));
-            newContent = updateSetEnvFile(newContent, dbVendor, "sysprop.bonita.db.vendor");
-            newContent = updateSetEnvFile(newContent, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
+            newContent = updateSetEnvFile(newContent, dbVendor, PlatformSetup.BONITA_DB_VENDOR_PROPERTY);
+            newContent = updateSetEnvFile(newContent, bdmDbVendor, PlatformSetup.BONITA_BDM_DB_VENDOR_PROPERTY);
             backupAndReplaceContentIfNecessary(setEnvUnixFile, newContent,
                     "Setting Bonita internal database vendor to '" + dbVendor
                             + "' and Business Data database vendor to '" + bdmDbVendor
