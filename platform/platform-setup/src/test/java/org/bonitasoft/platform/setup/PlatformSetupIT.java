@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.platform.setup;
 
+import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.platform.configuration.type.ConfigurationType.PLATFORM_ENGINE;
 import static org.bonitasoft.platform.configuration.type.ConfigurationType.TENANT_TEMPLATE_PORTAL;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
@@ -30,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
@@ -45,7 +45,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ClearSystemProperties;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,16 +63,11 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 })
 public class PlatformSetupIT {
 
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
     @Rule
     public final ClearSystemProperties clearSystemProperties = new ClearSystemProperties(BONITA_SETUP_FOLDER);
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();//.muteForSuccessfulTests();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Value("${db.vendor}")
     private String dbVendor;
@@ -136,7 +130,7 @@ public class PlatformSetupIT {
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList("SELECT * FROM CONFIGURATION WHERE resource_name = 'whatever.properties'");
         assertThat(rows).hasSize(1);
-        assertThat(rows.get(0).get("resource_content")).isEqualTo("custom content".getBytes());
+        assertThat(rows.get(0)).containsEntry("resource_content", "custom content".getBytes());
         assertThat(systemOutRule.getLog())
                 .contains("Database will be initialized with configuration files from folder: "
                         + setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").toString());
@@ -152,17 +146,17 @@ public class PlatformSetupIT {
                         + ConfigurationType.TENANT_TEMPLATE_PORTAL + "' ORDER BY resource_name");
         assertThat(rows).hasSize(9);
         int rowId = 0;
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping-custom.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME"))
-                .isEqualTo("compound-permissions-mapping-internal.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("console-config.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("custom-permissions-mapping.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("resources-permissions-mapping-custom.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME"))
-                .isEqualTo("resources-permissions-mapping-internal.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("resources-permissions-mapping.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("security-config.properties");
+        assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME", "compound-permissions-mapping-custom.properties");
+        assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME",
+                "compound-permissions-mapping-internal.properties");
+        assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME", "compound-permissions-mapping.properties");
+        assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME", "console-config.properties");
+        assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME", "custom-permissions-mapping.properties");
+        assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME", "resources-permissions-mapping-custom.properties");
+        assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME",
+                "resources-permissions-mapping-internal.properties");
+        assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME", "resources-permissions-mapping.properties");
+        assertThat(rows.get(rowId)).containsEntry("RESOURCE_NAME", "security-config.properties");
     }
 
     @Test
@@ -174,9 +168,9 @@ public class PlatformSetupIT {
                 .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.PLATFORM_PORTAL
                         + "' ORDER BY resource_name");
         assertThat(rows).hasSize(3);
-        assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("cache-config.xml");
-        assertThat(rows.get(1).get("RESOURCE_NAME")).isEqualTo("platform-tenant-config.properties");
-        assertThat(rows.get(2).get("RESOURCE_NAME")).isEqualTo("security-config.properties");
+        assertThat(rows.get(0)).containsEntry("RESOURCE_NAME", "cache-config.xml");
+        assertThat(rows.get(1)).containsEntry("RESOURCE_NAME", "platform-tenant-config.properties");
+        assertThat(rows.get(2)).containsEntry("RESOURCE_NAME", "security-config.properties");
     }
 
     @Test
@@ -232,8 +226,9 @@ public class PlatformSetupIT {
         assertThat(platformSetup.isPlatformAlreadyCreated()).isTrue();
 
         final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        assertThat(log).as("should setup log message").doesNotContain("Platform is already created. Nothing to do.");
-        assertThat(log).contains("Platform created.")
+        assertThat(log).as("should setup log message")
+                .doesNotContain("Platform is already created. Nothing to do.")
+                .contains("Platform created.")
                 .contains("Initial configuration files successfully pushed to database");
     }
 
@@ -250,10 +245,10 @@ public class PlatformSetupIT {
         assertThat(platformSetup.isPlatformAlreadyCreated()).isTrue();
 
         final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        assertThat(log).doesNotContain("Platform created.");
-        assertThat(log).contains("Platform is already created.");
-        assertThat(log).contains("Upgrading default configuration");
-
+        assertThat(log)
+                .doesNotContain("Platform created.")
+                .contains("Platform is already created.")
+                .contains("Upgrading default configuration");
     }
 
     @Test
@@ -270,8 +265,8 @@ public class PlatformSetupIT {
 
         // then
         assertThat(setupFolder.listFiles()).hasSize(1);
-        List backupDirectory = Arrays.stream(setupFolder.listFiles()[0].listFiles())
-                .filter(it -> it.getName().contains("backup")).collect(Collectors.toList());
+        List<File> backupDirectory = Arrays.stream(setupFolder.listFiles()[0].listFiles())
+                .filter(it -> it.getName().contains("backup")).toList();
         assertThat(backupDirectory).hasSize(1);
         final String log = systemOutRule.getLogWithNormalizedLineSeparator();
         assertThat(log).contains("Backup directory created:");
@@ -292,31 +287,27 @@ public class PlatformSetupIT {
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
         platformSetup.pull();
-        final Path platform_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
+        final Path platformEngine = setupFolder.toPath().resolve("platform_conf").resolve("current")
                 .resolve("platform_engine");
-        FileUtils.deleteDirectory(platform_engine.toFile());
+        FileUtils.deleteDirectory(platformEngine.toFile());
 
-        // then
-        expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("You are trying to remove a protected folder from configuration");
-        expectedException.expectMessage(platform_engine.toString());
-        expectedException.expectMessage("To restore the deleted folders");
-
-        // when
-        platformSetup.push();
+        // when - then
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::push)
+                .withMessageStartingWith("You are trying to remove a protected folder from configuration")
+                .withMessageContaining(platformEngine.toString())
+                .withMessageContaining("To restore the deleted folders");
     }
 
     @Test
-    public void push_should_throw_exception_when_platform_is_not_created() throws Exception {
+    public void push_should_throw_exception_when_platform_is_not_created() {
         //given
         assertThat(platformSetup.isPlatformAlreadyCreated()).isFalse();
 
-        //expect
-        expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("Platform is not created. Run 'setup init' first.");
-
-        //when
-        platformSetup.push();
+        // when - then
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::push)
+                .withMessage("Platform is not created. Run 'setup init' first.");
     }
 
     @Test
@@ -398,8 +389,8 @@ public class PlatformSetupIT {
         try {
             platformSetup.push();
             fail();
-        } catch (PlatformException ignored) {
-            assertThat(ignored.getMessage()).isEqualTo("Unable to push configuration from " +
+        } catch (PlatformException e) {
+            assertThat(e.getMessage()).isEqualTo("Unable to push configuration from " +
                     current +
                     ", as directory does not exists. To modify your configuration, run 'setup pull', update your configuration files from "
                     +
@@ -420,20 +411,18 @@ public class PlatformSetupIT {
         platformSetup.init();
         jdbcTemplate.execute("UPDATE platform SET version='bad version'");
 
-        //then
-        expectedException.expect(PlatformException.class);
-        expectedException.expectMessage(
-                "The version of the platform (binaries) you are running [" + versionService.getPlatformSetupVersion() +
-                        "] only support database schema in version ["
-                        + versionService.getSupportedDatabaseSchemaVersion() + "]" +
-                        " but the current database schema version is [bad version]." +
-                        " You might need to migrate your platform or use a different version of the binaries.");
-
-        //when
         final Path confFolder = temporaryFolder.newFolder().toPath();
         configurationFolderUtil.buildCurrentFolder(confFolder);
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toFile().getAbsolutePath());
-        platformSetup.push();
+
+        // when - then
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::push)
+                .withMessage("The version of the platform (binaries) you are running ["
+                        + versionService.getPlatformSetupVersion() + "] only support database schema in version ["
+                        + versionService.getSupportedDatabaseSchemaVersion() + "]" +
+                        " but the current database schema version is [bad version]." +
+                        " You might need to migrate your platform or use a different version of the binaries.");
     }
 
     @Test
@@ -442,24 +431,20 @@ public class PlatformSetupIT {
         platformSetup.init();
         jdbcTemplate.execute("UPDATE platform SET version='bad version'");
 
-        //then
-        expectedException.expect(PlatformException.class);
-        expectedException.expectMessage(
-                "The version of the platform (binaries) you are running [" + versionService.getPlatformSetupVersion() +
-                        "] only support database schema in version ["
+        // when - then
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::pull)
+                .withMessage("The version of the platform (binaries) you are running ["
+                        + versionService.getPlatformSetupVersion() + "] only support database schema in version ["
                         + versionService.getSupportedDatabaseSchemaVersion() + "]" +
                         " but the current database schema version is [bad version]." +
                         " You might need to migrate your platform or use a different version of the binaries.");
-
-        //when
-        platformSetup.pull();
-
     }
 
     @Test
     public void pushLicences_should_pass_if_licence_folder_does_not_exists() throws Exception {
         platformSetup.initProperties();
-        platformSetup.preventFromPushingZeroLicense();
+        assertThatNoException().isThrownBy(platformSetup::preventFromPushingZeroLicense);
     }
 
     @Test
@@ -470,46 +455,44 @@ public class PlatformSetupIT {
         configurationFolderUtil.buildSqlFolder(setupFolder, dbVendor);
         platformSetup.init();
         platformSetup.pull();
-        platformSetup.pull();
+        assertThatNoException().isThrownBy(platformSetup::pull);
     }
 
     @Test
     public void pushLicences_should_fail_if_licence_folder_exists_but_is_empty() throws Exception {
         final Path setupFolder = temporaryFolder.newFolder().toPath();
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
-        final Path platform_conf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
+        final Path platformConf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
 
-        final Path licenseFolder = platform_conf.resolve("licenses");
+        final Path licenseFolder = platformConf.resolve("licenses");
         Files.createDirectories(licenseFolder);
 
-        expectedException.expect(PlatformException.class);
-        expectedException
-                .expectMessage("No license (.lic file) found." + LINE_SEPARATOR
-                        + "This would prevent Bonita Platform subscription edition"
-                        + " to start normally." + LINE_SEPARATOR + "Place your license file");
-
         platformSetup.initProperties();
-        platformSetup.preventFromPushingZeroLicense();
+
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::preventFromPushingZeroLicense)
+                .withMessageStartingWith("No license (.lic file) found." + lineSeparator()
+                        + "This would prevent Bonita Platform subscription edition"
+                        + " to start normally." + lineSeparator() + "Place your license file");
     }
 
     @Test
     public void pushLicences_should_fail_if_no_license_file_with_lic_extension_exists() throws Exception {
         final Path setupFolder = temporaryFolder.newFolder().toPath();
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
-        final Path platform_conf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
+        final Path platformConf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
 
-        final Path licenseFolder = platform_conf.resolve("licenses");
+        final Path licenseFolder = platformConf.resolve("licenses");
         Files.createDirectories(licenseFolder);
         Files.createFile(licenseFolder.resolve("bonita-file.renamed"));
 
-        expectedException.expect(PlatformException.class);
-        expectedException
-                .expectMessage("No license (.lic file) found." + LINE_SEPARATOR
-                        + "This would prevent Bonita Platform subscription edition"
-                        + " to start normally." + LINE_SEPARATOR + "Place your license file");
-
         platformSetup.initProperties();
-        platformSetup.preventFromPushingZeroLicense();
+
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::preventFromPushingZeroLicense)
+                .withMessageStartingWith("No license (.lic file) found." + lineSeparator()
+                        + "This would prevent Bonita Platform subscription edition"
+                        + " to start normally." + lineSeparator() + "Place your license file");
     }
 
     @Test
@@ -536,7 +519,7 @@ public class PlatformSetupIT {
                 .queryForList(
                         "SELECT * FROM CONFIGURATION WHERE resource_name = 'resources-permissions-mapping.properties'");
         assertThat(rows).hasSize(2)
-                .allSatisfy(row -> assertThat(row.get("RESOURCE_CONTENT")).isEqualTo(new_7_6_0_content.getBytes()));
+                .allSatisfy(row -> assertThat(row).containsEntry("RESOURCE_CONTENT", new_7_6_0_content.getBytes()));
     }
 
     @Test

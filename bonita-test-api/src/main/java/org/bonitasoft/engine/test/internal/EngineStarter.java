@@ -42,6 +42,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.util.APITypeManager;
+import org.bonitasoft.platform.database.DatabaseVendor;
 import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
@@ -118,9 +119,10 @@ public class EngineStarter {
 
     protected void prepareEnvironment() throws Exception {
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
-        String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+        String dbVendor = setSystemPropertyIfNotSet(PlatformSetup.BONITA_DB_VENDOR_PROPERTY,
+                DatabaseVendor.H2.getValue());
         //is h2 and not started outside
-        if (Objects.equals("h2", dbVendor)) {
+        if (DatabaseVendor.H2.equalsValue(dbVendor)) {
             setSystemPropertyIfNotSet(DATABASE_DIR, "build/database");
         }
         engine.initializeEnvironment();

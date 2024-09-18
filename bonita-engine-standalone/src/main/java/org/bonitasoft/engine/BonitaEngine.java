@@ -53,8 +53,8 @@ public class BonitaEngine {
     private BasicDataSource notManagedBizDataSource;
     private javax.transaction.UserTransaction userTransaction;
     private javax.transaction.TransactionManager arjunaTransactionManager;
-    public static final String BONITA_BDM_DB_VENDOR = "sysprop.bonita.bdm.db.vendor";
-    public static final String BONITA_DB_VENDOR = "sysprop.bonita.db.vendor";
+    public static final String BONITA_BDM_DB_VENDOR = PlatformSetup.BONITA_BDM_DB_VENDOR_PROPERTY;
+    public static final String BONITA_DB_VENDOR = PlatformSetup.BONITA_DB_VENDOR_PROPERTY;
 
     public void initializeEnvironment() throws Exception {
         if (!initialized) {

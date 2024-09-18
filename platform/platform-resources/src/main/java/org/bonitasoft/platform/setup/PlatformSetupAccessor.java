@@ -47,14 +47,14 @@ public class PlatformSetupAccessor {
 
     public PlatformSetup getPlatformSetup() throws NamingException {
         if (instance == null) {
-            instance = createPlatformSetup();
+            instance = initPlatformSetup();
         }
         return instance;
     }
 
-    private PlatformSetup createPlatformSetup() throws NamingException {
+    private PlatformSetup initPlatformSetup() throws NamingException {
         final DataSource dataSource = lookupDataSource();
-        String dbVendor = System.getProperty("sysprop.bonita.db.vendor");
+        String dbVendor = PlatformSetup.getPropertyBonitaDbVendor();
         return createNewPlatformSetup(dataSource, dbVendor);
     }
 
@@ -70,8 +70,13 @@ public class PlatformSetupAccessor {
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
         VersionService versionService = new VersionServiceImpl(jdbcTemplate);
-        return new PlatformSetup(createScriptExecutor(dataSource, dbVendor, versionService),
+        return createPlatformSetup(createScriptExecutor(dataSource, dbVendor, versionService),
                 new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, dbVendor), versionService, dataSource);
+    }
+
+    protected PlatformSetup createPlatformSetup(ScriptExecutor scriptExecutor,
+            ConfigurationService configurationService, VersionService versionService, DataSource dataSource) {
+        return new PlatformSetup(scriptExecutor, configurationService, versionService, dataSource);
     }
 
     protected ScriptExecutor createScriptExecutor(DataSource dataSource, String dbVendor,
@@ -92,6 +97,6 @@ public class PlatformSetupAccessor {
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
         return new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate,
-                System.getProperty("sysprop.bonita.db.vendor"));
+                PlatformSetup.getPropertyBonitaDbVendor());
     }
 }

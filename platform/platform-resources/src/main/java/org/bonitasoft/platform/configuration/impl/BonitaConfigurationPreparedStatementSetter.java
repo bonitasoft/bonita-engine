@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
+import org.bonitasoft.platform.database.DatabaseVendor;
+import org.bonitasoft.platform.setup.PlatformSetup;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.support.lob.TemporaryLobCreator;
 
@@ -30,17 +32,14 @@ public class BonitaConfigurationPreparedStatementSetter implements BatchPrepared
     public static final String INSERT_CONFIGURATION = "INSERT into configuration(tenant_id, content_type, resource_name, resource_content) values (?,?,?,?)";
     private final List<BonitaConfiguration> bonitaConfigurations;
 
-    private String dbVendor;
-    private ConfigurationType type;
-    private long tenantId;
+    private final String dbVendor;
+    private final ConfigurationType type;
+    private final long tenantId;
 
     public BonitaConfigurationPreparedStatementSetter(List<BonitaConfiguration> bonitaConfigurations, String dbVendor,
             ConfigurationType type, long tenantId) {
         this.bonitaConfigurations = bonitaConfigurations;
-        this.dbVendor = dbVendor;
-        if (this.dbVendor == null) {
-            this.dbVendor = System.getProperty("sysprop.bonita.db.vendor");
-        }
+        this.dbVendor = dbVendor == null ? PlatformSetup.getPropertyBonitaDbVendor() : dbVendor;
         this.type = type;
         this.tenantId = tenantId;
     }
@@ -51,16 +50,12 @@ public class BonitaConfigurationPreparedStatementSetter implements BatchPrepared
         ps.setLong(COLUMN_INDEX_TENANT_ID, tenantId);
         ps.setString(COLUMN_INDEX_TYPE, type.toString());
         ps.setString(COLUMN_INDEX_RESOURCE_NAME, bonitaConfiguration.getResourceName());
-        switch (dbVendor) {
-            case "h2":
-            case "postgres":
+        switch (DatabaseVendor.parseValue(dbVendor)) {
+            case H2, POSTGRES:
                 ps.setBytes(COLUMN_INDEX_RESOURCE_CONTENT, bonitaConfiguration.getResourceContent());
                 break;
-            case "oracle":
-            case "mysql":
-            case "sqlserver":
-                TemporaryLobCreator temporaryLobCreator = new TemporaryLobCreator();
-                temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT,
+            case ORACLE, MYSQL, SQLSERVER:
+                new TemporaryLobCreator().setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT,
                         bonitaConfiguration.getResourceContent());
                 break;
             default:
