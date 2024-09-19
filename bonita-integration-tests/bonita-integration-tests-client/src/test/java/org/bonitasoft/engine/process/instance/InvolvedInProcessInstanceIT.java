@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.process.instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import java.util.Collections;
 
@@ -102,8 +103,9 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
         getProcessAPI().removeActorMember(jimActorMember.getId());
 
         // then
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(john.getId(), processInstanceId))
-                .as("directly mapped user should be involved").isTrue();
+        await().alias("directly mapped user should be involved")
+                .until(() -> getProcessAPI().isInvolvedInProcessInstance(john.getId(), processInstanceId));
+
         assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJohn.getId(), processInstanceId)).as(
                 "manager of directly mapped user should not be involved").isFalse();
         assertThat(getProcessAPI().isManagerOfUserInvolvedInProcessInstance(john.getId(), processInstanceId))
@@ -187,25 +189,23 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
         logoutThenloginAs(james.getUserName(), "bpm");
         final HumanTaskInstance step2Instance = waitForUserTaskAndAssignIt(processInstance, "step2", james);
         assertThat(getProcessAPI().isManagerOfUserInvolvedInProcessInstance(managerOfJames.getId(), processInstanceId))
-                .as(
-                        "the manager of a user assigned to a task should be involved")
-                .isTrue();
+                .as("the manager of a user assigned to a task should be involved").isTrue();
 
         getProcessAPI().removeActorMember(jackActorMember.getId());
         logoutThenloginAs(jack.getUserName(), "bpm");
         assignAndExecuteStep(step2Instance, jack);
         waitForProcessToFinish(processInstanceId);
         assertThat(getProcessAPI().isInvolvedInProcessInstance(jack.getId(), processInstanceId)).as(
-                "a user executer of a task in an archived process instance should be involved").isTrue();
+                "a user executor of a task in an archived process instance should be involved").isTrue();
         assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJack.getId(), processInstanceId)).as(
-                "a manager of a user executer of a task in an archived process instance should not be involved")
+                "a manager of a user executor of a task in an archived process instance should not be involved")
                 .isFalse();
         assertThat(getProcessAPI().isManagerOfUserInvolvedInProcessInstance(jack.getId(), processInstanceId)).as(
-                "a user executer of a task in an archived process instance should not be involved (as a manager)")
+                "a user executor of a task in an archived process instance should not be involved (as a manager)")
                 .isFalse();
         assertThat(getProcessAPI().isManagerOfUserInvolvedInProcessInstance(managerOfJack.getId(), processInstanceId))
                 .as(
-                        "a manager of a user executer of a task in an archived process instance should be involved (as a manager)")
+                        "a manager of a user executor of a task in an archived process instance should be involved (as a manager)")
                 .isTrue();
 
         assertThat(getProcessAPI().isInvolvedInProcessInstance(jim.getId(), processInstanceId)).as(
