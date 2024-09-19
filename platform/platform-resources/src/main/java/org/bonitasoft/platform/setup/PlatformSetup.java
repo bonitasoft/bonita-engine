@@ -85,7 +85,6 @@ public class PlatformSetup {
 
     private final DataSource dataSource;
 
-    @Value("${db.vendor}")
     protected String dbVendor;
 
     private Path initialConfigurationFolder;
@@ -97,11 +96,12 @@ public class PlatformSetup {
             PlatformSetup.class.getClassLoader());
 
     public PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService,
-            VersionService versionService, DataSource dataSource) {
+            VersionService versionService, DataSource dataSource, @Value("${db.vendor}") String dbVendor) {
         this.scriptExecutor = scriptExecutor;
         this.configurationService = configurationService;
         this.versionService = versionService;
         this.dataSource = dataSource;
+        this.dbVendor = dbVendor;
     }
 
     /**
