@@ -70,13 +70,16 @@ public class PlatformSetupAccessor {
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
         VersionService versionService = new VersionServiceImpl(jdbcTemplate);
-        return createPlatformSetup(createScriptExecutor(dataSource, dbVendor, versionService),
-                new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, dbVendor), versionService, dataSource);
+        return createPlatformSetup(
+                createScriptExecutor(dataSource, dbVendor, versionService),
+                new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, dbVendor),
+                versionService, dataSource, dbVendor);
     }
 
     protected PlatformSetup createPlatformSetup(ScriptExecutor scriptExecutor,
-            ConfigurationService configurationService, VersionService versionService, DataSource dataSource) {
-        return new PlatformSetup(scriptExecutor, configurationService, versionService, dataSource);
+            ConfigurationService configurationService, VersionService versionService, DataSource dataSource,
+            String dbVendor) {
+        return new PlatformSetup(scriptExecutor, configurationService, versionService, dataSource, dbVendor);
     }
 
     protected ScriptExecutor createScriptExecutor(DataSource dataSource, String dbVendor,

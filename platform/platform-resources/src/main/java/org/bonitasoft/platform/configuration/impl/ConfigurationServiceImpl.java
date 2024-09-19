@@ -47,7 +47,6 @@ import org.bonitasoft.platform.configuration.util.UpdateConfigurationInTransacti
 import org.bonitasoft.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -67,18 +66,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private final TransactionTemplate transactionTemplate;
 
-    @Value("${db.vendor}")
-    private String dbVendor;
-
-    @Autowired
-    public ConfigurationServiceImpl(JdbcTemplate jdbcTemplate,
-            TransactionTemplate transactionTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.transactionTemplate = transactionTemplate;
-    }
+    private final String dbVendor;
 
     public ConfigurationServiceImpl(JdbcTemplate jdbcTemplate,
-            TransactionTemplate transactionTemplate, String dbVendor) {
+            TransactionTemplate transactionTemplate, @Value("${db.vendor}") String dbVendor) {
         this.jdbcTemplate = jdbcTemplate;
         this.transactionTemplate = transactionTemplate;
         this.dbVendor = dbVendor;
