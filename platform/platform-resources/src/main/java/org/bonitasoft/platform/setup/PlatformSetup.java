@@ -81,6 +81,7 @@ public class PlatformSetup {
     @Getter // Used by distrib bundle tests
     private final ConfigurationService configurationService;
 
+    @Getter
     private final VersionService versionService;
 
     private final DataSource dataSource;
@@ -90,7 +91,7 @@ public class PlatformSetup {
     private Path initialConfigurationFolder;
     private Path currentConfigurationFolder;
     private Path backupConfigurationFolder;
-    private Path licensesFolder;
+    protected Path licensesFolder;
     private Path backupLicensesFolder;
     private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
             PlatformSetup.class.getClassLoader());
@@ -150,7 +151,7 @@ public class PlatformSetup {
             LOGGER.warn("Database will be initialized with configuration files from classpath");
             insertNewConfigurationsFromClasspathIfExist();
         }
-        pushLicenses();
+        pushLicenses(true);
         LOGGER.info("Initial configuration files successfully pushed to database");
         initializeTenant();
 
@@ -215,9 +216,10 @@ public class PlatformSetup {
         ensureNoCriticalFoldersAreDeleted(forcePush);
         pull(backupConfigurationFolder, backupLicensesFolder);
         LOGGER.info("Backup directory created: {}", backupConfigurationFolder);
+        var hasLicenses = !getConfigurationService().getLicenses().isEmpty();
         clean();
         pushFromFolder(currentConfigurationFolder);
-        pushLicenses();
+        pushLicenses(hasLicenses);
         LOGGER.info(
                 "Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
     }
@@ -332,13 +334,8 @@ public class PlatformSetup {
     /**
      * lookup for license file and push them to database
      */
-    private void pushLicenses() throws PlatformException {
-        if (!Files.isDirectory(licensesFolder)) {
-            //do nothing in community
-            return;
-        }
-        LOGGER.info("Pushing license files from folder: {}", licensesFolder);
-        configurationService.storeLicenses(licensesFolder.toFile());
+    protected void pushLicenses(boolean hasLicenses) throws PlatformException {
+        // Nothing to do in community
     }
 
     private void initializePlatform() throws PlatformException {

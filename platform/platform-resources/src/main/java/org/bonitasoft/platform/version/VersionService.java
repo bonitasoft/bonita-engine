@@ -28,6 +28,21 @@ public interface VersionService {
     String retrieveDatabaseSchemaVersion() throws PlatformException;
 
     /**
+     * Retrieves the platform information in database
+     *
+     * @return platform information
+     * @throws PlatformException
+     */
+    String retrievePlatformInformation() throws PlatformException;
+
+    /**
+     * Clear platform information
+     *
+     * @throws PlatformException
+     */
+    void clearPlatformInformation() throws PlatformException;
+
+    /**
      * Retrieves the platform setup tool version
      *
      * @return platform setup tool current version
