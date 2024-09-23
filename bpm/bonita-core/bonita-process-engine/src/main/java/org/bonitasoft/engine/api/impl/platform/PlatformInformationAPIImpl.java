@@ -33,18 +33,21 @@ import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 @AvailableInMaintenanceMode
 public class PlatformInformationAPIImpl implements PlatformInformationAPI {
 
-    private final ProcessStarterVerifier processStarterVerifier;
+    private ProcessStarterVerifier processStarterVerifier;
 
     public PlatformInformationAPIImpl() {
-        this.processStarterVerifier = ServiceAccessorSingleton.getInstance().getProcessStarterVerifier();
+        // Keep this empty constructor for compatibility with the APIAccessResolverImpl
     }
 
-    protected PlatformInformationAPIImpl(ProcessStarterVerifier processStarterVerifier) {
+    PlatformInformationAPIImpl(ProcessStarterVerifier processStarterVerifier) {
         this.processStarterVerifier = processStarterVerifier;
     }
 
     @Override
     public Map<String, String> getPlatformInformation() {
+        if (processStarterVerifier == null) {
+            this.processStarterVerifier = ServiceAccessorSingleton.getInstance().getProcessStarterVerifier();
+        }
         return Map.of(
                 "edition", "community",
                 "caseCounter", valueOf(processStarterVerifier.getCurrentNumberOfStartedProcessInstances()),
