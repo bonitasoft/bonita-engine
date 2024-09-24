@@ -18,7 +18,11 @@ import static org.bonitasoft.engine.Profiles.CLUSTER;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -45,6 +49,9 @@ public class SpringBeanAccessor {
     private static final String WORK_CORE_POOL_SIZE = "bonita.tenant.work.corePoolSize";
     private static final String WORK_MAX_POOL_SIZE = "bonita.tenant.work.maximumPoolSize";
     private static final String WORK_KEEP_ALIVE_IN_SECONDS = "bonita.tenant.work.keepAliveTimeSeconds";
+    private static final String WORK_SQLSERVER_DELAY_ON_MULTIPLE_XA_RESOURCE = "bonita.tenant.work.sqlserver.delayOnMultipleXAResource";
+    private static final String WORK_MYSQL_DELAY_ON_MULTIPLE_XA_RESOURCE = "bonita.tenant.work.mysql.delayOnMultipleXAResource";
+    private static final String WORK_ORACLE_DELAY_ON_MULTIPLE_XA_RESOURCE = "bonita.tenant.work.oracle.delayOnMultipleXAResource";
     private static final String CONNECTOR_CORE_POOL_SIZE = "bonita.tenant.connector.corePoolSize";
     private static final String CONNECTOR_MAX_POOL_SIZE = "bonita.tenant.connector.maximumPoolSize";
     private static final String CONNECTOR_KEEP_ALIVE_IN_SECONDS = "bonita.tenant.connector.keepAliveTimeSeconds";
@@ -120,6 +127,9 @@ public class SpringBeanAccessor {
         warnIfPropertyIsDeprecated(propertySources, WORK_CORE_POOL_SIZE);
         warnIfPropertyIsDeprecated(propertySources, WORK_MAX_POOL_SIZE);
         warnIfPropertyIsDeprecated(propertySources, WORK_KEEP_ALIVE_IN_SECONDS);
+        warnIfPropertyIsDeprecated(propertySources, WORK_SQLSERVER_DELAY_ON_MULTIPLE_XA_RESOURCE);
+        warnIfPropertyIsDeprecated(propertySources, WORK_MYSQL_DELAY_ON_MULTIPLE_XA_RESOURCE);
+        warnIfPropertyIsDeprecated(propertySources, WORK_ORACLE_DELAY_ON_MULTIPLE_XA_RESOURCE);
         warnIfPropertyIsDeprecated(propertySources, CONNECTOR_CORE_POOL_SIZE);
         warnIfPropertyIsDeprecated(propertySources, CONNECTOR_MAX_POOL_SIZE);
         warnIfPropertyIsDeprecated(propertySources, CONNECTOR_KEEP_ALIVE_IN_SECONDS);
