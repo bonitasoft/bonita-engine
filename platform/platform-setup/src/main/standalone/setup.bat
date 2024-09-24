@@ -24,7 +24,7 @@ IF NOT "%BONITA_DATABASE%" == "h2" IF NOT "%BONITA_DATABASE%" == "postgres" (
     exit /b 1
 )
 
-"%JAVA_CMD%" -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*" -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication %*
+"%JAVA_CMD%" -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*" -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication %*
 
 if errorlevel 1 (
     exit /b 1

@@ -12,7 +12,8 @@ configurations {
 }
 
 dependencies {
-    api "org.apache.commons:commons-text:1.10.0"
+    api project(':platform:platform-resources')
+    api libs.commonsText
     api libs.slf4jApi
     api(libs.springBootStarter) {
         exclude(module: 'jul-to-slf4j')
@@ -20,25 +21,15 @@ dependencies {
         exclude(module: 'snakeyaml')
     }
     api libs.springBootStarterJdbc
-    api(libs.postgresql)
-    api(libs.mysql) {
-        exclude(module: 'protobuf-java')
-    }
-    api libs.msSqlServer
-    api(libs.h2)
-    api(libs.oracle) {
-        exclude(module: "ons")
-        exclude(module: "oraclepki")
-        exclude(module: "osdt_cert")
-        exclude(module: "osdt_core")
-        exclude(module: "ucp")
-        exclude(module: "simplefan")
-    }
+    api libs.h2
+    api libs.postgresql
     api libs.commonsCLI
+
     annotationProcessor libs.lombok
     compileOnly libs.lombok
-    api(project(":platform:platform-resources"))
-    runtimeOnly(libs.logback)
+
+    runtimeOnly libs.logback
+
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
@@ -76,6 +67,7 @@ processResources {
 }
 
 distTar.enabled = false
+
 distributions {
     main {
         distributionBaseName = "Bonita-platform-setup"
@@ -124,21 +116,16 @@ distributions {
     }
 }
 
-
 tasks.distZip.dependsOn configurations.inDistrib
 
 artifacts { distributionZip distZip }
 
-test { include '**/*Test.class' }
-
-
-def iT = tasks.getByName("integrationTest")
-iT.configure {
+tasks.named("integrationTest").configure {
     def testDir = new File(buildDir, "integrationTest")
     doFirst {
         testDir.mkdirs()
         systemProperty "bonita.distribution.path", distZip.outputs.files.first()
     }
     workingDir testDir
+    dependsOn distZip
 }
-tasks.integrationTest.dependsOn distZip

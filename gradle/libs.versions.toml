@@ -13,6 +13,7 @@ commonsBeanutilsVersion = "1.9.4"
 commonsCollectionsVersion = "4.4"
 tomcatDbcpVersion = "9.0.93"
 commonsCLIVersion = "1.8.0"
+commonsTextVersion = "1.10.0"
 semver4jVersion = '3.1.0'
 slf4jVersion = "1.7.36"
 # Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
@@ -105,6 +106,7 @@ commonsBeanUtils = { group = "commons-beanutils", name = "commons-beanutils", ve
 commonsCollections = { group = "org.apache.commons", name = "commons-collections4", version.ref = "commonsCollectionsVersion" }
 tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatDbcpVersion" }
 commonsCLI = { group = "commons-cli", name = "commons-cli", version.ref = "commonsCLIVersion" }
+commonsText = { group = "org.apache.commons", name = "commons-text", version.ref = "commonsTextVersion" }
 semver4j = { group = "com.vdurmont", name = "semver4j", version.ref = "semver4jVersion" }
 slf4jApi = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jVersion" }
 
