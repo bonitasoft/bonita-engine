@@ -39,7 +39,7 @@ public class PropertyReaderTest {
     public void properties_file_values_can_be_overridden_by_system_properties() throws Exception {
         // given:
         final Properties properties = new Properties();
-        properties.load(this.getClass().getResourceAsStream("/database.properties"));
+        properties.load(this.getClass().getResourceAsStream("/datasource-config/database.properties"));
 
         final PropertyReader bdmConfig = new PropertyReader(properties);
         assertThat(bdmConfig.getPropertyAndFailIfNull("bdm.db.vendor")).isEqualTo("oracle");

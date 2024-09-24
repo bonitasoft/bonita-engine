@@ -15,28 +15,20 @@ package org.bonitasoft.platform.setup;
 
 import static org.mockito.Mockito.*;
 
-import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * author Emmanuel Duchastenier
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {
-        PlatformSetupApplication.class
-})
+@SpringBootTest(classes = PlatformSetupApplication.class,
+        // use an in-memory h2 database for those tests
+        properties = "h2.url=jdbc:h2:mem:${db.database.name}")
 public class ScriptExecutorTest {
-
-    @Autowired
-    MemoryJNDISetup memoryJNDISetup;
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -55,6 +47,7 @@ public class ScriptExecutorTest {
         verify(spy, times(0)).createTables();
         verify(spy, times(0)).initializePlatformStructure();
         verify(spy, times(0)).insertPlatform();
+        verify(spy, times(0)).insertTenant();
     }
 
     @Test
@@ -70,6 +63,7 @@ public class ScriptExecutorTest {
         verify(spy).createTables();
         verify(spy).initializePlatformStructure();
         verify(spy).insertPlatform();
+        verify(spy).insertTenant();
 
         //cleanup
         scriptExecutor.deleteTables();

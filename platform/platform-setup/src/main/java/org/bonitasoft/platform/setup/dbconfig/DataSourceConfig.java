@@ -13,18 +13,14 @@
  **/
 package org.bonitasoft.platform.setup.dbconfig;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 /**
- * This is enough to get a Datasource that spring creates using parameters provided in properties.
- *
- * @author Emmanuel Duchastenier
+ * Used by Spring to create an instance of {@link javax.sql.DataSource} using parameters provided in properties.
  */
 @Component
-@PropertySource("classpath:/postgres.properties")
-@Profile("postgres")
-public class PostgresDataSourceConfig {
+@PropertySource(value = { "classpath:/database.properties", "classpath:/internal.properties" })
+public class DataSourceConfig {
 
 }

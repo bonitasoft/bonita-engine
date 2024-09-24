@@ -22,7 +22,7 @@ if [ "$BONITA_DATABASE" != "h2" ] && [ "$BONITA_DATABASE" != "postgres" ]; then
   exit 1
 fi
 
-"${JAVA_EXE}" -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}${LIBS_CP}" ${JVM_OPTS} -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=${BONITA_DATABASE} org.bonitasoft.platform.setup.PlatformSetupApplication "$@"
+"${JAVA_EXE}" -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}${LIBS_CP}" ${JVM_OPTS} -Dsysprop.bonita.db.vendor=${BONITA_DATABASE} org.bonitasoft.platform.setup.PlatformSetupApplication "$@"
 COD_RET=$?
 if [ ${COD_RET} -ne 0 ]; then
   cd - 1>/dev/null

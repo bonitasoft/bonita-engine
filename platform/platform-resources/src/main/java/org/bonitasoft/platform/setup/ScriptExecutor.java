@@ -128,7 +128,7 @@ public class ScriptExecutor {
         }
     }
 
-    private void insertTenant() {
+    protected void insertTenant() {
         final String sql = "INSERT INTO tenant (id, created, createdBy, description, defaultTenant, name, status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 

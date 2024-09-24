@@ -72,21 +72,21 @@ public class PlatformSetupDistributionIT {
         int iExitValue = executor.execute(oCmdLine);
 
         //then
-        assertThat(iExitValue).isEqualTo(0);
+        assertThat(iExitValue).isZero();
         Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(setupFolder);
         Statement statement = jdbcConnection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
-        assertThat(resultSet.getInt("nb")).isGreaterThan(0);
+        assertThat(resultSet.getInt("nb")).isPositive();
 
         oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArgument("pull");
         iExitValue = executor.execute(oCmdLine);
-        assertThat(iExitValue).isEqualTo(0);
+        assertThat(iExitValue).isZero();
 
-        final Path platform_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
+        final Path platformEngine = setupFolder.toPath().resolve("platform_conf").resolve("current")
                 .resolve("platform_engine");
-        FileUtils.deleteDirectory(platform_engine.toFile());
+        FileUtils.deleteDirectory(platformEngine.toFile());
 
         oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArgument("push");
@@ -97,7 +97,7 @@ public class PlatformSetupDistributionIT {
         oCmdLine.addArgument("--force");
         executor.setExitValue(0);
         iExitValue = executor.execute(oCmdLine);
-        assertThat(iExitValue).isEqualTo(0);
+        assertThat(iExitValue).isZero();
     }
 
     @Test
@@ -110,12 +110,12 @@ public class PlatformSetupDistributionIT {
         //when
         int iExitValue = executor.execute(oCmdLine);
         //then
-        assertThat(iExitValue).isEqualTo(0);
+        assertThat(iExitValue).isZero();
         Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(setupFolder, "myUser");
         Statement statement = jdbcConnection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
-        assertThat(resultSet.getInt("nb")).isGreaterThan(0);
+        assertThat(resultSet.getInt("nb")).isPositive();
     }
 
     @Test
@@ -155,7 +155,7 @@ public class PlatformSetupDistributionIT {
             Files.write(databaseProperties, out.toByteArray());
             int iExitValue = executor.execute(oCmdLine);
             //then
-            assertThat(iExitValue).isEqualTo(0);
+            assertThat(iExitValue).isZero();
         } finally {
             pgServer.shutdown();
         }
