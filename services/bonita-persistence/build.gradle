@@ -1,7 +1,3 @@
-plugins {
-    id('bonita-tests')
-}
-
 dependencies {
     api libs.commonsLang
     api project(':services:bonita-events')
@@ -14,16 +10,21 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-lock')
     api libs.slf4jApi
+
     implementation(libs.javaxAnnotations)
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+
     compileOnly libs.jakartaTransactionApi
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok
-    testRuntimeOnly libs.logback
+
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+
     testAnnotationProcessor libs.lombok
     testImplementation libs.lombok
+
+    testRuntimeOnly libs.logback
 }

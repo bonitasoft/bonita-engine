@@ -33,10 +33,4 @@ dependencies {
     testImplementation("com.pholser:junit-quickcheck-generators:${Deps.junitQuickCheck}")
 }
 
-// run:
-// ./gradlew mysqlDatabaseTest
-// ./gradlew oracleDatabaseTest
-// ./gradlew sqlserverDatabaseTest
-// ./gradlew postgresDatabaseTest
-// to run tests on specific docker DB:
 databaseIntegrationTest { includes '**/*Test.class' }

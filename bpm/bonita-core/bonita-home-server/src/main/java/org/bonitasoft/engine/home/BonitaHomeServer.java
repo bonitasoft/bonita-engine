@@ -107,7 +107,6 @@ public class BonitaHomeServer {
         Properties allProperties = getPlatformProperties();
         Properties tenantProperties = mergeProperties(getPropertiesFromClassPath(
                 "bonita-tenant-community.properties",
-                "bonita-tenant-private-community.properties",
                 "bonita-tenant-sp.properties",
                 "bonita-tenant-sp-cluster.properties"), getConfigurationService().getTenantEngineConf(tenantId));
         allProperties.putAll(tenantProperties);

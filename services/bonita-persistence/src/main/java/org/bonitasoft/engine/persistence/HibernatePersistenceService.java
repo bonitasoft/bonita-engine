@@ -35,7 +35,6 @@ import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
-import org.bonitasoft.engine.services.Vendor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.hibernate.AssertionFailure;
@@ -90,9 +89,6 @@ public class HibernatePersistenceService implements PersistenceService {
         sessionFactory = hbmConfigurationProvider.getSessionFactory();
 
         this.queryBuilderFactory = queryBuilderFactory;
-        if (hbmConfigurationProvider.getVendor() == Vendor.SQLSERVER) {
-            this.queryBuilderFactory.setOrderByBuilder(new SQLServerOrderByBuilder());
-        }
         statistics = sessionFactory.getStatistics();
         classMapping = hbmConfigurationProvider.getMappedClasses();
         classAliasMappings = hbmConfigurationProvider.getClassAliasMappings();
