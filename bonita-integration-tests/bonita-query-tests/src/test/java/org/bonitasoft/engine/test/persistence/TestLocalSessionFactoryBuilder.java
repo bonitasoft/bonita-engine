@@ -27,14 +27,16 @@ public class TestLocalSessionFactoryBuilder extends LocalSessionFactoryBean {
         //register type before loading mappings/entities, type should be present before loading JPA entities
         switch (vendor) {
             case ORACLE:
-                sfb.setInterceptor(new OracleInterceptor());
+                // FIXME set following interceptor when this module is configured to run on all DB
+                //  sfb.setInterceptor(new OracleInterceptor());
                 break;
             case MYSQL:
             case OTHER:
                 sfb.registerTypeOverride(XMLType.INSTANCE);
                 break;
             case SQLSERVER:
-                sfb.setInterceptor(new SQLServerInterceptor());
+                // FIXME set following interceptor when this module is configured to run on all DB
+                //  sfb.setInterceptor(new SQLServerInterceptor());
                 sfb.registerTypeOverride(XMLType.INSTANCE);
                 break;
             case POSTGRES:
@@ -43,7 +45,7 @@ public class TestLocalSessionFactoryBuilder extends LocalSessionFactoryBean {
                 sfb.registerTypeOverride(new PostgresMaterializedClobType());
                 sfb.registerTypeOverride(PostgresXMLType.INSTANCE);
                 break;
-        };
+        }
         return super.buildSessionFactory(sfb);
     }
 }

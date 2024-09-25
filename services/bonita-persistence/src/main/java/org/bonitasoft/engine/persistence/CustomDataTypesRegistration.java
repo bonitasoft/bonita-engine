@@ -16,6 +16,7 @@ package org.bonitasoft.engine.persistence;
 import java.util.HashSet;
 import java.util.Set;
 
+import lombok.Getter;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.boot.spi.SessionFactoryBuilderFactory;
@@ -27,6 +28,7 @@ public class CustomDataTypesRegistration implements SessionFactoryBuilderFactory
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(CustomDataTypesRegistration.class);
 
+    @Getter
     private static Set<BasicType> typeOverrides = new HashSet<>();
 
     @Override
@@ -39,11 +41,8 @@ public class CustomDataTypesRegistration implements SessionFactoryBuilderFactory
         return defaultBuilder;
     }
 
-    static void addTypeOverride(BasicType type) {
+    public static void addTypeOverride(BasicType type) {
         typeOverrides.add(type);
     }
 
-    public static Set<BasicType> getTypeOverrides() {
-        return typeOverrides;
-    }
 }
