@@ -28,6 +28,7 @@ dependencies {
     implementation("org.restlet.jse:org.restlet.ext.jackson:${Deps.restletVersion}") {
         exclude(group: "org.codehaus.woodstox", module: "woodstox-core-asl")
         exclude(group: "org.codehaus.woodstox", module: "stax2-api")
+        exclude(group: "org.yaml", module: "snakeyaml")
     }
     implementation "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
     implementation libs.groovyCore
