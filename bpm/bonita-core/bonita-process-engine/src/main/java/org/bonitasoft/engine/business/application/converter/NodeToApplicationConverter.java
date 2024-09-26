@@ -64,6 +64,7 @@ public class NodeToApplicationConverter {
         application.setCreationDate(currentDate);
         application.setLastUpdateDate(currentDate);
         application.setCreatedBy(createdBy);
+        application.setUpdatedBy(createdBy);
         application.setIconPath(applicationNode.getIconPath());
         application.setDescription(applicationNode.getDescription());
         application.setState(applicationNode.getState());
@@ -73,9 +74,9 @@ public class NodeToApplicationConverter {
         if (applicationNode instanceof ApplicationNode legacy) {
             application.setLayoutId(getLayoutId(getLayoutName(legacy), token, importStatus));
             application.setThemeId(getThemeId(getThemeName(legacy), token, importStatus));
-            application.setIconContent(iconContent);
-            application.setIconMimeType(iconMimeType);
         }
+        application.setIconContent(iconContent);
+        application.setIconMimeType(iconMimeType);
 
         if (applicationNode.getProfile() != null) {
             setProfile(applicationNode.getProfile(), application, importStatus);
