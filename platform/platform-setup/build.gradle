@@ -92,6 +92,7 @@ distributions {
                     exclude(module: 'commons-logging')
                     exclude(module: 'log4j-api')
                     exclude(module: 'log4j-to-slf4j')
+                    exclude(module: 'snakeyaml')
                 }
             }
             configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each {
