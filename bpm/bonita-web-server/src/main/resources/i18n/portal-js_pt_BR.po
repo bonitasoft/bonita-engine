@@ -16,6 +16,12 @@ msgstr ""
 msgid "1 case has been deleted"
 msgstr "1 caso foi excluído"
 
+msgid "A Link to your application made outside the portal, e.g. with Bonita UI Builder."
+msgstr ""
+
+msgid "A classic Bonita Living Application."
+msgstr ""
+
 msgid "A page with this name already exists."
 msgstr "Já existe uma página com esse nome."
 
@@ -105,6 +111,9 @@ msgstr "Ocorreu um erro ao enviar o formulário. <br/> A tarefa pode não estar 
 
 msgid "An error occurred with the requested operation."
 msgstr "Ocorreu um erro com a operação solicitada"
+
+msgid "Application Link"
+msgstr ""
 
 msgid "Application XML file"
 msgstr "Arquivo XML do aplicativo"
@@ -523,6 +532,9 @@ msgstr "Última atualização"
 msgid "Layout"
 msgstr "Layout"
 
+msgid "Legacy Application"
+msgstr ""
+
 msgid "Loading..."
 msgstr "Carregando..."
 
@@ -856,6 +868,9 @@ msgstr "Ordenar pela URL"
 msgid "Sort by name"
 msgstr "Ordenar por nome"
 
+msgid "Sort by type"
+msgstr ""
+
 msgid "Sort by updated on"
 msgstr "Ordenar pela data de atualização"
 
@@ -996,6 +1011,12 @@ msgstr "Este é o painel de detalhes de tarefa. Nenhuma informação para exibir
 
 msgid "This name is already in use"
 msgstr "Este nome já está em uso"
+
+msgid "This only changes the application link. The application itself is still deployed at the same location."
+msgstr ""
+
+msgid "This only deletes the application link. The application itself is not deleted and is still deployed."
+msgstr ""
 
 msgid "This process is no longer available."
 msgstr "Este processo não está mais disponível."
