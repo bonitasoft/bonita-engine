@@ -46,8 +46,9 @@ class PlatformInformationAPIImplTest {
 
         //then
         assertThat(platformInformation).containsAllEntriesOf(Map.of(
-                "edition", "community",
+                "edition", "Community",
                 "caseCounter", "120",
-                "caseCounterLimit", valueOf(LIMIT)));
+                "caseCounterLimit", valueOf(LIMIT),
+                "enablePromotionMessages", "true"));
     }
 }

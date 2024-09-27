@@ -114,6 +114,7 @@ import org.bonitasoft.engine.work.WorkExecutorService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 public class SpringServiceAccessor
         implements ServiceAccessor, TenantServiceAccessor, PlatformServiceAccessor, PlatformInitServiceAccessor {
@@ -127,6 +128,11 @@ public class SpringServiceAccessor
     @Override
     public ParentContainerResolver getParentContainerResolver() {
         return beanAccessor.getService(ParentContainerResolver.class);
+    }
+
+    @Override
+    public Environment getSpringEnvironment() {
+        return beanAccessor.getContext().getEnvironment();
     }
 
     @Override
