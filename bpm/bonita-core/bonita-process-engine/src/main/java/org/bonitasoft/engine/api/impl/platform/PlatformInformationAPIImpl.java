@@ -48,9 +48,12 @@ public class PlatformInformationAPIImpl implements PlatformInformationAPI {
         if (processStarterVerifier == null) {
             this.processStarterVerifier = ServiceAccessorSingleton.getInstance().getProcessStarterVerifier();
         }
+
         return Map.of(
-                "edition", "community",
+                "edition", "Community",
                 "caseCounter", valueOf(processStarterVerifier.getCurrentNumberOfStartedProcessInstances()),
-                "caseCounterLimit", valueOf(LIMIT));
+                "caseCounterLimit", valueOf(LIMIT),
+                "enablePromotionMessages", "true");
     }
+
 }
