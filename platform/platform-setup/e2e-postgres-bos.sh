@@ -27,7 +27,7 @@ docker rm -vf bonita-postgres 2> /dev/null
 echo "============================================="
 echo "Start the Postgres database docker container"
 echo "============================================="
-docker run --rm -p 5432:5432 --name bonita-postgres -d bonitasoft/bonita-postgres:11.9
+docker run --rm -p 5432:5432 --name bonita-postgres -d bonitasoft/bonita-postgres:16.4
 
 cd ../../..
 ./gradlew build -x test
