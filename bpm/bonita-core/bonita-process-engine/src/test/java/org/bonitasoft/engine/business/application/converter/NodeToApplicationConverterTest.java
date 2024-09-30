@@ -85,7 +85,7 @@ public class NodeToApplicationConverterTest {
 
     private ImportResult convertToSApplication(final AbstractApplicationNode applicationNode, final long createdBy)
             throws Exception {
-        return converter.toSApplication(applicationNode, null, "", createdBy, true);
+        return converter.toSApplication(applicationNode, null, null, createdBy, true);
     }
 
     @Test
@@ -128,6 +128,7 @@ public class NodeToApplicationConverterTest {
         final SProfile profile = mock(SProfile.class);
         given(profile.getId()).willReturn(profileId);
         given(profileService.getProfileByName("admin")).willReturn(profile);
+        final long before = System.currentTimeMillis();
 
         //when
         long createdBy = 1L;
@@ -153,6 +154,12 @@ public class NodeToApplicationConverterTest {
         assertThat(application.getInternalProfile()).isNull();
         assertThat(application.isEditable()).isEqualTo(editable);
         assertThat(application.isLink()).isFalse();
+
+        // also check auto fields
+        final long after = System.currentTimeMillis();
+        assertThat(application.getUpdatedBy()).isEqualTo(createdBy);
+        assertThat(application.getCreationDate()).isBetween(before, after);
+        assertThat(application.getLastUpdateDate()).isEqualTo(application.getCreationDate());
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
