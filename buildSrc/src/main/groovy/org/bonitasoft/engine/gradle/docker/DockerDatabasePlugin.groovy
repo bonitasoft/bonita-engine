@@ -37,7 +37,7 @@ class DockerDatabasePlugin implements Plugin<Project> {
     List getVendors() {
         return [
                 [name       : 'postgres',
-                 image      : 'bonitasoft/bonita-postgres:15.3',
+                 image      : 'bonitasoft/bonita-postgres:16.4',
                  portBinding: 5432,
                  uriTemplate: 'jdbc:postgresql://%s:%s/%s',
                 ]
