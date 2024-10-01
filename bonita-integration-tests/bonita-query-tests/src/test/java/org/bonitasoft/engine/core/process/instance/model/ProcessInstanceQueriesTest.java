@@ -46,6 +46,7 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessM
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -876,10 +877,14 @@ public class ProcessInstanceQueriesTest {
         PersistentObject multiRefBusinessData = repository.selectOne("getSRefBusinessDataInstance",
                 pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "myMultiProcData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM ref_biz_data_inst WHERE proc_inst_id=" + PROCESS_INSTANCE_ID
-                        + " AND name='myMultiProcData'");
-        List<Map<String, Object>> dataIds = jdbcTemplate.queryForList(
-                "SELECT ID, IDX, DATA_ID FROM multi_biz_data WHERE id=" + multiRefBusinessDataInstance.getId());
+                .queryForObject(
+                        "SELECT TENANTID, ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, PROC_INST_ID, FN_INST_ID FROM ref_biz_data_inst WHERE proc_inst_id="
+                                + PROCESS_INSTANCE_ID
+                                + " AND name='myMultiProcData'",
+                        new JdbcRowMapper("TENANTID", "ID", "DATA_ID", "PROC_INST_ID", "FN_INST_ID"));
+        List<Map<String, Object>> dataIds = jdbcTemplate.query(
+                "SELECT ID, IDX, DATA_ID FROM multi_biz_data WHERE id=" + multiRefBusinessDataInstance.getId(),
+                new JdbcRowMapper("ID", "IDX", "DATA_ID"));
 
         assertThat(((SProcessMultiRefBusinessDataInstance) multiRefBusinessData).getDataIds())
                 .isEqualTo(Arrays.asList(23L, 25L, 27L));
@@ -894,9 +899,9 @@ public class ProcessInstanceQueriesTest {
                 entry("PROC_INST_ID", PROCESS_INSTANCE_ID),
                 entry("FN_INST_ID", null));
         assertThat(dataIds).containsExactly(
-                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 0), pair("DATA_ID", 23L)),
-                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 1), pair("DATA_ID", 25L)),
-                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 2), pair("DATA_ID", 27L)));
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 0L), pair("DATA_ID", 23L)),
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 1L), pair("DATA_ID", 25L)),
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 2L), pair("DATA_ID", 27L)));
     }
 
     @Test
@@ -912,9 +917,10 @@ public class ProcessInstanceQueriesTest {
         PersistentObject singleRefFromQuery = repository.selectOne("getSRefBusinessDataInstance",
                 pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "mySingleData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, PROC_INST_ID, FN_INST_ID FROM ref_biz_data_inst WHERE proc_inst_id="
-                                + PROCESS_INSTANCE_ID + " AND name='mySingleData'");
+                                + PROCESS_INSTANCE_ID + " AND name='mySingleData'",
+                        new JdbcRowMapper("ID", "DATA_ID", "PROC_INST_ID", "FN_INST_ID"));
         assertThat(singleRefFromQuery).isEqualTo(singleRef);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
                 entry("ID", singleRef.getId()),
@@ -940,10 +946,11 @@ public class ProcessInstanceQueriesTest {
         PersistentObject singleRefFromQuery = repository.selectOne("getSFlowNodeRefBusinessDataInstance",
                 pair("flowNodeInstanceId", FLOW_NODE_INSTANCE_ID), pair("name", "mySingleData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, PROC_INST_ID, FN_INST_ID FROM ref_biz_data_inst WHERE fn_inst_id="
                                 + FLOW_NODE_INSTANCE_ID
-                                + " AND name='mySingleData'");
+                                + " AND name='mySingleData'",
+                        new JdbcRowMapper("ID", "DATA_ID", "PROC_INST_ID", "FN_INST_ID"));
         assertThat(singleRefFromQuery).isEqualTo(singleRef);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
                 entry("ID", singleRef.getId()),

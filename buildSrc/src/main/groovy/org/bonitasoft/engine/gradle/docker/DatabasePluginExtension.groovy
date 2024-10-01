@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.gradle.docker
 
+import org.gradle.api.Action
+
 class DatabasePluginExtension {
 
     /**
@@ -48,28 +50,20 @@ class DatabasePluginExtension {
         this.includes.add(include)
     }
 
-    def postgres(Closure closure) {
-        closure.delegate = postgres
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
+    def postgres(Action<DatabaseExtraConfiguration> action) {
+        action.execute(postgres)
     }
 
-    def mysql(Closure closure) {
-        closure.delegate = mysql
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
+    def mysql(Action<DatabaseExtraConfiguration> action) {
+        action.execute(mysql)
     }
 
-    def oracle(Closure closure) {
-        closure.delegate = oracle
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
+    def oracle(Action<DatabaseExtraConfiguration> action) {
+        action.execute(oracle)
     }
 
-    def sqlserver(Closure closure) {
-        closure.delegate = sqlserver
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
+    def sqlserver(Action<DatabaseExtraConfiguration> action) {
+        action.execute(sqlserver)
     }
 
 }

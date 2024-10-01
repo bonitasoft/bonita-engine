@@ -49,6 +49,9 @@ class DockerDatabaseContainerTasksCreator {
         }
         project.plugins.apply('com.bmuschko.docker-remote-api')
         vendors.each { vendor ->
+            if (!extension."${vendor.name}".enabled) {
+                return // do not create docker tasks for disabled database configurations
+            }
             def uniqueName = vendor.name.capitalize()
 
             DbParser.DbConnectionSettings dbConnectionSettings = new DbParser.DbConnectionSettings()

@@ -17,9 +17,9 @@ class DockerDatabasePlugin implements Plugin<Project> {
         driversConfiguration(project)
         def databaseIntegrationTest = project.extensions.create("databaseIntegrationTest", DatabasePluginExtension)
 
-        DockerDatabaseContainerTasksCreator.createTasks(project, databaseIntegrationTest, getVendors())
 
         project.afterEvaluate {
+            DockerDatabaseContainerTasksCreator.createTasks(project, databaseIntegrationTest, getVendors())
             if (!databaseIntegrationTest.includes) {
                 println "No databaseIntegrationTest.include found. No tests to run!"
             }

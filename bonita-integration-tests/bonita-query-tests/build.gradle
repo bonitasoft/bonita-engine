@@ -1,6 +1,8 @@
-
+plugins { id 'bonita-docker-database' }
 
 dependencies {
+    testAnnotationProcessor(libs.lombok)
+    testImplementation(libs.lombok)
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation libs.h2
@@ -13,4 +15,7 @@ dependencies {
     testImplementation project(":bpm:bonita-server")
     testImplementation project(":bpm:bonita-common")
 
+    testRuntimeOnly libs.tomcatDbcp
 }
+
+databaseIntegrationTest { include "**/*Test.class" }

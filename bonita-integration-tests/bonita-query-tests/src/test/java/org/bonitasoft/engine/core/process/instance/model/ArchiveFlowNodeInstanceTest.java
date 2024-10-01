@@ -79,7 +79,7 @@ public class ArchiveFlowNodeInstanceTest {
                 .queryForMap("SELECT * FROM arch_flownode_instance where id = " + flowNode.getId());
 
         assertThat(flowNodeFromQuery).isEqualTo(flowNode);
-        assertThat(flowNodeAsMap.get("PRIORITY")).isEqualTo(3);
+        assertThat(((Number) flowNodeAsMap.get("PRIORITY")).intValue()).isEqualTo(3);
     }
 
     @Test
