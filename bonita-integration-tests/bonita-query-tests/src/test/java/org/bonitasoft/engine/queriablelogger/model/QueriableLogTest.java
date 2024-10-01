@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.TestRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +41,7 @@ public class QueriableLogTest {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    public void should_be_able_to_add_querriable_log() {
+    public void should_be_able_to_add_queriable_log() {
 
         SQueriableLog queriableLog = SQueriableLog.builder()
                 .initializeNow()//
@@ -75,7 +76,9 @@ public class QueriableLogTest {
 
         testRepository.flush();
 
-        List<Map<String, Object>> queriableLogs = jdbcTemplate.queryForList("SELECT * from queriable_log");
+        List<Map<String, Object>> queriableLogs = jdbcTemplate.query("SELECT * from queriable_log",
+                new JdbcRowMapper("ID", "TENANTID", "NUMERICINDEX1", "NUMERICINDEX2", "NUMERICINDEX3",
+                        "NUMERICINDEX4", "NUMERICINDEX5", "THREADNUMBER", "LOG_TIMESTAMP"));
 
         assertThat(queriableLogs).hasSize(2);
         assertThat(queriableLogs.stream().filter(m -> m.get("ID").equals(1L)).findFirst().get()).containsOnly(

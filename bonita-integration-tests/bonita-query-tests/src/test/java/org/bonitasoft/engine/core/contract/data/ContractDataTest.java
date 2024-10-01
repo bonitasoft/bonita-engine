@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.ContractDataRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,20 +53,20 @@ public class ContractDataTest {
         repository.flush();
 
         List<Map<String, Object>> contractData = jdbcTemplate
-                .queryForList("SELECT kind, name, scopeId, val from contract_data");
+                .query("SELECT KIND, NAME, SCOPEID, VAL from contract_data", new JdbcRowMapper("SCOPEID"));
 
         assertThat(contractData).hasSize(2);
         assertThat(contractData).anySatisfy(c -> {
-            assertThat(c.get("kind")).isEqualTo("PROCESS");
-            assertThat(c.get("name")).isEqualTo("myProcessContractData");
-            assertThat(c.get("scopeId")).isEqualTo(123L);
-            assertThat(c.get("val")).isEqualTo("<string>SerializedValue</string>");
+            assertThat(c.get("KIND")).isEqualTo("PROCESS");
+            assertThat(c.get("NAME")).isEqualTo("myProcessContractData");
+            assertThat(c.get("SCOPEID")).isEqualTo(123L);
+            assertThat(c.get("VAL")).isEqualTo("<string>SerializedValue</string>");
         });
         assertThat(contractData).anySatisfy(c -> {
-            assertThat(c.get("kind")).isEqualTo("TASK");
-            assertThat(c.get("name")).isEqualTo("myTaskContractData");
-            assertThat(c.get("scopeId")).isEqualTo(124L);
-            assertThat(c.get("val")).isEqualTo("<string>SerializedValue</string>");
+            assertThat(c.get("KIND")).isEqualTo("TASK");
+            assertThat(c.get("NAME")).isEqualTo("myTaskContractData");
+            assertThat(c.get("SCOPEID")).isEqualTo(124L);
+            assertThat(c.get("VAL")).isEqualTo("<string>SerializedValue</string>");
         });
     }
 

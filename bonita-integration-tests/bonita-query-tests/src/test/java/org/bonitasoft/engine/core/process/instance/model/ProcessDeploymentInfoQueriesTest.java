@@ -33,6 +33,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.ProcessDeploymentInfoRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -884,12 +885,15 @@ public class ProcessDeploymentInfoQueriesTest {
                 .designContent(content).build());
         repository.flush();
 
-        Map<String, Object> processDefinitionMap = jdbcTemplate.queryForMap(
-                "SELECT name, CONTENT_ID FROM process_definition WHERE processId=123456");
-        Map<String, Object> processContentMap = jdbcTemplate.queryForMap("SELECT ID FROM process_content ");
+        Map<String, Object> processDefinitionMap = jdbcTemplate.queryForObject(
+                "SELECT name, CONTENT_ID FROM process_definition WHERE processId=123456",
+                new JdbcRowMapper("CONTENT_ID"));
+        Map<String, Object> processContentMap = jdbcTemplate.queryForObject("SELECT ID FROM process_content",
+                new JdbcRowMapper("ID"));
 
-        assertThat(processDefinitionMap.get("name")).isEqualTo("MyProcessWithContent");
+        assertThat(processDefinitionMap.get("NAME")).isEqualTo("MyProcessWithContent");
         assertThat(processDefinitionMap.get("CONTENT_ID")).isEqualTo(content.getId());
         assertThat(processContentMap.get("ID")).isEqualTo(content.getId());
     }
+
 }

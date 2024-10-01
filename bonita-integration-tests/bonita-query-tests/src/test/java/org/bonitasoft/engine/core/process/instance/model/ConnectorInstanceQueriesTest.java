@@ -72,13 +72,12 @@ public class ConnectorInstanceQueriesTest {
         containerType = "Pouet";
         containerId = 1L;
         long differentContainerId = 5L;
-        long tenantId = 100L;
         expectedConnector1 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
                 .setActivationEvent(ON_FINISH)
                 .withFailureInfo(false).setState(ConnectorState.EXECUTING.toString()).build();
         expectedConnector2 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
                 .setActivationEvent(ON_ENTER)
-                .setState(ConnectorState.EXECUTING.toString()).withFailureInfo(false)
+                .setState(ConnectorState.EXECUTING.toString()).withFailureInfo(false).setExecutionOrder(1)
                 .build();
         expectedConnector3 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
                 .setActivationEvent(ON_ENTER)
@@ -86,7 +85,7 @@ public class ConnectorInstanceQueriesTest {
                 .build();
         expectedConnector4 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
                 .setActivationEvent(ON_ENTER)
-                .setState(ConnectorState.TO_BE_EXECUTED.toString()).withFailureInfo(false)
+                .setState(ConnectorState.TO_BE_EXECUTED.toString()).withFailureInfo(false).setExecutionOrder(2)
                 .build();
         expectedConnector5 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
                 .setActivationEvent(ON_ENTER)
@@ -143,10 +142,10 @@ public class ConnectorInstanceQueriesTest {
 
     @Test
     public void getNextExecutableConnectorInstance() {
-        SConnectorInstance connectors = repository
+        SConnectorInstance connector = repository
                 .getNextExecutableConnectorInstance(containerId, containerType, ON_ENTER);
 
-        assertThat(connectors).isSameAs(expectedConnector2);
+        assertThat(connector).isSameAs(expectedConnector2);
     }
 
     @Test

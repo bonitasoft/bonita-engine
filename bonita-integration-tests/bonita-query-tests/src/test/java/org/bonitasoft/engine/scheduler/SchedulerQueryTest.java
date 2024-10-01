@@ -30,6 +30,7 @@ import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.JobRepository;
 import org.hibernate.internal.util.SerializationHelper;
 import org.junit.Test;
@@ -97,7 +98,8 @@ public class SchedulerQueryTest {
 
         Long numberOfSJobDescriptor = jobRepository.selectCount("getNumberOfSJobDescriptor");
         PersistentObject searchSJobDescriptor = jobRepository.selectOne("searchSJobDescriptor");
-        Map<String, Object> jobDescriptorAsMap = jdbcTemplate.queryForMap("SELECT * FROM job_desc");
+        Map<String, Object> jobDescriptorAsMap = jdbcTemplate.queryForObject("SELECT * FROM job_desc",
+                new JdbcRowMapper("TENANTID", "ID"));
 
         assertThat(numberOfSJobDescriptor).isEqualTo(1);
         assertThat(searchSJobDescriptor).isEqualTo(jobDescriptor);
@@ -120,7 +122,8 @@ public class SchedulerQueryTest {
         Long numberOfSJobParameters = jobRepository.selectCount("getNumberOfSJobParameter");
         PersistentObject jobParameterFromQuery = jobRepository.selectOne("getJobParameters",
                 pair("jobDescriptorId", 1234L));
-        Map<String, Object> jobParameterAsMap = jdbcTemplate.queryForMap("SELECT * FROM job_param");
+        Map<String, Object> jobParameterAsMap = jdbcTemplate.queryForObject("SELECT * FROM job_param",
+                new JdbcRowMapper("TENANTID", "ID", "JOBDESCRIPTORID"));
 
         assertThat(numberOfSJobParameters).isEqualTo(1);
         assertThat(jobParameterFromQuery).isEqualTo(jobParameter);
@@ -144,7 +147,8 @@ public class SchedulerQueryTest {
 
         Long numberOfSJobLog = jobRepository.selectCount("getNumberOfSJobLog");
         PersistentObject jobLogFromQuery = jobRepository.selectOne("searchSJobLog");
-        Map<String, Object> jobLogAsMap = jdbcTemplate.queryForMap("SELECT * FROM job_log");
+        Map<String, Object> jobLogAsMap = jdbcTemplate.queryForObject("SELECT * FROM job_log",
+                new JdbcRowMapper("TENANTID", "ID", "JOBDESCRIPTORID", "RETRYNUMBER", "LASTUPDATEDATE"));
 
         assertThat(numberOfSJobLog).isEqualTo(1);
         assertThat(jobLogFromQuery).isEqualTo(jobLog);

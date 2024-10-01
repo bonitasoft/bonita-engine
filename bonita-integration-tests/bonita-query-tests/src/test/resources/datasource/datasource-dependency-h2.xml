@@ -1,0 +1,20 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<props>
+				<prop key="db.hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+				<prop key="db.datasource.classname">org.h2.jdbcx.JdbcDataSource</prop>
+				<prop key="db.url">jdbc:h2:mem:bonita;DB_CLOSE_ON_EXIT=FALSE;AUTOCOMMIT=OFF;IGNORECASE=TRUE;DATABASE_TO_LOWER=TRUE;</prop>
+				<prop key="db.user">sa</prop>
+				<prop key="db.password" />
+			</props>
+		</property>
+	</bean>
+
+	<bean id="interceptor" class="org.hibernate.EmptyInterceptor" />
+
+</beans>

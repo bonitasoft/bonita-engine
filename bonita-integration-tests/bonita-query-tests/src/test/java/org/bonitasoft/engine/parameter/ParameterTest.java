@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.TestRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +49,8 @@ public class ParameterTest {
                 pair("name", "parameterName"), pair("processDefinitionId", 12345L));
         testRepository.flush();
         Map<String, Object> parameterAsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM proc_parameter WHERE name = 'parameterName'");
+                .queryForObject("SELECT * FROM proc_parameter WHERE name = 'parameterName'",
+                        new JdbcRowMapper("TENANTID", "ID", "PROCESS_ID"));
 
         assertThat(parameterFromQuery).isEqualTo(sParameter);
         assertThat(parameterAsMap).containsOnly(
