@@ -95,11 +95,14 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
         final long processStartDate = processInstance.getStartDate();
         cleanupOldValues(processStartDate - PERIOD_IN_MILLIS);
         log.debug("Found {} cases already started in the last {} days", counters.size(), PERIOD_IN_DAYS);
+
         if (counters.size() >= LIMIT) {
-            final String nextValidTime = getStringRepresentation(getNextResetTimestamp(counters));
+            var nextResetTimestamp = getNextResetTimestamp(counters);
+            final String nextValidTime = getStringRepresentation(nextResetTimestamp);
             throw new SProcessInstanceCreationException(
                     format("Process start limit (%s cases during last %s days) reached. You are not allowed to start a new process until %s.",
-                            LIMIT, PERIOD_IN_DAYS, nextValidTime));
+                            LIMIT, PERIOD_IN_DAYS, nextValidTime),
+                    nextResetTimestamp);
         }
         try {
             synchronized (counters) {
@@ -112,7 +115,7 @@ public class ProcessStarterVerifierImpl implements ProcessStarterVerifier {
         } catch (IOException | SPlatformNotFoundException | SPlatformUpdateException e) {
             log.trace(e.getMessage(), e);
             throw new SProcessInstanceCreationException(
-                    format("Unable to start the process instance %s", processInstance.getId()));
+                    format("Unable to start the process instance %s", processInstance.getId()), e);
         }
     }
 

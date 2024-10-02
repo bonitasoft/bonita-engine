@@ -125,7 +125,7 @@ msgstr "La definición de dato %dataName% no existe para el proceso %processId%"
 msgid "Error during Application import file reading."
 msgstr "Error durante la lectura del archivo de importación de la aplicación."
 
-msgid "Error occured when starting process %processId%"
+msgid "Error occurred when starting process %processId%"
 msgstr "Ha ocurrido un error al iniciar el proceso %processId%"
 
 msgid "Error uploading the file. Maybe your session expired. You can try to refresh the page."

@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,7 +156,7 @@ public class ProcessInstantiationResourceTest extends RestletTest {
     }
 
     @Test
-    public void should_respond_400_Bad_request_when_contract_is_not_validated_when_instanciate_a_process()
+    public void should_respond_400_Bad_request_when_contract_is_not_validated_when_instantiate_a_process()
             throws Exception {
         doThrow(new ContractViolationException("aMessage", "aMessage",
                 asList("first explanation", "second explanation"), null))
@@ -164,15 +165,15 @@ public class ProcessInstantiationResourceTest extends RestletTest {
 
         final Response response = request(URL_API_PROCESS_INSTANTIATION_TEST).post(VALID_POST_BODY);
 
-        assertThat(response).hasStatus(Status.CLIENT_ERROR_BAD_REQUEST);
         assertThat(response)
+                .hasStatus(Status.CLIENT_ERROR_BAD_REQUEST)
                 .hasJsonEntityEqualTo(
                         "{\"exception\":\"class org.bonitasoft.engine.bpm.contract.ContractViolationException\",\"message\":\"aMessage\",\"explanations\":[\"first explanation\",\"second explanation\"]}");
         verify(processInstantiationResource.typeConverterUtil, times(0)).deleteTemporaryFiles(anyMap());
     }
 
     @Test
-    public void should_respond_500_Internal_server_error_when_error_occurs_on_process_instanciation() throws Exception {
+    public void should_respond_500_Internal_server_error_when_error_occurs_on_process_instantiation() throws Exception {
         doThrow(new ProcessExecutionException("aMessage"))
                 .when(processAPI).startProcessWithInputs(anyLong(), anyMapOf(String.class, Serializable.class));
 
@@ -182,6 +183,21 @@ public class ProcessInstantiationResourceTest extends RestletTest {
         assertThat(response.getEntityAsText()).doesNotContain("aMessage");
         assertThat(response.getEntityAsText()).contains("Unable to start the process with ID");
         verify(processInstantiationResource.typeConverterUtil, times(0)).deleteTemporaryFiles(anyMap());
+    }
+
+    @Test
+    public void should_respond_429_Too_Many_Requests_when_case_creation_limit_reached() throws Exception {
+        var retryAfter = new Date();
+        doThrow(new ProcessExecutionException(new RuntimeException("aMessage"), retryAfter.getTime()))
+                .when(processAPI).startProcessWithInputs(anyLong(), anyMapOf(String.class, Serializable.class));
+
+        final Response response = request(URL_API_PROCESS_INSTANTIATION_TEST).post(VALID_POST_BODY);
+
+        assertThat(response).hasStatus(Status.CLIENT_ERROR_TOO_MANY_REQUESTS);
+        assertThat(response.getRetryAfter()).isInSameSecondAs(retryAfter);
+        assertThat(response.getEntityAsText())
+                .contains("Case creation limit reached.")
+                .contains("Unable to start the process with ID");
     }
 
     @Test
@@ -261,4 +277,5 @@ public class ProcessInstantiationResourceTest extends RestletTest {
         }
 
     }
+
 }
