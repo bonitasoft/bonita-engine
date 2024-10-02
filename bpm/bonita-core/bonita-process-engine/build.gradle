@@ -72,13 +72,9 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:${Deps.junit5Version}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
+    testImplementation libs.junit5params
     testAnnotationProcessor libs.lombok
 
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"      // works with Junit4
@@ -88,8 +84,4 @@ dependencies {
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     testRuntimeOnly libs.logback
-}
-
-test {
-    useJUnitPlatform()
 }

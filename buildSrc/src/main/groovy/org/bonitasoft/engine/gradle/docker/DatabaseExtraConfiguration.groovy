@@ -5,14 +5,20 @@ import org.gradle.api.Project
 
 @Canonical
 class DatabaseExtraConfiguration {
-   /**
+    /**
      * Include an additional module in the test classpath
      */
     Project includeTestModule
     /**
-     * Excludes test class patterns
+     * Excludes test class patterns (e.g. '**&#47;*Test.class') applied to this database vendor.
+     * It can be combined with {@link #excludeTags}.
      */
     List<String> excludes
+    /**
+     * Excludes tests marked by JUnit tags (e.g. 'my-tag') applied to this database vendor.
+     * It can be combined with {@link #excludes}.
+     */
+    List<String> excludeTags
     /**
      * Enable or disable the execution of the test task for this database configuration
      */
@@ -30,4 +36,15 @@ class DatabaseExtraConfiguration {
         this.excludes.add(excludes)
     }
 
+    def excludeTags(String... tags) {
+        this.excludeTags = []
+        this.excludeTags.addAll(tags)
+    }
+
+    def excludeTag(String tag) {
+        if (this.excludeTags == null) {
+            this.excludeTags = []
+        }
+        this.excludeTags.add(tag)
+    }
 }

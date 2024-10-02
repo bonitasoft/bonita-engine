@@ -12,6 +12,7 @@ dependencies {
     implementation libs.slf4jApi
     implementation libs.commonsIO
     implementation libs.jakartaServletApi
+    implementation libs.junit4
     implementation libs.springTest
     testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"

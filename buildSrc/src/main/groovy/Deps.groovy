@@ -19,8 +19,6 @@ class Deps {
     public static String owaspHTMLSanitizerVersion = "20220608.1"
 
     // Test dependency versions:
-    public static String junit4Version = "4.13.2"
-    public static String junit5Version = "5.6.3"
     public static String awaitilityVersion = "4.0.3"
     public static String assertjVersion = "3.17.2"
     public static String xmlunitVersion = "1.6"

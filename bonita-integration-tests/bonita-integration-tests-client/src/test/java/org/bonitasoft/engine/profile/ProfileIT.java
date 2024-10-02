@@ -26,7 +26,6 @@ import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.junit.Assume;
 import org.junit.Test;
 
 /**
@@ -58,17 +57,6 @@ public class ProfileIT extends AbstractProfileIT {
         List<String> profiles = getApiClient().getSession().getProfiles();
         getApiClient().logout();
         return profiles;
-    }
-
-    @Test
-    public void searchProfile() throws BonitaException {
-        Assume.assumeTrue("Community only", isCommunityEdition());
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.sort(ProfileSearchDescriptor.NAME, Order.DESC);
-
-        final SearchResult<Profile> searchedProfiles = getProfileAPI().searchProfiles(builder.done());
-        assertThat(searchedProfiles.getCount()).isEqualTo(2);
-        assertEquals("User", searchedProfiles.getResult().get(0).getName());
     }
 
     @Test

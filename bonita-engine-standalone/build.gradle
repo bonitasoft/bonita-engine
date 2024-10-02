@@ -22,7 +22,6 @@ dependencies {
     compileOnly libs.lombok
 
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
 
     // These 3 drivers are used for some specific tests:

@@ -10,7 +10,6 @@ dependencies {
     api libs.httpComponentsClient
     api libs.xstream
     api libs.httpComponentsMime
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation libs.logback
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"

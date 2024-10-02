@@ -6,7 +6,6 @@ dependencies {
     compileOnly libs.lombok
 
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation libs.narayanaJta
     testImplementation "org.jboss.logging:jboss-logging:${Deps.jbossLoggingVersion}"

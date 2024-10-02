@@ -3,7 +3,6 @@ plugins {
     id("bonita-tests")
 }
 dependencies {
-    api "junit:junit:${Deps.junit4Version}"
     api "org.assertj:assertj-core:${Deps.assertjVersion}"
     api "org.mockito:mockito-core:${Deps.mockitoVersion}"
     api project(':bonita-integration-tests:bonita-integration-tests-client')

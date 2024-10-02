@@ -10,10 +10,6 @@ dependencies {
     implementation 'org.bonitasoft.engine:bonita-process-definition-model'
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation libs.junit5api
-    testImplementation libs.junit4
-    testRuntimeOnly(libs.junitJupiterEngine)
-    testRuntimeOnly(libs.junitVintageEngine)
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 }

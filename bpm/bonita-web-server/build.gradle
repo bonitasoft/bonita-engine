@@ -51,11 +51,7 @@ dependencies {
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation libs.junit5api
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testRuntimeOnly libs.junitJupiterEngine
-    testRuntimeOnly libs.junitVintageEngine
 }
 
 configurations {
@@ -100,7 +96,6 @@ tasks.register('testsJar', Jar) {
 }
 
 test {
-    useJUnitPlatform { includeEngines 'junit-jupiter', 'junit-vintage' }
     dependsOn tasks.named("testsJar")
 }
 

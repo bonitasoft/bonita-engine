@@ -4,6 +4,7 @@ import org.bonitasoft.engine.gradle.PomUtils
 plugins {
     id 'distribution'
     id 'bonita-tests'
+    id 'bonita-docker-database'
 }
 
 configurations {
@@ -30,7 +31,6 @@ dependencies {
 
     runtimeOnly libs.logback
 
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
@@ -95,18 +95,18 @@ distributions {
                     exclude(module: 'snakeyaml')
                 }
             }
-            configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each {
-                from(zipTree(it.file)) {
+            configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                // Copy all sql files under the distrib zip folder /platform_conf/sql/
+                from(zipTree(artifact.file)) {
                     include '**/sql/**'
                     eachFile { fcp ->
                         fcp.path = fcp.path.replaceAll(".*/sql/", "/platform_conf/sql/")
                     }
                 }
-            }
-            configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each {
-                from(zipTree(it.file)) {
+                // Copy all files excepting sql and classes under the distrib zip folder /platform_conf/initial/
+                from(zipTree(artifact.file)) {
                     exclude '**/sql/**'
-                    exclude '**/org/**'
+                    exclude '**/*.class'
                     eachFile { fcp ->
                         fcp.path = fcp.path.replaceAll(".*${version}/", "/platform_conf/initial/")
                     }
@@ -121,12 +121,19 @@ tasks.distZip.dependsOn configurations.inDistrib
 
 artifacts { distributionZip distZip }
 
-tasks.named("integrationTest").configure {
-    def testDir = new File(buildDir, "integrationTest")
-    doFirst {
-        testDir.mkdirs()
-        systemProperty "bonita.distribution.path", distZip.outputs.files.first()
-    }
-    workingDir testDir
-    dependsOn distZip
+databaseIntegrationTest {
+    include '**/*IT.class'
+    // No need to execute PlatformSetupDistributionIT on databases
+    exclude '**/PlatformSetupDistributionIT.class'
 }
+
+tasks.matching { task -> task.name == "integrationTest" || task.name.endsWith("DatabaseTest") }
+        .configureEach { task ->
+            def testDir = new File(buildDir, task.name)
+            doFirst {
+                testDir.mkdirs()
+                systemProperty "bonita.distribution.path", distZip.outputs.files.first()
+            }
+            workingDir testDir
+            dependsOn distZip
+        }

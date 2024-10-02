@@ -1,9 +1,8 @@
 plugins { id 'bonita-docker-database' }
 
 dependencies {
-    testAnnotationProcessor(libs.lombok)
-    testImplementation(libs.lombok)
-    testImplementation "junit:junit:${Deps.junit4Version}"
+    testAnnotationProcessor libs.lombok
+    testImplementation libs.lombok
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation libs.h2
     testImplementation libs.springBeans

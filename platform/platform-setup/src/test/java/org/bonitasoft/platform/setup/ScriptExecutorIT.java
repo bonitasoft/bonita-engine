@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.platform.setup;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.bonitasoft.platform.setup.PlatformSetup.PLATFORM_CONF_FOLDER_NAME;
 import static org.bonitasoft.platform.setup.ScriptExecutor.FAIL_ON_ERROR;
@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ClearSystemProperties;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
@@ -67,9 +66,6 @@ public class ScriptExecutorIT {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     @Before
     public void before() throws Exception {
         removeSetupFolderProperty();
@@ -95,15 +91,15 @@ public class ScriptExecutorIT {
         assertThat(platformRows).isEqualTo(1);
         final Map<String, Object> rowPlatform = jdbcTemplate.queryForMap("select * from platform");
         assertThat("" + rowPlatform.get("id")).isEqualTo("1"); // convert to String as not all RDBMS convert the same way (long, int, bigDecimal...)
-        assertThat(rowPlatform.get("created_by")).isEqualTo("platformAdmin");
+        assertThat(rowPlatform).containsEntry("created_by", "platformAdmin");
 
         final Map<String, Object> rowTenant = jdbcTemplate.queryForMap("select * from tenant");
         assertThat("" + rowTenant.get("id")).isEqualTo("1"); // convert to String as not all RDBMS convert the same way (long, int, bigDecimal...)
-        assertThat(rowTenant.get("createdBy")).isEqualTo("defaultUser");
+        assertThat(rowTenant).containsEntry("createdBy", "defaultUser");
     }
 
     @Test
-    public void should_executeSQLResource_use_filesystem() throws Exception {
+    public void executeSQLResource_should_be_successful_using_filesystem_scripts() throws Exception {
         //given
         final File confFolder = temporaryFolder.newFolder();
         final Path createTableScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql")
@@ -111,42 +107,30 @@ public class ScriptExecutorIT {
         final Path dropTableScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql")
                 .resolve(dbVendor).resolve("cleanup.sql");
         Files.createDirectories(createTableScript.getParent());
-        final String createTable = "CREATE TABLE " +
-                dbVendor +
-                "_configuration (" +
-                "  tenant_id BIGINT NOT NULL," +
-                "  content_type VARCHAR(50) NOT NULL," +
-                "  resource_name VARCHAR(120) NOT NULL," +
-                "  resource_content LONGBLOB NOT NULL" +
-                ")";
+        final String tableName = dbVendor + "_test";
+        final String createTable = "CREATE TABLE " + tableName + " (id INT NOT NULL)";
         Files.write(createTableScript, createTable.getBytes());
-        Files.write(dropTableScript, ("DROP TABLE " + dbVendor + "_configuration").getBytes());
+        Files.write(dropTableScript, ("DROP TABLE " + tableName).getBytes());
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.getAbsolutePath());
 
-        //when
-        scriptExecutor.executeSQLResource("myScript.sql", FAIL_ON_ERROR);
-
-        //then
-        final int platformRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, dbVendor +
-                "_configuration");
-        scriptExecutor.executeSQLResource("cleanup.sql", FAIL_ON_ERROR);
-        assertThat(platformRows).as("should create empty table from filesystem ").isEqualTo(0);
+        //when - then
+        assertThatNoException().isThrownBy(() -> scriptExecutor.executeSQLResource("myScript.sql", FAIL_ON_ERROR));
+        final int platformRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, tableName);
+        assertThatNoException().isThrownBy(() -> scriptExecutor.executeSQLResource("cleanup.sql", FAIL_ON_ERROR));
+        assertThat(platformRows).as("should create empty table from filesystem ").isZero();
     }
 
     @Test
-    public void should_executeSQLResource_fail_when_script_is_missing() throws Exception {
+    public void executeSQLResource_should_fail_when_script_is_missing() throws Exception {
         //given
         final File confFolder = temporaryFolder.newFolder();
         final Path sqlScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve(dbVendor)
                 .resolve("missingScript.sql");
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.getAbsolutePath());
 
-        //expect
-        expectedException.expect(RuntimeException.class);
-        expectedException
-                .expectMessage("SQL resource file not found in filesystem: " + sqlScript.toFile().getAbsolutePath());
-
-        //when
-        scriptExecutor.executeSQLResource("missingScript.sql", FAIL_ON_ERROR);
+        //when - then
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> scriptExecutor.executeSQLResource("missingScript.sql", FAIL_ON_ERROR))
+                .withMessage("SQL resource file not found in filesystem: " + sqlScript.toFile().getAbsolutePath());
     }
 }
