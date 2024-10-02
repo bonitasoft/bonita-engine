@@ -50,9 +50,9 @@ public interface ParameterService {
      * @param parameters
      *        parameters to merge
      * @throws SBonitaReadException
-     *         error thrown if an error occured while retrieving the process definition
+     *         error thrown if an error occurred while retrieving the process definition
      * @throws SObjectModificationException
-     *         error thrown if an error occured while updating the parameter value
+     *         error thrown if an error occurred while updating the parameter value
      */
     void merge(long processDefinitionId, Map<String, String> parameters)
             throws SBonitaReadException, SObjectModificationException;

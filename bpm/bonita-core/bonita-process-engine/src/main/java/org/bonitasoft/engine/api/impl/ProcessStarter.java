@@ -39,7 +39,11 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.execution.*;
+import org.bonitasoft.engine.execution.Filter;
+import org.bonitasoft.engine.execution.FlowNodeNameFilter;
+import org.bonitasoft.engine.execution.FlowNodeSelector;
+import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.operation.Operation;
@@ -110,6 +114,12 @@ public class ProcessStarter {
             throw new RetrieveException(e);
         } catch (final SProcessDefinitionException e) {
             throw new ProcessActivationException(e);
+        } catch (final SProcessInstanceCreationException e) {
+            if (e.getRetryAfter() != -1L) {
+                throw new ProcessExecutionException(e, e.getRetryAfter());
+            } else {
+                throw new ProcessExecutionException(e);
+            }
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
         }

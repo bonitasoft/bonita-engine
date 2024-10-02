@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.process;
 
+import lombok.Getter;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
@@ -26,6 +27,8 @@ import org.bonitasoft.engine.exception.ExecutionException;
 public class ProcessExecutionException extends ExecutionException {
 
     private static final long serialVersionUID = 4412292065541283593L;
+    @Getter
+    private long retryAfter = -1L;
 
     /**
      * Constructs a new exception with the specified detail cause.
@@ -37,6 +40,11 @@ public class ProcessExecutionException extends ExecutionException {
      */
     public ProcessExecutionException(Throwable cause) {
         super(cause);
+    }
+
+    public ProcessExecutionException(Throwable cause, long retryAfter) {
+        super(cause);
+        this.retryAfter = retryAfter;
     }
 
     /**

@@ -15,6 +15,7 @@ package org.bonitasoft.web.rest.server.api.bpm.process;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -29,6 +30,8 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
+import org.restlet.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Post;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +86,17 @@ public class ProcessInstantiationResource extends CommonResource {
         } catch (ProcessExecutionException e) {
             String errorMessage = "Unable to start the process with ID " + processDefinitionId;
             if (LOGGER.isErrorEnabled()) {
-                LOGGER.error(errorMessage + " Error: " + e.getMessage());
+                LOGGER.error("{}. Caused by: {}", errorMessage, e.getMessage());
+            }
+            if (e.getRetryAfter() != -1L) {
+                // Return a 429 status code with Retry-After header to indicate the client
+                // that he should retry later in case of case creation limit reached
+                Response response = getResponse();
+                response.setRetryAfter(new Date(e.getRetryAfter()));
+                var status = new Status(Status.CLIENT_ERROR_TOO_MANY_REQUESTS, "Case creation limit reached.",
+                        errorMessage);
+                response.setStatus(status);
+                return null;
             }
             //Avoid throwing original exception that may contain sensitive information unwanted in the HTTP response
             throw new ProcessExecutionException(errorMessage + " (consult the logs for more information).");
