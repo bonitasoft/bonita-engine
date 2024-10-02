@@ -9,7 +9,6 @@ dependencies {
 
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation libs.logback
     testImplementation testFixtures(project(':bpm:bonita-common'))
 

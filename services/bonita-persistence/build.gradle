@@ -18,7 +18,6 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"

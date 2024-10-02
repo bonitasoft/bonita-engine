@@ -122,7 +122,6 @@ import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
-import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -1862,11 +1861,4 @@ public class APITestUtil extends PlatformTestUtil {
         return DEFAULT_METHODS.contains(method.getName());
     }
 
-    protected boolean isCommunityEdition() {
-        try {
-            return "community".equalsIgnoreCase(getPlatformInformationAPI().getPlatformInformation().get("edition"));
-        } catch (PlatformNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

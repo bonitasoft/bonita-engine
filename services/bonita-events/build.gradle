@@ -3,7 +3,6 @@
 dependencies {
     api project(':services:bonita-commons')
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation libs.logback
 }
 

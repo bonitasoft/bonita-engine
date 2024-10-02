@@ -6,7 +6,6 @@ dependencies {
     api project(':services:bonita-persistence')
     api project(':services:bonita-commons')
     testImplementation project(':services:bonita-events')
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation libs.logback

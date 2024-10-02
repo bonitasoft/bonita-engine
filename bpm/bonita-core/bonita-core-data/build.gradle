@@ -6,7 +6,6 @@ dependencies {
     api libs.commonsLang
     api project(':services:bonita-cache')
     api project(':services:bonita-persistence')
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }

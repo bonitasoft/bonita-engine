@@ -16,7 +16,6 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"

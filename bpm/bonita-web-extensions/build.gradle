@@ -4,7 +4,6 @@ dependencies {
     api(libs.javaxServletApi)
     api(project(":bpm:bonita-client"))
     api(project(":bpm:bonita-common"))
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
 }
 

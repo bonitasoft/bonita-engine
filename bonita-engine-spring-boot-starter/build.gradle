@@ -19,7 +19,6 @@ dependencies {
     annotationProcessor(libs.springBootConfigurationProcessor)
 
     testImplementation(libs.springBootTest)
-    testImplementation("junit:junit:${Deps.junit4Version}")
     testImplementation("org.assertj:assertj-core:${Deps.assertjVersion}")
 }
 

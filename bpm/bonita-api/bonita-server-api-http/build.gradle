@@ -8,10 +8,6 @@ dependencies {
     api libs.commonsFileUpload
     api libs.commonsIO
     testImplementation libs.springTest
-    testImplementation libs.junit5api
-    testRuntimeOnly libs.junitJupiterEngine
-    testImplementation libs.junit4
-    testRuntimeOnly libs.junitVintageEngine
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
@@ -19,8 +15,4 @@ dependencies {
     testRuntimeOnly libs.springWebMvc
     compileOnly libs.jakartaServletApi
     testImplementation libs.jakartaServletApi
-}
-
-test {
-    useJUnitPlatform()
 }

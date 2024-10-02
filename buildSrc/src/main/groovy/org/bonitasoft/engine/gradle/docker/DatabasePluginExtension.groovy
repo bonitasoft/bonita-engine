@@ -18,9 +18,13 @@ import org.gradle.api.Action
 class DatabasePluginExtension {
 
     /**
-     * Include test class patterns
+     * Include test class patterns applied to database vendors
      */
     List<String> includes
+    /**
+     * Exclude test class patterns applied to all database vendors
+     */
+    List<String> excludes
     /**
      * Extra configuration for the postgres database
      */
@@ -48,6 +52,18 @@ class DatabasePluginExtension {
             this.includes = []
         }
         this.includes.add(include)
+    }
+
+    def excludes(String... excludes) {
+        this.excludes = []
+        this.excludes.addAll(excludes)
+    }
+
+    def exclude(String exclude) {
+        if (this.excludes == null) {
+            this.excludes = []
+        }
+        this.excludes.add(exclude)
     }
 
     def postgres(Action<DatabaseExtraConfiguration> action) {

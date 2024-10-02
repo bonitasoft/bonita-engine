@@ -13,7 +13,6 @@ dependencies {
     api(libs.javaxAnnotations)
 
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation libs.logback
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"

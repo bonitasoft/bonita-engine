@@ -9,7 +9,6 @@ dependencies {
     api libs.javassist
     compileOnly project(':bpm:bonita-client')
     testImplementation project(':bpm:bonita-client')
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation(libs.hibernateCore) {

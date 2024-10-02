@@ -15,6 +15,7 @@ package org.bonitasoft.platform.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -58,6 +59,11 @@ public class PlatformSetupDistributionIT {
     public void before() throws Exception {
         setupFolder = temporaryFolder.newFolder();
         PlatformSetupTestUtils.extractDistributionTo(setupFolder);
+        if (!PlatformSetupTestUtils.isCommunityEdition(getClass())) {
+            // Tests executed in the subscription edition need a fake license file
+            Files.createFile(Paths.get(setupFolder.getAbsolutePath()).resolve("platform_conf").resolve("licenses")
+                    .resolve("some.lic"));
+        }
     }
 
     @Test
@@ -167,7 +173,9 @@ public class PlatformSetupDistributionIT {
         final File temporaryFolderRoot = temporaryFolder.newFolder();
         Path bundleFolder = temporaryFolderRoot.toPath().toRealPath();
         Path tomcatFolder = bundleFolder.resolve("server");
-        PathUtils.copyDirectory(Paths.get("../resources/test/tomcat_conf/server").toAbsolutePath(), tomcatFolder);
+        var tomcatServerFolder = getClass().getResource("/tomcat_conf/server");
+        assertNotNull(tomcatServerFolder);
+        PathUtils.copyDirectory(Paths.get(tomcatServerFolder.toURI()), tomcatFolder);
         final File newSetupFolder = bundleFolder.resolve("setup").toFile();
         FileUtils.copyDirectory(setupFolder, newSetupFolder);
         //given

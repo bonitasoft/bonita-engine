@@ -3,7 +3,6 @@
 dependencies {
     api project(':services:bonita-persistence')
     api project(':services:bonita-commons')
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

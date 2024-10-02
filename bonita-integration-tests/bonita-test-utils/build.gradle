@@ -2,12 +2,12 @@ dependencies {
     api project(':bpm:bonita-client')
     api project(':bpm:bonita-common')
     api project(':bonita-test-api')
-    api "junit:junit:${Deps.junit4Version}"
     api libs.commonsIO
     api "xmlunit:xmlunit:${Deps.xmlunitVersion}"
     api "org.assertj:assertj-core:${Deps.assertjVersion}"
 
     implementation project(':bpm:bonita-core:bonita-process-engine')
+    implementation libs.junit4
     implementation libs.springTest
 }
 

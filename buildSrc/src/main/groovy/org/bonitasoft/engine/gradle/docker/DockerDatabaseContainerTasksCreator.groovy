@@ -145,8 +145,13 @@ class DockerDatabaseContainerTasksCreator {
                     classpath += extension."${vendor.name}".includeTestModule.sourceSets.test.runtimeClasspath
                 }
                 classpath += project.files(project.configurations.drivers)
-                if(extension."${vendor.name}"?.excludes) {
+                if (extension."${vendor.name}"?.excludes) {
                     exclude(extension."${vendor.name}".excludes)
+                }
+                if (extension."${vendor.name}"?.excludeTags) {
+                    useJUnitPlatform {
+                        excludeTags = extension."${vendor.name}".excludeTags
+                    }
                 }
                 onlyIf { extension."${vendor.name}"?.enabled }
 
@@ -185,7 +190,14 @@ class DockerDatabaseContainerTasksCreator {
                 from databaseTestTask.get().reports.html.outputLocation.get().getAsFile()
             }
             project.afterEvaluate {
-                databaseTestTask.configure { includes = extension.includes }
+                databaseTestTask.configure {
+                    if (extension.includes) {
+                        include(extension.includes)
+                    }
+                    if (extension.excludes) {
+                        exclude(extension.excludes)
+                    }
+                }
                 pullImage.configure { onlyIf { extension."${vendor.name}"?.enabled } }
                 createContainer.configure { onlyIf { extension."${vendor.name}"?.enabled } }
                 startContainer.configure { onlyIf { extension."${vendor.name}"?.enabled } }

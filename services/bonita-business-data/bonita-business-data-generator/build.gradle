@@ -14,7 +14,6 @@ dependencies {
     api project(':bpm:bonita-common')
     api libs.commonsLang
     api libs.jaxbCodeModel
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation libs.logback

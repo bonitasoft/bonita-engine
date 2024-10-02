@@ -20,8 +20,7 @@ import static org.bonitasoft.platform.configuration.type.ConfigurationType.PLATF
 import static org.bonitasoft.platform.configuration.type.ConfigurationType.TENANT_TEMPLATE_PORTAL;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.bonitasoft.platform.setup.PlatformSetup.PLATFORM_CONF_FOLDER_NAME;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
@@ -40,34 +40,28 @@ import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
 import org.bonitasoft.platform.util.ConfigurationFolderUtil;
 import org.bonitasoft.platform.version.VersionService;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ClearSystemProperties;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Baptiste Mesta
  */
-@RunWith(SpringRunner.class)
+@ExtendWith({ SpringExtension.class, OutputCaptureExtension.class })
 @SpringBootTest(classes = {
         PlatformSetupApplication.class
 })
-public class PlatformSetupIT {
-
-    @Rule
-    public final ClearSystemProperties clearSystemProperties = new ClearSystemProperties(BONITA_SETUP_FOLDER);
-
-    @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+class PlatformSetupIT {
 
     @Value("${db.vendor}")
     private String dbVendor;
@@ -86,17 +80,15 @@ public class PlatformSetupIT {
 
     private final ConfigurationFolderUtil configurationFolderUtil = new ConfigurationFolderUtil();
 
-    @After
-    public void after() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         System.clearProperty(BONITA_SETUP_FOLDER);
         platformSetup.destroy();
     }
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
     @Test
-    public void init_method_should_init_table_and_insert_conf() throws Exception {
+    @Tag("community-only")
+    void init_method_should_init_table_and_insert_conf() throws Exception {
         //when
         platformSetup.init();
 
@@ -113,36 +105,36 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void init_method_should_init_configuration_from_folder_if_exists() throws Exception {
+    void init_method_should_init_configuration_from_folder_if_exists(@TempDir Path setupFolder,
+            CapturedOutput capturedOutput) throws Exception {
         //given
-        File setupFolder = temporaryFolder.newFolder("conf");
-        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
-        FileUtils.write(setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toAbsolutePath().toString());
+        FileUtils.write(setupFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
                 .resolve("platform_engine")
                 .resolve("whatever.properties").toFile(), "custom content", Charset.defaultCharset());
-        configurationFolderUtil.buildSqlFolder(setupFolder.toPath(), dbVendor);
-        systemOutRule.clearLog();
+        configurationFolderUtil.buildSqlFolder(setupFolder, dbVendor);
 
         //when
         platformSetup.init();
 
         //then
         List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList("SELECT * FROM CONFIGURATION WHERE resource_name = 'whatever.properties'");
+                .queryForList("SELECT * FROM configuration WHERE resource_name = 'whatever.properties'");
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0)).containsEntry("resource_content", "custom content".getBytes());
-        assertThat(systemOutRule.getLog())
+        assertThat(capturedOutput.getOut())
                 .contains("Database will be initialized with configuration files from folder: "
-                        + setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").toString());
+                        + setupFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial"));
     }
 
     @Test
-    public void init_method_should_store_tenant_portal_resources_from_classpath() throws Exception {
+    @Tag("community-only")
+    void init_method_should_store_tenant_portal_resources_from_classpath() throws Exception {
         //when
         platformSetup.init();
         //then
         List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '"
+                .queryForList("SELECT * FROM configuration WHERE content_type= '"
                         + ConfigurationType.TENANT_TEMPLATE_PORTAL + "' ORDER BY resource_name");
         assertThat(rows).hasSize(9);
         int rowId = 0;
@@ -160,12 +152,12 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void init_method_should_store_platform_portal_resources_from_classpath() throws Exception {
+    void init_method_should_store_platform_portal_resources_from_classpath() throws Exception {
         //when
         platformSetup.init();
         //then
         List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.PLATFORM_PORTAL
+                .queryForList("SELECT * FROM configuration WHERE content_type= '" + ConfigurationType.PLATFORM_PORTAL
                         + "' ORDER BY resource_name");
         assertThat(rows).hasSize(3);
         assertThat(rows.get(0)).containsEntry("RESOURCE_NAME", "cache-config.xml");
@@ -174,17 +166,17 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void should_extract_configuration() throws Exception {
-        final File destinationFolder = temporaryFolder.newFolder("setup");
+    @Tag("community-only")
+    void should_extract_configuration(@TempDir Path setupFolder) throws Exception {
         //given
         platformSetup.init();
 
         //when
-        System.setProperty(BONITA_SETUP_FOLDER, destinationFolder.getAbsolutePath());
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toAbsolutePath().toString());
         platformSetup.pull();
 
         //then
-        File folderContainingResultOfGet = destinationFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME)
+        File folderContainingResultOfGet = setupFolder.resolve(PLATFORM_CONF_FOLDER_NAME)
                 .resolve("current").toFile();
         assertThat(folderContainingResultOfGet).as("should retrieve config files")
                 .exists()
@@ -193,7 +185,7 @@ public class PlatformSetupIT {
         List<FullBonitaConfiguration> configurations = new ArrayList<>();
         AllConfigurationResourceVisitor allConfigurationResourceVisitor = new AllConfigurationResourceVisitor(
                 configurations);
-        Files.walkFileTree(destinationFolder.toPath(), allConfigurationResourceVisitor);
+        Files.walkFileTree(setupFolder, allConfigurationResourceVisitor);
 
         assertThat(configurations).extracting("resourceName").containsOnly(
                 "bonita-platform-community-custom.properties",
@@ -214,53 +206,49 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void init_method_should_log_when_created() throws Exception {
+    void init_method_should_log_when_created(CapturedOutput capturedOutput) throws Exception {
         //given
         assertThat(platformSetup.isPlatformAlreadyCreated()).isFalse();
 
         //when
-        systemOutRule.clearLog();
         platformSetup.init();
 
         //then
         assertThat(platformSetup.isPlatformAlreadyCreated()).isTrue();
 
-        final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        assertThat(log).as("should setup log message")
+        assertThat(capturedOutput.getOut()).as("should setup log message")
                 .doesNotContain("Platform is already created. Nothing to do.")
                 .contains("Platform created.")
                 .contains("Initial configuration files successfully pushed to database");
     }
 
     @Test
-    public void init_method_should_upgrade_default_configuration_when_already_created() throws Exception {
+    void init_method_should_upgrade_default_configuration_when_already_created(CapturedOutput capturedOutput)
+            throws Exception {
         //given
         platformSetup.init();
 
         //when
-        systemOutRule.clearLog();
         platformSetup.init();
 
         //then
         assertThat(platformSetup.isPlatformAlreadyCreated()).isTrue();
 
-        final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        assertThat(log)
-                .doesNotContain("Platform created.")
-                .contains("Platform is already created.")
-                .contains("Upgrading default configuration");
+        assertThat(capturedOutput.getOut())
+                .containsOnlyOnce("Platform created.")
+                .containsOnlyOnce("Platform is already created.")
+                .containsOnlyOnce("Upgrading default configuration");
     }
 
     @Test
-    public void push_method_should_log_when_created_and_create_backup() throws Exception {
+    void push_method_should_log_when_created_and_create_backup(@TempDir File setupFolder,
+            CapturedOutput capturedOutput) throws Exception {
         // given
         platformSetup.init();
-        File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
         configurationFolderUtil.buildCurrentFolder(setupFolder.toPath());
 
         // when
-        systemOutRule.clearLog();
         platformSetup.forcePush();
 
         // then
@@ -268,26 +256,25 @@ public class PlatformSetupIT {
         List<File> backupDirectory = Arrays.stream(setupFolder.listFiles()[0].listFiles())
                 .filter(it -> it.getName().contains("backup")).toList();
         assertThat(backupDirectory).hasSize(1);
-        final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        assertThat(log).contains("Backup directory created:");
-        final String[] split = log.split("\n");
-        assertThat(split[split.length - 1]).as("should push new configuration and log message").contains("INFO")
-                .endsWith(
-                        "Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
+        assertThat(capturedOutput.getOut())
+                .contains("Backup directory created:")
+                .as("should push new configuration and log message")
+                .contains("Configuration files successfully pushed to database. " +
+                        "You can now restart Bonita to reflect your changes.");
     }
 
     @Test
-    public void push_should_fail_if_required_folder_would_be_deleted() throws Exception {
+    void push_should_fail_if_required_folder_would_be_deleted(@TempDir Path temporaryFolder) throws Exception {
         // on windows, the test fails to delete the 'platform init engine' directory
         // so do not run it for now
         assumeFalse(IS_OS_WINDOWS);
 
         // given
         platformSetup.init();
-        File setupFolder = temporaryFolder.newFolder("conf");
-        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
+        Path setupFolder = Files.createDirectory(temporaryFolder.resolve("conf"));
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toAbsolutePath().toString());
         platformSetup.pull();
-        final Path platformEngine = setupFolder.toPath().resolve("platform_conf").resolve("current")
+        final Path platformEngine = setupFolder.resolve("platform_conf").resolve("current")
                 .resolve("platform_engine");
         FileUtils.deleteDirectory(platformEngine.toFile());
 
@@ -300,7 +287,7 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void push_should_throw_exception_when_platform_is_not_created() {
+    void push_should_throw_exception_when_platform_is_not_created() {
         //given
         assertThat(platformSetup.isPlatformAlreadyCreated()).isFalse();
 
@@ -311,22 +298,20 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void clean_method_should_delete_and_log() throws Exception {
+    void clean_method_should_delete_and_log(@TempDir Path temporaryFolder, CapturedOutput capturedOutput)
+            throws Exception {
         //given
-        final Path path = temporaryFolder.newFolder("afterClean").toPath();
-        final Path licensePath = temporaryFolder.newFolder("licenses").toPath();
+        final Path path = Files.createDirectory(temporaryFolder.resolve("afterClean"));
+        final Path licensePath = Files.createDirectory(temporaryFolder.resolve("licenses"));
         platformSetup.init();
 
         //when
-        systemOutRule.clearLog();
         platformSetup.clean();
 
         //then
-        final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        final String[] split = log.split("\n");
-        assertThat(split).as("should log message").isNotEmpty();
-        assertThat(split[split.length - 1]).as("should log message").contains("DEBUG")
-                .endsWith("Execute DeleteAllConfigurationInTransaction transaction.");
+        assertThat(capturedOutput.getOut()).as("should log message")
+                .isNotEmpty()
+                .contains("Execute DeleteAllConfigurationInTransaction transaction.");
 
         platformSetup.pull(path, licensePath);
         List<FullBonitaConfiguration> configurations = new ArrayList<>();
@@ -338,13 +323,13 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void push_method_should_clean_previous_config() throws Exception {
+    void push_method_should_clean_previous_config(@TempDir Path temporaryFolder) throws Exception {
         //given
         List<FullBonitaConfiguration> configurations = new ArrayList<>();
-        final Path initPath = temporaryFolder.newFolder("init").toPath();
-        final Path pushPath = temporaryFolder.newFolder("push").toPath();
-        final Path checkPath = temporaryFolder.newFolder("check").toPath();
-        final Path licensesPath = temporaryFolder.newFolder("lic").toPath();
+        final Path initPath = Files.createDirectory(temporaryFolder.resolve("init"));
+        final Path pushPath = Files.createDirectory(temporaryFolder.resolve("push"));
+        final Path checkPath = Files.createDirectory(temporaryFolder.resolve("check"));
+        final Path licensesPath = Files.createDirectory(temporaryFolder.resolve("lic"));
 
         FileUtils.writeByteArrayToFile(
                 initPath.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
@@ -374,10 +359,10 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void push_method_should_throw_exception_if_no_current_folder() throws Exception {
+    void push_method_should_throw_exception_if_no_current_folder(@TempDir Path temporaryFolder) throws Exception {
         //given
         List<FullBonitaConfiguration> configurations = new ArrayList<>();
-        final Path confFolder = temporaryFolder.newFolder().toPath();
+        final Path confFolder = Files.createDirectory(temporaryFolder.resolve(UUID.randomUUID().toString()));
         configurationFolderUtil.buildPlatformEngineFolder(confFolder);
         configurationFolderUtil.buildSqlFolder(confFolder, dbVendor);
 
@@ -385,20 +370,13 @@ public class PlatformSetupIT {
         platformSetup.init();
         Path current = confFolder.resolve("platform_conf").resolve("current");
 
-        //when
-        try {
-            platformSetup.push();
-            fail();
-        } catch (PlatformException e) {
-            assertThat(e.getMessage()).isEqualTo("Unable to push configuration from " +
-                    current +
-                    ", as directory does not exists. To modify your configuration, run 'setup pull', update your configuration files from "
-                    +
-                    current +
-                    " folder, and then push your new configuration.");
-            //ok
-        }
-        //then
+        //when - then
+        assertThatExceptionOfType(PlatformException.class).isThrownBy(platformSetup::push)
+                .withMessage("Unable to push configuration from %1$s, as directory does not exists. " +
+                        "To modify your configuration, run 'setup pull', " +
+                        "update your configuration files from %1$s folder, " +
+                        "and then push your new configuration.", current);
+
         platformSetup.pull();
         Files.walkFileTree(current, new AllConfigurationResourceVisitor(configurations));
         assertThat(configurations).as("should have kept old files").hasSize(1)
@@ -406,12 +384,12 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void should_push_check_platform_version() throws Exception {
+    void should_push_check_platform_version(@TempDir Path temporaryFolder) throws Exception {
         //given
         platformSetup.init();
         jdbcTemplate.execute("UPDATE platform SET version='bad version'");
 
-        final Path confFolder = temporaryFolder.newFolder().toPath();
+        final Path confFolder = Files.createDirectory(temporaryFolder.resolve(UUID.randomUUID().toString()));
         configurationFolderUtil.buildCurrentFolder(confFolder);
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toFile().getAbsolutePath());
 
@@ -426,7 +404,7 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void should_pull_check_platform_version() throws Exception {
+    void should_pull_check_platform_version() throws Exception {
         //given
         platformSetup.init();
         jdbcTemplate.execute("UPDATE platform SET version='bad version'");
@@ -442,14 +420,14 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void pushLicences_should_pass_if_licence_folder_does_not_exists() throws Exception {
+    void pushLicences_should_pass_if_licence_folder_does_not_exists() throws Exception {
         platformSetup.initProperties();
         assertThatNoException().isThrownBy(platformSetup::preventFromPushingZeroLicense);
     }
 
     @Test
-    public void should_not_fail_when_pulling_twice_in_the_same_jvm() throws Exception {
-        final Path setupFolder = temporaryFolder.newFolder().toPath();
+    void should_not_fail_when_pulling_twice_in_the_same_jvm(@TempDir Path temporaryFolder) throws Exception {
+        final Path setupFolder = Files.createDirectory(temporaryFolder.resolve(UUID.randomUUID().toString()));
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
         configurationFolderUtil.buildPlatformEngineFolder(setupFolder);
         configurationFolderUtil.buildSqlFolder(setupFolder, dbVendor);
@@ -459,8 +437,9 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void pushLicences_should_fail_if_licence_folder_exists_but_is_empty() throws Exception {
-        final Path setupFolder = temporaryFolder.newFolder().toPath();
+    void pushLicences_should_fail_if_licence_folder_exists_but_is_empty(@TempDir Path temporaryFolder)
+            throws Exception {
+        final Path setupFolder = Files.createDirectory(temporaryFolder.resolve(UUID.randomUUID().toString()));
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
         final Path platformConf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
 
@@ -477,8 +456,9 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void pushLicences_should_fail_if_no_license_file_with_lic_extension_exists() throws Exception {
-        final Path setupFolder = temporaryFolder.newFolder().toPath();
+    void pushLicences_should_fail_if_no_license_file_with_lic_extension_exists(@TempDir Path temporaryFolder)
+            throws Exception {
+        final Path setupFolder = Files.createDirectory(temporaryFolder.resolve(UUID.randomUUID().toString()));
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
         final Path platformConf = configurationFolderUtil.buildPlatformConfFolder(setupFolder);
 
@@ -496,15 +476,15 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void init_method_should_update_configuration_files() throws Exception {
+    void init_method_should_update_configuration_files(@TempDir Path temporaryFolder) throws Exception {
         //given
-        File setupFolder = temporaryFolder.newFolder("conf");
-        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
-        final File permissionFile = setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
+        Path setupFolder = Files.createDirectory(temporaryFolder.resolve("conf"));
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toAbsolutePath().toString());
+        final File permissionFile = setupFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
                 .resolve("tenant_template_portal")
                 .resolve("resources-permissions-mapping.properties").toFile();
         FileUtils.write(permissionFile, "default 7.5.4 content", Charset.defaultCharset());
-        configurationFolderUtil.buildSqlFolder(setupFolder.toPath(), dbVendor);
+        configurationFolderUtil.buildSqlFolder(setupFolder, dbVendor);
         platformSetup.init();
 
         // Simulate new 7.6.0 configuration file content:
@@ -517,16 +497,16 @@ public class PlatformSetupIT {
         //then
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList(
-                        "SELECT * FROM CONFIGURATION WHERE resource_name = 'resources-permissions-mapping.properties'");
+                        "SELECT * FROM configuration WHERE resource_name = 'resources-permissions-mapping.properties'");
         assertThat(rows).hasSize(2)
                 .allSatisfy(row -> assertThat(row).containsEntry("RESOURCE_CONTENT", new_7_6_0_content.getBytes()));
     }
 
     @Test
-    public void init_on_existing_platform_should_add_new_config_files() throws Exception {
+    void init_on_existing_platform_should_add_new_config_files(CapturedOutput capturedOutput) throws Exception {
         //given
         platformSetup.init();
-        final String countConfigFile = "SELECT * FROM CONFIGURATION WHERE resource_name = 'bonita-tenant-community-custom.properties'";
+        final String countConfigFile = "SELECT * FROM configuration WHERE resource_name = 'bonita-tenant-community-custom.properties'";
         assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(2)
                 .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"))
                 .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_TEMPLATE_ENGINE"));
@@ -536,7 +516,6 @@ public class PlatformSetupIT {
                 .update("DELETE from configuration WHERE resource_name = 'bonita-tenant-community-custom.properties'");
 
         assertThat(jdbcTemplate.queryForList(countConfigFile)).isEmpty();
-        systemOutRule.clearLog();
 
         //when
         platformSetup.init();
@@ -545,7 +524,7 @@ public class PlatformSetupIT {
         assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(2)
                 .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"))
                 .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_TEMPLATE_ENGINE"));
-        assertThat(systemOutRule.getLog()).contains(
-                "New configuration file detected 'bonita-tenant-community-custom.properties'");
+        assertThat(capturedOutput.getOut())
+                .contains("New configuration file detected 'bonita-tenant-community-custom.properties'");
     }
 }
