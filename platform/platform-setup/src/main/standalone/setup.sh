@@ -42,7 +42,7 @@ check_vendor_supported "$BONITA_DATABASE"
 BONITA_BDM_DATABASE=$(grep '^bdm.db.vendor=' database.properties | sed -e 's/bdm.db.vendor=//g')
 check_vendor_supported "$BONITA_BDM_DATABASE"
 
-"${JAVA_EXE}" -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}${LIBS_CP}" "${JVM_OPTS}" \
+"${JAVA_EXE}" -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}${LIBS_CP}" \
     -Dsysprop.bonita.db.vendor="${BONITA_DATABASE}" \
     -Dsysprop.bonita.bdm.db.vendor="${BONITA_BDM_DATABASE}" \
     org.bonitasoft.platform.setup.PlatformSetupApplication "$@"
