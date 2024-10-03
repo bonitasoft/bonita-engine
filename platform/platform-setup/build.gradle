@@ -1,5 +1,6 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.bonitasoft.engine.gradle.PomUtils
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'distribution'
@@ -137,3 +138,14 @@ tasks.matching { task -> task.name == "integrationTest" || task.name.endsWith("D
             workingDir testDir
             dependsOn distZip
         }
+
+
+def setupE2e = tasks.register('setup-e2e', Exec) {
+    commandLine 'sh', 'src/test/e2e/e2e-postgres-bos.sh'
+    dependsOn distZip
+    onlyIf { OperatingSystem.current().isLinux() }
+}
+
+integrationTest.configure {
+    dependsOn setupE2e
+}

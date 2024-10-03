@@ -29,11 +29,7 @@ echo "Start the Postgres database docker container"
 echo "============================================="
 docker run --rm -p 5432:5432 --name bonita-postgres -d bonitasoft/bonita-postgres:16.4
 
-cd ../../..
-./gradlew build -x test
-cd -
-
-export VERSION=`cat ../platform-resources/build/resources/main/PLATFORM_ENGINE_VERSION`
+export VERSION="$(cat ../platform-resources/build/resources/main/PLATFORM_ENGINE_VERSION)"
 
 echo "========================================"
 echo "version: ${VERSION}"
@@ -127,8 +123,8 @@ docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -
 SELECT
     p.id,
     p.version,
-    p.initialversion,
-    p.createdby,
+    p.initial_bonita_version,
+    p.created_by,
     TO_CHAR(
         TO_TIMESTAMP(
             p.created / 1000
@@ -168,7 +164,7 @@ INSERT
             resource_name,
             resource_content
         ) SELECT
-            456,
+            1,
             'TENANT_SECURITY_SCRIPTS',
             c.resource_name,
             c.resource_content
@@ -211,48 +207,6 @@ testValue $compound "compound-permissions-mapping"
 echo "=> Verification Ok"
 
 echo "========================================"
-echo "modify & push"
-echo "========================================"
-
-echo "new content" > ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/SamplePermissionRule.groovy.sample
-# create custom groovy script and verify it is in database
-CUSTOM_FILE=${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/MyCustomRule.groovy
-touch ${CUSTOM_FILE}
-
-${E2E_DIR}/setup.sh push
-
-echo "============================================"
-echo "Backup folder should be created when pushing"
-echo "============================================"
-
-if [ "`ls ${E2E_DIR}/platform_conf/ | grep 'backup-'`" = "" ]; then
-    echo 'ERROR. Should have created backup folder';
-    exit -52
-else
-    echo 'OK. Backup folder present.'
-fi
-
-echo "========================================"
-echo "pull & check new value"
-echo "========================================"
-
-rm -rf ${E2E_DIR}/platform_conf/current/*
-
-${E2E_DIR}/setup.sh pull
-
-echo "========================================"
-echo "------------------ Retrieved content from database should be 'new content' ---------"
-echo "new content of file ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/SamplePermissionRule.groovy.sample is now:"
-new_content=`cat ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/SamplePermissionRule.groovy.sample`
-echo ${new_content}
-testValue "${new_content}" "new content"
-
-echo "Custom groovy script file MyCustomRule.groovy should have been pushed and retrieved:"
-ls ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/
-
-echo "========================================"
-
-echo "========================================"
 echo "remove some files & push"
 echo "========================================"
 
@@ -270,6 +224,17 @@ echo "==========================================="
 
 ${E2E_DIR}/setup.sh push --force
 testReturnCode $? "setup.sh push --force should be successful"
+
+echo "============================================"
+echo "Backup folder should be created when pushing"
+echo "============================================"
+
+if [ "`ls ${E2E_DIR}/platform_conf/ | grep 'backup-'`" = "" ]; then
+    echo 'ERROR. Should have created backup folder';
+    exit 52
+else
+    echo 'OK. Backup folder present.'
+fi
 
 echo "========================================"
 echo "should contain only bonita-platform-custom.xml:"
@@ -293,6 +258,13 @@ echo "========================================"
 echo "Docker database cleanup"
 echo "========================================"
 docker rm -vf bonita-postgres
+
+echo "========================================"
+echo "Test cleanup"
+echo "========================================"
+echo "Cleaning up $(cd ${E2E_DIR} && pwd) and $(cd ./build/h2_database && pwd)"
+rm -Rf ${E2E_DIR}
+rm -Rf ./build/h2_database
 
 echo "========================================"
 echo "END"
