@@ -166,6 +166,6 @@ groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx",
     "groovyDateutil", "groovyDocgenerator", "groovyJsr223", "groovySql", "groovyTemplates", "groovyYaml"]
 
 [plugins]
-bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "0.1.63" }
+bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "0.1.64" }
 dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.51.0" } # used by "List out-of-date dependencies" script
 taskInfo = { id = "org.barfuin.gradle.taskinfo", version = "2.2.0" } # Adds a 'tiTree' task to display Gradle task-graph

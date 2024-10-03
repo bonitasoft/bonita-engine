@@ -158,8 +158,8 @@ public class FlowNodeInstanceTest {
                         .get(SFlowNodeInstance.class,
                                 new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))
                         .getName()))
-                                .containsOnly("executingTask", "notStableTask", "terminalTask",
-                                        "abortingBoundary", "cancellingBoundary");
+                .containsOnly("executingTask", "notStableTask", "terminalTask",
+                        "abortingBoundary", "cancellingBoundary");
     }
 
     @Test
@@ -189,11 +189,11 @@ public class FlowNodeInstanceTest {
         assertThat(nodeToRestart.stream()
                 .map(id -> (repository.getSession().get(SFlowNodeInstance.class,
                         new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))).getName()))
-                                .containsOnly(
-                                        "gateway_initializing_but_finished",
-                                        "gateway_completed",
-                                        "gateway_aborting",
-                                        "gateway_cancelling");
+                .containsOnly(
+                        "gateway_initializing_but_finished",
+                        "gateway_completed",
+                        "gateway_aborting",
+                        "gateway_cancelling");
     }
 
     @Test
@@ -218,9 +218,9 @@ public class FlowNodeInstanceTest {
         assertThat(nodeToRestart.stream()
                 .map(id -> (repository.getSession().get(SFlowNodeInstance.class,
                         new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))).getName()))
-                                .containsOnly(
-                                        "gateway_completed",
-                                        "gateway_aborting");
+                .containsOnly(
+                        "gateway_completed",
+                        "gateway_aborting");
     }
 
     @Test

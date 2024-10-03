@@ -80,8 +80,8 @@ public class ProcessDefinitionDesignResourceTest extends RestletTest {
                 .isEqualToIgnoringCase("{ \"id\": \"123\"}");
         assertThat(
                 processDefinitionDesignResource.replaceLongIdToString("{ \"id\":123, \"test\": [ otherid: \"zerze\"]}"))
-                        .isEqualToIgnoringCase(
-                                "{ \"id\":\"123\", \"test\": [ otherid: \"zerze\"]}");
+                .isEqualToIgnoringCase(
+                        "{ \"id\":\"123\", \"test\": [ otherid: \"zerze\"]}");
         assertThat(processDefinitionDesignResource.replaceLongIdToString("{ \"iaed\": 123}"))
                 .isEqualToIgnoringCase("{ \"iaed\": 123}");
         assertThat(processDefinitionDesignResource.replaceLongIdToString("{ \"name\": \"\\\"id\\\": 123\"}"))

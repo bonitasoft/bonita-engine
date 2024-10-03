@@ -181,7 +181,7 @@ public class DataInstanceServiceImplTest {
         doReturn(dataInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
         doReturn(Arrays.asList(new DataContainer(68L, "SUBTASK"), new DataContainer(67L, "TASK"),
                 new DataContainer(66L, "PROC"))).when(parentContainerResolver)
-                        .getArchivedContainerHierarchy(new DataContainer(68L, "SUBTASK"));
+                .getArchivedContainerHierarchy(new DataContainer(68L, "SUBTASK"));
         //when
         SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 68L, "SUBTASK",
                 parentContainerResolver);
@@ -219,7 +219,7 @@ public class DataInstanceServiceImplTest {
         doReturn(dataInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
         doReturn(Arrays.asList(new DataContainer(68L, "SUBTASK"), new DataContainer(67L, "TASK"),
                 new DataContainer(66L, "PROC"))).when(parentContainerResolver)
-                        .getContainerHierarchy(new DataContainer(68L, "SUBTASK"));
+                .getContainerHierarchy(new DataContainer(68L, "SUBTASK"));
         //when
         SDataInstance dataInstance = dataInstanceServiceImpl.getDataInstance("testData", 68L, "SUBTASK",
                 parentContainerResolver);

@@ -137,11 +137,11 @@ public class BonitaHomeServerTest {
 
         doReturn(Collections.singletonList(new BonitaConfiguration("platform.properties",
                 getPropertiesAsByteArray("prop2=prop2PlatformDB", "prop3=prop3PlatformDB", "prop4=prop4PlatformDB"))))
-                        .when(configurationService).getPlatformEngineConf();
+                .when(configurationService).getPlatformEngineConf();
 
         doReturn(Collections.singletonList(new BonitaConfiguration("tenant.properties",
                 getPropertiesAsByteArray("prop4=prop4TenantDB"))))
-                        .when(configurationService).getTenantEngineConf(1);
+                .when(configurationService).getTenantEngineConf(1);
         //when
         Properties allProperties = bonitaHomeServer.getTenantProperties(1);
         //then

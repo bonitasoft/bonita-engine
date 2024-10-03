@@ -204,7 +204,7 @@ public class ConnectorInstanceServiceImplTest {
                         parameters,
                         SConnectorInstanceWithFailureInfo.class,
                         new QueryOptions(0, 100, SConnectorInstanceWithFailureInfo.class, "id", OrderByType.ASC))))
-                                .willReturn(connectors);
+                .willReturn(connectors);
 
         //when
         List<SConnectorInstanceWithFailureInfo> retrievedConnectors = connectorInstanceServiceImpl

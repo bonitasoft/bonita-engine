@@ -745,11 +745,11 @@ public class UserIT extends TestWithTechnicalUser {
         assertThat(getIdentityAPI().searchUsers(
                 new SearchOptionsBuilder(0, 10).searchTerm("jean").sort(UserSearchDescriptor.ID, Order.ASC).done())
                 .getResult())
-                        .hasSize(1).allMatch(user -> user.getUserName().equals("Jean_Michel"));
+                .hasSize(1).allMatch(user -> user.getUserName().equals("Jean_Michel"));
         assertThat(getIdentityAPI().searchUsers(
                 new SearchOptionsBuilder(0, 10).searchTerm("Jean").sort(UserSearchDescriptor.ID, Order.ASC).done())
                 .getResult())
-                        .hasSize(1).allMatch(user -> user.getUserName().equals("Jean_Michel"));
+                .hasSize(1).allMatch(user -> user.getUserName().equals("Jean_Michel"));
 
         deleteUsers(users);
     }

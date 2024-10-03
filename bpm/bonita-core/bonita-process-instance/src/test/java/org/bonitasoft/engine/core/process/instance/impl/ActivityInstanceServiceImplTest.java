@@ -404,7 +404,7 @@ public class ActivityInstanceServiceImplTest {
         List<SHumanTaskInstance> expectedResult = new ArrayList<>();
         when(persistenceService.searchEntity(SHumanTaskInstance.class, "PendingAssignedTo", options,
                 Collections.singletonMap("userId", 61L)))
-                        .thenReturn(expectedResult);
+                .thenReturn(expectedResult);
 
         // When
         final List<SHumanTaskInstance> result = activityInstanceServiceImpl.searchPendingTasksAssignedTo(61L, options);
@@ -419,7 +419,7 @@ public class ActivityInstanceServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.searchEntity(SHumanTaskInstance.class, "PendingAssignedTo", options,
                 Collections.singletonMap("userId", 99L)))
-                        .thenThrow(new SBonitaReadException("Fake for test"));
+                .thenThrow(new SBonitaReadException("Fake for test"));
 
         // When
         Throwable thrown = catchThrowable(() -> {
@@ -438,7 +438,7 @@ public class ActivityInstanceServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "PendingAssignedTo", options,
                 Collections.singletonMap("userId", 365L)))
-                        .thenReturn(14L);
+                .thenReturn(14L);
 
         // When
         final long count = activityInstanceServiceImpl.getNumberOfPendingTasksAssignedTo(365L, options);
@@ -454,7 +454,7 @@ public class ActivityInstanceServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "PendingAssignedTo", options,
                 Collections.singletonMap("userId", 3365L)))
-                        .thenThrow(new SBonitaReadException("Fake for test"));
+                .thenThrow(new SBonitaReadException("Fake for test"));
 
         // When
         Throwable thrown = catchThrowable(() -> {

@@ -2207,12 +2207,15 @@ public interface ProcessRuntimeAPI {
      *
      * <pre>
      * {@code
-     *  public List<ArchivedComment> retrieveComments(ProcessRuntimeAPI processRuntimeAPI, ArchivedProcessInstance archivedProcessInstance) {
-     *      SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
-     *          .filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, archivedProcessInstance.getSourceObjectId())
-     *          .done();
-     *      return processRuntimeAPI.searchArchivedComments(searchOptions).getResult();
-     *  }
+     *
+     * public List<ArchivedComment> retrieveComments(ProcessRuntimeAPI processRuntimeAPI,
+     *         ArchivedProcessInstance archivedProcessInstance) {
+     *     SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+     *             .filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID,
+     *                     archivedProcessInstance.getSourceObjectId())
+     *             .done();
+     *     return processRuntimeAPI.searchArchivedComments(searchOptions).getResult();
+     * }
      * }
      * </pre>
      *

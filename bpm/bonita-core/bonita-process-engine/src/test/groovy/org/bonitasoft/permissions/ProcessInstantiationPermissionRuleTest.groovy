@@ -92,7 +92,6 @@ public class ProcessInstantiationPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         Assertions.assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -131,7 +130,6 @@ public class ProcessInstantiationPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         Assertions.assertThat(isAuthorized).isTrue()
-
     }
 
     @Test

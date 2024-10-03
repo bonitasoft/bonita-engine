@@ -171,7 +171,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         assertThat(updatedApplication.getLastUpdateDate().after(application.getLastUpdateDate())).isTrue();
         assertThat(
                 updatedProcessStarterAPI.getLastModificationDate().after(processStarterAPI.getLastModificationDate()))
-                        .isTrue();
+                .isTrue();
         assertThat(updatedHealthPage.getLastModificationDate().after(healthPage.getLastModificationDate())).isTrue();
         assertThat(updatedPmLayout.getLastModificationDate().after(pmLayout.getLastModificationDate())).isTrue();
 
@@ -224,7 +224,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         // check updated custom pages
         assertThat(
                 updatedProcessStarterAPI.getLastModificationDate().after(processStarterAPI.getLastModificationDate()))
-                        .isTrue();
+                .isTrue();
         assertThat(updatedProcessStarterAPI.getContentName()).isEqualTo("processStarter-1.1.zip");
         assertThat(updatedHealthPage.getLastModificationDate().after(healthPage.getLastModificationDate())).isTrue();
         assertThat(updatedHealthPage.getContentName()).isEqualTo("page_HealthPage.zip");

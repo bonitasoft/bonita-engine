@@ -241,7 +241,7 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
                 .addAutomaticTask("autoWithConnector")
                 .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
                 .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue")).getProcess())
-                        .done());
+                .done());
     }
 
     protected ProcessDefinition createSubProcessDefinitionWithUserTask(User user) throws Exception {

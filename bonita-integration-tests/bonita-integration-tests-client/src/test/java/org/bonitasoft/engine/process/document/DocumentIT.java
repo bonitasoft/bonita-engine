@@ -701,7 +701,8 @@ public class DocumentIT extends TestWithUser {
             assertThat(
                     getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 45).searchTerm("doc1").done())
                             .getResult().get(0)
-                            .getContentFileName()).isEqualTo("doc1.jpg");
+                            .getContentFileName())
+                    .isEqualTo("doc1.jpg");
 
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());

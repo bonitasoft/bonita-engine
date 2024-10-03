@@ -149,7 +149,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         assertThatThrownBy(
                 () -> getTenantAdministrationAPI().updateBusinessDataModel(getZip(buildBOMWithInvalidQuery())))
-                        .isInstanceOf(BusinessDataRepositoryDeploymentException.class);
+                .isInstanceOf(BusinessDataRepositoryDeploymentException.class);
     }
 
     @Test
@@ -2527,7 +2527,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         waitForUserTask("userTask");
         assertThat(new String(getProcessAPI().getDocumentContent(
                 getProcessAPI().getLastDocument(processInstance.getId(), "myDoc").getContentStorageId())))
-                        .isEqualTo("updatedContents");
+                .isEqualTo("updatedContents");
 
         getProcessAPI().sendSignal("theSignal");
         //then
@@ -2536,7 +2536,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         //instantiation of the event sub process work and did not reinitialized elements
         assertThat(new String(getProcessAPI().getDocumentContent(
                 getProcessAPI().getLastDocument(processInstance.getId(), "myDoc").getContentStorageId())))
-                        .isEqualTo("updatedContents");
+                .isEqualTo("updatedContents");
         assertThat(getProcessAPI().getDocumentList(processInstance.getId(), "MyList", 0, 100)).hasSize(2);
         try {
             getProcessAPI().getLastDocument(eventSubProcessActivity.getParentProcessInstanceId(), "myDoc");
@@ -2545,7 +2545,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
         assertThat(
                 getProcessAPI().getDocumentList(eventSubProcessActivity.getParentProcessInstanceId(), "MyList", 0, 100))
-                        .isEmpty();
+                .isEmpty();
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -2590,7 +2590,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThatJson(
                 getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(
                         processInstance.getId()).get("ref_myBusinessData")))
-                                .node("lastName").isEqualTo("\"Doe\"");
+                .node("lastName").isEqualTo("\"Doe\"");
         //when
         getProcessAPI().sendSignal("theSignal");
         waitForUserTask("userTaskInSubProcess");
@@ -2599,7 +2599,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThatJson(
                 getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(
                         processInstance.getId()).get("ref_myBusinessData")))
-                                .node("lastName").isEqualTo("\"newName\"");
+                .node("lastName").isEqualTo("\"newName\"");
         disableAndDeleteProcess(processDefinition);
     }
 

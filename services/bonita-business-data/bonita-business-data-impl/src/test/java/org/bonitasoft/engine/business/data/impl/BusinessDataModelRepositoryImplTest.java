@@ -243,7 +243,7 @@ public class BusinessDataModelRepositoryImplTest {
         doReturn(singletonList(new CommandAcceptanceException("Error executing DDL bla bla bla...",
                 new SQLSyntaxErrorException("ORA-02275: une telle contrainte référentielle existe déjà dans la table",
                         new Exception("Root Oracle Cause")))))
-                                .when(schemaManager).update(anySet());
+                .when(schemaManager).update(anySet());
 
         // when - then:
         assertThatExceptionOfType(SBusinessDataRepositoryDeploymentException.class)
@@ -264,7 +264,7 @@ public class BusinessDataModelRepositoryImplTest {
                                 new Exception("Root Oracle Cause"))),
                 new CommandAcceptanceException("CommandAcceptanceException bliblibli",
                         new SQLSyntaxErrorException("Hibernate error"))))
-                                .when(schemaManager).update(anySet());
+                .when(schemaManager).update(anySet());
 
         // when - then:
         assertThatExceptionOfType(SBusinessDataRepositoryDeploymentException.class)
@@ -296,7 +296,7 @@ public class BusinessDataModelRepositoryImplTest {
         var generatedJarContent = "fake jar content".getBytes();
         when(dependencyService.getIdOfDependencyOfArtifact(TENANT_ID, ScopeType.TENANT,
                 BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME))
-                        .thenReturn(Optional.of(1L));
+                .thenReturn(Optional.of(1L));
         var deployedBdm = new SDependency();
         deployedBdm.setValue_(generatedJarContent);
         when(dependencyService.getDependency(1L)).thenReturn(deployedBdm);
@@ -318,7 +318,7 @@ public class BusinessDataModelRepositoryImplTest {
         var generatedJarContent = "fake jar content".getBytes();
         when(dependencyService.getIdOfDependencyOfArtifact(TENANT_ID, ScopeType.TENANT,
                 BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME))
-                        .thenReturn(Optional.of(1L));
+                .thenReturn(Optional.of(1L));
         var deployedBdm = new SDependency();
         deployedBdm.setValue_(existingJarContent);
         when(dependencyService.getDependency(1L)).thenReturn(deployedBdm);
@@ -338,7 +338,7 @@ public class BusinessDataModelRepositoryImplTest {
         var bdmArchive = "fake archive content".getBytes();
         when(dependencyService.getIdOfDependencyOfArtifact(TENANT_ID, ScopeType.TENANT,
                 BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME))
-                        .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         // when:
         var isDeployed = businessDataModelRepository.isDeployed(bdmArchive);

@@ -430,12 +430,15 @@ public interface DocumentAPI {
      *
      * <pre>
      * {@code
-     *   public List<ArchivedDocument> retrieveDocuments(DocumentAPI documentAPI, ArchivedProcessInstance archivedProcessInstance) {
-     *       SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
-     *               .filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, archivedProcessInstance.getSourceObjectId())
-     *               .done();
-     *       return documentAPI.searchArchivedDocuments(searchOptions).getResult();
-     *   }
+     *
+     * public List<ArchivedDocument> retrieveDocuments(DocumentAPI documentAPI,
+     *         ArchivedProcessInstance archivedProcessInstance) {
+     *     SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+     *             .filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID,
+     *                     archivedProcessInstance.getSourceObjectId())
+     *             .done();
+     *     return documentAPI.searchArchivedDocuments(searchOptions).getResult();
+     * }
      * }
      * </pre>
      *

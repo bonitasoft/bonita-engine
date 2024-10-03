@@ -407,7 +407,8 @@ public class ApplicationServiceImplTest {
         inputParameters.put("applicationPageToken", "mainDashBoard");
         given(persistenceService.selectOne(
                 new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationId", inputParameters,
-                        SApplicationPage.class))).willReturn(applicationPage);
+                        SApplicationPage.class)))
+                .willReturn(applicationPage);
 
         //when
         final SApplicationPage applicationPageToCreate = buildApplicationPage(7, 5, 16, "mainDashBoard");
@@ -679,7 +680,8 @@ public class ApplicationServiceImplTest {
         inputParameters.put("applicationId", 100);
         given(persistenceService
                 .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationHomePage", inputParameters,
-                        SApplicationPage.class))).willReturn(applicationPage);
+                        SApplicationPage.class)))
+                .willReturn(applicationPage);
 
         //when
         final SApplicationPage homePage = applicationServiceImpl.getApplicationHomePage(100);
@@ -696,7 +698,8 @@ public class ApplicationServiceImplTest {
         inputParameters.put("applicationId", 100);
         given(persistenceService
                 .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationHomePage", inputParameters,
-                        SApplicationPage.class))).willReturn(null);
+                        SApplicationPage.class)))
+                .willReturn(null);
 
         //when
         applicationServiceImpl.getApplicationHomePage(100);

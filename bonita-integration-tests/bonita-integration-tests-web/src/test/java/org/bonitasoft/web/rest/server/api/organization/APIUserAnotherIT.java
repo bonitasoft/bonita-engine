@@ -246,11 +246,11 @@ public class APIUserAnotherIT extends AbstractConsoleTest {
 
         final UserCreator userCreator = new UserCreator(user.getAttributeValue(UserItem.ATTRIBUTE_USERNAME),
                 user.getAttributeValue(UserItem.ATTRIBUTE_PASSWORD))
-                        .setFirstName(user.getAttributeValue(UserItem.ATTRIBUTE_FIRSTNAME))
-                        .setLastName(user.getAttributeValue(UserItem.ATTRIBUTE_LASTNAME))
-                        .setTitle(user.getAttributeValue(UserItem.ATTRIBUTE_TITLE))
-                        .setIconPath(user.getAttributeValue(UserItem.ATTRIBUTE_ICON))
-                        .setJobTitle(user.getAttributeValue(UserItem.ATTRIBUTE_JOB_TITLE));
+                .setFirstName(user.getAttributeValue(UserItem.ATTRIBUTE_FIRSTNAME))
+                .setLastName(user.getAttributeValue(UserItem.ATTRIBUTE_LASTNAME))
+                .setTitle(user.getAttributeValue(UserItem.ATTRIBUTE_TITLE))
+                .setIconPath(user.getAttributeValue(UserItem.ATTRIBUTE_ICON))
+                .setJobTitle(user.getAttributeValue(UserItem.ATTRIBUTE_JOB_TITLE));
         // .setPersonalData(personalInfo.done())
         // .setProfessionalData(professionalInfo.done());
 

@@ -272,7 +272,8 @@ public class ConnectorExecutorImplTest {
                 meterRegistry.find("executor.pool.size")
                         .tag("name", "bonita-connector-executor")
                         .tag("tenant", String.valueOf(TENANT_ID))
-                        .gauge()).isNotNull();
+                        .gauge())
+                .isNotNull();
     }
 
     // =================================================================================================================

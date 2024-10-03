@@ -579,7 +579,7 @@ public class ProcessAPIImplTest {
         final List<SDataInstance> sDataInstances = singletonList(sDataInstance);
         when(transientDataService.getDataInstances(FLOW_NODE_INSTANCE_ID,
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults))
-                        .thenReturn(sDataInstances);
+                .thenReturn(sDataInstances);
         final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
         doReturn(singletonList(dataInstance)).when(processAPI).convertModelToDataInstances(sDataInstances);
 
@@ -1567,8 +1567,8 @@ public class ProcessAPIImplTest {
     public void should_get_external_resources_from_process() throws Exception {
         doReturn(
                 new SBARResource("myResource", BARResourceType.EXTERNAL, PROCESS_DEFINITION_ID, new byte[] { 1, 2, 3 }))
-                        .when(processResourcesService)
-                        .get(PROCESS_DEFINITION_ID, BARResourceType.EXTERNAL, "myResource");
+                .when(processResourcesService)
+                .get(PROCESS_DEFINITION_ID, BARResourceType.EXTERNAL, "myResource");
 
         byte[] myResource = processAPI.getExternalProcessResource(PROCESS_DEFINITION_ID, "myResource");
 
@@ -1653,7 +1653,7 @@ public class ProcessAPIImplTest {
         // When
         assertThatThrownBy(() -> processAPI.executeOperations(connectorResult, new ArrayList<>(),
                 new HashMap<>(), new SExpressionContext(), ProcessAPIImplTest.class.getClassLoader(), serviceAccessor))
-                        .isInstanceOf(SOperationExecutionException.class);
+                .isInstanceOf(SOperationExecutionException.class);
 
         // Then
         verify(connectorService).disconnect(connectorResult);

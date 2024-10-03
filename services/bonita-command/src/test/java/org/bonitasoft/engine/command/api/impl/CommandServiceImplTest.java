@@ -249,7 +249,7 @@ public class CommandServiceImplTest {
         final int maxResults = 1;
         when(persistence
                 .selectList(SelectDescriptorBuilder.getUserCommands(field, orderByType, startIndex, maxResults)))
-                        .thenReturn(sCommands);
+                .thenReturn(sCommands);
 
         // When
         final List<SCommand> userCommands = commandServiceImpl.getUserCommands(startIndex, maxResults,
@@ -268,8 +268,8 @@ public class CommandServiceImplTest {
         final int maxResults = 1;
         when(persistence
                 .selectList(SelectDescriptorBuilder.getUserCommands(field, orderByType, startIndex, maxResults)))
-                        .thenThrow(
-                                new SBonitaReadException(""));
+                .thenThrow(
+                        new SBonitaReadException(""));
 
         // When
         commandServiceImpl.getUserCommands(startIndex, maxResults, SCommandCriterion.NAME_DESC);

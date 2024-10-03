@@ -78,7 +78,7 @@ public class IndexUpdaterTest {
                 .willReturn(Arrays.asList(menu3, menu4));
         given(applicationService
                 .searchApplicationMenus(new QueryOptions(MAX_RESULTS, MAX_RESULTS, orderBy, filters, null)))
-                        .willReturn(Arrays.asList(menu5));
+                .willReturn(Arrays.asList(menu5));
 
         //when
         indexUpdater.incrementIndexes(1L, 3, 5);
@@ -118,7 +118,7 @@ public class IndexUpdaterTest {
                 .willReturn(Arrays.asList(menu3, menu4));
         given(applicationService
                 .searchApplicationMenus(new QueryOptions(MAX_RESULTS, MAX_RESULTS, orderBy, filters, null)))
-                        .willReturn(Arrays.asList(menu5));
+                .willReturn(Arrays.asList(menu5));
 
         //when
         indexUpdater.decrementIndexes(1L, 3, 5);

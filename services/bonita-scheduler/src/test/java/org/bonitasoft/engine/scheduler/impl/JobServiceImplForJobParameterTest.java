@@ -275,8 +275,8 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         when(readPersistenceService.selectById(
                 SelectDescriptorBuilder.getElementById(SJobParameter.class, "SJobParameter", jobParameterId)))
-                        .thenReturn(
-                                sJobParameter);
+                .thenReturn(
+                        sJobParameter);
 
         // When
         final SJobParameter result = jobServiceImpl.getJobParameter(jobParameterId);

@@ -72,7 +72,7 @@ public class HttpAPIServletCallTest {
         when(serverAPI.invokeMethod(new HashMap<>(), "com.bonitasoft.engine.api.LoginAPI", "login",
                 asList(String.class.getName(), String.class.getName()) //
                 , new Object[] { "install", "install" })) //
-                        .thenReturn(apiSession);
+                .thenReturn(apiSession);
 
         //when:
         httpAPIServletCall.doPost();

@@ -447,13 +447,14 @@ public class ContractIT extends CommonAPIIT {
         waitForUserTaskAndGetIt(TASK2);
         assertThat((List<Map<String, Object>>) getProcessAPI()
                 .getArchivedActivityDataInstance("expenseData", userTask.getId()).getValue()).as(
-                        "should have my expense report data").hasSize(3);
+                        "should have my expense report data")
+                .hasSize(3);
         final Serializable reportData = getProcessAPI().getArchivedActivityDataInstance("reportData", userTask.getId())
                 .getValue();
         assertThat(reportData).as("should have single file").isEqualTo(reportFile);
         assertThat((List<Object>) getProcessAPI().getArchivedActivityDataInstance("receiptsData", userTask.getId())
                 .getValue()).as("should have multiple file")
-                        .containsExactly(receipt1, receipt2);
+                .containsExactly(receipt1, receipt2);
         final List<Document> receiptsAsDoc = getProcessAPI().getDocumentList(processInstance.getId(), "receiptsAsDoc",
                 0, 100);
         final Document reportAsDoc = getProcessAPI().getLastDocument(processInstance.getId(), "reportAsDoc");
