@@ -140,9 +140,9 @@ class DockerDatabaseContainerTasksCreator {
                 description = "Runs slow integration test suite on $vendor.name database."
                 systemProperty "bonita.version", project.version
                 jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.lang=ALL-UNNAMED', '-Dfile.encoding=UTF-8']
-                if (extension."${vendor.name}"?.includeTestModule) {
-                    testClassesDirs += extension."${vendor.name}".includeTestModule.sourceSets.test.output.classesDirs
-                    classpath += extension."${vendor.name}".includeTestModule.sourceSets.test.runtimeClasspath
+                if (extension."${vendor.name}"?.includeTestProject) {
+                    testClassesDirs += extension."${vendor.name}".includeTestProject.sourceSets.test.output.classesDirs
+                    classpath += extension."${vendor.name}".includeTestProject.sourceSets.test.runtimeClasspath
                 }
                 classpath += project.files(project.configurations.drivers)
                 if (extension."${vendor.name}"?.excludes) {
