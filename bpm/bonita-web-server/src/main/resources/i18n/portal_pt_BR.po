@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-28 14:29+0000\n"
+"POT-Creation-Date: 2024-10-02 15:47+0000\n"
 "PO-Revision-Date: 2024-01-01 00:00\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
@@ -127,6 +127,9 @@ msgstr "Erro na leitura do arquivo de importação de aplicações."
 
 msgid "Error occurred when starting process %processId%"
 msgstr "Ocorreu um erro ao iniciar o processo %processId%"
+
+msgid "Error occurred when starting process %processId%. Case creation limit reached."
+msgstr "Ocorreu um erro ao iniciar o processo %processId%. Limite de criação de casos atingido."
 
 msgid "Error uploading the file. Maybe your session expired. You can try to refresh the page."
 msgstr "Erro ao carregar o arquivo. Talvez sua sessão tenha expirado. Você pode tentar atualizar a página."

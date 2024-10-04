@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-28 14:29+0000\n"
+"POT-Creation-Date: 2024-10-02 15:47+0000\n"
 "PO-Revision-Date: 2024-01-01 00:00\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
@@ -127,6 +127,9 @@ msgstr "アプリケーションのインポート ファイルの読み取り�
 
 msgid "Error occurred when starting process %processId%"
 msgstr "プロセス：%processId% の開始時にエラーが発生しました"
+
+msgid "Error occurred when starting process %processId%. Case creation limit reached."
+msgstr "プロセス %processId%の開始時にエラーが発生しました。ケース作成の上限に達しました。"
 
 msgid "Error uploading the file. Maybe your session expired. You can try to refresh the page."
 msgstr "ファイルのアップロード中にエラーが発生しました。セッションの有効期限が切れた可能性があります。ページを更新してみてください。"
