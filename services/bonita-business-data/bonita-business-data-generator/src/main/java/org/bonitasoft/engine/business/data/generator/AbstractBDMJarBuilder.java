@@ -21,47 +21,63 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.persistence.Entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.generator.compiler.JDTCompiler;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  */
 public abstract class AbstractBDMJarBuilder {
 
+    private static final Logger log = LoggerFactory.getLogger(AbstractBDMJarBuilder.class);
     private final JDTCompiler compiler;
 
-    private AbstractBDMCodeGenerator bdmCodeGenerator;
+    private final AbstractBDMCodeGenerator bdmCodeGenerator;
 
     @Deprecated
-    public AbstractBDMJarBuilder(AbstractBDMCodeGenerator bdmCodeGenerator, final JDTCompiler compiler) {
+    protected AbstractBDMJarBuilder(AbstractBDMCodeGenerator bdmCodeGenerator, final JDTCompiler compiler) {
         this.bdmCodeGenerator = bdmCodeGenerator;
         this.compiler = compiler;
     }
 
-    public AbstractBDMJarBuilder(AbstractBDMCodeGenerator bdmCodeGenerator) {
+    protected AbstractBDMJarBuilder(AbstractBDMCodeGenerator bdmCodeGenerator) {
         this.bdmCodeGenerator = bdmCodeGenerator;
         this.compiler = new JDTCompiler();
     }
 
     /**
-     * @param bom
+     * @param bom the business object model to generate the jar from
      * @param fileFilter
      *        filter the entries to be added or not in generated jar
      * @return the content of the generated jar
-     * @throws BDMJarGenerationException
+     * @throws BDMJarGenerationException if an error occurs during the generation of the jar
      */
     public byte[] build(final BusinessObjectModel bom, final IOFileFilter fileFilter) throws BDMJarGenerationException {
         try {
             final File tmpBDMDirectory = Files.createTempDirectory("bdm").toFile();
             try {
                 addSourceFilesToDirectory(bom, tmpBDMDirectory);
-                compiler.compile(tmpBDMDirectory, tmpBDMDirectory, Thread.currentThread().getContextClassLoader());
+                var additionalClasspath = getCompileDependencies();
+                if (log.isDebugEnabled()) {
+                    log.debug("Compiling BDM classes using classpath: {}",
+                            additionalClasspath.stream()
+                                    .map(File::getName)
+                                    .collect(Collectors.joining(File.pathSeparator)));
+                }
+                compiler.compile(tmpBDMDirectory, tmpBDMDirectory, additionalClasspath.toArray(File[]::new));
                 return generateJar(tmpBDMDirectory, fileFilter);
             } finally {
                 deleteDirectory(tmpBDMDirectory);
@@ -69,6 +85,23 @@ public abstract class AbstractBDMJarBuilder {
         } catch (final Exception e) {
             throw new BDMJarGenerationException(e);
         }
+    }
+
+    /**
+     * Add BDM compile dependencies required to compile the BDM classes.
+     * It uses the current classloader to find the required classes and retrieve their corresponding jar files.
+     *
+     * @throws ClassNotFoundException if a required class cannot be found in the current classloader
+     */
+    protected Set<File> getCompileDependencies() throws ClassNotFoundException {
+        return Set.of(
+                JDTCompiler.lookupJarContaining(Entity.class),
+                JDTCompiler.lookupJarContaining(org.bonitasoft.engine.bdm.Entity.class),
+                JDTCompiler.lookupJarContaining(JsonIgnore.class),
+                JDTCompiler.lookupJarContaining("org.hibernate.annotations.Parameter"),
+                JDTCompiler.lookupJarContaining(DateConverter.class),
+                JDTCompiler.lookupJarContaining(SBonitaRuntimeException.class),
+                JDTCompiler.lookupJarContaining("org.bonitasoft.engine.business.data.BusinessDataRepository"));
     }
 
     protected void addSourceFilesToDirectory(final BusinessObjectModel bom, final File directory)
@@ -82,7 +115,7 @@ public abstract class AbstractBDMJarBuilder {
 
     private byte[] generateJar(final File directory, final IOFileFilter fileFilter) throws IOException {
         final Collection<File> files = FileUtils.listFiles(directory, fileFilter, TrueFileFilter.TRUE);
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        final Map<String, byte[]> resources = new HashMap<>();
         for (final File file : files) {
             final String relativeName = directory.toURI().relativize(file.toURI()).getPath();
             final byte[] content = FileUtils.readFileToByteArray(file);

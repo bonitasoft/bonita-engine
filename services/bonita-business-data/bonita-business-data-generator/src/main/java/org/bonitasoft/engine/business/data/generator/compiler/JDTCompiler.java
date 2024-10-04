@@ -15,7 +15,6 @@ package org.bonitasoft.engine.business.data.generator.compiler;
 
 import static java.lang.String.join;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,9 +26,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.batch.Main;
 
 /**
@@ -40,10 +38,21 @@ import org.eclipse.jdt.internal.compiler.batch.Main;
  */
 public class JDTCompiler {
 
-    private static final String COMPILER_COMPLIANCE_LEVEL = "-1.8";
+    private static final String COMPILER_COMPLIANCE_LEVEL = "-17";
     //Used to keep parameters name in bytecode to allow reflection in DAO
     private static final String PARAMETERS_NAME_ARG = "-parameters";
-    private ClassLoader classLoader;
+
+    public static File lookupJarContaining(Class<?> clazz) {
+        var jarFile = new File(clazz.getProtectionDomain().getCodeSource().getLocation().getPath());
+        if (!jarFile.exists()) {
+            throw new IllegalArgumentException("Cannot find jar file for class " + clazz.getName());
+        }
+        return jarFile;
+    }
+
+    public static File lookupJarContaining(String className) throws ClassNotFoundException {
+        return lookupJarContaining(Class.forName(className));
+    }
 
     /**
      * Compile files in output directory using provided classpath
@@ -53,15 +62,16 @@ public class JDTCompiler {
      *         if compilation errors occurs
      */
     @Deprecated
-    public void compile(final Collection<File> filesToBeCompiled, final File outputDirectory, ClassLoader classLoader)
+    public void compile(final Collection<File> filesToBeCompiled, final File outputDirectory,
+            File... additionalClasspath)
             throws CompilationException {
-        compile(filesToBeCompiled, outputDirectory, classLoader, emptySet());
+        compile(filesToBeCompiled, outputDirectory, additionalClasspath);
     }
 
-    public void compile(final File srcDirectory, File outputDirectory, ClassLoader classLoader)
+    public void compile(final File srcDirectory, File outputDirectory, File... additionalClasspath)
             throws CompilationException {
         Map<String, File> sourceFiles = listJavaFilesAndClasses(srcDirectory);
-        compile(sourceFiles.values(), outputDirectory, classLoader, sourceFiles.keySet());
+        launchCompiler(buildCommandLineArguments(sourceFiles.values(), outputDirectory, additionalClasspath));
     }
 
     private Map<String, File> listJavaFilesAndClasses(File srcFile) {
@@ -100,20 +110,21 @@ public class JDTCompiler {
         return path;
     }
 
-    private void compile(Collection<File> filesToBeCompiled, File outputDirectory,
-            ClassLoader classLoader, Set<String> classesToBeCompiled) throws CompilationException {
-        this.classLoader = classLoader;
-        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputDirectory);
-        launchCompiler(commandLine, classesToBeCompiled);
-    }
-
-    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory) {
+    private String[] buildCommandLineArguments(final Collection<File> files, final File outputDirectory,
+            File... additionalClasspath) {
         final List<String> arguments = new ArrayList<>();
+        if (additionalClasspath != null) {
+            arguments.add("-classpath");
+            arguments.add(
+                    Arrays.stream(additionalClasspath)
+                            .map(File::getAbsolutePath)
+                            .collect(Collectors.joining(File.pathSeparator)));
+        }
         arguments.add(COMPILER_COMPLIANCE_LEVEL);
         arguments.add(PARAMETERS_NAME_ARG);
-        arguments.addAll(outputDirectoryArguments(outputdirectory));
+        arguments.addAll(outputDirectoryArguments(outputDirectory));
         arguments.addAll(filesToBeCompiledArguments(files));
-        return arguments.toArray(new String[arguments.size()]);
+        return arguments.toArray(new String[0]);
     }
 
     private List<String> filesToBeCompiledArguments(final Collection<File> files) {
@@ -124,44 +135,34 @@ public class JDTCompiler {
         return arguments;
     }
 
-    private List<String> outputDirectoryArguments(final File outputdirectory) {
-        if (outputdirectory == null) {
+    private List<String> outputDirectoryArguments(final File outputDirectory) {
+        if (outputDirectory == null) {
             return Collections.emptyList();
         }
-        return Arrays.asList("-d", outputdirectory.getAbsolutePath());
+        return Arrays.asList("-d", outputDirectory.getAbsolutePath());
     }
 
-    private void launchCompiler(final String[] commandLine, Set<String> classesToBeCompiled)
+    private void launchCompiler(final String[] commandLine)
             throws CompilationException {
         final PrintWriter outWriter = new PrintWriter(new ByteArrayOutputStream());
         // closing outwriter since we don't want to see compilation out stream
         outWriter.close();
 
         final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-        final PrintWriter errorWriter = new PrintWriter(errorStream);
-        try {
-            doCompilation(commandLine, outWriter, errorStream, errorWriter, classesToBeCompiled);
-        } finally {
-            // no need to close OutputStream, printWriter is doing it for us
-            errorWriter.close();
+
+        try (var errorWriter = new PrintWriter(errorStream)) {
+            doCompilation(commandLine, outWriter, errorStream, errorWriter);
         }
     }
 
     private void doCompilation(final String[] commandLine, final PrintWriter outWriter,
-            final ByteArrayOutputStream errorStream, final PrintWriter errorWriter, Set<String> classesToBeCompiled)
+            final ByteArrayOutputStream errorStream, final PrintWriter errorWriter)
             throws CompilationException {
         final Main mainCompiler = new Main(outWriter, errorWriter, false /* systemExit */, null /* options */,
-                new DummyCompilationProgress()) {
-
-            @Override
-            public FileSystem getLibraryAccess() {
-                final ClassLoader contextClassLoader = classLoader;
-                return new ClassLoaderEnvironment(contextClassLoader, classesToBeCompiled);
-            }
-        };
+                new DummyCompilationProgress());
         final boolean succeeded = mainCompiler.compile(commandLine);
         if (!succeeded) {
-            throw new CompilationException(new String(errorStream.toByteArray()));
+            throw new CompilationException(errorStream.toString());
         }
     }
 

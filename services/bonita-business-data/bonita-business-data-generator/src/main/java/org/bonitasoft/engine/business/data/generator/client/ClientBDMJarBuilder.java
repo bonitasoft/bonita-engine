@@ -14,8 +14,14 @@
 package org.bonitasoft.engine.business.data.generator.client;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+import javassist.util.proxy.MethodHandler;
 
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
 import org.bonitasoft.engine.business.data.generator.CodeGenerationException;
 import org.bonitasoft.engine.business.data.generator.compiler.JDTCompiler;
@@ -36,6 +42,21 @@ public class ClientBDMJarBuilder extends AbstractBDMJarBuilder {
     public ClientBDMJarBuilder(ResourcesLoader resourcesLoader) {
         super(new ClientBDMCodeGenerator());
         this.resourcesLoader = resourcesLoader;
+    }
+
+    @Override
+    protected Set<File> getCompileDependencies() throws ClassNotFoundException {
+        var compileDependencies = new HashSet<>(super.getCompileDependencies());
+        // Add dependencies to compile client jar
+        compileDependencies.addAll(Set.of(
+                JDTCompiler.lookupJarContaining("org.bonitasoft.engine.api.TenantAPIAccessor"),
+                JDTCompiler.lookupJarContaining(
+                        "org.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer"),
+                JDTCompiler.lookupJarContaining(MethodHandler.class),
+                JDTCompiler.lookupJarContaining(ObjectMapper.class),
+                JDTCompiler.lookupJarContaining(ObjectCodec.class),
+                JDTCompiler.lookupJarContaining(Field.class)));
+        return compileDependencies;
     }
 
     @Override

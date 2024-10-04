@@ -14,12 +14,13 @@
 package org.bonitasoft.engine.business.data.generator.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
 
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.generator.BOMBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,23 +39,46 @@ public class ServerBDMJarBuilderTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private File directory;
+    private ServerBDMJarBuilder bdmJarBuilder;
 
     @Before
     public void setUp() throws Exception {
         directory = temporaryFolder.newFolder();
+        bdmJarBuilder = new ServerBDMJarBuilder(new ServerBDMCodeGenerator());
     }
 
     @Test
     public void should_addPersistenceUnittestGetPersistenceFileContentFor() throws Exception {
-        final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder(new ServerBDMCodeGenerator()));
-
-        builder.addPersistenceFile(directory, bom);
+        bdmJarBuilder.addPersistenceFile(directory, bom);
 
         verify(bom).getBusinessObjects();
         assertThat(directory).isDirectory();
         final File metaInf = new File(directory, "META-INF");
         assertThat(metaInf).exists();
         assertThat(new File(metaInf, "persistence.xml")).exists();
+    }
+
+    /* Just to test we have no errors in full chain. Must be improved */
+    @Test
+    public void jar_builder_should_go_well_without_errors() throws Exception {
+        bdmJarBuilder.build(BOMBuilder.aBOM().build(), TrueFileFilter.TRUE);
+    }
+
+    @Test
+    public void jar_builder_should_go_well_without_errors_with_queries() throws Exception {
+        final BOMBuilder builder = new BOMBuilder();
+        bdmJarBuilder.build(builder.buildComplex(), TrueFileFilter.TRUE);
+    }
+
+    @Test
+    public void jar_builder_should_go_well_without_errors_with_queries2() throws Exception {
+        bdmJarBuilder.build(BOMBuilder.aBOM().buildPerson(), TrueFileFilter.TRUE);
+    }
+
+    @Test
+    public void jar_builder_should_go_well_with_multipleBoolean() throws Exception {
+        final BOMBuilder builder = new BOMBuilder();
+        bdmJarBuilder.build(builder.buildModelWithMultipleBoolean(), TrueFileFilter.TRUE);
     }
 
 }
