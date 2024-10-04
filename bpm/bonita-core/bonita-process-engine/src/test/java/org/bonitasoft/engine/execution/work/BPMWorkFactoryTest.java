@@ -241,10 +241,9 @@ public class BPMWorkFactoryTest {
         if (clazz.isAssignableFrom(work.getClass())) {
             return ((T) work);
         }
-        if (!(work instanceof WrappingBonitaWork)) {
+        if (!(work instanceof WrappingBonitaWork wrappingBonitaWork)) {
             return null;
         }
-        WrappingBonitaWork wrappingBonitaWork = ((WrappingBonitaWork) work);
         return getWorkOfClass(wrappingBonitaWork.getWrappedWork(), clazz);
     }
 

@@ -57,7 +57,7 @@ public class IndexUpdaterTest {
     private IndexUpdater indexUpdater;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         indexUpdater = new IndexUpdater(applicationService, MAX_RESULTS);
 
         given(menu3.getIndex()).willReturn(3);

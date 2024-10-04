@@ -65,8 +65,7 @@ public class BusinessDataResource extends CommonResource {
         // Exception are all wrapped so we need to get cause fist
         if (throwable.getCause() != null) {
             final Throwable realException = throwable.getCause();
-            if (realException instanceof CommandExecutionException) {
-                final CommandExecutionException e = (CommandExecutionException) realException;
+            if (realException instanceof CommandExecutionException e) {
                 if (e.getCause() instanceof DataNotFoundException) {
                     return (DataNotFoundException) e.getCause();
                 }

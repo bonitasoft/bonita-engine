@@ -322,10 +322,9 @@ public class CustomPageService {
     private boolean isOutdated(GroovyClassLoader pageClassLoader,
             BDMClientDependenciesResolver bdmDependenciesResolver) {
         final ClassLoader parent = pageClassLoader.getParent();
-        if (!(parent instanceof VersionedClassloader)) {
+        if (!(parent instanceof VersionedClassloader cachedClassloader)) {
             throw new IllegalStateException("Parent classloader should be versioned.");
         }
-        final VersionedClassloader cachedClassloader = (VersionedClassloader) parent;
         return !cachedClassloader.hasVersion(bdmDependenciesResolver.getBusinessDataModelVersion());
     }
 

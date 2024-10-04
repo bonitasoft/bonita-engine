@@ -15,6 +15,7 @@ package org.bonitasoft.engine.business.application.impl.filter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -27,8 +28,8 @@ import org.bonitasoft.engine.persistence.QueryOptions;
  */
 public class ChildrenMenusFilterBuilder implements FilterBuilder {
 
-    private SelectRange range;
-    private long parentId;
+    private final SelectRange range;
+    private final long parentId;
 
     public ChildrenMenusFilterBuilder(SelectRange range, long parentId) {
         this.range = range;
@@ -48,14 +49,12 @@ public class ChildrenMenusFilterBuilder implements FilterBuilder {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ChildrenMenusFilterBuilder))
+        if (!(o instanceof ChildrenMenusFilterBuilder that))
             return false;
-
-        ChildrenMenusFilterBuilder that = (ChildrenMenusFilterBuilder) o;
 
         if (parentId != that.parentId)
             return false;
-        if (range != null ? !range.equals(that.range) : that.range != null)
+        if (!Objects.equals(range, that.range))
             return false;
 
         return true;

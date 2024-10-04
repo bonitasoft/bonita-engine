@@ -2103,8 +2103,7 @@ public class ModelConvertor {
         if (sRefBusinessDataInstance == null) {
             return null;
         }
-        if (sRefBusinessDataInstance instanceof SProcessMultiRefBusinessDataInstance) {
-            final SProcessMultiRefBusinessDataInstance multi = (SProcessMultiRefBusinessDataInstance) sRefBusinessDataInstance;
+        if (sRefBusinessDataInstance instanceof SProcessMultiRefBusinessDataInstance multi) {
             return new MultipleBusinessDataReferenceImpl(multi.getName(), multi.getDataClassName(), multi.getDataIds());
         }
         final SSimpleRefBusinessDataInstance simple = (SSimpleRefBusinessDataInstance) sRefBusinessDataInstance;

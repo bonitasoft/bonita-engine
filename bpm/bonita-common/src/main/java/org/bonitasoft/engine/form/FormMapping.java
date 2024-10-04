@@ -146,9 +146,8 @@ public class FormMapping implements BaseElement {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof FormMapping))
+        if (!(o instanceof FormMapping that))
             return false;
-        FormMapping that = (FormMapping) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(processDefinitionId, that.processDefinitionId) &&
                 Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&

@@ -96,9 +96,8 @@ public class ValidationStatus {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ValidationStatus))
+        if (!(o instanceof ValidationStatus that))
             return false;
-        ValidationStatus that = (ValidationStatus) o;
         return Objects.equals(statusList, that.statusList);
     }
 

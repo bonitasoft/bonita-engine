@@ -205,8 +205,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         final TriggerBuilder<org.quartz.Trigger> base = TriggerBuilder.newTrigger().forJob(jobName, tenantId)
                 .withIdentity(trigger.getName(), tenantId)
                 .startNow();
-        if (trigger instanceof CronTrigger) {
-            final CronTrigger cronTrigger = (CronTrigger) trigger;
+        if (trigger instanceof CronTrigger cronTrigger) {
             final CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder
                     .cronSchedule(cronTrigger.getExpression());
             switch (cronTrigger.getMisfireHandlingPolicy()) {

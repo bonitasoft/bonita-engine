@@ -44,8 +44,7 @@ public class TaskReadyHandler extends AbstractJMSUpdateHandler {
     @Override
     public boolean isInterested(final SEvent event) {
         // the !isStateExecuting avoid having 2 times the same event in case of execution of e.g. connectors
-        if (event.getObject() instanceof SFlowNodeInstance) {
-            final SFlowNodeInstance fni = (SFlowNodeInstance) event.getObject();
+        if (event.getObject() instanceof SFlowNodeInstance fni) {
             boolean interested = !fni.isStateExecuting();
             interested &= fni.getStateId() == 4;
             interested &= (fni.getType() == SFlowNodeType.USER_TASK || fni.getType() == SFlowNodeType.MANUAL_TASK);

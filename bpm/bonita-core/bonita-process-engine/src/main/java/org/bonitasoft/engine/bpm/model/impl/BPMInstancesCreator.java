@@ -227,8 +227,7 @@ public class BPMInstancesCreator {
             final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter,
             final SStateCategory stateCategory,
             final long relatedActivityInstanceId) throws SActorNotFoundException, SActivityReadException {
-        if (!createInnerActivity && sFlowNodeDefinition instanceof SActivityDefinition) {
-            final SActivityDefinition activityDefinition = (SActivityDefinition) sFlowNodeDefinition;
+        if (!createInnerActivity && sFlowNodeDefinition instanceof SActivityDefinition activityDefinition) {
             final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
             if (loopCharacteristics != null) {
                 SFlowNodeInstanceBuilder builder;

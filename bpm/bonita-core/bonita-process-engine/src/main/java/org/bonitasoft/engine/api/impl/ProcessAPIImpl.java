@@ -5884,10 +5884,9 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SProcessDefinition processDefinition = processDefinitionService
                     .getProcessDefinition(processDefinitionId);
             final SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(humanTaskName);
-            if (!(flowNode instanceof SHumanTaskDefinition)) {
+            if (!(flowNode instanceof SHumanTaskDefinition humanTask)) {
                 return Collections.emptyList();
             }
-            final SHumanTaskDefinition humanTask = (SHumanTaskDefinition) flowNode;
             final String actorName = humanTask.getActorName();
             final List<Long> userIds = getUserIdsForActor(serviceAccessor, processDefinitionId, actorName, startIndex,
                     maxResults);

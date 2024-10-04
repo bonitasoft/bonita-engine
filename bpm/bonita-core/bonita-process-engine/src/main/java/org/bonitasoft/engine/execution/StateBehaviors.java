@@ -89,7 +89,6 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNode
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -203,10 +202,9 @@ public class StateBehaviors {
             if (activityDefinition != null) {// can be null if the activity was added in runtime
                 try {
                     final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
-                    if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
+                    if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics miLoop
                             && ((SMultiInstanceLoopCharacteristics) loopCharacteristics)
                                     .getDataOutputItemRef() != null) {
-                        final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
                         final SBusinessDataDefinition businessData = processContainer
                                 .getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
                         if (businessData == null) {
@@ -340,8 +338,7 @@ public class StateBehaviors {
             final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
         // handle catch event
-        if (flowNodeInstance instanceof SIntermediateCatchEventInstance) {
-            final SCatchEventInstance intermediateCatchEventInstance = (SCatchEventInstance) flowNodeInstance;
+        if (flowNodeInstance instanceof SIntermediateCatchEventInstance intermediateCatchEventInstance) {
             // handleEventTriggerInstances(processDefinition, intermediateCatchEventInstance);
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SIntermediateCatchEventDefinition intermediateCatchEventDefinition = (SIntermediateCatchEventDefinition) processContainer
@@ -352,8 +349,7 @@ public class StateBehaviors {
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException("unable to handle catch event " + flowNodeInstance, e);
             }
-        } else if (flowNodeInstance instanceof SReceiveTaskInstance) {
-            final SReceiveTaskInstance receiveTaskInstance = (SReceiveTaskInstance) flowNodeInstance;
+        } else if (flowNodeInstance instanceof SReceiveTaskInstance receiveTaskInstance) {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SReceiveTaskDefinition receiveTaskIDefinition = (SReceiveTaskDefinition) processContainer
                     .getFlowNode(receiveTaskInstance
@@ -433,10 +429,9 @@ public class StateBehaviors {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SFlowNodeDefinition flowNodeDefinition = processContainer
                 .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-        if (!(flowNodeDefinition instanceof SHumanTaskDefinition)) {
+        if (!(flowNodeDefinition instanceof SHumanTaskDefinition humanTaskDefinition)) {
             return;
         }
-        SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) flowNodeDefinition;
         final SExpression expectedDurationExpression = humanTaskDefinition.getExpectedDuration();
         if (expectedDurationExpression == null) {
             return;
@@ -490,8 +485,7 @@ public class StateBehaviors {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SFlowNodeDefinition flowNode = processContainer
                     .getFlowNode(activityInstance.getFlowNodeDefinitionId());
-            if (flowNode instanceof SActivityDefinition) {
-                final SActivityDefinition activityDefinition = (SActivityDefinition) flowNode;
+            if (flowNode instanceof SActivityDefinition activityDefinition) {
                 final List<SOperation> sOperations = activityDefinition.getSOperations();
                 final SExpressionContext sExpressionContext = new SExpressionContext(activityInstance.getId(),
                         DataInstanceContainer.ACTIVITY_INSTANCE.name(),
@@ -505,8 +499,7 @@ public class StateBehaviors {
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
-        if (flowNodeInstance instanceof SThrowEventInstance) {
-            final SThrowEventInstance throwEventInstance = (SThrowEventInstance) flowNodeInstance;
+        if (flowNodeInstance instanceof SThrowEventInstance throwEventInstance) {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SThrowEventDefinition eventDefinition = (SThrowEventDefinition) processContainer
                     .getFlowNode(throwEventInstance.getFlowNodeDefinitionId());
@@ -755,8 +748,7 @@ public class StateBehaviors {
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (loopDataInput != null) {
             final Serializable value = loopDataInput.getValue();
-            if (value instanceof List) {
-                final List<?> loopDataInputCollection = (List<?>) value;
+            if (value instanceof List<?> loopDataInputCollection) {
                 return loopDataInputCollection.size();
             }
             throw new SActivityStateExecutionException(

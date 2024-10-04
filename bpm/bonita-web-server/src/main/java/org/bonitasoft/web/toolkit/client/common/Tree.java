@@ -99,11 +99,9 @@ public class Tree<VALUE_CLASS> extends AbstractTreeNode<VALUE_CLASS>
         if (o == this) {
             return true;
         }
-        if (!(o instanceof Tree)) {
+        if (!(o instanceof Tree<?> tree)) {
             return false;
         }
-
-        final Tree<?> tree = (Tree<?>) o;
 
         if (tree.size() != this.size()) {
             return false;

@@ -59,8 +59,7 @@ public class InitializingMultiInstanceActivityState implements FlowNodeState {
             final SActivityDefinition activity = (SActivityDefinition) processContainer
                     .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
             final SLoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
-            if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics) {
-                final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
+            if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics miLoop) {
                 final SExpression loopCardinality = miLoop.getLoopCardinality();
                 int numberOfInstanceMax = -1;
                 if (loopCardinality != null) {

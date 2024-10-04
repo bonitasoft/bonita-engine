@@ -28,7 +28,7 @@ public class ChildrenMenusFilterBuilderTest {
     public static final int MAX_RESULTS = 10;
 
     @Test
-    public void build_query_options_should_filter_on_parent_id() throws Exception {
+    public void build_query_options_should_filter_on_parent_id() {
         //given
         long parentId = 4L;
         ChildrenMenusFilterBuilder builder = new ChildrenMenusFilterBuilder(new SelectRange(START_INDEX, MAX_RESULTS),

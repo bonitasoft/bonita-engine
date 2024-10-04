@@ -79,10 +79,9 @@ public class Employee implements Comparable<Object>, Serializable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof Employee)) {
+        if (!(obj instanceof Employee other)) {
             return false;
         }
-        final Employee other = (Employee) obj;
         if (experience != other.experience) {
             return false;
         }

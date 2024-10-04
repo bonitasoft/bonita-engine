@@ -42,8 +42,7 @@ public class BusinessDataReferenceResource extends CommonResource {
     }
 
     public static BusinessDataReferenceClient toClient(BusinessDataReference object) {
-        if (object instanceof SimpleBusinessDataReference) {
-            final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) object;
+        if (object instanceof SimpleBusinessDataReference businessDataReference) {
             return new SimpleBusinessDataReferenceClient(object.getName(), object.getType(),
                     getUrl(object.getType(), getStorageIdString(businessDataReference)),
                     businessDataReference.getStorageId());

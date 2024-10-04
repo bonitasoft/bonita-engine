@@ -61,14 +61,11 @@ public class ConsoleCallbackHandler implements CallbackHandler {
     @Override
     public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (final Callback callback : callbacks) {
-            if (callback instanceof NameCallback) {
-                final NameCallback nc = (NameCallback) callback;
+            if (callback instanceof NameCallback nc) {
                 nc.setName(this.name);
-            } else if (callback instanceof PasswordCallback) {
-                final PasswordCallback pc = (PasswordCallback) callback;
+            } else if (callback instanceof PasswordCallback pc) {
                 pc.setPassword(this.password.toCharArray());
-            } else if (callback instanceof TextInputCallback) {
-                final TextInputCallback tc = (TextInputCallback) callback;
+            } else if (callback instanceof TextInputCallback tc) {
                 tc.setText(String.valueOf(TenantsManagementUtils.getDefaultTenantId()));
             }
 

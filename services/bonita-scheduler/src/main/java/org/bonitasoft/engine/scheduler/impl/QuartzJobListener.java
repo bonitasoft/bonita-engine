@@ -126,8 +126,7 @@ public class QuartzJobListener implements JobListener {
 
     private StatelessJob getBosJob(final JobExecutionContext context) {
         final Job instance = context.getJobInstance();
-        if (instance instanceof AbstractQuartzJob) {
-            final AbstractQuartzJob job = (AbstractQuartzJob) instance;
+        if (instance instanceof AbstractQuartzJob job) {
             return job.getBosJob();
         }
         return null;
