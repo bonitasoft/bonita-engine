@@ -6,9 +6,9 @@ import org.gradle.api.Project
 @Canonical
 class DatabaseExtraConfiguration {
     /**
-     * Include an additional module in the test classpath
+     * Include an additional project in the test classpath
      */
-    Project includeTestModule
+    Project includeTestProject
     /**
      * Excludes test class patterns (e.g. '**&#47;*Test.class') applied to this database vendor.
      * It can be combined with {@link #excludeTags}.
