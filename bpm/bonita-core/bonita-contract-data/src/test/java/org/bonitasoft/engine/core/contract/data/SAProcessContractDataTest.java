@@ -15,12 +15,66 @@ package org.bonitasoft.engine.core.contract.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
-public class SAProcessContractDataTest {
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
+import org.junit.jupiter.api.Test;
+
+class SAProcessContractDataTest {
 
     @Test
-    public void creatingSAProcessContractDataShouldCopyNonArchivedValues() throws Exception {
+    void clearFileInputContent() {
+        var contractData = new SProcessContractData();
+        contractData.setId(1);
+        contractData.setName("myFile");
+        contractData.setValue(new FileInputValue("theFile", "content".getBytes()));
+
+        var archivedContractData = new SAProcessContractData(contractData);
+
+        assertThat(archivedContractData.getValue()).isInstanceOf(FileInputValue.class)
+                .extracting("content")
+                .isNull();
+    }
+
+    @Test
+    void clearMultipleFileInputContent() {
+        var contractData = new SProcessContractData();
+        contractData.setId(1);
+        contractData.setName("myFile");
+        contractData.setValue((Serializable) List.of(
+                new FileInputValue("theFile", "content".getBytes()),
+                new FileInputValue("theFile1", "content1".getBytes())));
+
+        var archivedContractData = new SAProcessContractData(contractData);
+
+        assertThat(archivedContractData.getValue()).isInstanceOf(Collection.class);
+        assertThat((Collection<?>) archivedContractData.getValue())
+                .extracting("content")
+                .containsNull();
+    }
+
+    @Test
+    void clearComplexInputWithFileInputContent() {
+        var contractData = new SProcessContractData();
+        contractData.setId(1);
+        contractData.setName("parent");
+        contractData.setValue(
+                (Serializable) Map.ofEntries(Map.entry("myFile", new FileInputValue("theFile", "content".getBytes()))));
+
+        var archivedContractData = new SAProcessContractData(contractData);
+
+        assertThat(archivedContractData.getValue()).isInstanceOf(Map.class);
+        assertThat((Map) archivedContractData.getValue())
+                .hasEntrySatisfying("myFile", value -> assertThat(value).isInstanceOf(FileInputValue.class)
+                        .extracting("content")
+                        .isNull());
+    }
+
+    @Test
+    void creatingSAProcessContractDataShouldCopyNonArchivedValues() {
         long processInstanceId = 555L;
         String some_name = "some_name";
         long value = 999999L;
@@ -31,11 +85,11 @@ public class SAProcessContractDataTest {
 
         final SAProcessContractData saProcessContractData = new SAProcessContractData(processContractData);
 
-        assertThat(saProcessContractData.getTenantId()).isEqualTo(0L); // not set yet by Persistence service
-        assertThat(saProcessContractData.getId()).isEqualTo(0L);
+        assertThat(saProcessContractData.getTenantId()).isZero(); // not set yet by Persistence service
+        assertThat(saProcessContractData.getId()).isZero();
         assertThat(saProcessContractData.getName()).isEqualTo(some_name);
         assertThat(saProcessContractData.getScopeId()).isEqualTo(processInstanceId);
-        assertThat(saProcessContractData.getArchiveDate()).isEqualTo(0L);
+        assertThat(saProcessContractData.getArchiveDate()).isZero();
         assertThat(saProcessContractData.getSourceObjectId()).isEqualTo(originalProcessDataId);
         assertThat(saProcessContractData.getValue()).isEqualTo(value);
     }

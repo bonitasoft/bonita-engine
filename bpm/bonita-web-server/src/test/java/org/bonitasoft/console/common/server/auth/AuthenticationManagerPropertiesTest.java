@@ -39,7 +39,7 @@ public class AuthenticationManagerPropertiesTest {
                 "OAuth.consumerKey = ove2vcdjptar\n" +
                 "OAuth.consumerSecret = vdaBrCmHvkgJoYz1\n" +
                 "OAuth.callbackURL = http://127.0.0.1:8888/loginservice").getBytes())).when(loginManagerProperties)
-                        .getTenantPropertiesOfScope();
+                .getTenantPropertiesOfScope();
     }
 
     @After

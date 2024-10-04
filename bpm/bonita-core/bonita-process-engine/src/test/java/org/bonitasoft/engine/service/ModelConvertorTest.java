@@ -699,7 +699,7 @@ class ModelConvertorTest {
         final SASendTaskInstance sendTaskInstance = new SASendTaskInstance();
         assertThat(
                 ModelConvertor.toArchivedFlowNodeInstance(sendTaskInstance, flowNodeStateManager).getReachedStateDate())
-                        .isNotNull();
+                .isNotNull();
     }
 
     @Test

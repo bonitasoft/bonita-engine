@@ -260,8 +260,8 @@ public class JobServiceImplForJobDescriptorTest {
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
         when(readPersistenceService.selectById(
                 SelectDescriptorBuilder.getElementById(SJobDescriptor.class, "SJobDescriptor", jobDescriptorId)))
-                        .thenReturn(
-                                sJobDescriptor);
+                .thenReturn(
+                        sJobDescriptor);
 
         // When
         final SJobDescriptor jobDescriptor = jobServiceImpl.getJobDescriptor(jobDescriptorId);

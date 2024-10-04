@@ -262,7 +262,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             throws SConnectorException {
         final String implementationClassName = getConnectorImplementationDescriptor(processDefinitionId,
                 connectorDefinitionId, connectorDefinitionVersion)
-                        .getImplementationClassName();
+                .getImplementationClassName();
         final Map<String, Object> inputParameters;
         try {
             inputParameters = evaluateInputParameters(connectorDefinitionId, connectorInputParameters,

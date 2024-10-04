@@ -289,7 +289,6 @@ public class CasePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         Assertions.assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -324,6 +323,5 @@ public class CasePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         Assertions.assertThat(isAuthorized).isTrue()
-
     }
 }

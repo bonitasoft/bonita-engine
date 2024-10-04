@@ -132,7 +132,7 @@ public class ServerAPIImplTest {
         doReturn(true).when(platformLoginService).isValid(PLATFORM_SESSION_ID);
         doAnswer(invocation -> (isMaintenanceEnabled ? MaintenanceDetails.State.ENABLED
                 : MaintenanceDetails.State.DISABLED))
-                        .when(maintenanceDetails).getMaintenanceState();
+                .when(maintenanceDetails).getMaintenanceState();
         doAnswer(invocation -> maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
         accessResolver = new APIAccessResolver() {

@@ -27,7 +27,7 @@ public class DeepRegexFileFilterTest {
         final String parentPatternPathname = "/media/drive/some_folder";
         assertThat(new DeepRegexFileFilter(new File(parentPatternPathname), pattern)
                 .accept(new File("/media/drive/some_folder/folder/sub/matchingFile.txt")))
-                        .isTrue();
+                .isTrue();
     }
 
     @Test
@@ -36,7 +36,7 @@ public class DeepRegexFileFilterTest {
         final String parentPatternPathname = "/home/some_folder/";
         assertThat(new DeepRegexFileFilter(new File(parentPatternPathname), pattern)
                 .accept(new File("/home/some_folder/folder/sub/matchingFile.txt")))
-                        .isTrue();
+                .isTrue();
     }
 
     @Test
@@ -45,7 +45,7 @@ public class DeepRegexFileFilterTest {
         final String parentPatternPathname = "/home/some_folder/";
         assertThat(new DeepRegexFileFilter(new File(parentPatternPathname), pattern)
                 .accept(new File("/home/some_folder/folder/sub/someReport.pdf")))
-                        .isFalse();
+                .isFalse();
     }
 
     @Test
@@ -54,7 +54,7 @@ public class DeepRegexFileFilterTest {
         final String parentPatternPathname = "/home";
         assertThat(new DeepRegexFileFilter(new File(parentPatternPathname), pattern)
                 .accept(new File("/home/folder/sub/sub2/fileHiddenInDeepFolder.txt")))
-                        .isTrue();
+                .isTrue();
     }
 
     @Test
@@ -63,7 +63,7 @@ public class DeepRegexFileFilterTest {
         final String parentPatternPathname = "/home";
         assertThat(new DeepRegexFileFilter(new File(parentPatternPathname), pattern)
                 .accept(new File("/home/folder/sub/sub2/fileHiddenInDeepFolder.txt")))
-                        .isFalse();
+                .isFalse();
     }
 
 }

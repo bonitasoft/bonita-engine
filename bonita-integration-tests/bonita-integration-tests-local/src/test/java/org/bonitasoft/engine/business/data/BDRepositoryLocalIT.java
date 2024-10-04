@@ -496,7 +496,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
             case "oracle":
                 assertThat(((List<BigDecimal>) execute_native_sql(
                         "SELECT COUNT(*) FROM user_sequences WHERE sequence_name = 'HIBERNATE_SEQUENCE'")).get(0)
-                                .intValue()).isEqualTo(1);
+                        .intValue()).isEqualTo(1);
                 break;
             case "mysql":
                 assertThat(Arrays.toString((Object[]) execute_native_sql("describe EMPLOYEE").get(0)))

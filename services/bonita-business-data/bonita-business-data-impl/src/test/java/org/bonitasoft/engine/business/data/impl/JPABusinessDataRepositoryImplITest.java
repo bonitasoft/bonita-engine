@@ -218,7 +218,7 @@ public class JPABusinessDataRepositoryImplITest {
                 (Serializable) "Unknown_lastName");
         assertThat(
                 businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters))
-                        .isNull();
+                .isNull();
     }
 
     @Test(expected = IllegalStateException.class)

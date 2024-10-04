@@ -76,7 +76,8 @@ public class DefaultBonitaExecutorServiceFactoryTest {
                 meterRegistry.find("executor.pool.size")
                         .tag("name", "bonita-work-executor")
                         .tag("tenant", String.valueOf(tenantId))
-                        .gauge()).isNotNull();
+                        .gauge())
+                .isNotNull();
     }
 
     @Test
@@ -102,6 +103,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
                 meterRegistry.find("executor.pool.size")
                         .tag("name", "bonita-work-executor")
                         .tag("tenant", String.valueOf(tenantId))
-                        .gauge()).isNull();
+                        .gauge())
+                .isNull();
     }
 }

@@ -103,7 +103,7 @@ class JavaMethodInvokerTest {
                             myData, "setDoesNotExistMethod",
                             "java.lang.String");
                 })
-                        .isInstanceOf(NoSuchMethodException.class);
+                .isInstanceOf(NoSuchMethodException.class);
     }
 
 }

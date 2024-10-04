@@ -612,7 +612,7 @@ public class HibernatePersistenceService implements PersistenceService {
             }
             QueryGeneratorForFilters.QueryGeneratedFilters whereClause = new QueryGeneratorForFilters(
                     getClassAliasMappings(), '%'/* there is no 'like' in these delete queries */)
-                            .generate(filters);
+                    .generate(filters);
             parameters.putAll(whereClause.getParameters());
             baseQuery += " WHERE ( " + whereClause.getFilters() + " )";
         }

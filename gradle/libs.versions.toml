@@ -1,20 +1,20 @@
 [versions]
 # The groovy version must be in synch with the bonita-project-parent POM (bonita-project repository):
-groovyVersion = "3.0.21"
+groovyVersion = "3.0.22"
 springVersion = "5.3.39"
 springSessionVersion = "2.7.4"
 springBootVersion = "2.7.18"
-commonsLangVersion = "3.14.0"
+commonsLangVersion = "3.17.0"
 junit4Version = "4.13.2"
-junit5Version = "5.10.2"
+junit5Version = "5.11.1"
 bonitaArtifactsModelVersion = "1.1.1"
-commonsIOVersion = "2.16.1"
+commonsIOVersion = "2.17.0"
 commonsFileUploadVersion = "1.5"
 commonsBeanutilsVersion = "1.9.4"
 commonsCollectionsVersion = "4.4"
-tomcatDbcpVersion = "9.0.93"
-commonsCLIVersion = "1.8.0"
-commonsTextVersion = "1.10.0"
+tomcatVersion = "9.0.95"
+commonsCLIVersion = "1.9.0"
+commonsTextVersion = "1.12.0"
 semver4jVersion = '3.1.0'
 slf4jVersion = "1.7.36"
 # Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
@@ -23,7 +23,7 @@ hibernateVersion = "5.4.33"
 javassistVersion = "3.27.0-GA"
 # javax.persistence-api is used by hibernate:
 javaxPersistenceApiVersion = "2.2"
-jacksonBomVersion = "2.17.1"
+jacksonBomVersion = "2.18.0"
 jakartaTransactionVersion = "1.3.3"
 jakartaServletVersion = "4.0.4"
 # Keep this until all client projects have migrated to jakarta or it will break their builds !
@@ -31,23 +31,23 @@ javaxServletVersion = "4.0.1"
 httpComponentsVersion = "4.5.14"
 xstreamVersion = "1.4.20"
 ehCacheVersion = "2.10.10.12.7"
-eclipseCompilerVersion = "3.38.0"
+eclipseCompilerVersion = "3.39.0"
 jakartaActivationVersion = "1.2.2"
 quartzVersion = "2.3.2"
-micrometerVersion = "1.13.1"
+micrometerVersion = "1.13.4"
 # DB drivers:
-mysqlVersion = "8.2.0"
-msSqlServerVersion = "8.4.1.jre8"
-oracleVersion = "19.3.0.0"
-postgresqlVersion = "42.4.4"
+mysqlVersion = "8.4.0"
+msSqlServerVersion = "9.4.1.jre11"
+oracleVersion = "19.24.0.0"
+postgresqlVersion = "42.7.4"
 
 narayanaVersion = "5.10.6.Final"
 logbackVersion = "1.2.13"
-jaxbVersion = "2.3.1"
+jaxbVersion = "2.3.9"
 javaxAnnotationsVersion = "1.3.2"
 hazelcastVersion = "5.4.0" # Also update http://www.hazelcast.com/schema/config/hazelcast-config-<VERSION>.xsd if needed
-jcacheVersion = "1.0.0"
-guavaVersion = "32.1.2-jre"
+jcacheVersion = "1.1.1"
+guavaVersion = "33.3.1-jre"
 antlr4RuntimeVersion = "4.7.2"
 
 [libraries]
@@ -105,7 +105,7 @@ commonsIO = { group = "commons-io", name = "commons-io", version.ref = "commonsI
 commonsFileUpload = { group = "commons-fileupload", name = "commons-fileupload", version.ref = "commonsFileUploadVersion" }
 commonsBeanUtils = { group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutilsVersion" }
 commonsCollections = { group = "org.apache.commons", name = "commons-collections4", version.ref = "commonsCollectionsVersion" }
-tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatDbcpVersion" }
+tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatVersion" }
 commonsCLI = { group = "commons-cli", name = "commons-cli", version.ref = "commonsCLIVersion" }
 commonsText = { group = "org.apache.commons", name = "commons-text", version.ref = "commonsTextVersion" }
 semver4j = { group = "com.vdurmont", name = "semver4j", version.ref = "semver4jVersion" }
@@ -149,7 +149,7 @@ msSqlServer = { group = "com.microsoft.sqlserver", name = "mssql-jdbc", version.
 oracle = { group = "com.oracle.database.jdbc", name = "ojdbc8", version.ref = "oracleVersion" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
 
-lombok = "org.projectlombok:lombok:1.18.32"
+lombok = "org.projectlombok:lombok:1.18.34"
 
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 
@@ -166,6 +166,6 @@ groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx",
     "groovyDateutil", "groovyDocgenerator", "groovyJsr223", "groovySql", "groovyTemplates", "groovyYaml"]
 
 [plugins]
-bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "0.1.63" }
+bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "0.1.64" }
 dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.51.0" } # used by "List out-of-date dependencies" script
 taskInfo = { id = "org.barfuin.gradle.taskinfo", version = "2.2.0" } # Adds a 'tiTree' task to display Gradle task-graph

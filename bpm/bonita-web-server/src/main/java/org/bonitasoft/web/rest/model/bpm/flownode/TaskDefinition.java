@@ -50,7 +50,7 @@ public class TaskDefinition extends ActivityDefinition {
         // add extra state
         ((EnumValidator) getAttribute(FlowNodeItem.ATTRIBUTE_STATE)
                 .getValidator(EnumValidator.class.getName()))
-                        .addValue(TaskItem.VALUE_STATE_REPLAY);
+                .addValue(TaskItem.VALUE_STATE_REPLAY);
     }
 
     @Override

@@ -6,9 +6,10 @@ dependencies {
     api project(':services:bonita-log')
     api project(':services:bonita-archive')
     api project(':services:bonita-persistence')
+    implementation platform(libs.bonitaArtifactsModelBom)
+    implementation 'org.bonitasoft.engine:bonita-process-definition-model'
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 }

@@ -56,7 +56,7 @@ public class TenantResourceServiceQueriesTest {
                 String.class)).isEqualTo("INSTALLED");
         assertThat(
                 jdbcTemplate.queryForObject("select type from tenant_resource where name = 'MyResource'", String.class))
-                        .isEqualTo("BDM");
+                .isEqualTo("BDM");
 
         //when
         STenantResource myResource = repository.getTenantResource(TenantResourceType.BDM, "MyResource");
