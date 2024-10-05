@@ -48,14 +48,13 @@ public class ClientBDMJarBuilder extends AbstractBDMJarBuilder {
     protected Set<File> getCompileDependencies() throws ClassNotFoundException {
         var compileDependencies = new HashSet<>(super.getCompileDependencies());
         // Add dependencies to compile client jar
-        compileDependencies.addAll(Set.of(
-                JDTCompiler.lookupJarContaining("org.bonitasoft.engine.api.TenantAPIAccessor"),
-                JDTCompiler.lookupJarContaining(
-                        "org.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer"),
-                JDTCompiler.lookupJarContaining(MethodHandler.class),
-                JDTCompiler.lookupJarContaining(ObjectMapper.class),
-                JDTCompiler.lookupJarContaining(ObjectCodec.class),
-                JDTCompiler.lookupJarContaining(Field.class)));
+        compileDependencies.add(JDTCompiler.lookupJarContaining("org.bonitasoft.engine.api.TenantAPIAccessor"));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(
+                "org.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer"));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(MethodHandler.class));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(ObjectMapper.class));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(ObjectCodec.class));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(Field.class));
         return compileDependencies;
     }
 

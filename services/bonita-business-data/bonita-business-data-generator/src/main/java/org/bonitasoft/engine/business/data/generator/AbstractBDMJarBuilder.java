@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -94,14 +95,16 @@ public abstract class AbstractBDMJarBuilder {
      * @throws ClassNotFoundException if a required class cannot be found in the current classloader
      */
     protected Set<File> getCompileDependencies() throws ClassNotFoundException {
-        return Set.of(
-                JDTCompiler.lookupJarContaining(Entity.class),
-                JDTCompiler.lookupJarContaining(org.bonitasoft.engine.bdm.Entity.class),
-                JDTCompiler.lookupJarContaining(JsonIgnore.class),
-                JDTCompiler.lookupJarContaining("org.hibernate.annotations.Parameter"),
-                JDTCompiler.lookupJarContaining(DateConverter.class),
-                JDTCompiler.lookupJarContaining(SBonitaRuntimeException.class),
-                JDTCompiler.lookupJarContaining("org.bonitasoft.engine.business.data.BusinessDataRepository"));
+        var compileDependencies = new HashSet<File>();
+        compileDependencies.add(JDTCompiler.lookupJarContaining(Entity.class));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(org.bonitasoft.engine.bdm.Entity.class));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(JsonIgnore.class));
+        compileDependencies.add(JDTCompiler.lookupJarContaining("org.hibernate.annotations.Parameter"));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(DateConverter.class));
+        compileDependencies.add(JDTCompiler.lookupJarContaining(SBonitaRuntimeException.class));
+        compileDependencies
+                .add(JDTCompiler.lookupJarContaining("org.bonitasoft.engine.business.data.BusinessDataRepository"));
+        return compileDependencies;
     }
 
     protected void addSourceFilesToDirectory(final BusinessObjectModel bom, final File directory)
