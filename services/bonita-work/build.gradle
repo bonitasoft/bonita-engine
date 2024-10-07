@@ -7,10 +7,9 @@ dependencies {
     api project(':services:bonita-transaction')
     api libs.springJdbc
     api libs.springContext
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
 }

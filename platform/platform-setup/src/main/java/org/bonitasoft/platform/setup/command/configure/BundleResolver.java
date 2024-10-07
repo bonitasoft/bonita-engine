@@ -20,19 +20,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.platform.exception.PlatformException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class contains the logic to determine if we are in the context of an application server that we must configure.
  * Only Tomcat is supported.
- *
- * @author Emmanuel Duchastenier
  */
+@Slf4j
 class BundleResolver {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
     private final Path rootPath;
 
@@ -48,7 +44,7 @@ class BundleResolver {
     private boolean fileExists(Path filePath) {
         final boolean exists = Files.exists(filePath);
         if (!exists) {
-            LOGGER.debug("File " + filePath.toString() + " does not exist.");
+            log.debug("File {} does not exist.", filePath);
         }
         return exists;
     }
@@ -71,8 +67,8 @@ class BundleResolver {
         if (isTomcatEnvironment()) {
             return new TomcatBundleConfigurator(rootPath);
         } else {
-            LOGGER.info(
-                    "No Application Server detected. You may need to manually configure the access to the database. Only Tomcat 8.x is supported");
+            log.info("No Application Server detected. You may need to manually configure the access to the database. " +
+                    "Only Tomcat 9.0.x is supported");
             return null;
         }
     }

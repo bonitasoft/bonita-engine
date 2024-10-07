@@ -60,6 +60,7 @@ import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.ProcessStarterVerifier;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -113,6 +114,7 @@ import org.bonitasoft.engine.work.WorkExecutorService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 public class SpringServiceAccessor
         implements ServiceAccessor, TenantServiceAccessor, PlatformServiceAccessor, PlatformInitServiceAccessor {
@@ -126,6 +128,11 @@ public class SpringServiceAccessor
     @Override
     public ParentContainerResolver getParentContainerResolver() {
         return beanAccessor.getService(ParentContainerResolver.class);
+    }
+
+    @Override
+    public Environment getSpringEnvironment() {
+        return beanAccessor.getContext().getEnvironment();
     }
 
     @Override
@@ -643,5 +650,10 @@ public class SpringServiceAccessor
     @Override
     public InstallationService getInstallationService() {
         return beanAccessor.getService(InstallationService.class);
+    }
+
+    @Override
+    public ProcessStarterVerifier getProcessStarterVerifier() {
+        return beanAccessor.getService(ProcessStarterVerifier.class);
     }
 }

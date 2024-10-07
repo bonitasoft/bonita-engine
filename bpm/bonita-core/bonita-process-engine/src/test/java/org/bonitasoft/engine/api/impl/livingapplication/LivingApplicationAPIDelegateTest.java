@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -24,10 +25,15 @@ import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationLink;
+import org.bonitasoft.engine.business.application.ApplicationLinkCreator;
+import org.bonitasoft.engine.business.application.ApplicationLinkUpdater;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import org.bonitasoft.engine.business.application.impl.ApplicationLinkImpl;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.business.application.importer.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -65,13 +71,13 @@ public class LivingApplicationAPIDelegateTest {
     private ApplicationModelConverter converter;
 
     @Mock
-    private SearchApplications searchApplications;
+    private SearchApplications<IApplication> searchApplications;
 
     @Mock
     private ApplicationService applicationService;
 
     @Mock
-    private SearchResult<Application> appSearchResult;
+    private SearchResult<IApplication> appSearchResult;
 
     @Mock
     ApplicationTokenValidator validator;
@@ -126,6 +132,26 @@ public class LivingApplicationAPIDelegateTest {
 
         //then
         assertThat(createdApplication).isEqualTo(application);
+    }
+
+    @Test
+    public void createApplicationLink_should_call_applicationService_createApplication_and_return_created_application()
+            throws Exception {
+        //given
+        final ApplicationLinkCreator creator = new ApplicationLinkCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
+        creator.setDescription(DESCRIPTION);
+        final SApplicationWithIcon sApp = buildDefaultApplicationWithMetadata();
+        sApp.setDescription(DESCRIPTION);
+        final ApplicationLinkImpl applicationLink = new ApplicationLinkImpl(APP_TOKEN, VERSION, DESCRIPTION);
+        given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        given(converter.toApplication(sApp)).willReturn(applicationLink);
+        given(applicationService.createApplication(sApp)).willReturn(sApp);
+
+        //when
+        final ApplicationLink createdApplication = delegate.createApplicationLink(creator);
+
+        //then
+        assertThat(createdApplication).isEqualTo(applicationLink);
     }
 
     private SApplication buildDefaultApplication() {
@@ -248,7 +274,7 @@ public class LivingApplicationAPIDelegateTest {
         given(converter.toApplication(sApp)).willReturn(application);
 
         //when
-        final Application retriedApp = delegate.getApplication(APPLICATION_ID);
+        final IApplication retriedApp = delegate.getIApplication(APPLICATION_ID);
 
         //then
         assertThat(retriedApp).isEqualTo(application);
@@ -262,7 +288,7 @@ public class LivingApplicationAPIDelegateTest {
         given(applicationService.getApplication(APPLICATION_ID)).willThrow(new SBonitaReadException(""));
 
         //when
-        delegate.getApplication(APPLICATION_ID);
+        delegate.getIApplication(APPLICATION_ID);
 
         //then exception
     }
@@ -274,7 +300,7 @@ public class LivingApplicationAPIDelegateTest {
         given(applicationService.getApplication(APPLICATION_ID)).willThrow(new SObjectNotFoundException());
 
         //when
-        delegate.getApplication(APPLICATION_ID);
+        delegate.getIApplication(APPLICATION_ID);
 
         //then exception
     }
@@ -288,7 +314,7 @@ public class LivingApplicationAPIDelegateTest {
         given(converter.toApplication(sApp)).willReturn(application);
 
         //when
-        final Application retriedApp = delegate.getApplicationByToken(APP_TOKEN);
+        final IApplication retriedApp = delegate.getIApplicationByToken(APP_TOKEN);
 
         //then
         assertThat(retriedApp).isEqualTo(application);
@@ -302,7 +328,7 @@ public class LivingApplicationAPIDelegateTest {
         given(applicationService.getApplicationByToken(APP_TOKEN)).willThrow(new SBonitaReadException(""));
 
         //when
-        delegate.getApplicationByToken(APP_TOKEN);
+        delegate.getIApplicationByToken(APP_TOKEN);
 
         //then exception
     }
@@ -314,7 +340,7 @@ public class LivingApplicationAPIDelegateTest {
         given(applicationService.getApplicationByToken(APP_TOKEN)).willReturn(null);
 
         //when
-        delegate.getApplicationByToken(APP_TOKEN);
+        delegate.getIApplicationByToken(APP_TOKEN);
 
         //then exception
     }
@@ -337,6 +363,43 @@ public class LivingApplicationAPIDelegateTest {
 
         //then
         assertThat(updatedApplication).isEqualTo(application);
+    }
+
+    @Test
+    public void updateApplicationLink_should_return_result_of_applicationservice_updateApplication() throws Exception {
+        //given
+        final SApplicationWithIcon sApplicationWithIcon = mock(SApplicationWithIcon.class);
+        final ApplicationLink applicationLink = mock(ApplicationLink.class);
+        final ApplicationLinkUpdater updater = new ApplicationLinkUpdater();
+        updater.setToken("newToken");
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor))
+                .willReturn(sApplicationWithIcon);
+        given(converter.toApplication(sApplicationWithIcon)).willReturn(applicationLink);
+
+        //when
+        final ApplicationLink updatedApplication = delegate.updateApplicationLink(APPLICATION_ID, updater);
+
+        //then
+        assertThat(updatedApplication).isEqualTo(applicationLink);
+    }
+
+    @Test
+    public void updateApplicationLink_should_not_return_when_using_ApplicationUpdater() throws Exception {
+        //given
+        final SApplicationWithIcon sApplicationWithIcon = mock(SApplicationWithIcon.class);
+        final ApplicationLink applicationLink = mock(ApplicationLink.class);
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setToken("newToken");
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor))
+                .willReturn(sApplicationWithIcon);
+        given(converter.toApplication(sApplicationWithIcon)).willReturn(applicationLink);
+
+        //when/ then
+        assertThrows(UpdateException.class, () -> delegate.updateApplication(APPLICATION_ID, updater));
     }
 
     @Test
@@ -457,7 +520,7 @@ public class LivingApplicationAPIDelegateTest {
         given(searchApplications.getResult()).willReturn(appSearchResult);
 
         //when
-        final SearchResult<Application> retrievedSearchResult = delegate.searchApplications(searchApplications);
+        final SearchResult<IApplication> retrievedSearchResult = delegate.searchIApplications(searchApplications);
 
         //then
         assertThat(retrievedSearchResult).isEqualTo(appSearchResult);
@@ -471,7 +534,7 @@ public class LivingApplicationAPIDelegateTest {
         doThrow(new SBonitaReadException("")).when(searchApplications).execute();
 
         //when
-        delegate.searchApplications(searchApplications);
+        delegate.searchIApplications(searchApplications);
 
         //then exception
     }

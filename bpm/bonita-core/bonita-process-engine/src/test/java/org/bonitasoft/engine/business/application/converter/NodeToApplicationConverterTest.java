@@ -14,7 +14,9 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.business.application.InternalProfiles.*;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.bonitasoft.engine.business.application.InternalProfiles.INTERNAL_PROFILE_ALL;
+import static org.bonitasoft.engine.business.application.InternalProfiles.INTERNAL_PROFILE_SUPER_ADMIN;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -27,18 +29,17 @@ import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
+import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationLinkNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -63,12 +64,9 @@ public class NodeToApplicationConverterTest {
 
     public static final long DEFAULT_THEME_ID = 102;
 
-    private static String ICON_MIME_TYPE = "iconMimeType";
+    private static final String ICON_MIME_TYPE = "iconMimeType";
 
     private static final byte[] ICON_CONTENT = "iconContent".getBytes(StandardCharsets.UTF_8);
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     ApplicationImportValidator validator;
@@ -85,8 +83,13 @@ public class NodeToApplicationConverterTest {
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
     }
 
+    private ImportResult convertToSApplication(final AbstractApplicationNode applicationNode, final long createdBy)
+            throws Exception {
+        return converter.toSApplication(applicationNode, null, null, createdBy, true);
+    }
+
     @Test
-    public void toSApplication_should_set_internalField_when_applicable() throws ImportException, SBonitaReadException {
+    public void toSApplication_should_set_internalField_when_applicable() throws Exception {
         //given
         final ApplicationNode node1 = new ApplicationNode();
         final ApplicationNode node2 = new ApplicationNode();
@@ -95,8 +98,8 @@ public class NodeToApplicationConverterTest {
         long createdBy = 1L;
 
         //when
-        final ImportResult importResult1 = converter.toSApplication(node1, ICON_CONTENT, ICON_MIME_TYPE, createdBy);
-        final ImportResult importResult2 = converter.toSApplication(node2, ICON_CONTENT, ICON_MIME_TYPE, createdBy);
+        final ImportResult importResult1 = convertToSApplication(node1, createdBy);
+        final ImportResult importResult2 = convertToSApplication(node2, createdBy);
 
         final SApplicationWithIcon application1 = importResult1.getApplication();
         final SApplicationWithIcon application2 = importResult2.getApplication();
@@ -125,10 +128,13 @@ public class NodeToApplicationConverterTest {
         final SProfile profile = mock(SProfile.class);
         given(profile.getId()).willReturn(profileId);
         given(profileService.getProfileByName("admin")).willReturn(profile);
+        final long before = System.currentTimeMillis();
 
         //when
         long createdBy = 1L;
-        final ImportResult importResult = converter.toSApplication(node, ICON_CONTENT, ICON_MIME_TYPE, createdBy);
+        boolean editable = false;
+        final ImportResult importResult = converter.toSApplication(node, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
+                editable);
 
         //then
         assertThat(importResult).isNotNull();
@@ -146,11 +152,66 @@ public class NodeToApplicationConverterTest {
         assertThat(application.getIconContent()).isEqualTo(ICON_CONTENT);
         assertThat(application.getIconMimeType()).isEqualTo(ICON_MIME_TYPE);
         assertThat(application.getInternalProfile()).isNull();
+        assertThat(application.isEditable()).isEqualTo(editable);
+        assertThat(application.isLink()).isFalse();
+
+        // also check auto fields
+        final long after = System.currentTimeMillis();
+        assertThat(application.getUpdatedBy()).isEqualTo(createdBy);
+        assertThat(application.getCreationDate()).isBetween(before, after);
+        assertThat(application.getLastUpdateDate()).isEqualTo(application.getCreationDate());
+
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatus.getErrors()).isEmpty();
+    }
 
+    @Test
+    public void toSApplication_should_return_ImportResult_with_no_errors_and_application_link_with_correct_fields()
+            throws Exception {
+        //given
+        final ApplicationLinkNode node = new ApplicationLinkNode();
+        node.setDisplayName("My app");
+        node.setDescription("This is my app");
+        node.setVersion("1.0");
+        node.setToken("app");
+        node.setIconPath("/icon.jpg");
+        node.setProfile("admin");
+        node.setState("ENABLED");
+
+        long profileId = 8L;
+        final SProfile profile = mock(SProfile.class);
+        given(profile.getId()).willReturn(profileId);
+        given(profileService.getProfileByName("admin")).willReturn(profile);
+
+        //when
+        long createdBy = 1L;
+        final ImportResult importResult = convertToSApplication(node, createdBy);
+
+        //then
+        assertThat(importResult).isNotNull();
+
+        final SApplicationWithIcon application = importResult.getApplication();
+        assertThat(application.getDisplayName()).isEqualTo("My app");
+        assertThat(application.getDescription()).isEqualTo("This is my app");
+        assertThat(application.getHomePageId()).isNull();
+        assertThat(application.getVersion()).isEqualTo("1.0");
+        assertThat(application.getToken()).isEqualTo("app");
+        assertThat(application.getIconPath()).isEqualTo("/icon.jpg");
+        assertThat(application.getProfileId()).isEqualTo(profileId);
+        assertThat(application.getState()).isEqualTo("ENABLED");
+        assertThat(application.getCreatedBy()).isEqualTo(createdBy);
+        assertThat(application.getIconContent()).isNull();
+        assertThat(application.getIconMimeType()).isNull();
+        assertThat(application.getInternalProfile()).isNull();
+        assertThat(application.isEditable()).isTrue();
+        assertThat(application.isLink()).isTrue();
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
     }
 
     @Test
@@ -167,7 +228,7 @@ public class NodeToApplicationConverterTest {
 
         //when
         long createdBy = 1L;
-        final ImportResult importResult = converter.toSApplication(node, createdBy);
+        final ImportResult importResult = convertToSApplication(node, createdBy);
 
         //then
         assertThat(importResult).isNotNull();
@@ -196,7 +257,7 @@ public class NodeToApplicationConverterTest {
 
         //when
         long createdBy = 1L;
-        final ImportResult importResult = converter.toSApplication(node, createdBy);
+        final ImportResult importResult = convertToSApplication(node, createdBy);
 
         //then
         assertThat(importResult).isNotNull();
@@ -222,15 +283,10 @@ public class NodeToApplicationConverterTest {
 
         given(pageService.getPageByName(notAvailableLayout)).willReturn(null);
 
-        //then
-        expectedException.expect(ImportException.class);
-        expectedException.expectMessage(
-                String.format("Unable to import application with token '%s' because the layout '%s' was not found.",
-                        token, notAvailableLayout));
-
-        //when
-        converter.toSApplication(node, 1L);
-
+        //when - then exception
+        assertThatExceptionOfType(ImportException.class).isThrownBy(() -> convertToSApplication(node, 1L))
+                .withMessage("Unable to import application with token '%s' because the layout '%s' was not found.",
+                        token, notAvailableLayout);
     }
 
     @Test
@@ -247,7 +303,7 @@ public class NodeToApplicationConverterTest {
 
         //when
         long createdBy = 1L;
-        final ImportResult importResult = converter.toSApplication(node, createdBy);
+        final ImportResult importResult = convertToSApplication(node, createdBy);
 
         //then
         assertThat(importResult).isNotNull();
@@ -269,7 +325,7 @@ public class NodeToApplicationConverterTest {
         node.setToken("app");
 
         long createdBy = 1L;
-        final ImportResult importResult = converter.toSApplication(node, createdBy);
+        final ImportResult importResult = convertToSApplication(node, createdBy);
 
         //then
         assertThat(importResult).isNotNull();
@@ -293,15 +349,10 @@ public class NodeToApplicationConverterTest {
 
         given(pageService.getPageByName("notAvailable")).willReturn(null);
 
-        //then
-        expectedException.expect(ImportException.class);
-        expectedException.expectMessage(
-                String.format("Unable to import application with token '%s' because the theme '%s' was not found.",
-                        "app", "notAvailable", ApplicationService.DEFAULT_THEME_NAME));
-
-        //when
-        converter.toSApplication(node, 1L);
-
+        //when - then exception
+        assertThatExceptionOfType(ImportException.class).isThrownBy(() -> convertToSApplication(node, 1L))
+                .withMessage("Unable to import application with token '%s' because the theme '%s' was not found.",
+                        "app", "notAvailable");
     }
 
     @Test
@@ -313,7 +364,7 @@ public class NodeToApplicationConverterTest {
         node.setToken("TokenName"); // token can never be null in the XML
 
         //when
-        final ImportResult importResult = converter.toSApplication(node, 1L);
+        final ImportResult importResult = convertToSApplication(node, 1L);
 
         //then
         assertThat(importResult).isNotNull();
@@ -332,7 +383,7 @@ public class NodeToApplicationConverterTest {
         given(profileService.getProfileByName("admin")).willThrow(new SProfileNotFoundException(""));
 
         //when
-        final ImportResult importResult = converter.toSApplication(node, 1L);
+        final ImportResult importResult = convertToSApplication(node, 1L);
 
         //then
         assertThat(importResult.getApplication().getProfileId()).isNull();
@@ -343,30 +394,29 @@ public class NodeToApplicationConverterTest {
         assertThat(importStatus.getErrors()).containsExactly(new ImportError("admin", ImportError.Type.PROFILE));
     }
 
-    @Test(expected = ImportException.class)
+    @Test
     public void toSApplication_should_throw_ImportException_when_layout_is_not_found() throws Exception {
         //given
         final ApplicationNode node = buildApplicationNode("app", "1.0");
 
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
 
-        //when
-        converter.toSApplication(node, 1L);
-
-        //then exception
+        //when - then exception
+        assertThatExceptionOfType(ImportException.class).isThrownBy(() -> convertToSApplication(node, 1L))
+                .withMessage("Unable to import application with token '%s' because the layout '%s' was not found.",
+                        "app", ApplicationService.DEFAULT_LAYOUT_NAME);
     }
 
-    @Test(expected = ImportException.class)
+    @Test
     public void toSApplication_should_throw_ImportException_when_theme_is_not_found() throws Exception {
         //given
         final ApplicationNode node = buildApplicationNode("app", "1.0");
 
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(null);
 
-        //when
-        converter.toSApplication(node, 1L);
-
-        //then exception
+        assertThatExceptionOfType(ImportException.class).isThrownBy(() -> convertToSApplication(node, 1L))
+                .withMessage("Unable to import application with token '%s' because the theme '%s' was not found.",
+                        "app", ApplicationService.DEFAULT_THEME_NAME);
     }
 
     private ApplicationNode buildApplicationNode(final String token, final String version) {
@@ -383,13 +433,9 @@ public class NodeToApplicationConverterTest {
         doThrow(new ImportException("invalid token")).when(validator).validate("invalid");
         ApplicationNode applicationNode = buildApplicationNode("invalid", "1.0");
 
-        //then
-        expectedException.expect(ImportException.class);
-        expectedException.expectMessage("invalid token");
-
-        //when
-        converter.toSApplication(applicationNode, 1L);
-
+        //when - then exception
+        assertThatExceptionOfType(ImportException.class).isThrownBy(() -> convertToSApplication(applicationNode, 1L))
+                .withMessage("invalid token");
     }
 
 }

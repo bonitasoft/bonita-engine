@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
-            http://www.springframework.org/schema/jdbc 
-            http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
-            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
             http://www.springframework.org/schema/context
             http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
-    <jdbc:embedded-database id="dataSource" type="H2" />
+    <import resource="classpath:/datasource/datasource-dependency-${sysprop.bonita.db.vendor:h2}.xml" />
+
     <context:component-scan base-package="org.bonitasoft.engine.test.persistence" />
+
+    <bean id="dataSource" class="org.apache.tomcat.dbcp.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="initialSize" value="1"/>
+        <property name="maxTotal" value="10"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.user}"/>
+        <property name="password" value="${db.password}"/>
+    </bean>
 
     <bean class="org.springframework.jdbc.core.JdbcTemplate">
         <constructor-arg name="dataSource" ref="dataSource" />
     </bean>
 
     <bean id="sessionFactory" class="org.bonitasoft.engine.test.persistence.TestLocalSessionFactoryBuilder">
+        <property name="interceptor" ref="interceptor" />
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedPackages">
             <list>
@@ -210,7 +217,6 @@
                 <value>/org/bonitasoft/engine/platform/model/impl/hibernate/platform.queries.hbm.xml</value>
                 <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.queries.hbm.xml</value>
 
-                <!-- GLUPSSSS Needed by process instance queries -->
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
@@ -235,7 +241,7 @@
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-                <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+                <prop key="hibernate.dialect">${db.hibernate.dialect}</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.format_sql">false</prop>
                 <prop key="hibernate.use_sql_comments">false</prop>

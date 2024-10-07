@@ -27,6 +27,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APINotFoundException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APITooManyRequestException;
 import org.bonitasoft.web.toolkit.client.common.i18n.T_;
 import org.bonitasoft.web.toolkit.client.common.texttemplate.Arg;
 
@@ -70,8 +71,14 @@ public class CaseEngineClient {
                     new T_("Can't start process, process %processId% is not enabled", new Arg("processId", processId)),
                     e);
         } catch (final ProcessExecutionException e) {
+            if (e.getRetryAfter() != -1L) {
+                throw new APITooManyRequestException(
+                        new T_("Error occurred when starting process %processId%. Case creation limit reached.",
+                                new Arg("processId", processId)),
+                        e.getRetryAfter());
+            }
             throw new APIException(
-                    new T_("Error occured when starting process %processId%", new Arg("processId", processId)), e);
+                    new T_("Error occurred when starting process %processId%", new Arg("processId", processId)), e);
         } catch (final UserNotFoundException e) {
             throw new APIException(
                     new T_("Can't start process %processId%, user %userId% not found", new Arg("processId", processId),

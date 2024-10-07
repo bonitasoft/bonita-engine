@@ -86,7 +86,7 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
             }
         } catch (final InvalidSessionException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Invalid Bonita engine session.", e.getMessage());
+                LOGGER.debug("Invalid Bonita engine session: {}", e.getMessage());
             }
             SessionUtil.sessionLogout(httpServletRequest.getSession());
             ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -31,6 +31,8 @@ import org.junit.rules.TestRule;
  */
 public class DatabaseConfigurationTest {
 
+    private static final String TEST_DATASOURCE_CONFIG_DIR = "/datasource-config/";
+
     @Rule
     public TestRule clean = new RestoreSystemProperties();
 
@@ -39,7 +41,7 @@ public class DatabaseConfigurationTest {
         // given:
         final Properties properties = new PropertyLoader().loadProperties();
 
-        System.setProperty("db.vendor", "mysql");
+        System.setProperty("db.vendor", "postgres");
         System.setProperty("db.server.name", "postgresServer");
         System.setProperty("db.server.port", "3333");
         System.setProperty("db.database.name", "bonita_database");
@@ -50,7 +52,7 @@ public class DatabaseConfigurationTest {
         final DatabaseConfiguration bonitaConfig = new DatabaseConfiguration("", properties, null);
 
         // then:
-        assertThat(bonitaConfig.getDbVendor()).isEqualTo("mysql");
+        assertThat(bonitaConfig.getDbVendor()).isEqualTo("postgres");
         assertThat(bonitaConfig.getServerName()).isEqualTo("postgresServer");
         assertThat(bonitaConfig.getServerPort()).isEqualTo("3333");
         assertThat(bonitaConfig.getDatabaseName()).isEqualTo("bonita_database");
@@ -62,7 +64,7 @@ public class DatabaseConfigurationTest {
     public void bdm_database_values_can_be_overridden_by_system_properties() throws Exception {
         // given:
         final Properties properties = new Properties();
-        properties.load(this.getClass().getResourceAsStream("/internal.properties"));
+        properties.load(this.getClass().getResourceAsStream(TEST_DATASOURCE_CONFIG_DIR + "internal.properties"));
 
         System.setProperty("bdm.db.vendor", "postgres");
         System.setProperty("bdm.db.server.name", "myServer");
@@ -87,8 +89,9 @@ public class DatabaseConfigurationTest {
     public void database_values_should_be_trimmed() throws Exception {
         // given:
         final Properties properties = new Properties();
-        properties.load(this.getClass().getResourceAsStream("/database_with_space_values.properties"));
-        properties.load(this.getClass().getResourceAsStream("/internal.properties"));
+        properties.load(this.getClass()
+                .getResourceAsStream(TEST_DATASOURCE_CONFIG_DIR + "database_with_space_values.properties"));
+        properties.load(this.getClass().getResourceAsStream(TEST_DATASOURCE_CONFIG_DIR + "internal.properties"));
 
         System.setProperty("db.server.name", "  localhost   ");
         System.setProperty("db.server.port", "   5135   ");
@@ -100,7 +103,7 @@ public class DatabaseConfigurationTest {
         // then:
         assertThat(dbConfig.getUrl()).isEqualTo("jdbc:postgresql://localhost:5135/bonita");
         assertThat(bdmDbConfig.getUrl())
-                .isEqualTo("jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_DATABASE?oracle.net.disableOob=true");
+                .isEqualTo("jdbc:postgresql://postgres.rd.lan:5432/business_data");
     }
 
     @Test
@@ -124,7 +127,7 @@ public class DatabaseConfigurationTest {
         assertThat(bonitaConfig.getUrl())
                 .isEqualTo("jdbc:h2:file:"
                         + h2DatabaseDir
-                        + "/bonita;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
+                        + "/bonita_journal.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
     }
 
     @Test
@@ -144,7 +147,7 @@ public class DatabaseConfigurationTest {
         assertThat(dbConfig.getUrl())
                 .isEqualTo("jdbc:h2:file:"
                         + h2DatabaseDir
-                        + "/bonita;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
+                        + "/bonita_journal.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
     }
 
     @Test
@@ -165,14 +168,14 @@ public class DatabaseConfigurationTest {
                 .isEqualTo("jdbc:h2:file:"
                         + rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath().normalize().toString()
                                 .replace("\\", "/")
-                        + "/bonita;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
+                        + "/bonita_journal.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
     }
 
     @Test
     public void jdbc_pool_size_values_must_be_integers() throws Exception {
         // given:
         final Properties properties = new Properties();
-        properties.load(this.getClass().getResourceAsStream("/internal.properties"));
+        properties.load(this.getClass().getResourceAsStream(TEST_DATASOURCE_CONFIG_DIR + "internal.properties"));
 
         System.setProperty("bdm.db.vendor", "postgres");
         System.setProperty("bdm.db.server.name", "myServer");

@@ -16,7 +16,9 @@ package org.bonitasoft.console.common.server.page;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,7 +74,7 @@ public class CustomPageAuthorizationsHelperTest {
                         0, 0, "", ContentType.PAGE, null));
         given(applicationAPI.searchApplicationPages(any()))
                 .willReturn(new SearchResultImpl<>(1, Collections.<ApplicationPage> emptyList()));
-        given(applicationAPI.searchApplications(any()))
+        given(applicationAPI.searchIApplications(any()))
                 .willReturn(applicationResult);
 
         given(applicationResult.getResult()).willReturn(Arrays.asList(application));
@@ -102,7 +104,7 @@ public class CustomPageAuthorizationsHelperTest {
     public void should_unAuthorize_page_when_appToken_not_null_and_page_not_authorized_in_application()
             throws Exception {
 
-        given(applicationAPI.searchApplications(any()))
+        given(applicationAPI.searchIApplications(any()))
                 .willReturn(applicationResult);
         given(applicationResult.getResult()).willReturn(Arrays.asList(application));
         given(applicationFactory.createApplicationModel(any(String.class))).willReturn(applicationModel);

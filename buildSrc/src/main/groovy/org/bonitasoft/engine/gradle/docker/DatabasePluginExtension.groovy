@@ -13,12 +13,34 @@
  **/
 package org.bonitasoft.engine.gradle.docker
 
-/**
- * @author Baptiste Mesta
- */
+import org.gradle.api.Action
+
 class DatabasePluginExtension {
 
+    /**
+     * Include test class patterns applied to database vendors
+     */
     List<String> includes
+    /**
+     * Exclude test class patterns applied to all database vendors
+     */
+    List<String> excludes
+    /**
+     * Extra configuration for the postgres database
+     */
+    DatabaseExtraConfiguration postgres = new DatabaseExtraConfiguration(enabled: true)
+    /**
+     * Extra configuration for the mysql database
+     */
+    DatabaseExtraConfiguration mysql = new DatabaseExtraConfiguration()
+    /**
+     * Extra configuration for the oracle database
+     */
+    DatabaseExtraConfiguration oracle = new DatabaseExtraConfiguration()
+    /**
+     * Extra configuration for the sqlserver database
+     */
+    DatabaseExtraConfiguration sqlserver = new DatabaseExtraConfiguration()
 
     def includes(String... includes) {
         this.includes = []
@@ -30,6 +52,34 @@ class DatabasePluginExtension {
             this.includes = []
         }
         this.includes.add(include)
+    }
+
+    def excludes(String... excludes) {
+        this.excludes = []
+        this.excludes.addAll(excludes)
+    }
+
+    def exclude(String exclude) {
+        if (this.excludes == null) {
+            this.excludes = []
+        }
+        this.excludes.add(exclude)
+    }
+
+    def postgres(Action<DatabaseExtraConfiguration> action) {
+        action.execute(postgres)
+    }
+
+    def mysql(Action<DatabaseExtraConfiguration> action) {
+        action.execute(mysql)
+    }
+
+    def oracle(Action<DatabaseExtraConfiguration> action) {
+        action.execute(oracle)
+    }
+
+    def sqlserver(Action<DatabaseExtraConfiguration> action) {
+        action.execute(sqlserver)
     }
 
 }

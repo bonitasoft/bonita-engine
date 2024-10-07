@@ -22,13 +22,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.text.StringEscapeUtils;
+import org.bonitasoft.platform.database.DatabaseVendor;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,20 +52,16 @@ abstract class BundleConfigurator {
 
     static final Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
-    private static final String H2 = "h2";
-    private static final String ORACLE = "oracle";
-    private static final String SQLSERVER = "sqlserver";
-
     private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
     static final String APPSERVER_FOLDERNAME = "server";
 
-    private Path rootPath;
+    private final Path rootPath;
 
     DatabaseConfiguration standardConfiguration;
     DatabaseConfiguration bdmConfiguration;
     private Path backupsFolder;
-    private String timestamp;
+    private final String timestamp;
 
     BundleConfigurator(Path rootPath) throws PlatformException {
         try {
@@ -273,10 +273,10 @@ abstract class BundleConfigurator {
     }
 
     private String getDriverPattern(String dbVendor) {
-        if (ORACLE.equals(dbVendor)) {
+        if (DatabaseVendor.ORACLE.equalsValue(dbVendor)) {
             return ".*(ojdbc|oracle).*\\.(jar|zip)";
         }
-        if (SQLSERVER.equals(dbVendor)) {
+        if (DatabaseVendor.SQLSERVER.equalsValue(dbVendor)) {
             return ".*(sqlserver|mssql|sqljdbc).*\\.(jar|zip)";
         }
         return ".*" + dbVendor + ".*";
@@ -330,7 +330,7 @@ abstract class BundleConfigurator {
 
     static String getDatabaseConnectionUrlForPropertiesFile(DatabaseConfiguration configuration) {
         String url = getDatabaseConnectionUrl(configuration);
-        if (H2.equals(configuration.getDbVendor())) {
+        if (DatabaseVendor.H2.equalsValue(configuration.getDbVendor())) {
             url = StringEscapeUtils.escapeJava(url);
         }
         return Matcher.quoteReplacement(url);
@@ -338,7 +338,7 @@ abstract class BundleConfigurator {
 
     private static String getDatabaseConnectionUrl(DatabaseConfiguration configuration) {
         String url = configuration.getUrl();
-        if (H2.equals(configuration.getDbVendor())) {
+        if (DatabaseVendor.H2.equalsValue(configuration.getDbVendor())) {
             url = convertWindowsBackslashes(url);
         }
         return url;

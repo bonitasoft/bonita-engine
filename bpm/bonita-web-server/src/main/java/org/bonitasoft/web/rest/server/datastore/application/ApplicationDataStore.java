@@ -21,16 +21,22 @@ import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationLink;
+import org.bonitasoft.engine.business.application.ApplicationLinkCreator;
+import org.bonitasoft.engine.business.application.ApplicationLinkUpdater;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.rest.model.application.AbstractApplicationItem;
 import org.bonitasoft.web.rest.model.application.ApplicationDefinition;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
+import org.bonitasoft.web.rest.model.application.ApplicationLinkItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.datastore.filter.Filters;
 import org.bonitasoft.web.rest.server.datastore.utils.SearchOptionsCreator;
@@ -48,10 +54,10 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Application>
-        implements DatastoreHasAdd<ApplicationItem>,
-        DatastoreHasUpdate<ApplicationItem>,
-        DatastoreHasGet<ApplicationItem>, DatastoreHasSearch<ApplicationItem>, DatastoreHasDelete {
+public class ApplicationDataStore extends CommonDatastore<AbstractApplicationItem, IApplication>
+        implements DatastoreHasAdd<AbstractApplicationItem>,
+        DatastoreHasUpdate<AbstractApplicationItem>,
+        DatastoreHasGet<AbstractApplicationItem>, DatastoreHasSearch<AbstractApplicationItem>, DatastoreHasDelete {
 
     private final ApplicationAPI applicationAPI;
     private final ApplicationItemConverter converter;
@@ -82,9 +88,9 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
     }
 
     @Override
-    public ApplicationItem get(final APIID id) {
+    public AbstractApplicationItem get(final APIID id) {
         try {
-            final Application application = applicationAPI.getApplication(id.toLong());
+            final IApplication application = applicationAPI.getIApplication(id.toLong());
             return converter.toApplicationItem(application);
         } catch (final BonitaException e) {
             throw new APIException(e);
@@ -95,6 +101,21 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
      * @deprecated as of 9.0.0, Applications should be created at startup.
      */
     @Override
+    @Deprecated(since = "9.0.0")
+    public AbstractApplicationItem add(final AbstractApplicationItem item) {
+        if (item instanceof ApplicationItem legacy) {
+            return add(legacy);
+        } else if (item instanceof ApplicationLinkItem link) {
+            return add(link);
+        } else {
+            // should not occur anyway
+            throw new APIException("Unknown application type.");
+        }
+    }
+
+    /**
+     * @deprecated as of 9.0.0, Applications should be created at startup.
+     */
     @Deprecated(since = "9.0.0")
     public ApplicationItem add(final ApplicationItem item) {
 
@@ -107,7 +128,35 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
             final ApplicationPage appHomePage = applicationAPI.createApplicationPage(application.getId(),
                     homePageDef.getId(), "home");
             applicationAPI.setApplicationHomePage(application.getId(), appHomePage.getId());
-            return converter.toApplicationItem(application);
+            var converted = converter.toApplicationItem(application);
+            if (converted instanceof ApplicationItem res) {
+                return res;
+            } else {
+                // should not occur anyway
+                throw new APIException("Use dedicated API for application links.");
+            }
+        } catch (final BonitaException e) {
+            throw new APIException(e);
+        }
+    }
+
+    /**
+     * @deprecated as of 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "9.0.0")
+    public ApplicationLinkItem add(final ApplicationLinkItem item) {
+
+        try {
+            final ApplicationLinkCreator creator = converter.toApplicationLinkCreator(item);
+
+            final ApplicationLink application = applicationAPI.createApplicationLink(creator);
+            var converted = converter.toApplicationItem(application);
+            if (converted instanceof ApplicationLinkItem res) {
+                return res;
+            } else {
+                // should not occur anyway
+                throw new APIException("Use dedicated API for legacy applications.");
+            }
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
@@ -118,25 +167,37 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
      */
     @Override
     @Deprecated(since = "9.0.0")
-    public ApplicationItem update(final APIID id, final Map<String, String> attributes) {
+    public AbstractApplicationItem update(final APIID id, final Map<String, String> attributes) {
         try {
-            final ApplicationUpdater applicationUpdater = converter.toApplicationUpdater(attributes);
-            final Application application = applicationAPI.updateApplication(id.toLong(), applicationUpdater);
-            return converter.toApplicationItem(application);
+            // no way to know the application type without getting it first
+            IApplication app = applicationAPI.getIApplication(id.toLong());
+            if (app instanceof Application) {
+                final ApplicationUpdater applicationUpdater = converter.toApplicationUpdater(attributes);
+                final Application application = applicationAPI.updateApplication(id.toLong(), applicationUpdater);
+                return converter.toApplicationItem(application);
+            } else if (app instanceof ApplicationLink) {
+                final ApplicationLinkUpdater applicationUpdater = converter.toApplicationLinkUpdater(attributes);
+                final ApplicationLink link = applicationAPI.updateApplicationLink(id.toLong(), applicationUpdater);
+                return converter.toApplicationItem(link);
+            } else {
+                // should not occur anyway
+                throw new APIException("Unknown application type.");
+            }
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
 
     @Override
-    public ItemSearchResult<ApplicationItem> search(final int page, final int resultsByPage, final String search,
+    public ItemSearchResult<AbstractApplicationItem> search(final int page, final int resultsByPage,
+            final String search,
             final String orders,
             final Map<String, String> filters) {
         // Build search
         final SearchOptionsCreator creator = makeSearchOptionCreator(page, resultsByPage, search, orders, filters);
 
         // Run search depending on filters passed
-        SearchResult<Application> searchResult;
+        SearchResult<IApplication> searchResult;
         try {
             searchResult = runSearch(creator);
 
@@ -157,8 +218,8 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
                         new ApplicationFilterCreator(getSearchDescriptorConverter())));
     }
 
-    protected SearchResult<Application> runSearch(final SearchOptionsCreator creator) throws SearchException {
-        return applicationAPI.searchApplications(creator.create());
+    protected SearchResult<IApplication> runSearch(final SearchOptionsCreator creator) throws SearchException {
+        return applicationAPI.searchIApplications(creator.create());
     }
 
     protected ApplicationSearchDescriptorConverter getSearchDescriptorConverter() {
@@ -166,7 +227,7 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
     }
 
     @Override
-    protected ApplicationItem convertEngineToConsoleItem(final Application item) {
+    protected AbstractApplicationItem convertEngineToConsoleItem(final IApplication item) {
         return new ApplicationItemConverter(new BonitaHomeFolderAccessor()).toApplicationItem(item);
     }
 

@@ -1,9 +1,11 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.bonitasoft.engine.gradle.PomUtils
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'distribution'
     id 'bonita-tests'
+    id 'bonita-docker-database'
 }
 
 configurations {
@@ -12,35 +14,24 @@ configurations {
 }
 
 dependencies {
-    api "org.apache.commons:commons-text:1.10.0"
+    api project(':platform:platform-resources')
+    api libs.commonsText
     api libs.slf4jApi
     api(libs.springBootStarter) {
         exclude(module: 'jul-to-slf4j')
         exclude(module: 'log4j-to-slf4j')
         exclude(module: 'snakeyaml')
     }
-    api libs.snakeyaml
     api libs.springBootStarterJdbc
-    api "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    api ("com.mysql:mysql-connector-j:${Deps.mysqlVersion}") {
-        exclude(module: 'protobuf-java')
-    }
-    api "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     api libs.h2
-    api("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
-        exclude(module: "ons")
-        exclude(module: "oraclepki")
-        exclude(module: "osdt_cert")
-        exclude(module: "osdt_core")
-        exclude(module: "ucp")
-        exclude(module: "simplefan")
-    }
+    api libs.postgresql
     api libs.commonsCLI
+
     annotationProcessor libs.lombok
     compileOnly libs.lombok
-    api(project(":platform:platform-resources"))
-    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
+
+    runtimeOnly libs.logback
+
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
@@ -77,6 +68,7 @@ processResources {
 }
 
 distTar.enabled = false
+
 distributions {
     main {
         distributionBaseName = "Bonita-platform-setup"
@@ -101,20 +93,21 @@ distributions {
                     exclude(module: 'commons-logging')
                     exclude(module: 'log4j-api')
                     exclude(module: 'log4j-to-slf4j')
+                    exclude(module: 'snakeyaml')
                 }
             }
-            configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each {
-                from(zipTree(it.file)) {
+            configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                // Copy all sql files under the distrib zip folder /platform_conf/sql/
+                from(zipTree(artifact.file)) {
                     include '**/sql/**'
                     eachFile { fcp ->
                         fcp.path = fcp.path.replaceAll(".*/sql/", "/platform_conf/sql/")
                     }
                 }
-            }
-            configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each {
-                from(zipTree(it.file)) {
+                // Copy all files excepting sql and classes under the distrib zip folder /platform_conf/initial/
+                from(zipTree(artifact.file)) {
                     exclude '**/sql/**'
-                    exclude '**/org/**'
+                    exclude '**/*.class'
                     eachFile { fcp ->
                         fcp.path = fcp.path.replaceAll(".*${version}/", "/platform_conf/initial/")
                     }
@@ -125,21 +118,34 @@ distributions {
     }
 }
 
-
 tasks.distZip.dependsOn configurations.inDistrib
 
 artifacts { distributionZip distZip }
 
-test { include '**/*Test.class' }
-
-
-def iT = tasks.getByName("integrationTest")
-iT.configure {
-    def testDir = new File(buildDir, "integrationTest")
-    doFirst {
-        testDir.mkdirs()
-        systemProperty "bonita.distribution.path", distZip.outputs.files.first()
-    }
-    workingDir testDir
+databaseIntegrationTest {
+    include '**/*IT.class'
+    // No need to execute PlatformSetupDistributionIT on databases
+    exclude '**/PlatformSetupDistributionIT.class'
 }
-tasks.integrationTest.dependsOn distZip
+
+tasks.matching { task -> task.name == "integrationTest" || task.name.endsWith("DatabaseTest") }
+        .configureEach { task ->
+            def testDir = new File(buildDir, task.name)
+            doFirst {
+                testDir.mkdirs()
+                systemProperty "bonita.distribution.path", distZip.outputs.files.first()
+            }
+            workingDir testDir
+            dependsOn distZip
+        }
+
+
+def setupE2e = tasks.register('setup-e2e', Exec) {
+    commandLine 'sh', 'src/test/e2e/e2e-postgres-bos.sh'
+    dependsOn distZip
+    onlyIf { OperatingSystem.current().isLinux() }
+}
+
+integrationTest.configure {
+    dependsOn setupE2e
+}

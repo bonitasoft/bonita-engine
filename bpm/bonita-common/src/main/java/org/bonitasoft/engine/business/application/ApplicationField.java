@@ -22,71 +22,73 @@ import org.bonitasoft.engine.profile.Profile;
  * @see ApplicationCreator
  * @see ApplicationUpdater
  * @since 7.0.0
+ * @deprecated This class should no longer be used. Since 9.0.0, Applications should be updated at startup.
  */
+@Deprecated(since = "10.2.0")
 public enum ApplicationField {
 
     /**
-     * References the {@link Application} token
+     * References the {@link IApplication} token
      *
-     * @see Application
+     * @see IApplication
      */
     TOKEN,
 
     /**
-     * References the {@link Application} display name
+     * References the {@link IApplication} display name
      *
-     * @see Application
+     * @see IApplication
      */
     DISPLAY_NAME,
 
     /**
-     * References the {@link Application} version
+     * References the {@link IApplication} version
      *
-     * @see Application
+     * @see IApplication
      */
     VERSION,
 
     /**
-     * References the {@link Application} description
+     * References the {@link IApplication} description
      *
-     * @see Application
+     * @see IApplication
      */
     DESCRIPTION,
 
     /**
-     * References the {@link Application} icon path
+     * References the {@link IApplication} icon path
      *
-     * @see Application
+     * @see IApplication
      * @deprecated since 7.13.0, use {@link #ICON_CONTENT} and {@link #ICON_FILE_NAME} instead
      */
     @Deprecated(since = "7.13.0")
     ICON_PATH,
 
     /**
-     * byte array content of the icon of the {@link Application}
+     * byte array content of the icon of the {@link IApplication}
      *
      * @since 7.13.0
      */
     ICON_CONTENT,
 
     /**
-     * Filename of the icon of the {@link Application}
+     * Filename of the icon of the {@link IApplication}
      *
      * @since 7.13.0
      */
     ICON_FILE_NAME,
 
     /**
-     * References the {@link Application} state
+     * References the {@link IApplication} state
      *
-     * @see Application
+     * @see IApplication
      */
     STATE,
 
     /**
-     * References the identifier of the {@link Profile} associated to the {@link Application}
+     * References the identifier of the {@link Profile} associated to the {@link IApplication}
      *
-     * @see Application
+     * @see IApplication
      * @see Profile
      */
     PROFILE_ID,
@@ -97,7 +99,7 @@ public enum ApplicationField {
      * @see org.bonitasoft.engine.business.application.ApplicationPage
      * @see org.bonitasoft.engine.business.application.Application
      */
-    HOME_PAGE_ID,
+    HOME_PAGE_ID(Application.class),
 
     /**
      * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application}
@@ -107,7 +109,7 @@ public enum ApplicationField {
      * @see org.bonitasoft.engine.business.application.Application
      * @since 7.0.0
      */
-    LAYOUT_ID,
+    LAYOUT_ID(Application.class),
 
     /**
      * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application}
@@ -117,6 +119,37 @@ public enum ApplicationField {
      * @see org.bonitasoft.engine.business.application.Application
      * @since 7.0.0
      */
-    THEME_ID
+    THEME_ID(Application.class);
+
+    /** The class which support this type of field */
+    private Class<? extends IApplication> supportingClass;
+
+    /**
+     * Private Constructor for fields which are suitable for all application types.
+     */
+    private ApplicationField() {
+        this(IApplication.class);
+    }
+
+    /**
+     * Private Constructor for fields which are suitable only for a particular application type (e.g. Legacy, but not
+     * Link).
+     *
+     * @param appropriateClazz the class which support this type of field.
+     */
+    private ApplicationField(Class<? extends IApplication> appropriateClazz) {
+        supportingClass = appropriateClazz;
+    }
+
+    /**
+     * Test whether this application field is suitable for a particular application type
+     *
+     * @param clazz the application type to test (usually {@link Application} for legacy applications of
+     *        {@link ApplicationLink})
+     * @return
+     */
+    public boolean isForClass(Class<? extends IApplication> clazz) {
+        return supportingClass.isAssignableFrom(clazz);
+    }
 
 }

@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl.livingapplication;
 
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.business.application.*;
 import org.bonitasoft.engine.business.application.impl.IconImpl;
@@ -58,7 +61,13 @@ public class LivingApplicationAPIDelegate {
             validateCreator(applicationCreator);
             final SApplicationWithIcon sApplicationWithIcon = applicationService
                     .createApplication(converter.buildSApplication(applicationCreator, loggedUserId));
-            return converter.toApplication(sApplicationWithIcon);
+            var converted = converter.toApplication(sApplicationWithIcon);
+            if (converted instanceof Application res) {
+                return res;
+            } else {
+                // should not occur anyway
+                throw new CreationException("Use dedicated API for application links.");
+            }
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SBonitaException e) {
@@ -66,7 +75,32 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    private void validateCreator(final ApplicationCreator applicationCreator) throws CreationException {
+    /**
+     * @deprecated as of 9.0.0, Applications should be created at startup. This also concerns application links
+     *             introduced in 10.2.0.
+     */
+    @Deprecated(since = "10.2.0")
+    public ApplicationLink createApplicationLink(final ApplicationLinkCreator applicationLinkCreator)
+            throws CreationException {
+        try {
+            validateCreator(applicationLinkCreator);
+            final SApplicationWithIcon sApplicationWithIcon = applicationService
+                    .createApplication(converter.buildSApplication(applicationLinkCreator, loggedUserId));
+            var converted = converter.toApplication(sApplicationWithIcon);
+            if (converted instanceof ApplicationLink res) {
+                return res;
+            } else {
+                // should not occur anyway
+                throw new CreationException("Use dedicated API for legacy applications.");
+            }
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException(e.getMessage());
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
+        }
+    }
+
+    private void validateCreator(final AbstractApplicationCreator<?> applicationCreator) throws CreationException {
         ValidationStatus validationStatus = tokenValidator.validate(applicationCreator.getToken());
         if (!validationStatus.isValid()) {
             throw new CreationException(validationStatus.getMessage());
@@ -75,9 +109,14 @@ public class LivingApplicationAPIDelegate {
         if (displayName == null || displayName.trim().isEmpty()) {
             throw new CreationException("The application display name can not be null or empty");
         }
+        Class<? extends IApplication> appClass = applicationCreator.isLink() ? ApplicationLink.class
+                : Application.class;
+        if (!applicationCreator.getFields().keySet().stream().allMatch(k -> k.isForClass(appClass))) {
+            throw new CreationException("The application fields used must be valid for the application type");
+        }
     }
 
-    public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
+    public IApplication getIApplication(final long applicationId) throws ApplicationNotFoundException {
         try {
             return converter.toApplication(applicationService.getApplication(applicationId));
         } catch (final SBonitaReadException e) {
@@ -87,7 +126,7 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    public Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
+    public IApplication getIApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
         try {
             SApplication applicationByToken = applicationService.getApplicationByToken(applicationToken);
             if (applicationByToken == null) {
@@ -123,8 +162,8 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    public SearchResult<Application> searchApplications(
-            final AbstractSearchEntity<Application, SApplication> searchApplications)
+    public <E extends IApplication> SearchResult<E> searchIApplications(
+            final AbstractSearchEntity<E, SApplication> searchApplications)
             throws SearchException {
         try {
             searchApplications.execute();
@@ -145,12 +184,26 @@ public class LivingApplicationAPIDelegate {
             validateUpdater(updater);
             AbstractSApplication application;
             if (!updater.getFields().isEmpty()) {
+                /*
+                 * This API may be called within our without a transaction.
+                 * So we must check first whether the application is a link to have a consistent behavior
+                 * and never update the application link.
+                 */
+                if (Optional.ofNullable(applicationService.getApplicationWithIcon(applicationId))
+                        .filter(AbstractSApplication::isLink).isPresent()) {
+                    throw new UpdateException("Use dedicated API for application links.");
+                }
                 application = applicationService.updateApplication(applicationId,
                         converter.toApplicationUpdateDescriptor(updater, loggedUserId));
             } else {
                 application = applicationService.getApplication(applicationId);
             }
-            return converter.toApplication(application);
+            var converted = converter.toApplication(application);
+            if (converted instanceof Application res) {
+                return res;
+            } else {
+                throw new UpdateException("Use dedicated API for application links.");
+            }
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SObjectNotFoundException e) {
@@ -160,12 +213,59 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    private void validateUpdater(final ApplicationUpdater updater) throws UpdateException {
-        validateToken(updater);
-        validateDisplayName(updater);
+    /**
+     * @deprecated as of 9.0.0, Applications should be updated at startup. This also concerns application links
+     *             introduced in 10.2.0.
+     */
+    @Deprecated(since = "10.2.0")
+    public ApplicationLink updateApplicationLink(final long applicationId, final ApplicationLinkUpdater updater)
+            throws UpdateException,
+            AlreadyExistsException, ApplicationNotFoundException {
+        try {
+            validateUpdater(updater);
+            AbstractSApplication application;
+            if (!updater.getFields().isEmpty()) {
+                /*
+                 * This API may be called within our without a transaction.
+                 * So we must check first whether the application is a link to have a consistent behavior
+                 * and never update the legacy application.
+                 */
+                Predicate<SApplicationWithIcon> isLink = AbstractSApplication::isLink;
+                if (Optional.ofNullable(applicationService.getApplicationWithIcon(applicationId))
+                        .filter(isLink.negate()).isPresent()) {
+                    throw new UpdateException("Use dedicated API for legacy applications.");
+                }
+                application = applicationService.updateApplication(applicationId,
+                        converter.toApplicationUpdateDescriptor(updater, loggedUserId));
+            } else {
+                application = applicationService.getApplication(applicationId);
+            }
+            var converted = converter.toApplication(application);
+            if (converted instanceof ApplicationLink res) {
+                return res;
+            } else {
+                throw new UpdateException("Use dedicated API for legacy applications.");
+            }
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException(e.getMessage());
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationNotFoundException(applicationId);
+        } catch (final SBonitaException e) {
+            throw new UpdateException(e);
+        }
     }
 
-    private void validateDisplayName(final ApplicationUpdater updater) throws UpdateException {
+    private void validateUpdater(final AbstractApplicationUpdater<?> updater) throws UpdateException {
+        validateToken(updater);
+        validateDisplayName(updater);
+        Class<? extends IApplication> appClass = updater instanceof ApplicationLinkUpdater ? ApplicationLink.class
+                : Application.class;
+        if (!updater.getFields().keySet().stream().allMatch(k -> k.isForClass(appClass))) {
+            throw new UpdateException("The application fields used must be valid for the application type");
+        }
+    }
+
+    private void validateDisplayName(final AbstractApplicationUpdater<?> updater) throws UpdateException {
         if (updater.getFields().keySet().contains(ApplicationField.DISPLAY_NAME)) {
             final String displayName = (String) updater.getFields().get(ApplicationField.DISPLAY_NAME);
             if (displayName == null || displayName.trim().isEmpty()) {
@@ -174,7 +274,7 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    private void validateToken(final ApplicationUpdater updater) throws UpdateException {
+    private void validateToken(final AbstractApplicationUpdater<?> updater) throws UpdateException {
         if (updater.getFields().keySet().contains(ApplicationField.TOKEN)) {
             final String token = (String) updater.getFields().get(ApplicationField.TOKEN);
             ValidationStatus validationStatus = tokenValidator.validate(token);

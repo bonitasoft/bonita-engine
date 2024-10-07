@@ -87,7 +87,7 @@ public class ErrorPageServlet extends HttpServlet {
                             if (LOGGER.isErrorEnabled()) {
                                 LOGGER.error("Error while trying to get the error page.", e);
                             }
-                            output.println("An Error occured.");
+                            output.println("An Error occurred.");
                         }
                     }
                     writeFormatedResponse(output, errorCode, contextPath);
@@ -124,7 +124,7 @@ public class ErrorPageServlet extends HttpServlet {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("Error while trying to display the error page.", e);
             }
-            output.println("An Error occured.");
+            output.println("An Error occurred.");
         }
 
     }

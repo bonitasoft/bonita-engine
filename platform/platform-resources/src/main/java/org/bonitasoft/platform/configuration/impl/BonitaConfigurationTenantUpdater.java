@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
+import org.bonitasoft.platform.database.DatabaseVendor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.support.lob.TemporaryLobCreator;
 
@@ -30,8 +31,8 @@ public class BonitaConfigurationTenantUpdater implements BatchPreparedStatementS
     public static final String UPDATE_ALL_TENANTS_CONFIGURATION = "UPDATE configuration SET resource_content=? WHERE content_type=? AND resource_name=?";
 
     private final List<BonitaConfiguration> bonitaConfigurations;
-    private String dbVendor;
-    private ConfigurationType type;
+    private final String dbVendor;
+    private final ConfigurationType type;
 
     public BonitaConfigurationTenantUpdater(List<BonitaConfiguration> bonitaConfigurations, String dbVendor,
             ConfigurationType type) {
@@ -45,14 +46,11 @@ public class BonitaConfigurationTenantUpdater implements BatchPreparedStatementS
         final BonitaConfiguration bonitaConfiguration = bonitaConfigurations.get(i);
         ps.setString(2, type.toString());
         ps.setString(3, bonitaConfiguration.getResourceName());
-        switch (dbVendor) {
-            case "h2":
-            case "postgres":
+        switch (DatabaseVendor.parseValue(dbVendor)) {
+            case H2, POSTGRES:
                 ps.setBytes(1, bonitaConfiguration.getResourceContent());
                 break;
-            case "oracle":
-            case "mysql":
-            case "sqlserver":
+            case ORACLE, MYSQL, SQLSERVER:
                 new TemporaryLobCreator().setBlobAsBytes(ps, 1, bonitaConfiguration.getResourceContent());
                 break;
             default:

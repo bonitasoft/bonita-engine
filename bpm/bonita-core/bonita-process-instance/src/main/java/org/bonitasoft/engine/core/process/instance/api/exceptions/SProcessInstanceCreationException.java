@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api.exceptions;
 
+import lombok.Getter;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 
@@ -23,19 +24,24 @@ public class SProcessInstanceCreationException extends SBonitaException {
 
     private static final long serialVersionUID = 7581906795549409593L;
 
+    @Getter
+    private long retryAfter = -1L;
+
     public SProcessInstanceCreationException(final Throwable cause) {
         super(cause);
     }
 
-    public SProcessInstanceCreationException(final String message, final SBonitaException e) {
-        super(message, e);
+    public SProcessInstanceCreationException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
-    /**
-     * @param string
-     */
     public SProcessInstanceCreationException(final String message) {
         super(message);
+    }
+
+    public SProcessInstanceCreationException(final String message, final long retryAfter) {
+        super(message);
+        this.retryAfter = retryAfter;
     }
 
     /**

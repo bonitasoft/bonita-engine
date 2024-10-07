@@ -43,6 +43,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessorSingleton;
+import org.bonitasoft.platform.setup.PlatformSetup;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
@@ -485,7 +486,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
 
     @Test
     public void deploy_a_BDR_and_verify_sequence_behaviour_by_DBVendor() throws Exception {
-        String dbVendor = System.getProperty("sysprop.bonita.bdm.db.vendor");
+        String dbVendor = PlatformSetup.getPropertyBonitaBdmDbVendor();
         Assume.assumeTrue("We don't test sequence behaviour on h2", !dbVendor.equals("h2"));
         switch (dbVendor) {
             case "postgres":

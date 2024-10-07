@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.TestRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,24 +53,26 @@ public class FormMappingTest {
 
         testRepository.flush();
 
-        List<Map<String, Object>> formMapping = jdbcTemplate.queryForList("SELECT * from form_mapping");
+        List<Map<String, Object>> formMapping = jdbcTemplate.query("SELECT * from form_mapping",
+                new JdbcRowMapper("PAGE_MAPPING_ID", "LASTUPDATEDATE", "LASTUPDATEDBY", "PROCESS"));
+
         assertThat(formMapping).hasSize(2);
 
         assertThat(formMapping).anySatisfy(c -> {
-            assertThat(c.get("task")).isEqualTo("task1");
-            assertThat(c.get("type")).isEqualTo(3);
-            assertThat(c.get("page_mapping_id")).isEqualTo(1L);
-            assertThat(c.get("lastupdatedate")).isEqualTo(200L);
-            assertThat(c.get("lastupdatedby")).isEqualTo(100L);
-            assertThat(c.get("process")).isEqualTo(2L);
-            assertThat(c.get("target")).isEqualTo("target1");
+            assertThat(c.get("TASK")).isEqualTo("task1");
+            assertThat(c.get("TYPE")).isEqualTo(3);
+            assertThat(c.get("PAGE_MAPPING_ID")).isEqualTo(1L);
+            assertThat(c.get("LASTUPDATEDATE")).isEqualTo(200L);
+            assertThat(c.get("LASTUPDATEDBY")).isEqualTo(100L);
+            assertThat(c.get("PROCESS")).isEqualTo(2L);
+            assertThat(c.get("TARGET")).isEqualTo("target1");
         });
         assertThat(formMapping).anySatisfy(c -> {
-            assertThat(c.get("task")).isEqualTo("task2");
-            assertThat(c.get("page_mapping_id")).isEqualTo(1L);
-            assertThat(c.get("type")).isEqualTo(4);
-            assertThat(c.get("process")).isEqualTo(3L);
-            assertThat(c.get("target")).isEqualTo("target2");
+            assertThat(c.get("TASK")).isEqualTo("task2");
+            assertThat(c.get("PAGE_MAPPING_ID")).isEqualTo(1L);
+            assertThat(c.get("TYPE")).isEqualTo(4);
+            assertThat(c.get("PROCESS")).isEqualTo(3L);
+            assertThat(c.get("TARGET")).isEqualTo("target2");
         });
     }
 

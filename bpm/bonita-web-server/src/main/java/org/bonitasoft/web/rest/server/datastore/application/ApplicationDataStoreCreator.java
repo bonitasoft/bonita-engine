@@ -18,6 +18,9 @@ import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 
@@ -30,12 +33,22 @@ public class ApplicationDataStoreCreator {
         ApplicationAPI applicationAPI;
         PageAPI pageAPI;
         try {
-            applicationAPI = TenantAPIAccessor.getLivingApplicationAPI(session);
-            pageAPI = TenantAPIAccessor.getCustomPageAPI(session);
+            applicationAPI = getLivingApplicationAPI(session);
+            pageAPI = getCustomPageAPI(session);
             return new ApplicationDataStore(session, applicationAPI, pageAPI, getApplicationConverter());
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
+    }
+
+    protected PageAPI getCustomPageAPI(APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getCustomPageAPI(session);
+    }
+
+    protected ApplicationAPI getLivingApplicationAPI(APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getLivingApplicationAPI(session);
     }
 
     protected ApplicationItemConverter getApplicationConverter() {

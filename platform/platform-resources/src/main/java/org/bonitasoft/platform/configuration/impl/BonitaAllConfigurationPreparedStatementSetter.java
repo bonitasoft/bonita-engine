@@ -18,6 +18,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
+import org.bonitasoft.platform.database.DatabaseVendor;
+import org.bonitasoft.platform.setup.PlatformSetup;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.support.lob.TemporaryLobCreator;
 
@@ -30,15 +32,12 @@ public class BonitaAllConfigurationPreparedStatementSetter
     public static final String INSERT_CONFIGURATION = "INSERT into configuration(tenant_id, content_type, resource_name, resource_content) values (?,?,?,?)";
     private final List<FullBonitaConfiguration> bonitaConfigurations;
 
-    String dbVendor;
+    private final String dbVendor;
 
     public BonitaAllConfigurationPreparedStatementSetter(List<FullBonitaConfiguration> bonitaConfigurations,
             String dbVendor) {
         this.bonitaConfigurations = bonitaConfigurations;
-        this.dbVendor = dbVendor;
-        if (this.dbVendor == null) {
-            this.dbVendor = System.getProperty("sysprop.bonita.db.vendor");
-        }
+        this.dbVendor = dbVendor == null ? PlatformSetup.getPropertyBonitaDbVendor() : dbVendor;
     }
 
     @Override
@@ -47,14 +46,11 @@ public class BonitaAllConfigurationPreparedStatementSetter
         ps.setLong(COLUMN_INDEX_TENANT_ID, bonitaConfiguration.getTenantId());
         ps.setString(COLUMN_INDEX_TYPE, bonitaConfiguration.getConfigurationType());
         ps.setString(COLUMN_INDEX_RESOURCE_NAME, bonitaConfiguration.getResourceName());
-        switch (dbVendor) {
-            case "h2":
-            case "postgres":
+        switch (DatabaseVendor.parseValue(dbVendor)) {
+            case H2, POSTGRES:
                 ps.setBytes(COLUMN_INDEX_RESOURCE_CONTENT, bonitaConfiguration.getResourceContent());
                 break;
-            case "oracle":
-            case "mysql":
-            case "sqlserver":
+            case ORACLE, MYSQL, SQLSERVER:
                 TemporaryLobCreator temporaryLobCreator = new TemporaryLobCreator();
                 temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT,
                         bonitaConfiguration.getResourceContent());

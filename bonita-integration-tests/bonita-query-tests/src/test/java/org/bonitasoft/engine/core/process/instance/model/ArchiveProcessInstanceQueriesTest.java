@@ -31,6 +31,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.business.data.S
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,7 +85,7 @@ public class ArchiveProcessInstanceQueriesTest {
     }
 
     @Test
-    public void should_save_and_get_multi_business_data_reference_for_process() {
+    public void should_save_and_get_multi_business_data_reference_for_archived_process() {
         SAProcessMultiRefBusinessDataInstance multiRefBusinessDataInstance = new SAProcessMultiRefBusinessDataInstance();
         multiRefBusinessDataInstance.setDataIds(Arrays.asList(23L, 25L, 27L));
         multiRefBusinessDataInstance.setProcessInstanceId(PROCESS_INSTANCE_ID);
@@ -96,12 +97,14 @@ public class ArchiveProcessInstanceQueriesTest {
         PersistentObject multiRefBusinessData = repository.selectOne("getSARefBusinessDataInstance",
                 pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "myMultiProcData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, ORIG_PROC_INST_ID, ORIG_FN_INST_ID FROM arch_ref_biz_data_inst WHERE orig_proc_inst_id="
-                                + PROCESS_INSTANCE_ID + " AND name='myMultiProcData'");
+                                + PROCESS_INSTANCE_ID + " AND name='myMultiProcData'",
+                        new JdbcRowMapper("ID", "DATA_ID", "ORIG_PROC_INST_ID", "ORIG_FN_INST_ID"));
         List<Map<String, Object>> dataIds = jdbcTemplate
-                .queryForList("SELECT ID, IDX, DATA_ID FROM arch_multi_biz_data WHERE id="
-                        + multiRefBusinessDataInstance.getId());
+                .query("SELECT ID, IDX, DATA_ID FROM arch_multi_biz_data WHERE id="
+                        + multiRefBusinessDataInstance.getId(),
+                        new JdbcRowMapper("ID", "IDX", "DATA_ID"));
 
         assertThat(((SAProcessMultiRefBusinessDataInstance) multiRefBusinessData).getDataIds())
                 .isEqualTo(Arrays.asList(23L, 25L, 27L));
@@ -115,13 +118,13 @@ public class ArchiveProcessInstanceQueriesTest {
                 entry("ORIG_PROC_INST_ID", PROCESS_INSTANCE_ID),
                 entry("ORIG_FN_INST_ID", null));
         assertThat(dataIds).containsExactly(
-                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 0), pair("DATA_ID", 23L)),
-                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 1), pair("DATA_ID", 25L)),
-                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 2), pair("DATA_ID", 27L)));
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 0L), pair("DATA_ID", 23L)),
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 1L), pair("DATA_ID", 25L)),
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 2L), pair("DATA_ID", 27L)));
     }
 
     @Test
-    public void should_save_and_get_single_business_data_reference_for_process() {
+    public void should_save_and_get_single_business_data_reference_for_archived_process() {
         SAProcessSimpleRefBusinessDataInstance singleRef = new SAProcessSimpleRefBusinessDataInstance();
         singleRef.setDataId(43L);
         singleRef.setProcessInstanceId(PROCESS_INSTANCE_ID);
@@ -133,10 +136,11 @@ public class ArchiveProcessInstanceQueriesTest {
         PersistentObject singleRefFromQuery = repository.selectOne("getSARefBusinessDataInstance",
                 pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "mySingleData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, ORIG_PROC_INST_ID, ORIG_FN_INST_ID FROM arch_ref_biz_data_inst WHERE orig_proc_inst_id="
                                 + PROCESS_INSTANCE_ID
-                                + " AND name='mySingleData'");
+                                + " AND name='mySingleData'",
+                        new JdbcRowMapper("ID", "DATA_ID", "ORIG_PROC_INST_ID", "ORIG_FN_INST_ID"));
         assertThat(singleRefFromQuery).isEqualTo(singleRef);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
                 entry("ID", singleRef.getId()),
@@ -149,7 +153,7 @@ public class ArchiveProcessInstanceQueriesTest {
     }
 
     @Test
-    public void should_save_and_get_single_business_data_reference_for_flow_node() {
+    public void should_save_and_get_single_business_data_reference_for_flow_node_of_archived_process() {
         SAFlowNodeSimpleRefBusinessDataInstance singleRef = new SAFlowNodeSimpleRefBusinessDataInstance();
         singleRef.setDataId(43L);
         singleRef.setFlowNodeInstanceId(FLOW_NODE_INSTANCE_ID);
@@ -161,10 +165,11 @@ public class ArchiveProcessInstanceQueriesTest {
         PersistentObject singleRefFromQuery = repository.selectOne("getSAFlowNodeRefBusinessDataInstance",
                 pair("flowNodeInstanceId", FLOW_NODE_INSTANCE_ID), pair("name", "mySingleData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, ORIG_PROC_INST_ID, ORIG_FN_INST_ID FROM arch_ref_biz_data_inst WHERE orig_fn_inst_id="
                                 + FLOW_NODE_INSTANCE_ID
-                                + " AND name='mySingleData'");
+                                + " AND name='mySingleData'",
+                        new JdbcRowMapper("ID", "DATA_ID", "ORIG_PROC_INST_ID", "ORIG_FN_INST_ID"));
         assertThat(singleRefFromQuery).isEqualTo(singleRef);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
                 entry("ID", singleRef.getId()),

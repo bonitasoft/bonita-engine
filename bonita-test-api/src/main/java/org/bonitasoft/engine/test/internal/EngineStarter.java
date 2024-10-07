@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import javax.naming.NamingException;
+
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.BonitaEngine;
@@ -40,6 +42,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.util.APITypeManager;
+import org.bonitasoft.platform.database.DatabaseVendor;
 import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
@@ -56,7 +59,7 @@ public class EngineStarter {
     private static boolean hasFailed = false;
 
     private boolean dropOnStart = true;
-    private BonitaEngine engine;
+    private final BonitaEngine engine;
 
     protected EngineStarter(BonitaEngine engine) {
         this.engine = engine;
@@ -76,7 +79,7 @@ public class EngineStarter {
         }
         try {
             LOGGER.info("=====================================================");
-            LOGGER.info("============  Starting Bonita Engine  ===========");
+            LOGGER.info("==============  Starting Bonita Engine  =============");
             LOGGER.info("=====================================================");
             final long startTime = System.currentTimeMillis();
             System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", "jbossts-properties.xml");
@@ -102,19 +105,24 @@ public class EngineStarter {
     }
 
     protected void setupPlatform() throws Exception {
-        PlatformSetup platformSetup = PlatformSetupAccessor.getPlatformSetup();
+        PlatformSetup platformSetup = getPlatformSetup();
         if (isDropOnStart()) {
             platformSetup.destroy();
         }
+    }
+
+    protected PlatformSetup getPlatformSetup() throws NamingException {
+        return PlatformSetupAccessor.getInstance().getPlatformSetup();
     }
 
     //--------------  engine life cycle methods
 
     protected void prepareEnvironment() throws Exception {
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
-        String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+        String dbVendor = setSystemPropertyIfNotSet(PlatformSetup.BONITA_DB_VENDOR_PROPERTY,
+                DatabaseVendor.H2.getValue());
         //is h2 and not started outside
-        if (Objects.equals("h2", dbVendor)) {
+        if (DatabaseVendor.H2.equalsValue(dbVendor)) {
             setSystemPropertyIfNotSet(DATABASE_DIR, "build/database");
         }
         engine.initializeEnvironment();

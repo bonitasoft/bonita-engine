@@ -53,7 +53,7 @@ class CustomOrDefaultApplicationInstallerTest {
     ArgumentCaptor<Callable<Object>> callableCaptor;
 
     @Mock
-    private ApplicationInstaller applicationInstaller;
+    private ApplicationInstallerImpl applicationInstaller;
     @Mock
     DefaultLivingApplicationImporter defaultLivingApplicationImporter;
     @Mock

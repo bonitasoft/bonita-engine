@@ -7,14 +7,20 @@ msgstr ""
 "X-Crowdin-Project: bonita\n"
 "X-Crowdin-Project-ID: 13316\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /master/bonita-web/portal/portal-js.pot\n"
-"X-Crowdin-File-ID: 61810\n"
+"X-Crowdin-File: /release-10.2.0/bonita-web/portal/portal-js.pot\n"
+"X-Crowdin-File-ID: 72894\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
 "PO-Revision-Date: 2024-01-01 00:00\n"
 
 msgid "1 case has been deleted"
 msgstr "1 案件が削除されました"
+
+msgid "A Link to your application made outside the portal, e.g. with Bonita UI Builder."
+msgstr ""
+
+msgid "A classic Bonita Living Application."
+msgstr ""
 
 msgid "A page with this name already exists."
 msgstr "この名前のページは既に存在します。"
@@ -106,6 +112,9 @@ msgstr "フォームの送信中にエラーが発生しました。 <br/>この
 
 msgid "An error occurred with the requested operation."
 msgstr "要求された操作でエラーが発生しました。"
+
+msgid "Application Link"
+msgstr ""
 
 msgid "Application XML file"
 msgstr "アプリケーションのXMLファイル"
@@ -526,6 +535,9 @@ msgstr "最新更新日時"
 msgid "Layout"
 msgstr "レイアウト"
 
+msgid "Legacy Application"
+msgstr ""
+
 msgid "Loading..."
 msgstr "ロード中..."
 
@@ -859,6 +871,9 @@ msgstr "URL で並べ替え"
 msgid "Sort by name"
 msgstr "名前で並べ替え"
 
+msgid "Sort by type"
+msgstr ""
+
 msgid "Sort by updated on"
 msgstr "更新日で並べ替え"
 
@@ -999,6 +1014,12 @@ msgstr "これは、タスクの詳細パネルです。表示する情報があ
 
 msgid "This name is already in use"
 msgstr "この名前は既に使用中"
+
+msgid "This only changes the application link. The application itself is still deployed at the same location."
+msgstr ""
+
+msgid "This only deletes the application link. The application itself is not deleted and is still deployed."
+msgstr ""
 
 msgid "This process is no longer available."
 msgstr "このプロセスは既に使用できません。"

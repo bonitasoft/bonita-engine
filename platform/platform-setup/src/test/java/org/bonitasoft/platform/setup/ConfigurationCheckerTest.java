@@ -32,6 +32,8 @@ import org.junit.rules.TestRule;
  */
 public class ConfigurationCheckerTest {
 
+    private static final String TEST_DATASOURCE_CONFIG_DIR = "/datasource-config/";
+
     @Rule
     public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user",
             "db.password", "db.vendor", "db.server.name=",
@@ -52,7 +54,8 @@ public class ConfigurationCheckerTest {
     @Test
     public void validate_should_fail_to_load_class_if_not_found() throws Exception {
         final ConfigurationChecker configurationChecker = new ConfigurationChecker(
-                new PropertyLoader("/database.properties", "/missingDriverClass_internal.properties").loadProperties());
+                new PropertyLoader(TEST_DATASOURCE_CONFIG_DIR + "database.properties",
+                        TEST_DATASOURCE_CONFIG_DIR + "missingDriverClass_internal.properties").loadProperties());
         configurationChecker.loadProperties();
 
         expectedException.expect(PlatformException.class);
@@ -64,9 +67,10 @@ public class ConfigurationCheckerTest {
     @Test
     public void validate_should_fail_mandatory_property_is_not_set() throws Exception {
         final String dbVendor = "dbVendor";
-        System.setProperty("sysprop.bonita.db.vendor", dbVendor);
-        final Properties propertiesWithMissingServerName = new PropertyLoader("/incomplete_database.properties")
-                .loadProperties();
+        System.setProperty(PlatformSetup.BONITA_DB_VENDOR_PROPERTY, dbVendor);
+        final Properties propertiesWithMissingServerName = new PropertyLoader(
+                TEST_DATASOURCE_CONFIG_DIR + "incomplete_database.properties")
+                        .loadProperties();
 
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("Mandatory property");
@@ -77,7 +81,8 @@ public class ConfigurationCheckerTest {
     @Test
     public void validate_should_fail_if_class_to_load_is_not_set() throws Exception {
         final ConfigurationChecker configurationChecker = new ConfigurationChecker(
-                new PropertyLoader("/database.properties", "/incomplete_internal.properties").loadProperties());
+                new PropertyLoader(TEST_DATASOURCE_CONFIG_DIR + "database.properties",
+                        TEST_DATASOURCE_CONFIG_DIR + "incomplete_internal.properties").loadProperties());
 
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("Mandatory property 'postgres.nonXaDriver'");

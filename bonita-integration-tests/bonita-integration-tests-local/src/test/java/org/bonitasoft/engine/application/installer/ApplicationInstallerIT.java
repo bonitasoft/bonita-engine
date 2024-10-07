@@ -22,16 +22,7 @@ import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchiveReader;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationInstaller;
-import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.BdmDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.CustomPageDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.IconDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.LayoutDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.LivingApplicationDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.OrganizationDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.PageAndFormDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.ProcessDetector;
-import org.bonitasoft.engine.api.impl.application.installer.detector.ThemeDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.*;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -55,6 +46,11 @@ public class ApplicationInstallerIT extends CommonAPIIT {
 
     @After
     public void after() throws Exception {
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            getTenantAdministrationAPI().resume();
+        }
         logoutOnTenant();
     }
 
@@ -62,10 +58,10 @@ public class ApplicationInstallerIT extends CommonAPIIT {
     public void custom_application_should_be_deployed_entirely() throws Exception {
         // ensure application did not exist initially:
         assertThatExceptionOfType(ApplicationNotFoundException.class)
-                .isThrownBy(() -> getApplicationAPI().getApplicationByToken("appsManagerBonita"));
+                .isThrownBy(() -> getApplicationAPI().getIApplicationByToken("appsManagerBonita"));
 
         // given:
-        ApplicationInstaller applicationInstallerImpl = ServiceAccessorSingleton.getInstance()
+        ApplicationInstaller applicationInstaller = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
@@ -76,7 +72,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         // when:
         try (var applicationAsStream = ApplicationInstallerIT.class.getResourceAsStream("/customer-application.zip")) {
             var applicationArchive = applicationArchiveReader.read(applicationAsStream);
-            applicationInstallerImpl.install(applicationArchive);
+            applicationInstaller.install(applicationArchive);
         }
 
         // then:
@@ -87,7 +83,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         assertThat(getIdentityAPI().getRoleByName("appsManager")).isNotNull();
         assertThat(getIdentityAPI().getGroupByPath("/appsManagement")).isNotNull();
 
-        assertThat(getApplicationAPI().getApplicationByToken("appsManagerBonita").getDisplayName())
+        assertThat(getApplicationAPI().getIApplicationByToken("appsManagerBonita").getDisplayName())
                 .isEqualTo("Application manager");
         final long processDefinitionId = getProcessAPI().getProcessDefinitionId("CallHealthCheck", "1.0");
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
@@ -107,7 +103,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
     @Test
     public void custom_application_should_be_installed_with_configuration() throws Exception {
         // given:
-        ApplicationInstaller applicationInstallerImpl = ServiceAccessorSingleton.getInstance()
+        ApplicationInstaller applicationInstaller = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
@@ -121,7 +117,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
             var applicationArchive = applicationArchiveReader.read(applicationAsStream);
             applicationArchive.setConfigurationFile(new File(ApplicationInstallerIT.class
                     .getResource("/simple-app-1.0.0-SNAPSHOT-local.bconf").getFile()));
-            applicationInstallerImpl.install(applicationArchive);
+            applicationInstaller.install(applicationArchive);
         }
 
         final long processDefinitionId = getProcessAPI().getProcessDefinitionId("Pool", "1.0");

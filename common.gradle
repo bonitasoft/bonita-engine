@@ -4,7 +4,7 @@ allprojects {
     apply plugin: 'maven-publish'
 
     group = 'org.bonitasoft.engine'
-    
+
     tasks.withType(Copy).configureEach {
         setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
     }
@@ -59,12 +59,18 @@ subprojects {
         mavenLocal()
     }
 
+    dependencies {
+        testImplementation libs.junit5api
+        testCompileOnly libs.junit4
+        testRuntimeOnly libs.junitJupiterEngine
+        // to support junit4 tests
+        testRuntimeOnly libs.junitVintageEngine
+    }
+
     java {
         toolchain {
             languageVersion = JavaLanguageVersion.of(17)
         }
-    }
-    configurations.configureEach {
     }
     afterEvaluate {
         tasks.withType(AbstractCompile).configureEach { options.encoding = 'UTF-8' }
@@ -72,9 +78,6 @@ subprojects {
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
         options.fork = true
-    }
-    tasks.named('test') {
-        jvmArgs += ['--add-opens','java.base/java.util=ALL-UNNAMED','--add-opens','java.base/java.lang=ALL-UNNAMED','-Dfile.encoding=UTF-8']
     }
     tasks.withType(Javadoc).configureEach {
         options.addStringOption('Xdoclint:none', '-quiet')
@@ -85,7 +88,13 @@ subprojects {
         description "List runtime dependencies for a specified configuration"
         configurations = [project.configurations.runtimeClasspath]
     }
+
+    // Configure all test tasks (test, integrationTest, httpIT, databaseTest)
     tasks.withType(Test).configureEach {
+        useJUnitPlatform {
+            includeEngines 'junit-jupiter', 'junit-vintage'
+        }
+        jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.lang=ALL-UNNAMED', '-Dfile.encoding=UTF-8']
         if (!project.hasProperty("createTestReports")) {
             reports.html.required = false
             reports.junitXml.required = false

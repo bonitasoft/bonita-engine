@@ -24,6 +24,7 @@ import java.util.List;
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -56,12 +57,12 @@ public class SearchApplicationsOfUsersTest {
     @Mock
     private ApplicationModelConverter convertor;
 
-    private SearchApplicationsOfUser searchApplicationsOfUser;
+    private SearchApplicationsOfUser<IApplication> searchApplicationsOfUser;
 
     @Before
     public void before() {
-        searchApplicationsOfUser = new SearchApplicationsOfUser(userId, applicationService, descriptor, options,
-                convertor);
+        searchApplicationsOfUser = SearchApplicationsOfUser.defaultSearchApplicationsOfUser(userId, applicationService,
+                descriptor, options, convertor);
     }
 
     @Test
@@ -115,7 +116,7 @@ public class SearchApplicationsOfUsersTest {
         given(convertor.toApplication(sApplications)).willReturn(Arrays.asList(app));
 
         //when
-        final List<Application> applications = searchApplicationsOfUser.convertToClientObjects(sApplications);
+        final List<IApplication> applications = searchApplicationsOfUser.convertToClientObjects(sApplications);
 
         //then
         assertThat(applications).containsExactly(app);

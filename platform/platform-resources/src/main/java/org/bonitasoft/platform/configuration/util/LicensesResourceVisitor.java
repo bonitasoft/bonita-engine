@@ -35,7 +35,7 @@ public class LicensesResourceVisitor extends SimpleFileVisitor<Path> {
 
     private final List<BonitaConfiguration> bonitaConfigurations;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(LicensesResourceVisitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LicensesResourceVisitor.class);
     private Path dir;
 
     public LicensesResourceVisitor(List<BonitaConfiguration> bonitaConfigurations) {
@@ -64,7 +64,7 @@ public class LicensesResourceVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
         if (isLicenseFile(path)) {
-            LOGGER.info("found license file: " + path.getFileName());
+            LOGGER.info("Found license file: {}", path.getFileName());
             bonitaConfigurations.add(new BonitaConfiguration(path.getFileName().toString(), Files.readAllBytes(path)));
         }
         return CONTINUE;

@@ -15,17 +15,11 @@ package org.bonitasoft.platform.setup.command.configure;
 
 import java.util.Properties;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.platform.exception.PlatformException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/**
- * @author Emmanuel Duchastenier
- */
+@Slf4j
 public class PropertyReader {
-
-    // Use BundleConfigurator logger for easier configuration (no need for a specific logger here):
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
     private final Properties properties;
 
@@ -37,7 +31,7 @@ public class PropertyReader {
         // Any property value can be overridden by system property with the same name:
         final String sysPropValue = System.getProperty(propertyName);
         if (sysPropValue != null) {
-            LOGGER.info("System property '{}' set to '{}', overriding value from file database.properties.",
+            log.info("System property '{}' set to '{}', overriding value from file database.properties.",
                     propertyName, sysPropValue);
             return sysPropValue.trim();
         }

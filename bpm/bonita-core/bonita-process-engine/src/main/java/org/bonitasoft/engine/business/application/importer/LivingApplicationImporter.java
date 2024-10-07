@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -137,7 +137,7 @@ public abstract class LivingApplicationImporter {
             throws ImportException, AlreadyExistsException {
         List<ImportStatus> importStatuses = new ArrayList<>();
         ApplicationNodeContainer applicationNodeContainer = applicationImporter.getApplicationNodeContainer(xmlContent);
-        for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
+        for (AbstractApplicationNode applicationNode : applicationNodeContainer.getAllApplications()) {
             // set the strategy to skip it if a version already exists
             importStatuses.add(
                     applicationImporter.importApplication(applicationNode, editable, SessionService.SYSTEM_ID,

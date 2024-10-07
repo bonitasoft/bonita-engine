@@ -16,8 +16,8 @@ package org.bonitasoft.engine.api.impl.transaction.application;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
-import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -25,16 +25,29 @@ import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
-public class SearchApplicationsOfUser extends AbstractSearchEntity<Application, SApplication> {
+public class SearchApplicationsOfUser<E extends IApplication> extends AbstractSearchEntity<E, SApplication> {
 
+    private final Class<E> applicationClass;
     private long userId;
     private final ApplicationService applicationService;
     private final ApplicationModelConverter convertor;
 
-    public SearchApplicationsOfUser(final long userId, final ApplicationService applicationService,
+    public static SearchApplicationsOfUser<IApplication> defaultSearchApplicationsOfUser(
+            final long userId,
+            final ApplicationService applicationService,
+            final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options,
+            final ApplicationModelConverter convertor) {
+        return new SearchApplicationsOfUser<IApplication>(IApplication.class, userId, applicationService,
+                searchDescriptor, options, convertor);
+    }
+
+    public SearchApplicationsOfUser(final Class<E> applicationClass, final long userId,
+            final ApplicationService applicationService,
             final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
             final ApplicationModelConverter convertor) {
         super(searchDescriptor, options);
+        this.applicationClass = applicationClass;
         this.userId = userId;
         this.applicationService = applicationService;
         this.convertor = convertor;
@@ -51,8 +64,13 @@ public class SearchApplicationsOfUser extends AbstractSearchEntity<Application, 
     }
 
     @Override
-    public List<Application> convertToClientObjects(final List<SApplication> serverObjects) {
-        return convertor.toApplication(serverObjects);
+    public List<E> convertToClientObjects(final List<SApplication> serverObjects) {
+        if (IApplication.class.equals(applicationClass)) {
+            return (List<E>) convertor.toApplication(serverObjects);
+        } else {
+            return convertor.toApplication(serverObjects).stream().filter(applicationClass::isInstance)
+                    .map(applicationClass::cast).toList();
+        }
     }
 
 }

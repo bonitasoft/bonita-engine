@@ -36,6 +36,10 @@ public class WorkerThreadFactory implements ThreadFactory {
         this.padding = guessPadding(maximumPoolSize);
     }
 
+    public WorkerThreadFactory(final String name, final long tenantId) {
+        this(name, tenantId, 1);
+    }
+
     /**
      * @param maximumPoolSize
      */

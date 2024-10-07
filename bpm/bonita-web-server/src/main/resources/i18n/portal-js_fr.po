@@ -7,14 +7,20 @@ msgstr ""
 "X-Crowdin-Project: bonita\n"
 "X-Crowdin-Project-ID: 13316\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /master/bonita-web/portal/portal-js.pot\n"
-"X-Crowdin-File-ID: 61810\n"
+"X-Crowdin-File: /release-10.2.0/bonita-web/portal/portal-js.pot\n"
+"X-Crowdin-File-ID: 72894\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
 "PO-Revision-Date: 2024-01-01 00:00\n"
 
 msgid "1 case has been deleted"
 msgstr "1 cas a été supprimé"
+
+msgid "A Link to your application made outside the portal, e.g. with Bonita UI Builder."
+msgstr "Un Lien vers votre application créée en dehors du portail, par exemple avec Bonita UI Builder."
+
+msgid "A classic Bonita Living Application."
+msgstr "Une Living Application Bonita traditionnelle."
 
 msgid "A page with this name already exists."
 msgstr "Une page portant ce nom existe déjà."
@@ -106,6 +112,9 @@ msgstr "Une erreur s’est produite lors de l’envoi du formulaire. <br/> Il se
 
 msgid "An error occurred with the requested operation."
 msgstr "Une erreur s'est produite lors de l'opération demandée"
+
+msgid "Application Link"
+msgstr "Lien d'Application"
 
 msgid "Application XML file"
 msgstr "Fichier XML de l'application"
@@ -524,6 +533,9 @@ msgstr "Dernière mise à jour"
 msgid "Layout"
 msgstr "Layout"
 
+msgid "Legacy Application"
+msgstr "Application Traditionnelle"
+
 msgid "Loading..."
 msgstr "Chargement..."
 
@@ -857,6 +869,9 @@ msgstr "Trier par URL"
 msgid "Sort by name"
 msgstr "Trier par nom"
 
+msgid "Sort by type"
+msgstr "Trier par type"
+
 msgid "Sort by updated on"
 msgstr "Trier par date de mise à jour"
 
@@ -997,6 +1012,12 @@ msgstr "Cette zone est dédiée aux détails d'une tâche. Aucune information à
 
 msgid "This name is already in use"
 msgstr "Ce nom est déjà utilisé"
+
+msgid "This only changes the application link. The application itself is still deployed at the same location."
+msgstr "Cela ne modifie que le lien de l'application. L'application elle-même est toujours déployée au même endroit."
+
+msgid "This only deletes the application link. The application itself is not deleted and is still deployed."
+msgstr "Ceci ne supprime que le lien de l'application. L'application elle-même n'est pas supprimée et est toujours déployée."
 
 msgid "This process is no longer available."
 msgstr "Ce processus n'est plus disponible."

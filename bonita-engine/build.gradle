@@ -31,8 +31,8 @@ dependencyManagement {
             exclude 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec'
         }
         dependency(libs.hibernateJCache.get() as String)
-        dependency("javax.cache:cache-api:${Deps.jcacheVersion}")
-        dependency "javax.persistence:javax.persistence-api:${Deps.javaxPersistenceApiVersion}"
+        dependency(libs.jcache.get() as String)
+        dependency(libs.javaxPersistenceApi.get() as String)
         dependency libs.commonsIO.get() as String
         dependency libs.commonsFileUpload.get() as String
         dependency(libs.commonsBeanUtils.get() as String) {
@@ -49,21 +49,16 @@ dependencyManagement {
         }
         dependency libs.xstream.get() as String
         dependency libs.tomcatDbcp.get() as String
-        dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+        dependency libs.narayanaJta.get() as String
         dependency libs.jakartaActivation.get() as String
-        dependency libs.snakeyaml.get() as String
-        dependency("org.quartz-scheduler:quartz:${Deps.quartzVersion}")
+        dependency(libs.quartz.get() as String)
         dependency(libs.eclipseCompiler.get() as String)
-        dependency("javax.annotation:javax.annotation-api:$Deps.javaxAnnotationsVersion")
-        dependencySet(group: "io.micrometer", version: Deps.micrometerVersion) {
-            entry "micrometer-core"
-            entry "micrometer-registry-jmx"
-            entry "micrometer-registry-prometheus"
-        }
-        dependencySet(group: 'com.hazelcast', version: Deps.hazelcastVersion) {
-            entry 'hazelcast'
-            entry 'hazelcast-spring'
-        }
+        dependency(libs.javaxAnnotations.get() as String)
+        dependency(libs.micrometerCore.get() as String)
+        dependency(libs.micrometerRegistryJmx.get() as String)
+        dependency(libs.micrometerRegistryPrometheus.get() as String)
+        dependency(libs.hazelcast.get() as String)
+        dependency(libs.hazelcastSpring.get() as String)
         // declared here because it is used by web-extension and by distrib
         dependency(libs.jakartaServletApi.get() as String)
         // To be removed only when client projects (rest api extension) have all moved their deps to jakarta

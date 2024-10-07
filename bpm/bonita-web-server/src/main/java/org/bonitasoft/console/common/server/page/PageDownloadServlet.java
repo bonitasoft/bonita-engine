@@ -105,7 +105,7 @@ public class PageDownloadServlet extends HttpServlet {
                 LOGGER.error(e.getMessage(), e);
             }
             try {
-                out.write("An exception occured. Please contact an administrator".getBytes());
+                out.write("An exception occurred. Please contact an administrator".getBytes());
             } catch (final IOException e1) {
                 throw new ServletException(e1);
             }

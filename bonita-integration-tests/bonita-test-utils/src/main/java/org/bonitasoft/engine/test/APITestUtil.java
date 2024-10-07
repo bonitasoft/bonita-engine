@@ -47,6 +47,7 @@ import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
+import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.Query;
@@ -94,7 +95,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
-import org.bonitasoft.engine.business.application.Application;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -1033,9 +1034,15 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state)
             throws Exception {
+        waitForProcessToBeInState(processInstanceId, state, DEFAULT_TIMEOUT);
+    }
+
+    public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state,
+            final int timeoutInMillis)
+            throws Exception {
         ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
                 ClientEventUtil.getProcessInstanceInState(processInstanceId, state.getId()),
-                DEFAULT_TIMEOUT);
+                timeoutInMillis);
     }
 
     public void waitForInitializingProcess() throws Exception {
@@ -1046,7 +1053,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName,
             final boolean useRootProcessInstance,
-            final int timeout) throws Exception {
+            final int timeoutInMillis) throws Exception {
         Map<String, Serializable> params;
         if (useRootProcessInstance) {
             params = ClientEventUtil.getFlowNodeInState(processInstanceId, state.getStateName(), flowNodeName);
@@ -1054,7 +1061,7 @@ public class APITestUtil extends PlatformTestUtil {
             params = ClientEventUtil.getFlowNodeInStateWithParentId(processInstanceId, state.getStateName(),
                     flowNodeName);
         }
-        return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
+        return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeoutInMillis);
     }
 
     public FlowNodeInstance waitForFlowNodeInReadyState(final ProcessInstance processInstance,
@@ -1355,13 +1362,11 @@ public class APITestUtil extends PlatformTestUtil {
     protected void cleanProcessDefinitions() throws BonitaException {
         final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200,
                 ProcessDeploymentInfoCriterion.DEFAULT);
-        if (processes.size() > 0) {
-            for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
-                if (ActivationState.ENABLED.equals(processDeploymentInfo.getActivationState())) {
-                    getProcessAPI().disableProcess(processDeploymentInfo.getProcessId());
-                }
-                getProcessAPI().deleteProcessDefinition(processDeploymentInfo.getProcessId());
+        for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
+            if (ActivationState.ENABLED.equals(processDeploymentInfo.getActivationState())) {
+                getProcessAPI().disableProcess(processDeploymentInfo.getProcessId());
             }
+            getProcessAPI().deleteProcessDefinition(processDeploymentInfo.getProcessId());
         }
     }
 
@@ -1370,17 +1375,15 @@ public class APITestUtil extends PlatformTestUtil {
         builder.sort(ProcessSupervisorSearchDescriptor.ID, Order.ASC);
         final List<ProcessSupervisor> supervisors = getProcessAPI().searchProcessSupervisors(builder.done())
                 .getResult();
-        if (supervisors.size() > 0) {
-            for (final ProcessSupervisor supervisor : supervisors) {
-                getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
-            }
+        for (final ProcessSupervisor supervisor : supervisors) {
+            getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
         }
     }
 
     protected void cleanApplications() throws SearchException, DeletionException {
-        final SearchResult<Application> applications = getApplicationAPI()
-                .searchApplications(new SearchOptionsBuilder(0, 100).done());
-        for (Application application : applications.getResult()) {
+        final SearchResult<IApplication> applications = getApplicationAPI()
+                .searchIApplications(new SearchOptionsBuilder(0, 100).done());
+        for (IApplication application : applications.getResult()) {
             if (application.isEditable()) {
                 getApplicationAPI().deleteApplication(application.getId());
             }
@@ -1461,6 +1464,10 @@ public class APITestUtil extends PlatformTestUtil {
                 getCommandAPI().unregister(command.getName());
             }
         }
+    }
+
+    public PlatformInformationAPI getPlatformInformationAPI() {
+        return getApiClient().getPlatformInformationAPI();
     }
 
     public ProcessAPI getProcessAPI() {

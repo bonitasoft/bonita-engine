@@ -24,14 +24,15 @@ import java.util.List;
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.IApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -54,8 +55,13 @@ public class SearchApplicationsTest {
     @Mock
     private ApplicationModelConverter convertor;
 
-    @InjectMocks
-    private SearchApplications searchApplications;
+    private SearchApplications<IApplication> searchApplications;
+
+    @Before
+    public void initSearchApplications() {
+        searchApplications = SearchApplications.defaultSearchApplications(applicationService, descriptor, options,
+                convertor);
+    }
 
     @Test
     public void executeCount_should_return_result_of_applicationService_getNumberOfApplications() throws Exception {
@@ -107,7 +113,7 @@ public class SearchApplicationsTest {
         given(convertor.toApplication(sApplications)).willReturn(Arrays.asList(app));
 
         //when
-        final List<Application> applications = searchApplications.convertToClientObjects(sApplications);
+        final List<IApplication> applications = searchApplications.convertToClientObjects(sApplications);
 
         //then
         assertThat(applications).containsExactly(app);

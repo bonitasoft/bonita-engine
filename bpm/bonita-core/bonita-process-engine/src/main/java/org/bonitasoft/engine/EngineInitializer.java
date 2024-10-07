@@ -68,6 +68,8 @@ public class EngineInitializer {
             LOGGER.info("Starting node...");
 
             logEditionMessage();
+            logDataCollectionMessage();
+
             platformAPI.startNode();
             LOGGER.info("Node started successfully.");
             final long after = System.currentTimeMillis();
@@ -90,6 +92,27 @@ public class EngineInitializer {
                 " |____/ \\___/|_| |_|_|\\__\\__,_|  \\_____\\___/|_| |_| |_|_| |_| |_|\\__,_|_| |_|_|\\__|\\__, |");
         LOGGER.info("                                                                                    __/ |");
         LOGGER.info("                                                                                   |___/ ");
+    }
+
+    public void logDataCollectionMessage() {
+        LOGGER.info("-----------------------------------------------------------------------------------------");
+        LOGGER.info("Anonymous Data Collection for Product Improvement");
+        LOGGER.info("");
+        LOGGER.info("Dear User,");
+        LOGGER.info("");
+        LOGGER.info("We collect strictly anonymous usage data from Bonita Studio and the Runtime (production");
+        LOGGER.info("environment) to help us continuously improve the product and enhance the user experience.");
+        LOGGER.info("The data collected is fully anonymous and cannot be used to identify you in any way.");
+        LOGGER.info("");
+        LOGGER.info("This data helps us understand how the product is used in both development and production");
+        LOGGER.info("settings, allowing us to optimize performance, fix bugs, and introduce new features that");
+        LOGGER.info("benefit all users.");
+        LOGGER.info("");
+        LOGGER.info("For more information on what data we collect and how to opt-out, please visit our");
+        LOGGER.info("Product Documentation (https://documentation.bonitasoft.com/bonita/latest).");
+        LOGGER.info("");
+        LOGGER.info("Thank you for supporting the ongoing improvement of our product!");
+        LOGGER.info("-----------------------------------------------------------------------------------------");
     }
 
     SessionAccessor getSessionAccessor() throws BonitaHomeNotSetException, IOException,

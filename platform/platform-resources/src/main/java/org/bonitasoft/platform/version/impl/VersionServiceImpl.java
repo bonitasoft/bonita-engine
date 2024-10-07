@@ -33,7 +33,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class VersionServiceImpl implements VersionService {
 
-    private static final String SQL_PLATFORM_VERSION = "SELECT p.version FROM platform p ORDER BY p.id";
+    private static final String SQL_PLATFORM_VERSION = "SELECT p.version FROM platform p";
+    private static final String SQL_PLATFORM_INFORMATION = "SELECT p.information FROM platform p";
+    private static final String SQL_CLEAR_PLATFORM_INFORMATION = "UPDATE platform SET information = NULL";
 
     private JdbcTemplate jdbcTemplate;
 
@@ -54,6 +56,29 @@ public class VersionServiceImpl implements VersionService {
             throw new PlatformException("Platform is not created. Run 'setup init' first.");
         }
         return strings.get(0);
+    }
+
+    @Override
+    public String retrievePlatformInformation() throws PlatformException {
+        final List<String> strings;
+        try {
+            strings = jdbcTemplate.queryForList(SQL_PLATFORM_INFORMATION, String.class);
+        } catch (DataAccessException e) {
+            throw new PlatformException("Platform is not created. Run 'setup init' first.", e);
+        }
+        if (hasNotSingleResult(strings)) {
+            throw new PlatformException("Platform is not created. Run 'setup init' first.");
+        }
+        return strings.get(0);
+    }
+
+    @Override
+    public void clearPlatformInformation() throws PlatformException {
+        try {
+            jdbcTemplate.execute(SQL_CLEAR_PLATFORM_INFORMATION);
+        } catch (DataAccessException e) {
+            throw new PlatformException("Unable to clear platform information", e);
+        }
     }
 
     private boolean hasNotSingleResult(List<String> strings) {

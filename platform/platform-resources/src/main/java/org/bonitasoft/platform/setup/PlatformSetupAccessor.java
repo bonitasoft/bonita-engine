@@ -33,18 +33,28 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 public class PlatformSetupAccessor {
 
-    private static PlatformSetup _INSTANCE;
+    private static final PlatformSetupAccessor _UNIQUE = new PlatformSetupAccessor();
 
-    public static PlatformSetup getPlatformSetup() throws NamingException {
-        if (_INSTANCE == null) {
-            _INSTANCE = createPlatformSetup();
-        }
-        return _INSTANCE;
+    private PlatformSetup instance;
+
+    protected PlatformSetupAccessor() {
+        // Empty protected constructor to prevent instantiation
     }
 
-    private static PlatformSetup createPlatformSetup() throws NamingException {
+    public static PlatformSetupAccessor getInstance() {
+        return _UNIQUE;
+    }
+
+    public PlatformSetup getPlatformSetup() throws NamingException {
+        if (instance == null) {
+            instance = initPlatformSetup();
+        }
+        return instance;
+    }
+
+    private PlatformSetup initPlatformSetup() throws NamingException {
         final DataSource dataSource = lookupDataSource();
-        String dbVendor = System.getProperty("sysprop.bonita.db.vendor");
+        String dbVendor = PlatformSetup.getPropertyBonitaDbVendor();
         return createNewPlatformSetup(dataSource, dbVendor);
     }
 
@@ -55,13 +65,26 @@ public class PlatformSetupAccessor {
      * @param dbVendor the Database vendor (default H2) to point at
      * @return a NEW instance of Platform Setup
      */
-    public static PlatformSetup createNewPlatformSetup(DataSource dataSource, String dbVendor) {
+    public PlatformSetup createNewPlatformSetup(DataSource dataSource, String dbVendor) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
         VersionService versionService = new VersionServiceImpl(jdbcTemplate);
-        return new PlatformSetup(new ScriptExecutor(dbVendor, dataSource, versionService),
-                new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, dbVendor), versionService, dataSource);
+        return createPlatformSetup(
+                createScriptExecutor(dataSource, dbVendor, versionService),
+                new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, dbVendor),
+                versionService, dataSource, dbVendor);
+    }
+
+    protected PlatformSetup createPlatformSetup(ScriptExecutor scriptExecutor,
+            ConfigurationService configurationService, VersionService versionService, DataSource dataSource,
+            String dbVendor) {
+        return new PlatformSetup(scriptExecutor, configurationService, versionService, dataSource, dbVendor);
+    }
+
+    protected ScriptExecutor createScriptExecutor(DataSource dataSource, String dbVendor,
+            VersionService versionService) {
+        return new ScriptExecutor(dbVendor, dataSource, versionService);
     }
 
     private static DataSource lookupDataSource() throws NamingException {
@@ -77,6 +100,6 @@ public class PlatformSetupAccessor {
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
         return new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate,
-                System.getProperty("sysprop.bonita.db.vendor"));
+                PlatformSetup.getPropertyBonitaDbVendor());
     }
 }

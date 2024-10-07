@@ -1,8 +1,10 @@
 dependencies {
     api libs.commonsIO
     api project(':bonita-engine-standalone')
-    api "junit:junit:${Deps.junit4Version}"
+    api libs.junit4
     api(project(':platform:platform-resources'))
+
+    implementation libs.springTest
 
     // for http tests:
     compileOnly("org.eclipse.jetty:jetty-server:${Deps.jettyVersion}")

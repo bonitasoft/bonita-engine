@@ -26,6 +26,7 @@ import org.bonitasoft.engine.core.process.comment.model.SHumanComment;
 import org.bonitasoft.engine.core.process.comment.model.SSystemComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.CommentRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +63,7 @@ public class CommentsTest {
         repository.add(new SHumanComment(PROCESS2_ID, "comment5", JACK_ID));
 
         assertThat(repository.getCommentsOfProcessInstance(PROCESS1_ID)).extracting("content", "userId", "class")
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                         tuple("comment1", JACK_ID, SHumanComment.class),
                         tuple("comment2", JOHN_ID, SHumanComment.class),
                         tuple("comment3", JACK_ID, SHumanComment.class),
@@ -77,13 +78,15 @@ public class CommentsTest {
         repository.flush();
 
         Map<String, Object> comment1AsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, KIND, CONTENT, POSTDATE, PROCESSINSTANCEID, USERID FROM process_comment WHERE processInstanceId = "
-                                + PROCESS1_ID);
+                                + PROCESS1_ID,
+                        new JdbcRowMapper("ID", "POSTDATE", "PROCESSINSTANCEID", "USERID"));
         Map<String, Object> comment2AsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, KIND, CONTENT, POSTDATE, PROCESSINSTANCEID, USERID FROM process_comment WHERE processInstanceId = "
-                                + PROCESS2_ID);
+                                + PROCESS2_ID,
+                        new JdbcRowMapper("ID", "POSTDATE", "PROCESSINSTANCEID", "USERID"));
 
         assertThat(comment1AsMap).containsOnly(
                 entry("ID", comment1.getId()),
@@ -112,13 +115,17 @@ public class CommentsTest {
         PersistentObject comment2FromQuery = repository.selectOne("getArchivedCommentById",
                 pair("id", comment2.getId()));
         Map<String, Object> comment1AsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, SOURCEOBJECTID, ARCHIVEDATE, CONTENT, POSTDATE, PROCESSINSTANCEID, USERID FROM arch_process_comment WHERE processInstanceId = "
-                                + PROCESS1_ID);
+                                + PROCESS1_ID,
+                        new JdbcRowMapper("ID", "SOURCEOBJECTID", "ARCHIVEDATE", "POSTDATE", "PROCESSINSTANCEID",
+                                "USERID"));
         Map<String, Object> comment2AsMap = jdbcTemplate
-                .queryForMap(
+                .queryForObject(
                         "SELECT ID, SOURCEOBJECTID, ARCHIVEDATE, CONTENT, POSTDATE, PROCESSINSTANCEID, USERID FROM arch_process_comment WHERE processInstanceId = "
-                                + PROCESS2_ID);
+                                + PROCESS2_ID,
+                        new JdbcRowMapper("ID", "SOURCEOBJECTID", "ARCHIVEDATE", "POSTDATE", "PROCESSINSTANCEID",
+                                "USERID"));
 
         assertThat(comment1FromQuery).isEqualTo(comment1);
         assertThat(comment2FromQuery).isEqualTo(comment2);

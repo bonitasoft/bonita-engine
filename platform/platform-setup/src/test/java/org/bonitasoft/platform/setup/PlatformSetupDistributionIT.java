@@ -15,6 +15,7 @@ package org.bonitasoft.platform.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -58,6 +59,11 @@ public class PlatformSetupDistributionIT {
     public void before() throws Exception {
         setupFolder = temporaryFolder.newFolder();
         PlatformSetupTestUtils.extractDistributionTo(setupFolder);
+        if (!PlatformSetupTestUtils.isCommunityEdition(getClass())) {
+            // Tests executed in the subscription edition need a fake license file
+            Files.createFile(Paths.get(setupFolder.getAbsolutePath()).resolve("platform_conf").resolve("licenses")
+                    .resolve("some.lic"));
+        }
     }
 
     @Test
@@ -72,21 +78,21 @@ public class PlatformSetupDistributionIT {
         int iExitValue = executor.execute(oCmdLine);
 
         //then
-        assertThat(iExitValue).isEqualTo(0);
+        assertThat(iExitValue).isZero();
         Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(setupFolder);
         Statement statement = jdbcConnection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
-        assertThat(resultSet.getInt("nb")).isGreaterThan(0);
+        assertThat(resultSet.getInt("nb")).isPositive();
 
         oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArgument("pull");
         iExitValue = executor.execute(oCmdLine);
-        assertThat(iExitValue).isEqualTo(0);
+        assertThat(iExitValue).isZero();
 
-        final Path platform_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
+        final Path platformEngine = setupFolder.toPath().resolve("platform_conf").resolve("current")
                 .resolve("platform_engine");
-        FileUtils.deleteDirectory(platform_engine.toFile());
+        FileUtils.deleteDirectory(platformEngine.toFile());
 
         oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArgument("push");
@@ -97,7 +103,7 @@ public class PlatformSetupDistributionIT {
         oCmdLine.addArgument("--force");
         executor.setExitValue(0);
         iExitValue = executor.execute(oCmdLine);
-        assertThat(iExitValue).isEqualTo(0);
+        assertThat(iExitValue).isZero();
     }
 
     @Test
@@ -110,12 +116,12 @@ public class PlatformSetupDistributionIT {
         //when
         int iExitValue = executor.execute(oCmdLine);
         //then
-        assertThat(iExitValue).isEqualTo(0);
+        assertThat(iExitValue).isZero();
         Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(setupFolder, "myUser");
         Statement statement = jdbcConnection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
-        assertThat(resultSet.getInt("nb")).isGreaterThan(0);
+        assertThat(resultSet.getInt("nb")).isPositive();
     }
 
     @Test
@@ -155,7 +161,7 @@ public class PlatformSetupDistributionIT {
             Files.write(databaseProperties, out.toByteArray());
             int iExitValue = executor.execute(oCmdLine);
             //then
-            assertThat(iExitValue).isEqualTo(0);
+            assertThat(iExitValue).isZero();
         } finally {
             pgServer.shutdown();
         }
@@ -167,7 +173,9 @@ public class PlatformSetupDistributionIT {
         final File temporaryFolderRoot = temporaryFolder.newFolder();
         Path bundleFolder = temporaryFolderRoot.toPath().toRealPath();
         Path tomcatFolder = bundleFolder.resolve("server");
-        PathUtils.copyDirectory(Paths.get("../resources/test/tomcat_conf/server").toAbsolutePath(), tomcatFolder);
+        var tomcatServerFolder = getClass().getResource("/tomcat_conf/server");
+        assertNotNull(tomcatServerFolder);
+        PathUtils.copyDirectory(Paths.get(tomcatServerFolder.toURI()), tomcatFolder);
         final File newSetupFolder = bundleFolder.resolve("setup").toFile();
         FileUtils.copyDirectory(setupFolder, newSetupFolder);
         //given

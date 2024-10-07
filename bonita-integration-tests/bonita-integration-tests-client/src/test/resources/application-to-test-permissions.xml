@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.1">
+    <application token="application-to-test-permissions" version="2.1" profile="User" state="ACTIVATED" layout="custompage_layoutBonita" theme="custompage_themeBonita">
+        <displayName>Bonita Editable Application</displayName>
+        <iconPath>bonita-application-directory.png</iconPath>
+        <applicationPages>
+            <applicationPage customPage="custompage_pageToTestPermissions" token="pageToTestPermissions"/>
+        </applicationPages>
+        <applicationMenus>
+            <applicationMenu applicationPage="pageToTestPermissions">
+                <displayName>Some page</displayName>
+            </applicationMenu>
+        </applicationMenus>
+    </application>
+</applications>

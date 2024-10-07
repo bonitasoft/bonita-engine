@@ -13,37 +13,46 @@
  **/
 package org.bonitasoft.engine.test.persistence;
 
-import org.bonitasoft.engine.persistence.*;
+import org.bonitasoft.engine.persistence.PostgresMaterializedBlobType;
+import org.bonitasoft.engine.persistence.PostgresMaterializedClobType;
+import org.bonitasoft.engine.persistence.PostgresXMLType;
+import org.bonitasoft.engine.persistence.XMLType;
 import org.bonitasoft.engine.services.Vendor;
+import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 
 public class TestLocalSessionFactoryBuilder extends LocalSessionFactoryBean {
 
+    private Interceptor interceptor;
+
     @Override
     protected SessionFactory buildSessionFactory(LocalSessionFactoryBuilder sfb) {
         Vendor vendor = Vendor.fromHibernateConfiguration(sfb);
         //register type before loading mappings/entities, type should be present before loading JPA entities
         switch (vendor) {
-            case ORACLE:
-                sfb.setInterceptor(new OracleInterceptor());
-                break;
-            case MYSQL:
-            case OTHER:
+            case ORACLE, OTHER, SQLSERVER:
                 sfb.registerTypeOverride(XMLType.INSTANCE);
                 break;
-            case SQLSERVER:
-                sfb.setInterceptor(new SQLServerInterceptor());
+            case MYSQL:
+                System.setProperty("hibernate.dialect.storage_engine", "innodb");
                 sfb.registerTypeOverride(XMLType.INSTANCE);
                 break;
             case POSTGRES:
-                sfb.setInterceptor(new PostgresInterceptor());
                 sfb.registerTypeOverride(new PostgresMaterializedBlobType());
                 sfb.registerTypeOverride(new PostgresMaterializedClobType());
                 sfb.registerTypeOverride(PostgresXMLType.INSTANCE);
                 break;
-        };
+        }
+        if (interceptor != null) {
+            sfb.setInterceptor(interceptor);
+        }
         return super.buildSessionFactory(sfb);
     }
+
+    public void setInterceptor(Interceptor interceptor) {
+        this.interceptor = interceptor;
+    }
+
 }

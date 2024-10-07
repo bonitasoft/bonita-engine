@@ -26,12 +26,15 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
+import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,33 +75,20 @@ public class ApplicationImporter {
         }
     }
 
-    public ImportStatus importApplication(ApplicationNode applicationNode, boolean editable, long createdBy,
+    public ImportStatus importApplication(AbstractApplicationNode applicationNode, boolean editable, long createdBy,
             byte[] iconContent, String iconMimeType, boolean addIfMissing, ApplicationImportStrategy strategy)
             throws ImportException, AlreadyExistsException {
         try {
             ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, iconContent,
-                    iconMimeType, createdBy);
+                    iconMimeType, createdBy, editable);
+
             SApplicationWithIcon applicationToBeImported = importResult.getApplication();
-            applicationToBeImported.setEditable(editable);
             ImportStatus importStatus = importResult.getImportStatus();
-            SApplication conflictingApplication = applicationService
-                    .getApplicationByToken(applicationToBeImported.getToken());
+
             importStatus.setStatus(ImportStatus.Status.ADDED);
-            if (conflictingApplication != null) {
-                switch (strategy.whenApplicationExists(conflictingApplication, applicationToBeImported)) {
-                    case FAIL:
-                        throw new AlreadyExistsException(
-                                "An application with token '" + conflictingApplication.getToken() + "' already exists",
-                                conflictingApplication.getToken());
-                    case REPLACE:
-                        importStatus.setStatus(ImportStatus.Status.REPLACED);
-                        applicationService.forceDeleteApplication(conflictingApplication);
-                        break;
-                    case SKIP:
-                        importStatus.setStatus(ImportStatus.Status.SKIPPED);
-                        break;
-                }
-            }
+
+            // import status will change depending on the chosen strategy, or will throw exception
+            applyStrategyWhenApplicationExists(strategy, applicationToBeImported, importStatus);
 
             if (!addIfMissing) {
                 importStatus.setStatus(ImportStatus.Status.SKIPPED);
@@ -106,17 +96,44 @@ public class ApplicationImporter {
 
             if (importStatus.getStatus() != ImportStatus.Status.SKIPPED) {
                 applicationService.createApplication(applicationToBeImported);
-                importStatus.addErrorsIfNotExists(applicationPageImporter
-                        .importApplicationPages(applicationNode.getApplicationPages(), applicationToBeImported));
-                importStatus
-                        .addErrorsIfNotExists(
-                                applicationMenuImporter.importApplicationMenus(applicationNode.getApplicationMenus(),
-                                        applicationToBeImported));
-                updateHomePage(applicationToBeImported, applicationNode, createdBy, importResult);
+
+                // import more elements for applications built with legacy UID
+                if (applicationNode instanceof ApplicationNode legacy) {
+                    importStatus.addErrorsIfNotExists(
+                            applicationPageImporter
+                                    .importApplicationPages(legacy.getApplicationPages(), applicationToBeImported));
+                    importStatus.addErrorsIfNotExists(
+                            applicationMenuImporter
+                                    .importApplicationMenus(legacy.getApplicationMenus(), applicationToBeImported));
+                    updateHomePage(applicationToBeImported, legacy, createdBy, importResult);
+                }
             }
+
             return importStatus;
         } catch (SBonitaException e) {
             throw new ImportException(e);
+        }
+    }
+
+    private void applyStrategyWhenApplicationExists(ApplicationImportStrategy strategy,
+            SApplicationWithIcon applicationToBeImported, ImportStatus importStatus)
+            throws SBonitaReadException, AlreadyExistsException, SObjectModificationException {
+        SApplication conflictingApplication = applicationService
+                .getApplicationByToken(applicationToBeImported.getToken());
+        if (conflictingApplication != null) {
+            switch (strategy.whenApplicationExists(conflictingApplication, applicationToBeImported)) {
+                case FAIL:
+                    throw new AlreadyExistsException(
+                            "An application with token '" + conflictingApplication.getToken() + "' already exists",
+                            conflictingApplication.getToken());
+                case REPLACE:
+                    importStatus.setStatus(ImportStatus.Status.REPLACED);
+                    applicationService.forceDeleteApplication(conflictingApplication);
+                    break;
+                case SKIP:
+                    importStatus.setStatus(ImportStatus.Status.SKIPPED);
+                    break;
+            }
         }
     }
 
@@ -124,7 +141,7 @@ public class ApplicationImporter {
             long createdBy, ApplicationImportStrategy strategy) throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
         List<ImportStatus> importStatus = new ArrayList<>();
-        for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
+        for (AbstractApplicationNode applicationNode : applicationNodeContainer.getAllApplications()) {
             importStatus.add(
                     importApplication(applicationNode, true, createdBy, iconContent, iconMimeType, true, strategy));
         }

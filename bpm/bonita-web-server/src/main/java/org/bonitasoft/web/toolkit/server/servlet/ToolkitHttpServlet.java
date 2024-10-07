@@ -15,6 +15,11 @@ package org.bonitasoft.web.toolkit.server.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -26,7 +31,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.bonitasoft.console.common.server.utils.LocaleUtils;
 import org.bonitasoft.web.rest.server.framework.json.JSonSimpleDeserializer;
 import org.bonitasoft.web.toolkit.client.common.CommonDateFormater;
-import org.bonitasoft.web.toolkit.client.common.exception.api.*;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIIncorrectIdException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemIdMalformedException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemNotFoundException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIMethodNotAllowedException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APINotFoundException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APITooManyRequestException;
 import org.bonitasoft.web.toolkit.client.common.i18n.AbstractI18n.LOCALE;
 import org.bonitasoft.web.toolkit.client.common.json.JSonItemReader;
 import org.bonitasoft.web.toolkit.client.common.json.JSonSerializer;
@@ -44,6 +56,10 @@ import org.slf4j.LoggerFactory;
 public abstract class ToolkitHttpServlet extends HttpServlet {
 
     private static final long serialVersionUID = -8470006030459575773L;
+
+    public static final DateTimeFormatter RFC1123_DATE_TIME_FORMATTER = DateTimeFormatter
+            .ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US)
+            .withZone(ZoneId.of("GMT"));
 
     /**
      * Console logger
@@ -104,8 +120,8 @@ public abstract class ToolkitHttpServlet extends HttpServlet {
 
         try {
             final PrintWriter output = resp.getWriter();
-            if (e instanceof APIException) {
-                setLocalization((APIException) e, LocaleUtils.getUserLocaleAsString(req));
+            if (e instanceof APIException apiException) {
+                setLocalization(apiException, LocaleUtils.getUserLocaleAsString(req));
             }
 
             output.print(e == null ? "" : JSonSerializer.serialize(e));
@@ -113,6 +129,14 @@ public abstract class ToolkitHttpServlet extends HttpServlet {
         } catch (final Exception e2) {
             throw new APIException(e2);
         }
+    }
+
+    protected final void outputException(final Throwable e, final HttpServletRequest req,
+            final HttpServletResponse resp, final int httpStatusCode, Map<String, String> headers) {
+        for (var header : headers.entrySet()) {
+            resp.addHeader(header.getKey(), header.getValue());
+        }
+        outputException(e, req, resp, httpStatusCode);
     }
 
     /**
@@ -161,12 +185,7 @@ public abstract class ToolkitHttpServlet extends HttpServlet {
                 LOGGER.info(exception.getMessage(), exception);
             }
             outputException(exception, req, resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        } else if (exception instanceof APINotFoundException) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info(exception.getMessage(), exception);
-            }
-            outputException(exception, req, resp, HttpServletResponse.SC_NOT_FOUND);
-        } else if (exception instanceof ServiceNotFoundException) {
+        } else if (exception instanceof APINotFoundException || exception instanceof ServiceNotFoundException) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info(exception.getMessage(), exception);
             }
@@ -194,6 +213,13 @@ public abstract class ToolkitHttpServlet extends HttpServlet {
                 LOGGER.debug(exception.getMessage(), exception);
             }
             outputException(exception, req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } else if (exception instanceof APITooManyRequestException ex) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(exception.getMessage(), exception);
+            }
+            var headers = Map.of("Retry-After",
+                    RFC1123_DATE_TIME_FORMATTER.format(Instant.ofEpochMilli(ex.getRetryAfter())));
+            outputException(exception, req, resp, ex.getStatusCode(), headers);
         } else {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error(exception.getMessage(), exception);

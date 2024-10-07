@@ -53,6 +53,8 @@ public class InitCommandTest {
 
     @Test
     public void should_execute_init() throws Exception {
+        doNothing().when(initCommand).askConfirmationIfH2();
+
         initCommand.execute(new Options(), buildCommandLine());
 
         verify(platformSetup).init();
@@ -60,6 +62,8 @@ public class InitCommandTest {
 
     @Test
     public void should_call_h2_confirmation() throws Exception {
+        doNothing().when(initCommand).askConfirmationIfH2();
+
         initCommand.execute(new Options(), buildCommandLine());
 
         verify(initCommand).askConfirmationIfH2();

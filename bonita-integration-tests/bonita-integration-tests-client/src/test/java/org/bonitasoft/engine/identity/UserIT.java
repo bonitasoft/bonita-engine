@@ -27,7 +27,13 @@ import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
@@ -35,7 +41,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -733,8 +738,6 @@ public class UserIT extends TestWithTechnicalUser {
      */
     @Test
     public void should_search_user_case_insensitively() throws BonitaException {
-        Assume.assumeTrue("Search is case sensitive on our docker oracle",
-                !System.getProperty("sysprop.bonita.bdm.db.vendor").equals("oracle"));
         List<User> users = asList(
                 getIdentityAPI().createUser("Jean_Michel", "bpm", "Jean Michel", "Jarre"),
                 getIdentityAPI().createUser("michel.mimi", "bpm", "Michel", "Mimi"));

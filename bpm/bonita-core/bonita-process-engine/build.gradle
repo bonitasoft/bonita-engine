@@ -64,21 +64,17 @@ dependencies {
     api libs.springSessionCore
     api libs.springWeb
     api libs.bundles.groovy
-    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    api libs.micrometerCore
 
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
-    api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
+    api(libs.javaxAnnotations)
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:${Deps.junit5Version}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
+    testImplementation libs.junit5params
     testAnnotationProcessor libs.lombok
 
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"      // works with Junit4
@@ -87,9 +83,5 @@ dependencies {
     compileOnly project(':bpm:bonita-common')
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-}
-
-test {
-    useJUnitPlatform()
+    testRuntimeOnly libs.logback
 }

@@ -3,7 +3,6 @@
 dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-session')
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
 }

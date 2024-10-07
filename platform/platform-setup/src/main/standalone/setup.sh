@@ -1,7 +1,29 @@
 #!/bin/sh
 set -e
 
-BASEDIR=$(cd $(dirname $(dirname "$0")/..) && pwd -P)
+# Function that exits with an error message if the vendor is not supported
+# - first argument is the database vendor value to check
+check_vendor_supported() {
+  db_vendor=$1
+  is_supported=false
+  # supported databases:
+  set -- h2 postgres
+  for db in "$@"; do
+    if [ "$db" = "$db_vendor" ]; then
+      is_supported=true
+      break
+    fi
+  done
+  if [ "$is_supported" = false ]; then
+    echo "ERROR: Unsupported database vendor (valid values are h2, postgres)."
+    echo "For access to additional databases (oracle, mysql, sqlserver), please consider upgrading to the Enterprise Edition."
+    echo "Please update file ${BASEDIR}/database.properties to set a valid value."
+    exit 1
+  fi
+}
+
+# Let's position into the folder containing this script:
+BASEDIR=$(cd "$(dirname "$(dirname "$0")/..")" && pwd -P)
 cd "${BASEDIR}"
 
 # JAVA_CMD is exported by start-bonita.sh, so that same Java command is used:
@@ -15,14 +37,15 @@ for lib in lib/*.jar; do
 done
 
 BONITA_DATABASE=$(grep '^db.vendor=' database.properties | sed -e 's/db.vendor=//g')
+check_vendor_supported "$BONITA_DATABASE"
 
-if [ "$BONITA_DATABASE" != "h2" -a "$BONITA_DATABASE" != "postgres" -a "$BONITA_DATABASE" != "sqlserver" -a "$BONITA_DATABASE" != "oracle" -a "$BONITA_DATABASE" != "mysql" ]; then
-  echo "Cannot determine database vendor (valid values are h2, postgres, sqlserver, oracle, mysql)."
-  echo "Please configure file ${BASEDIR}/database.properties properly."
-  exit 1
-fi
+BONITA_BDM_DATABASE=$(grep '^bdm.db.vendor=' database.properties | sed -e 's/bdm.db.vendor=//g')
+check_vendor_supported "$BONITA_BDM_DATABASE"
 
-"${JAVA_EXE}" -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}${LIBS_CP}" ${JVM_OPTS} -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=${BONITA_DATABASE} org.bonitasoft.platform.setup.PlatformSetupApplication "$@"
+"${JAVA_EXE}" -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}${LIBS_CP}" \
+    -Dsysprop.bonita.db.vendor="${BONITA_DATABASE}" \
+    -Dsysprop.bonita.bdm.db.vendor="${BONITA_BDM_DATABASE}" \
+    org.bonitasoft.platform.setup.PlatformSetupApplication "$@"
 COD_RET=$?
 if [ ${COD_RET} -ne 0 ]; then
   cd - 1>/dev/null

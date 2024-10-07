@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.work;
 
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,8 +40,10 @@ public interface BonitaExecutorService {
      *
      * @param work
      */
-    void submit(WorkDescriptor work);
+    Future<?> submit(WorkDescriptor work);
 
     boolean awaitTermination(long workTerminationTimeout, TimeUnit seconds) throws InterruptedException;
+
+    ThreadPoolExecutor getExecutor();
 
 }

@@ -272,7 +272,7 @@ public class TransientDataServiceImpl implements TransientDataService {
         } catch (SProcessDefinitionNotFoundException | SFlowNodeNotFoundException | SFlowNodeReadException
                 | SBonitaReadException e) {
             throw new SDataInstanceException(
-                    String.format("An error occured while retrieving transient data for container %s with type %s",
+                    String.format("An error occurred while retrieving transient data for container %s with type %s",
                             containerId, containerType),
                     e);
         }

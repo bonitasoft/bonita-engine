@@ -28,6 +28,7 @@ dependencies {
     implementation("org.restlet.jse:org.restlet.ext.jackson:${Deps.restletVersion}") {
         exclude(group: "org.codehaus.woodstox", module: "woodstox-core-asl")
         exclude(group: "org.codehaus.woodstox", module: "stax2-api")
+        exclude(group: "org.yaml", module: "snakeyaml")
     }
     implementation "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
     implementation libs.groovyCore
@@ -45,20 +46,20 @@ dependencies {
     testImplementation(project(":bpm:bonita-server"))
     testImplementation "net.javacrumbs.json-unit:json-unit:${Deps.jsonUnitVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
     testImplementation libs.springTest
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
 }
 
 configurations {
-    all {
+    configureEach {
         // Specify woodstox version to override the version pulled by jackson-dataformat-xml (transitive dep of restlet)
         resolutionStrategy.force "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
         // Specify Guava version to override the version pulled by owasp-java-html-sanitizer
-        resolutionStrategy.force "com.google.guava:guava:${Deps.guavaVersion}" //forcing managed version (transitive dependency of owasp-java-html-sanitizer)
+        resolutionStrategy.force libs.guava //forcing managed version (transitive dependency of owasp-java-html-sanitizer)
     }
     tests
 }
@@ -88,14 +89,14 @@ tasks.named("build") {
     dependsOn tasks.named("buildZip")
 }
 
-tasks.named("test") {
-    dependsOn tasks.named("testsJar")
-}
-
 tasks.register('testsJar', Jar) {
     dependsOn testClasses
     archiveClassifier = 'tests'
     from(sourceSets.test.output)
+}
+
+test {
+    dependsOn tasks.named("testsJar")
 }
 
 artifacts {

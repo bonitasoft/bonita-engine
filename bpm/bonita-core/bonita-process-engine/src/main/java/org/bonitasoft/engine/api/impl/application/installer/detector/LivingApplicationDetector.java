@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LivingApplicationDetector extends XmlDetector implements ArtifactDetector {
 
-    private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.0";
+    private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.1";
 
     public LivingApplicationDetector() {
         super(APPLICATION_NAMESPACE);

@@ -59,6 +59,7 @@ import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.ProcessStarterVerifier;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -104,6 +105,7 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkExecutorService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Matthieu Chaffotte
@@ -311,4 +313,8 @@ public interface ServiceAccessor {
     PlatformRetriever getPlatformRetriever();
 
     InstallationService getInstallationService();
+
+    ProcessStarterVerifier getProcessStarterVerifier();
+
+    Environment getSpringEnvironment();
 }

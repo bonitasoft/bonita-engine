@@ -20,6 +20,8 @@ import org.bonitasoft.engine.business.application.InternalProfiles;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
+import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationLinkNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -47,21 +49,13 @@ public class NodeToApplicationConverter {
         this.validator = validator;
     }
 
-    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy)
-            throws SBonitaReadException, ImportException {
-        return toSApplication(applicationNode, null, "", createdBy);
-    }
-
-    public ImportResult toSApplication(final ApplicationNode applicationNode, byte[] iconContent, String iconMimeType,
-            final long createdBy)
+    public ImportResult toSApplication(final AbstractApplicationNode applicationNode, byte[] iconContent,
+            String iconMimeType, final long createdBy, final boolean editable)
             throws SBonitaReadException, ImportException {
         String token = applicationNode.getToken();
-        InternalProfiles internalProfileByApplicationNodeProfile = InternalProfiles
-                .getInternalProfileByProfileName(applicationNode.getProfile());
         validator.validate(token);
+
         final ImportStatus importStatus = new ImportStatus(token);
-        Long layoutId = getLayoutId(getLayoutName(applicationNode), token, importStatus);
-        Long themeId = getThemeId(getThemeName(applicationNode), token, importStatus);
         final long currentDate = System.currentTimeMillis();
         SApplicationWithIcon application = new SApplicationWithIcon();
         application.setToken(token);
@@ -70,22 +64,22 @@ public class NodeToApplicationConverter {
         application.setCreationDate(currentDate);
         application.setLastUpdateDate(currentDate);
         application.setCreatedBy(createdBy);
-        application.setLayoutId(layoutId);
-        application.setThemeId(themeId);
+        application.setUpdatedBy(createdBy);
         application.setIconPath(applicationNode.getIconPath());
-        application.setIconContent(iconContent);
-        application.setIconMimeType(iconMimeType);
         application.setDescription(applicationNode.getDescription());
         application.setState(applicationNode.getState());
+        application.setEditable(editable);
+        application.setLink(applicationNode instanceof ApplicationLinkNode);
 
-        if (internalProfileByApplicationNodeProfile == null) {
-            final ImportError importError = setProfile(applicationNode, application);
-            if (importError != null) {
-                importStatus.addError(importError);
-            }
-        } else {
-            application.setInternalProfile(internalProfileByApplicationNodeProfile.getProfileName());
-            application.setProfileId(null);
+        if (applicationNode instanceof ApplicationNode legacy) {
+            application.setLayoutId(getLayoutId(getLayoutName(legacy), token, importStatus));
+            application.setThemeId(getThemeId(getThemeName(legacy), token, importStatus));
+        }
+        application.setIconContent(iconContent);
+        application.setIconMimeType(iconMimeType);
+
+        if (applicationNode.getProfile() != null) {
+            setProfile(applicationNode.getProfile(), application, importStatus);
         }
 
         return new ImportResult(application, importStatus);
@@ -123,27 +117,29 @@ public class NodeToApplicationConverter {
                         applicationToken, themeName));
     }
 
-    protected String getLayoutName(final ApplicationNode applicationNode) {
+    private String getLayoutName(final ApplicationNode applicationNode) {
         return applicationNode.getLayout() != null ? applicationNode.getLayout()
                 : ApplicationService.DEFAULT_LAYOUT_NAME;
     }
 
-    protected String getThemeName(final ApplicationNode applicationNode) {
+    private String getThemeName(final ApplicationNode applicationNode) {
         return applicationNode.getTheme() != null ? applicationNode.getTheme() : ApplicationService.DEFAULT_THEME_NAME;
     }
 
-    private ImportError setProfile(final ApplicationNode applicationNode,
-            SApplicationWithIcon application) {
-        ImportError importError = null;
-        if (applicationNode.getProfile() != null) {
+    private void setProfile(String profileName, SApplicationWithIcon application, ImportStatus importStatus) {
+        InternalProfiles internalProfileByApplicationNodeProfile = InternalProfiles
+                .getInternalProfileByProfileName(profileName);
+        if (internalProfileByApplicationNodeProfile == null) {
             try {
-                final SProfile profile = profileService.getProfileByName(applicationNode.getProfile());
+                final SProfile profile = profileService.getProfileByName(profileName);
                 application.setProfileId(profile.getId());
             } catch (final SProfileNotFoundException | SBonitaReadException e) {
-                importError = new ImportError(applicationNode.getProfile(), ImportError.Type.PROFILE);
+                importStatus.addError(new ImportError(profileName, ImportError.Type.PROFILE));
             }
+        } else {
+            application.setInternalProfile(internalProfileByApplicationNodeProfile.getProfileName());
+            application.setProfileId(null);
         }
-        return importError;
     }
 
     protected PageService getPageService() {

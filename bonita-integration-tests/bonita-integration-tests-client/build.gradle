@@ -5,7 +5,6 @@ plugins {
 }
 dependencies {
     api project(':bonita-test-api')
-    api "junit:junit:${Deps.junit4Version}"
     api libs.commonsIO
     api project(':bpm:bonita-common')
     api project(':bpm:bonita-client')
@@ -14,7 +13,7 @@ dependencies {
     api "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     api "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     api "net.jodah:concurrentunit:${Deps.concurrentUnitVersion}"
-    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    runtimeOnly libs.logback
     testImplementation project(':bpm:bonita-server')
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"

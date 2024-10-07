@@ -12,10 +12,9 @@ dependencies {
     api project(':services:bonita-data-instance')
     api project(':services:bonita-classloader')
     api project(':services:bonita-builder')
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

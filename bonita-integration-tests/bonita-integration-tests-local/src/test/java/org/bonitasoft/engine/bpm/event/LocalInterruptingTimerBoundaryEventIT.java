@@ -370,8 +370,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         waitForUserTask(processInstance.getId(), "step1");
         waitForUserTaskAssignAndExecuteIt(processInstance, "step2", user, Map.of());
         waitForProcessToFinish(processInstance);
-        List<String> allJobs = schedulerService.getAllJobs();
-        assertThat(allJobs).isEmpty();
+        assertThat(schedulerService.getAllJobs()).isEmpty();
         disableAndDeleteProcess(processDefinition);
     }
 

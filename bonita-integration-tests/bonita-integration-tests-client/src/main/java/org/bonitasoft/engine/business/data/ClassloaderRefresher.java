@@ -15,7 +15,6 @@ package org.bonitasoft.engine.business.data;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -42,9 +41,9 @@ public class ClassloaderRefresher {
      */
     public ClassLoader loadClientModelInClassloader(final byte[] clientZipContent, final ClassLoader contextClassLoader,
             final String modelClass,
-            final File fsFolderToPutJars) throws IOException, MalformedURLException {
+            final File fsFolderToPutJars) throws IOException {
         final Map<String, byte[]> ressources = IOUtils.unzip(clientZipContent);
-        final List<URL> urls = new ArrayList<URL>();
+        final List<URL> urls = new ArrayList<>();
         for (final Entry<String, byte[]> e : ressources.entrySet()) {
             final File file = new File(fsFolderToPutJars, e.getKey());
             if (file.getName().endsWith(".jar")) {
@@ -58,7 +57,7 @@ public class ClassloaderRefresher {
                 }
                 if (file.getName().contains("dao")) {
                     try {
-                        contextClassLoader.loadClass(modelClass + "DAO");
+                        contextClassLoader.loadClass(modelClass + "DAOImpl");
                     } catch (final ClassNotFoundException e1) {
                         FileUtils.writeByteArrayToFile(file, e.getValue());
                         urls.add(file.toURI().toURL());
@@ -76,7 +75,7 @@ public class ClassloaderRefresher {
         }
         ClassLoader classLoaderWithBDM = contextClassLoader;
         if (!urls.isEmpty()) {
-            classLoaderWithBDM = new URLClassLoader(urls.toArray(new URL[urls.size()]), contextClassLoader);
+            classLoaderWithBDM = new URLClassLoader(urls.toArray(new URL[0]), contextClassLoader);
         }
         return classLoaderWithBDM;
     }

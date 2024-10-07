@@ -281,7 +281,7 @@ public class RestAPIAuthorizationFilterTest {
     }
 
     @Test
-    public void testMatchExcludePatterns() throws Exception {
+    public void testMatchExcludePatterns() {
         matchExcludePattern("http://host/bonita/portal/resource/page/API/system/i18ntranslation", true);
         matchExcludePattern("http://host/bonita/apps/app/API/system/i18ntranslation", true);
         matchExcludePattern("http://host/bonita/API/system/i18ntranslation", true);
@@ -294,17 +294,17 @@ public class RestAPIAuthorizationFilterTest {
     }
 
     @Test
-    public void testCompileNullPattern() throws Exception {
+    public void testCompileNullPattern() {
         assertThat(restAPIAuthorizationFilter.compilePattern(null)).isNull();
     }
 
     @Test
-    public void testCompileWrongPattern() throws Exception {
+    public void testCompileWrongPattern() {
         assertThat(restAPIAuthorizationFilter.compilePattern("((((")).isNull();
     }
 
     @Test
-    public void testCompileSimplePattern() throws Exception {
+    public void testCompileSimplePattern() {
         final String patternToCompile = "test";
         assertThat(restAPIAuthorizationFilter.compilePattern(patternToCompile)).isNotNull().has(new Condition<>() {
 
@@ -316,7 +316,7 @@ public class RestAPIAuthorizationFilterTest {
     }
 
     @Test
-    public void testCompileExcludePattern() throws Exception {
+    public void testCompileExcludePattern() {
         final String patternToCompile = RestAPIAuthorizationFilter.AUTHORIZATION_FILTER_EXCLUDED_PAGES_PATTERN;
         assertThat(restAPIAuthorizationFilter.compilePattern(patternToCompile)).isNotNull().has(new Condition<>() {
 

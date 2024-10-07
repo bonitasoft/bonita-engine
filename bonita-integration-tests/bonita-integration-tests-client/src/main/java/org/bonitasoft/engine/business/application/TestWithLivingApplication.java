@@ -54,12 +54,10 @@ public class TestWithLivingApplication extends CommonAPIIT {
 
     @After
     public void tearDown() throws Exception {
-        final SearchResult<Application> searchResult = getLivingApplicationAPI()
-                .searchApplications(new SearchOptionsBuilder(0, 1000).done());
-        for (final Application app : searchResult.getResult()) {
-            if (app.isEditable()) {
-                getLivingApplicationAPI().deleteApplication(app.getId());
-            }
+        final SearchResult<IApplication> searchResult = getLivingApplicationAPI()
+                .searchIApplications(new SearchOptionsBuilder(0, 1000).done());
+        for (final IApplication app : searchResult.getResult()) {
+            getLivingApplicationAPI().deleteApplication(app.getId());
         }
         logoutThenlogin();
         deleteUser(user);

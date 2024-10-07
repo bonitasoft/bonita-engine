@@ -31,24 +31,7 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ActivityStates;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ArchivedAutomaticTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ArchivedManualTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.*;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -66,6 +49,7 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.junit.Test;
 
@@ -357,8 +341,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
         ProcessDefinition p1 = deployAndEnableProcessWithActor(bar1, "a", user);
         ProcessDefinition p2 = deployAndEnableProcessWithActor(bar2, "a", user);
 
-        getProcessAPI().startProcess(p1.getId());
-        getProcessAPI().startProcess(p2.getId());
+        var instance1 = getProcessAPI().startProcess(p1.getId());
+        var instance2 = getProcessAPI().startProcess(p2.getId());
         waitForUserTask("p1task1");
         long p1task2 = waitForUserTask("p1task2");
         long p1task3 = waitForUserTask("p1task3");
@@ -388,6 +372,16 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .filter("name", "p1task3").done());
         assertThat(searchResult).matches(haveTasks(), toDescription(searchResult));
 
+        try {
+            waitForTaskInState(instance1, "p1task3", TestStates.NORMAL_FINAL);
+        } catch (ActivityInstanceNotFoundException e) {
+            // ignore it, instance is already completed
+        }
+        try {
+            waitForTaskInState(instance2, "p2task3", TestStates.NORMAL_FINAL);
+        } catch (ActivityInstanceNotFoundException e) {
+            // ignore it, instance is already completed
+        }
         disableAndDeleteProcess(p1, p2);
     }
 
@@ -1267,6 +1261,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         assertThat(searchHumanTaskInstancesCountOnly.getResult()).describedAs("Human tasks").isEmpty();
 
         // -------- tear down
+        try {
+            waitForTaskInState(processInstance, "userTask6_assigned_to_John_long_execution", TestStates.NORMAL_FINAL);
+        } catch (ActivityInstanceNotFoundException e) {
+            // ignore it, activity is already finished
+        }
         disableAndDeleteProcess(processDefinition);
         deleteUser(john);
     }

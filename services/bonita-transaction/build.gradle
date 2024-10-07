@@ -6,9 +6,8 @@ dependencies {
     compileOnly libs.lombok
 
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+    testImplementation libs.narayanaJta
     testImplementation "org.jboss.logging:jboss-logging:${Deps.jbossLoggingVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntimeOnly libs.logback
 }

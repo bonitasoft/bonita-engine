@@ -10,9 +10,8 @@ dependencies {
     api libs.httpComponentsClient
     api libs.xstream
     api libs.httpComponentsMime
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.logback
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation 'org.eclipse.jetty:jetty-server:8.1.14.v20131031'
     testImplementation 'org.eclipse.jetty:jetty-jndi:8.1.14.v20131031'

@@ -159,4 +159,13 @@ public class PlatformSetupTestUtils {
             return oCmdLine;
         }
     }
+
+    public static boolean isCommunityEdition(Class<?> clazz) {
+        try {
+            return clazz.getClassLoader().loadClass("com.bonitasoft.platform.setup.PlatformSetupSP") == null;
+        } catch (ClassNotFoundException e) {
+            return true;
+        }
+    }
+
 }

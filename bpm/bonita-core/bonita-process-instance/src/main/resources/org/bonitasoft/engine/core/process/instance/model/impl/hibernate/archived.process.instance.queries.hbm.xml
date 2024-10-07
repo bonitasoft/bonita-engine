@@ -413,6 +413,13 @@
 		WHERE ap.sourceObjectId IN (:sourceObjectIds)
 	</query>
 
+	<query name="getLastArchivedProcessInstanceStartDates">
+		SELECT DISTINCT ap.startDate
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.stateId = 0
+		AND ap.startDate &gt;= :sinceDateInMillis
+	</query>
+
 	<query name="getArchivedProcessInstance">
 		SELECT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap

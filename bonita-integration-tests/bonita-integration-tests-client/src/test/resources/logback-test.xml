@@ -10,6 +10,8 @@
     <logger name="org.bonitasoft" level="INFO" />
     <logger name="org.hibernate.orm.cache" level="WARN" />
     <logger name="org.hibernate.SQL_SLOW" level="INFO"/>
+    <logger name="org.bonitasoft.engine.execution.ProcessStarterVerifierImpl" level="DEBUG"/>
+    <logger name="org.bonitasoft.engine.execution.ProcessCounterChecker" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

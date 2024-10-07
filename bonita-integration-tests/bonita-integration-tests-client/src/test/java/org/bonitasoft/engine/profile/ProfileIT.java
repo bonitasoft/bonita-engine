@@ -60,16 +60,6 @@ public class ProfileIT extends AbstractProfileIT {
     }
 
     @Test
-    public void searchProfile() throws BonitaException {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.sort(ProfileSearchDescriptor.NAME, Order.DESC);
-
-        final SearchResult<Profile> searchedProfiles = getProfileAPI().searchProfiles(builder.done());
-        assertEquals(2, searchedProfiles.getCount());
-        assertEquals("User", searchedProfiles.getResult().get(0).getName());
-    }
-
-    @Test
     public void searchProfileWithSearchTerm() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileSearchDescriptor.NAME, Order.ASC);

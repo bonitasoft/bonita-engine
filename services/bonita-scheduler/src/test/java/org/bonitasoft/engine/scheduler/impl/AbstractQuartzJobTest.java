@@ -52,7 +52,7 @@ public class AbstractQuartzJobTest {
     @Test
     public void should_not_unschedule_job_on_exception() throws Exception {
         // job should never throw an exception and be handled by the JobWrapper
-        // we do not unschedule the job in that case. we don't want to loose the job
+        // we do not unschedule the job in that case. we don't want to lose the job
         doReturn(jobThatFails()).when(schedulerService).getPersistedJob(any());
 
         try {
