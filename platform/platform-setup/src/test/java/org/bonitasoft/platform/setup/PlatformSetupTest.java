@@ -15,8 +15,7 @@ package org.bonitasoft.platform.setup;
 
 import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
 import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_DB_VENDOR_PROPERTY;
-import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
+import static org.bonitasoft.platform.setup.PlatformSetup.*;
 import static org.mockito.Mockito.*;
 
 import java.nio.file.Files;
@@ -76,9 +75,18 @@ public class PlatformSetupTest {
 
     @Before
     public void before() throws Exception {
-        ReflectionTestUtils.setField(platformSetup, "dbVendor", DatabaseVendor.H2.getValue());
+        setPlatformSetupDbVendor(DatabaseVendor.H2.getValue());
+        setPlatformSetupBdmDbVendor(DatabaseVendor.H2.getValue());
         doReturn(connection).when(dataSource).getConnection();
         doReturn(metaData).when(connection).getMetaData();
+    }
+
+    private void setPlatformSetupDbVendor(String dbVendor) {
+        ReflectionTestUtils.setField(platformSetup, "dbVendor", dbVendor);
+    }
+
+    private void setPlatformSetupBdmDbVendor(String bdmDbVendor) {
+        ReflectionTestUtils.setField(platformSetup, "bdmDbVendor", bdmDbVendor);
     }
 
     @Test
@@ -111,7 +119,19 @@ public class PlatformSetupTest {
     public void should_fail_if_init_with_incorrect_database_vendor() {
         //given
         String dbVendor = "foobar";
-        ReflectionTestUtils.setField(platformSetup, "dbVendor", dbVendor);
+        setPlatformSetupDbVendor(dbVendor);
+
+        //when - then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(platformSetup::init)
+                .withMessage("Unknown database vendor: %s", dbVendor);
+    }
+
+    @Test
+    public void should_fail_if_init_with_incorrect_bdm_database_vendor() {
+        //given
+        String dbVendor = "foobar";
+        setPlatformSetupBdmDbVendor(dbVendor);
 
         //when - then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -123,7 +143,19 @@ public class PlatformSetupTest {
     public void should_fail_if_init_with_unsupported_database_vendor() {
         //given
         DatabaseVendor dbVendor = DatabaseVendor.ORACLE;
-        ReflectionTestUtils.setField(platformSetup, "dbVendor", dbVendor.getValue());
+        setPlatformSetupDbVendor(dbVendor.getValue());
+
+        //when - then
+        assertThatExceptionOfType(PlatformException.class)
+                .isThrownBy(platformSetup::init)
+                .withMessage("Database vendor '%s' is not supported with the community edition", dbVendor);
+    }
+
+    @Test
+    public void should_fail_if_init_with_unsupported_bdm_database_vendor() {
+        //given
+        DatabaseVendor dbVendor = DatabaseVendor.ORACLE;
+        setPlatformSetupBdmDbVendor(dbVendor.getValue());
 
         //when - then
         assertThatExceptionOfType(PlatformException.class)
@@ -134,7 +166,16 @@ public class PlatformSetupTest {
     @Test
     public void should_not_fail_if_init_with_postgres_database_vendor() {
         //given
-        ReflectionTestUtils.setField(platformSetup, "dbVendor", DatabaseVendor.POSTGRES.getValue());
+        setPlatformSetupDbVendor(DatabaseVendor.POSTGRES.getValue());
+
+        //when - then
+        assertThatNoException().isThrownBy(platformSetup::init);
+    }
+
+    @Test
+    public void should_not_fail_if_init_with_postgres_bdm_database_vendor() {
+        //given
+        setPlatformSetupBdmDbVendor(DatabaseVendor.POSTGRES.getValue());
 
         //when - then
         assertThatNoException().isThrownBy(platformSetup::init);
@@ -143,7 +184,7 @@ public class PlatformSetupTest {
     @Test
     public void should_init_dbVendor_with_system_prop_if_null() throws Exception {
         //given
-        ReflectionTestUtils.setField(platformSetup, "dbVendor", null);
+        setPlatformSetupDbVendor(null);
         DatabaseVendor dbVendor = DatabaseVendor.POSTGRES;
         System.setProperty(BONITA_DB_VENDOR_PROPERTY, dbVendor.getValue());
 
@@ -152,6 +193,20 @@ public class PlatformSetupTest {
 
         //then
         assertThat(platformSetup.dbVendor).isEqualTo(dbVendor.getValue());
+    }
+
+    @Test
+    public void should_init_bdmDbVendor_with_system_prop_if_null() throws Exception {
+        //given
+        setPlatformSetupBdmDbVendor(null);
+        DatabaseVendor dbVendor = DatabaseVendor.POSTGRES;
+        System.setProperty(BONITA_BDM_DB_VENDOR_PROPERTY, dbVendor.getValue());
+
+        //when
+        platformSetup.initProperties();
+
+        //then
+        assertThat(platformSetup.bdmDbVendor).isEqualTo(dbVendor.getValue());
     }
 
     @Test

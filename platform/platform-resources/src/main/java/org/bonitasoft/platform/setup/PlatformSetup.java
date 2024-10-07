@@ -87,6 +87,7 @@ public class PlatformSetup {
     private final DataSource dataSource;
 
     protected String dbVendor;
+    protected String bdmDbVendor;
 
     private Path initialConfigurationFolder;
     private Path currentConfigurationFolder;
@@ -97,12 +98,14 @@ public class PlatformSetup {
             PlatformSetup.class.getClassLoader());
 
     public PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService,
-            VersionService versionService, DataSource dataSource, @Value("${db.vendor}") String dbVendor) {
+            VersionService versionService, DataSource dataSource, @Value("${db.vendor}") String dbVendor,
+            @Value("${bdm.db.vendor}") String bdmDbVendor) {
         this.scriptExecutor = scriptExecutor;
         this.configurationService = configurationService;
         this.versionService = versionService;
         this.dataSource = dataSource;
         this.dbVendor = dbVendor;
+        this.bdmDbVendor = bdmDbVendor;
     }
 
     /**
@@ -347,6 +350,12 @@ public class PlatformSetup {
             dbVendor = getPropertyBonitaDbVendor();
         }
         checkSupportedVendor(dbVendor);
+
+        if (bdmDbVendor == null) {
+            bdmDbVendor = getPropertyBonitaBdmDbVendor();
+        }
+        checkSupportedVendor(bdmDbVendor);
+
         String setupFolderPath = System.getProperty(BONITA_SETUP_FOLDER);
         Path platformConfFolder;
         if (setupFolderPath != null) {
