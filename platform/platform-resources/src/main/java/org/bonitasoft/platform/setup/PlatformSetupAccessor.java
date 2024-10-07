@@ -55,7 +55,8 @@ public class PlatformSetupAccessor {
     private PlatformSetup initPlatformSetup() throws NamingException {
         final DataSource dataSource = lookupDataSource();
         String dbVendor = PlatformSetup.getPropertyBonitaDbVendor();
-        return createNewPlatformSetup(dataSource, dbVendor);
+        String bdmDbVendor = PlatformSetup.getPropertyBonitaBdmDbVendor();
+        return createNewPlatformSetup(dataSource, dbVendor, bdmDbVendor);
     }
 
     /**
@@ -63,9 +64,10 @@ public class PlatformSetupAccessor {
      *
      * @param dataSource the datasource to use to access the database
      * @param dbVendor the Database vendor (default H2) to point at
+     * @param bdmDbVendor the BDM Database vendor (default H2) to point at
      * @return a NEW instance of Platform Setup
      */
-    public PlatformSetup createNewPlatformSetup(DataSource dataSource, String dbVendor) {
+    public PlatformSetup createNewPlatformSetup(DataSource dataSource, String dbVendor, String bdmDbVendor) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
@@ -73,13 +75,14 @@ public class PlatformSetupAccessor {
         return createPlatformSetup(
                 createScriptExecutor(dataSource, dbVendor, versionService),
                 new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, dbVendor),
-                versionService, dataSource, dbVendor);
+                versionService, dataSource, dbVendor, bdmDbVendor);
     }
 
     protected PlatformSetup createPlatformSetup(ScriptExecutor scriptExecutor,
             ConfigurationService configurationService, VersionService versionService, DataSource dataSource,
-            String dbVendor) {
-        return new PlatformSetup(scriptExecutor, configurationService, versionService, dataSource, dbVendor);
+            String dbVendor, String bdmDbVendor) {
+        return new PlatformSetup(scriptExecutor, configurationService, versionService, dataSource, dbVendor,
+                bdmDbVendor);
     }
 
     protected ScriptExecutor createScriptExecutor(DataSource dataSource, String dbVendor,
