@@ -91,7 +91,7 @@ msgstr "Une application est un environnement adapté à un profil particulier, d
 msgid "An error has occurred. For more information, check the log file."
 msgstr "Une erreur s'est produite. Pour plus d'informations, consultez les logs."
 
-msgid "An error occured during categories update"
+msgid "An error occurred during categories update"
 msgstr "Une erreur s'est produite à la mise à jour des catégories"
 
 msgid "An error occurred when deploying the BDM. Consult the logs for more information."
