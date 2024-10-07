@@ -98,7 +98,7 @@ msgid "An error has occurred. For more information, check the log file."
 msgstr "Ha ocurrido un error. Para más información, compruebe el archivo de registro."
 
 msgid "An error occurred during categories update"
-msgstr "Se ha producido un error durante la actualización de categorías"
+msgstr "Se produjo un error durante la actualización de las categorías"
 
 msgid "An error occurred when deploying the BDM. Consult the logs for more information."
 msgstr "Se ha producido un error al desplegar el BDM. Para más información, consulte los registros."
