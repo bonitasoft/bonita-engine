@@ -22,6 +22,7 @@ import org.bonitasoft.engine.test.internal.EngineCommander;
 import org.bonitasoft.engine.test.internal.EngineStarter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -138,6 +139,7 @@ public class TestEngineImpl implements TestEngine {
      * Configuration class used to override bean definitions for test purposes.
      */
     @Configuration
+    @Profile("!update-tool") // to allow to remove this default bypass in Update Tool tests (and so test it in the real condition)
     static class TestConfiguration {
 
         @Bean
