@@ -19,6 +19,8 @@ import static java.util.Collections.emptyList;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,11 +45,16 @@ public class JDTCompiler {
     private static final String PARAMETERS_NAME_ARG = "-parameters";
 
     public static File lookupJarContaining(Class<?> clazz) {
-        var jarFile = new File(clazz.getProtectionDomain().getCodeSource().getLocation().getPath());
-        if (!jarFile.exists()) {
-            throw new IllegalArgumentException("Cannot find jar file for class " + clazz.getName());
+        try {
+            File jarFile = Path.of(clazz.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
+            if (!jarFile.exists()) {
+                throw new IllegalArgumentException("Cannot find jar file for class " + clazz.getName() +". Resolved jar file: " + jarFile.getAbsolutePath() +" does not exist.");
+            }
+            return jarFile;
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Cannot find jar file for class " + clazz.getName(), e);
         }
-        return jarFile;
+
     }
 
     public static File lookupJarContaining(String className) throws ClassNotFoundException {
