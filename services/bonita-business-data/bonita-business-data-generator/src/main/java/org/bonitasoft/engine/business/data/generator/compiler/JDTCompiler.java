@@ -48,7 +48,8 @@ public class JDTCompiler {
         try {
             File jarFile = Path.of(clazz.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
             if (!jarFile.exists()) {
-                throw new IllegalArgumentException("Cannot find jar file for class " + clazz.getName() +". Resolved jar file: " + jarFile.getAbsolutePath() +" does not exist.");
+                throw new IllegalArgumentException("Cannot find jar file for class " + clazz.getName()
+                        + ". Resolved jar file: " + jarFile.getAbsolutePath() + " does not exist.");
             }
             return jarFile;
         } catch (URISyntaxException e) {
