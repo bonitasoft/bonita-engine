@@ -27,15 +27,7 @@ class TestsPlugin implements Plugin<Project> {
             }
             integrationTest.configure { systemProperty("bonita.version", project.version) }
 
-            if (tests.slowTestsSuite) {
-                TaskProvider<Test> slowTest = project.tasks.register("slowTest", Test)
-                slowTest.configure { include(tests.slowTestsSuite) }
-                JVMModifier.setTestJVM(project, slowTest)
-                JVMModifier.setJvmArgs(project, slowTest)
-                slowTest.configure { systemProperty("bonita.version", project.version) }
-            }
-
-            TaskProvider<Test> testTask = project.tasks.named("test")
+            TaskProvider<Test> testTask = project.tasks.named("test", Test)
             if (testTask) {
                 JVMModifier.setTestJVM(project, testTask)
                 JVMModifier.setJvmArgs(project, testTask)

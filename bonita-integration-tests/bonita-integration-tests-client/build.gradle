@@ -50,8 +50,4 @@ httpTests {
     integrationTestsSuite = "**/*IT.class"
 }
 
-tests {
-    slowTestsSuite = "**/*IT.class"
-}
-
 databaseIntegrationTest { include "**/*IT.class" }
