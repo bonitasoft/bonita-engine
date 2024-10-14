@@ -18,7 +18,7 @@ msgstr ""
 "X-Crowdin-File-ID: 60581\n"
 
 msgid "%attribute% file format is not allowed. Only %file_formats% files are allowed."
-msgstr "le format de fichier %attribute%  n'est pas autorisé. Utiliser les fichiers de format %file_formats%."
+msgstr "Le format de fichier %attribute%  n'est pas autorisé. Utiliser les fichiers de format %file_formats%."
 
 msgid "%attribute% file format not allowed or not starting with correct servlet path"
 msgstr "Le format de fichier %attribute% n'est pas autorisé ou ne commence pas par un chemin de servlet correct"
