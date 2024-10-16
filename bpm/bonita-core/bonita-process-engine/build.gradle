@@ -75,13 +75,13 @@ dependencies {
     testImplementation libs.junit5params
     testAnnotationProcessor libs.lombok
 
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"      // works with Junit4
-    testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"    // works with Junit5
+    testImplementation libs.assertj
+    testImplementation libs.mockitoJunitJupiter
+    testImplementation libs.systemRules      // works with Junit4
+    testImplementation libs.systemLambda    // works with Junit5
     testImplementation libs.springTest
     compileOnly project(':bpm:bonita-common')
     testImplementation testFixtures(project(':bpm:bonita-common'))
-    testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    testImplementation libs.awaitility
     testRuntimeOnly libs.logback
 }

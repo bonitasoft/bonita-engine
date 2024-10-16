@@ -32,13 +32,13 @@ dependencies {
 
     runtimeOnly libs.logback
 
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.systemRules
     testImplementation(libs.springBootStarterTest) {
         exclude(module: 'json-path')
     }
-    testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    testImplementation libs.xmlunit
     testImplementation project(':platform:platform-setup-test')
 
     inDistrib project(path: ':platform:platform-resources', configuration: 'distributionZip')

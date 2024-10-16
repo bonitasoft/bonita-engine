@@ -14,10 +14,10 @@ dependencies {
     implementation libs.jakartaServletApi
     implementation libs.junit4
     implementation libs.springTest
-    testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.restlet.jse:org.restlet:${Deps.restletVersion}"
+    testImplementation libs.hamcrest
+    testImplementation libs.mockitoCore
+    testImplementation libs.assertj
+    testImplementation libs.restlet
 }
 
 java {

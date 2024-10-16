@@ -4,5 +4,5 @@ dependencies {
     api project(':bpm:bonita-core:bonita-process-engine')
     api project(':services:bonita-command')
     api project(':bpm:bonita-core:bonita-process-definition')
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.mockitoCore
 }

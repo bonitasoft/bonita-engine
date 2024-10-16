@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    api "org.assertj:assertj-core:${Deps.assertjVersion}"
-    api "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api libs.assertj
+    api libs.mockitoCore
     api project(':bonita-integration-tests:bonita-integration-tests-client')
     api project(':bpm:bonita-server')
     testRuntimeOnly libs.logback

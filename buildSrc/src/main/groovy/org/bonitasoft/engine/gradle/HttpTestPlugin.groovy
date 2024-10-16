@@ -2,6 +2,7 @@ package org.bonitasoft.engine.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 
@@ -36,8 +37,9 @@ class HttpTestPlugin implements Plugin<Project> {
                 httpTestConfig
             }
             project.dependencies {
-                httpTestConfig "org.eclipse.jetty:jetty-server:${Deps.jettyVersion}"
-                httpTestConfig "org.eclipse.jetty:jetty-servlet:${Deps.jettyVersion}"
+                def versionCatalog = project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
+                httpTestConfig(versionCatalog.findLibrary("jettyServer").get())
+                httpTestConfig(versionCatalog.findLibrary("jettyServlet").get())
             }
             httpIntegrationTests.configure { classpath += project.configurations.httpTestConfig }
 

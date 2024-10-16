@@ -1,8 +1,8 @@
 dependencies {
     api project(':bpm:bonita-common')
     api project(':bpm:bonita-core:bonita-home-server')
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.mockitoCore
+    testImplementation libs.systemRules
     testRuntimeOnly libs.logback
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation libs.assertj
 }

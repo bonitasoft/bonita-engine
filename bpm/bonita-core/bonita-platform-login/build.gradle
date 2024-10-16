@@ -4,5 +4,5 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-platform-session')
     api project(':services:bonita-platform-authentication')
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.mockitoCore
 }

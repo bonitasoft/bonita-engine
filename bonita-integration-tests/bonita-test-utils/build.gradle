@@ -3,8 +3,8 @@ dependencies {
     api project(':bpm:bonita-common')
     api project(':bonita-test-api')
     api libs.commonsIO
-    api "xmlunit:xmlunit:${Deps.xmlunitVersion}"
-    api "org.assertj:assertj-core:${Deps.assertjVersion}"
+    api libs.xmlunit
+    api libs.assertj
 
     implementation project(':bpm:bonita-core:bonita-process-engine')
     implementation libs.junit4

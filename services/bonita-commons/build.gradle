@@ -12,11 +12,11 @@ dependencies {
     api libs.springContext
     api libs.springBootAutoconfigure
     api libs.slf4jApi
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.mockitoJunitJupiter
+    testImplementation libs.systemRules
+    testImplementation libs.systemLambda
     testImplementation libs.logback
 
     annotationProcessor libs.lombok

@@ -19,7 +19,7 @@ dependencies {
     annotationProcessor(libs.springBootConfigurationProcessor)
 
     testImplementation(libs.springBootTest)
-    testImplementation("org.assertj:assertj-core:${Deps.assertjVersion}")
+    testImplementation(libs.assertj)
 }
 
 tasks.register("sourcesJar", Jar) {

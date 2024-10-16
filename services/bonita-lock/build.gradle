@@ -3,6 +3,6 @@
 dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-session')
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation libs.assertj
     testImplementation libs.logback
 }

@@ -5,9 +5,9 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation libs.mockitoCore
+    testImplementation libs.assertj
     testImplementation libs.narayanaJta
-    testImplementation "org.jboss.logging:jboss-logging:${Deps.jbossLoggingVersion}"
+    testImplementation libs.jbossLogging
     testRuntimeOnly libs.logback
 }

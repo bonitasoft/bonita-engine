@@ -13,8 +13,8 @@ dependencies {
         exclude(module: "HikariCP-java7") // Same reason
     }
     api libs.micrometerCore
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
     testImplementation libs.logback
 
     annotationProcessor libs.lombok

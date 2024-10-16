@@ -20,8 +20,8 @@ dependencies {
     api libs.springBootAutoconfigure
     implementation "com.fasterxml.jackson.core:jackson-databind"
 
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
     testImplementation libs.logback
 }
 

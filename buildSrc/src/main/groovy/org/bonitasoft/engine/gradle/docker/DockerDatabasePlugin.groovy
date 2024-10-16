@@ -29,8 +29,8 @@ class DockerDatabasePlugin implements Plugin<Project> {
     def driversConfiguration(project) {
         project.dependencies {
             // the following jdbc drivers are available for integration tests
-            drivers(project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
-                    .findLibrary("postgresql").get())
+            def versionCatalog = project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
+            drivers(versionCatalog.findLibrary("postgresql").get())
         }
     }
 
