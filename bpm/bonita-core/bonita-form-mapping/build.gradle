@@ -10,8 +10,8 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-events')
     api libs.hibernateCore
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

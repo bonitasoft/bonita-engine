@@ -22,16 +22,16 @@ dependencies {
     annotationProcessor libs.lombok
 
     testImplementation project(':bpm:bonita-sap-jco-connector-api')
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
     testImplementation libs.logback
-    testImplementation 'org.jmockit:jmockit:1.44'
-    testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    testImplementation libs.jmockit
+    testImplementation libs.jsonUnitFluent
 
     testFixturesApi("org.bonitasoft.engine:bonita-business-object-model") {
         artifact { classifier = 'tests' }
     }
-    testFixturesImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testFixturesImplementation libs.assertj
 }
 
 tasks.register("testsJar", Jar) {

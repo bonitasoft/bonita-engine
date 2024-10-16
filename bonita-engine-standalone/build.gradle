@@ -21,8 +21,8 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.systemRules
 
     // These 3 drivers are used for some specific tests:
     testImplementation(libs.postgresql)

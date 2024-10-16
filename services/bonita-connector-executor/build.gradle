@@ -7,9 +7,9 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-time-tracker')
     api project(':services:bonita-session')
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.systemRules
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 }

@@ -8,10 +8,10 @@ dependencies {
     api libs.commonsFileUpload
     api libs.commonsIO
     testImplementation libs.springTest
-    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.mockitoJunitJupiter
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.systemRules
     testRuntimeOnly libs.springWebMvc
     compileOnly libs.jakartaServletApi
     testImplementation libs.jakartaServletApi

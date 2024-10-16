@@ -8,8 +8,8 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-events')
     api libs.jakartaActivation
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation libs.mockitoCore
+    testImplementation libs.assertj
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

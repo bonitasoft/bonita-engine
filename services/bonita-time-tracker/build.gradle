@@ -3,8 +3,8 @@
 dependencies {
     api project(':services:bonita-commons')
     api libs.commonsCollections
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation libs.mockitoCore
+    testImplementation libs.assertj
     testImplementation libs.logback
 }
 

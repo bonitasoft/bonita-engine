@@ -11,6 +11,6 @@ dependencies {
     api project(':bpm:bonita-core:bonita-process-instance')
     api project(':bpm:bonita-core:bonita-home-server')
     api project(':services:bonita-commons')
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
 }

@@ -12,10 +12,10 @@ dependencies {
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
     api(libs.javaxAnnotations)
 
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation libs.mockitoCore
+    testImplementation libs.assertj
     testImplementation libs.logback
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.systemRules
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

@@ -6,8 +6,8 @@ dependencies {
     api project(':services:bonita-builder')
     api project(':services:bonita-events')
     api project(':services:bonita-persistence')
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
     testImplementation libs.logback
 
     annotationProcessor libs.lombok

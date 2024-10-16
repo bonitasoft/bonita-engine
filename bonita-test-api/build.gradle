@@ -7,16 +7,16 @@ dependencies {
     implementation libs.springTest
 
     // for http tests:
-    compileOnly("org.eclipse.jetty:jetty-server:${Deps.jettyVersion}")
-    compileOnly("org.eclipse.jetty:jetty-servlet:${Deps.jettyVersion}")
+    compileOnly(libs.jettyServer)
+    compileOnly(libs.jettyServlet)
     compileOnly(project(':bpm:bonita-api:bonita-server-api-http'))
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
     testImplementation project(':bpm:bonita-server')
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation libs.mockitoCore
+    testImplementation libs.assertj
 }
 
 publishing {

@@ -4,6 +4,6 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-transaction')
     api project(':services:bonita-persistence')
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.mockitoCore
     testImplementation libs.logback
 }

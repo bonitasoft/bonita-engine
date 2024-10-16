@@ -16,20 +16,20 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.jsonUnitFluent
+    testImplementation libs.mockitoCore
     testImplementation libs.logback
     testImplementation libs.narayanaJta
     testImplementation libs.springTest
     testImplementation libs.springJdbc
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testRuntimeOnly libs.tomcatDbcp
-    testRuntimeOnly(libs.h2)
+    testRuntimeOnly libs.h2
 
     // Property Based Test framework:
-    testImplementation("com.pholser:junit-quickcheck-core:${Deps.junitQuickCheck}")
-    testImplementation("com.pholser:junit-quickcheck-generators:${Deps.junitQuickCheck}")
+    testImplementation(libs.quickcheckCore)
+    testImplementation(libs.quickcheckGenerators)
 }
 
 databaseIntegrationTest { includes '**/*Test.class' }

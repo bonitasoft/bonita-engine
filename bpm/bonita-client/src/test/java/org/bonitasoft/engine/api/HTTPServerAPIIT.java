@@ -18,7 +18,11 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +35,7 @@ import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.junit.AfterClass;
@@ -86,7 +91,6 @@ public class HTTPServerAPIIT {
         security.setConstraintMappings(Collections.singletonList(mapping));
         security.setAuthenticator(new BasicAuthenticator());
         security.setLoginService(loginService);
-        security.setStrict(false);
 
         // Simulate Bonita engine part
         BonitaHandler bonitaHandler = new BonitaHandler();
@@ -96,7 +100,7 @@ public class HTTPServerAPIIT {
         server.start();
 
         // retrieve port
-        int actualPort = server.getConnectors()[0].getLocalPort();
+        int actualPort = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
         baseResourceUrl = "http://localhost:" + actualPort;
     }
 

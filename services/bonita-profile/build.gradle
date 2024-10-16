@@ -8,7 +8,7 @@ dependencies {
     api project(':services:bonita-events')
     api project(':services:bonita-builder')
     api project(':services:bonita-identity')
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.mockitoCore
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

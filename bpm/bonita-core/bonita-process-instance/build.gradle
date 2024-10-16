@@ -23,9 +23,9 @@ dependencies {
     api project(':bpm:bonita-core:bonita-contract-data')
     api 'org.bonitasoft.engine:bonita-connector-model'
 
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.systemRules
 
     testRuntimeOnly libs.logback
 
