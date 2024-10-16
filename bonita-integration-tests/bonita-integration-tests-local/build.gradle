@@ -3,21 +3,21 @@ plugins {
     id("bonita-tests")
 }
 dependencies {
-    api "junit:junit:${Deps.junit4Version}"
-    api "org.assertj:assertj-core:${Deps.assertjVersion}"
-    api "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api libs.junit4
+    api libs.assertj
+    api libs.mockitoCore
     api project(':bonita-integration-tests:bonita-integration-tests-client')
     implementation(project(":bpm:bonita-core:bonita-process-engine"))
     api project(':bpm:bonita-server')
     api libs.commonsIO
-    runtimeOnly "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
-    runtimeOnly "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
-    runtimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    runtimeOnly libs.mysql
+    runtimeOnly libs.msSqlServer
+    runtimeOnly libs.postgresql
+    testRuntimeOnly libs.logback
     testAnnotationProcessor libs.lombok
     testImplementation libs.lombok
-    testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
-    testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"
+    testImplementation libs.awaitility
+    testImplementation libs.systemLambda
 }
 
 tasks.register("testsJar", Jar) {

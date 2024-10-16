@@ -3,10 +3,10 @@
 dependencies {
     api project(':services:bonita-commons')
     api libs.commonsCollections
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.junit4
+    testImplementation libs.mockitoCore
+    testImplementation libs.assertj
+    testImplementation libs.logback
 }
 
 description = 'Bonita Time Tracker'

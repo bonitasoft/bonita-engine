@@ -12,7 +12,7 @@ dependencies {
     implementation(project(':platform:platform-resources'))
 
     implementation libs.springContext
-    implementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+    implementation libs.narayanaJta
     implementation libs.tomcatDbcp
     implementation libs.slf4jApi
     runtimeOnly libs.h2
@@ -21,11 +21,11 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testImplementation "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    testImplementation "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.junit4
+    testImplementation libs.systemRules
+    testImplementation libs.postgresql
+    testImplementation libs.mysql
     testImplementation libs.h2
 
 }

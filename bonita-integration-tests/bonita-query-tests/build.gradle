@@ -1,16 +1,15 @@
 
 
 dependencies {
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation libs.junit4
+    testImplementation libs.assertj
     testImplementation libs.h2
     testImplementation libs.springBeans
     testImplementation libs.springTx
     testImplementation libs.springTest
     testImplementation libs.springJdbc
-    testImplementation "org.springframework:spring-orm:4.3.16.RELEASE"
-    testImplementation "jakarta.inject:jakarta.inject-api:1.0.5"
+    testImplementation libs.springOrm
+    testImplementation libs.jakartaInjectApi
     testImplementation project(":bpm:bonita-server")
     testImplementation project(":bpm:bonita-common")
-
 }

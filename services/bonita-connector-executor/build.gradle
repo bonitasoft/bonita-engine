@@ -3,14 +3,14 @@ plugins {
 }
 
 dependencies {
-    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    runtimeOnly libs.logback
     api project(':services:bonita-commons')
     api project(':services:bonita-time-tracker')
     api project(':services:bonita-session')
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.junit4
+    testImplementation libs.systemRules
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 }

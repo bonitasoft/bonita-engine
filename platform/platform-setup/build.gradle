@@ -12,7 +12,7 @@ configurations {
 }
 
 dependencies {
-    api "org.apache.commons:commons-text:1.10.0"
+    api libs.commonsText
     api libs.slf4jApi
     api(libs.springBootStarter) {
         exclude(module: 'jul-to-slf4j')
@@ -21,13 +21,13 @@ dependencies {
     }
     api libs.snakeyaml
     api libs.springBootStarterJdbc
-    api "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    api ("com.mysql:mysql-connector-j:${Deps.mysqlVersion}") {
+    api libs.postgresql
+    api(libs.mysql) {
         exclude(module: 'protobuf-java')
     }
-    api "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+    api libs.msSqlServer
     api libs.h2
-    api("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
+    api(libs.oracle) {
         exclude(module: "ons")
         exclude(module: "oraclepki")
         exclude(module: "osdt_cert")
@@ -39,15 +39,15 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
     api(project(":platform:platform-resources"))
-    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    runtimeOnly libs.logback
+    testImplementation libs.junit4
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.systemRules
     testImplementation(libs.springBootStarterTest) {
         exclude(module: 'json-path')
     }
-    testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    testImplementation libs.xmlunit
     testImplementation project(':platform:platform-setup-test')
 
     inDistrib project(path: ':platform:platform-resources', configuration: 'distributionZip')

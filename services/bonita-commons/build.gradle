@@ -8,21 +8,20 @@ dependencies {
     api libs.jakartaActivation
     api libs.commonsLang
     api(libs.xstream)
-    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    api libs.micrometerCore
     api libs.springContext
     api libs.springBootAutoconfigure
     api libs.slf4jApi
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: Deps.junit5Version
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: Deps.junit5Version
-    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: Deps.junit5Version
+    testImplementation libs.junit4
+    testImplementation libs.junit5api
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.mockitoJunitJupiter
+    testImplementation libs.systemRules
+    testImplementation libs.systemLambda
+    testImplementation libs.logback
+    testRuntimeOnly libs.junitJupiterEngine
+    testRuntimeOnly libs.junitVintageEngine
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

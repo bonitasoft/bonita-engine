@@ -16,10 +16,10 @@ dependencies {
     api libs.slf4jApi
     api libs.commonsIO
 
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.junit4
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.logback
 }
 
 

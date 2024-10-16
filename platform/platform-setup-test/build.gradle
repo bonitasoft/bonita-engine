@@ -2,7 +2,7 @@
 
 dependencies {
     api libs.commonsLang
-    api "org.apache.commons:commons-exec:${Deps.commonsExecVersion}"
+    api libs.commonsExec
 }
 
 group = 'org.bonitasoft.platform'

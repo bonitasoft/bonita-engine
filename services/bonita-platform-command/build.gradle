@@ -4,9 +4,9 @@ dependencies {
     api project(':services:bonita-log')
     api project(':services:bonita-commons')
     api project(':services:bonita-persistence')
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.junit4
+    testImplementation libs.mockitoCore
+    testImplementation libs.logback
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

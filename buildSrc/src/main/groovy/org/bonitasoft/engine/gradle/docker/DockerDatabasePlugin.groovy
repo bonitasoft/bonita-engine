@@ -2,6 +2,8 @@ package org.bonitasoft.engine.gradle.docker
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
+
 /**
  * @author Emmanuel Duchastenier
  */
@@ -12,9 +14,7 @@ class DockerDatabasePlugin implements Plugin<Project> {
         project.configurations {
             drivers
         }
-
-        defineJdbcDriversConfiguration(project)
-
+        driversConfiguration(project)
         def databaseIntegrationTest = project.extensions.create("databaseIntegrationTest", DatabasePluginExtension)
 
         DockerDatabaseContainerTasksCreator.createTasks(project, databaseIntegrationTest)
@@ -26,13 +26,14 @@ class DockerDatabasePlugin implements Plugin<Project> {
         }
     }
 
-    def defineJdbcDriversConfiguration(Project project) {
+    def driversConfiguration(project) {
         project.dependencies {
             // the following jdbc drivers are available for integration tests
-            drivers JdbcDriverDependencies.mysql
-            drivers JdbcDriverDependencies.oracle
-            drivers JdbcDriverDependencies.postgres
-            drivers JdbcDriverDependencies.sqlserver
+            def versionCatalog = project.extensions.getByType(VersionCatalogsExtension.class).named("libs")
+            drivers(versionCatalog.findLibrary("mysql").get())
+            drivers(versionCatalog.findLibrary("oracle").get())
+            drivers(versionCatalog.findLibrary("postgresql").get())
+            drivers(versionCatalog.findLibrary("msSqlServer").get())
         }
     }
 }

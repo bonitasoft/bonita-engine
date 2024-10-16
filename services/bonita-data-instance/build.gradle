@@ -9,11 +9,11 @@ dependencies {
     api project(':services:bonita-events')
     api project(':services:bonita-log')
     api project(':services:bonita-archive')
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation libs.junit4
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.logback
+    testImplementation libs.systemRules
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

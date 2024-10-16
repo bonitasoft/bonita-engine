@@ -7,8 +7,8 @@ dependencies {
     api project(':services:bonita-events')
     api project(':services:bonita-log')
     api project(':services:bonita-persistence')
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation libs.junit4
+    testImplementation libs.mockitoCore
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok

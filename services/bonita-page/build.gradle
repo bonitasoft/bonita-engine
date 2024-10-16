@@ -7,10 +7,10 @@ dependencies {
     api project(':services:bonita-authorization')
     api project(':bpm:bonita-common')
 
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation libs.assertj
+    testImplementation libs.mockitoCore
+    testImplementation libs.junit4
+    testImplementation libs.logback
     testImplementation testFixtures(project(':bpm:bonita-common'))
 
     annotationProcessor libs.lombok

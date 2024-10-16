@@ -14,16 +14,16 @@ dependencies {
     api project(':services:bonita-commons')
     api project(':services:bonita-lock')
     api libs.slf4jApi
-    implementation("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    implementation(libs.javaxAnnotations)
+    testImplementation libs.junit4
+    testImplementation libs.mockitoCore
+    testImplementation libs.assertj
     compileOnly libs.jakartaTransactionApi
 
     annotationProcessor libs.lombok
     compileOnly libs.lombok
-    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testRuntimeOnly libs.logback
+    testImplementation libs.systemRules
     testAnnotationProcessor libs.lombok
     testImplementation libs.lombok
 }
