@@ -18,8 +18,6 @@ import static org.bonitasoft.engine.commons.Pair.pair;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
@@ -36,6 +34,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -46,9 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ArchiveFlowNodeInstanceTest {
 
-    @Inject
+    @Autowired
     private FlowNodeInstanceRepository repository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test

@@ -19,12 +19,11 @@ import static org.bonitasoft.engine.commons.Pair.pair;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.ContractDataRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -38,9 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ContractDataTest {
 
-    @Inject
+    @Autowired
     private ContractDataRepository repository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test

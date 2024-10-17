@@ -20,11 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.test.persistence.repository.PageRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PageQueriesTest {
 
-    @Inject
+    @Autowired
     private PageRepository repository;
 
     @Test

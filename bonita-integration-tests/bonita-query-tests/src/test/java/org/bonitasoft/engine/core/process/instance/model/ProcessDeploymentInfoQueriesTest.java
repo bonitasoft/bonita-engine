@@ -26,8 +26,6 @@ import static org.bonitasoft.engine.test.persistence.builder.UserTaskInstanceBui
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
@@ -38,6 +36,7 @@ import org.bonitasoft.engine.test.persistence.repository.ProcessDeploymentInfoRe
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -80,9 +79,9 @@ public class ProcessDeploymentInfoQueriesTest {
 
     private static final long ROOT_PROCESS_INSTANCE_ID_NOT_SUPERVISED = 1269L;
 
-    @Inject
+    @Autowired
     private ProcessDeploymentInfoRepository repository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Before

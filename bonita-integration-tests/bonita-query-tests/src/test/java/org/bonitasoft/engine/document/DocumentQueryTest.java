@@ -15,8 +15,6 @@ package org.bonitasoft.engine.document;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
@@ -25,6 +23,7 @@ import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.test.persistence.repository.DocumentRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +35,7 @@ public class DocumentQueryTest {
 
     private static final long PROCESS_INSTANCE_ID = 6666666666666666L;
 
-    @Inject
+    @Autowired
     private DocumentRepository repository;
 
     @Test

@@ -28,8 +28,6 @@ import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuild
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
@@ -43,6 +41,7 @@ import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.test.persistence.repository.ApplicationRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ApplicationQueriesTest {
 
-    @Inject
+    @Autowired
     private ApplicationRepository repository;
 
     @Test
