@@ -22,8 +22,6 @@ import static org.bonitasoft.engine.test.persistence.builder.JobLogBuilder.aJobL
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
@@ -34,6 +32,7 @@ import org.bonitasoft.engine.test.persistence.repository.JobRepository;
 import org.hibernate.internal.util.SerializationHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -44,9 +43,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SchedulerQueryTest {
 
-    @Inject
+    @Autowired
     private JobRepository jobRepository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test

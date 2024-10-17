@@ -18,8 +18,6 @@ import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.*;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -27,6 +25,7 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.test.persistence.repository.SupervisorRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +47,7 @@ public class SupervisorQueriesTest {
 
     private static final long roleId = 6;
 
-    @Inject
+    @Autowired
     private SupervisorRepository repository;
 
     @Test

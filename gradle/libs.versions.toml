@@ -256,7 +256,6 @@ jettySecurity = { group = "org.eclipse.jetty", name = "jetty-security", version.
 jbossLogging = { group = "org.jboss.logging", name = "jboss-logging", version.ref = "jbossLoggingVersion" }
 commonsExec = { group = "org.apache.commons", name = "commons-exec", version.ref = "commonsExecVersion" }
 jmockit = { group = "org.jmockit", name = "jmockit", version.ref = "jmockitVersion" }
-jakartaInjectApi = { group = "jakarta.inject", name = "jakarta.inject-api", version = "1.0.5" }
 mockServerJunit = { group = "org.mock-server", name = "mockserver-junit-rule-no-dependencies", version.ref = "mockServerJunitVersion" }
 
 

@@ -20,8 +20,6 @@ import static org.bonitasoft.engine.commons.Pair.pair;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.core.process.comment.model.SHumanComment;
 import org.bonitasoft.engine.core.process.comment.model.SSystemComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
@@ -29,6 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.CommentRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -46,9 +45,9 @@ public class CommentsTest {
     private static final long JOHN_ID = 784L;
     private static final long PROCESS1_ID = 123L;
     private static final long PROCESS2_ID = 124L;
-    @Inject
+    @Autowired
     private CommentRepository repository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     //Those tests currently verify that the queries returning UserMemberships correctly retrieve the groupParentPath when building the Usermembership objects

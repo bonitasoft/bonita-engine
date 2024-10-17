@@ -20,8 +20,6 @@ import static org.bonitasoft.engine.test.persistence.builder.ConnectorInstanceBu
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.assertj.core.api.Condition;
 import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
@@ -30,6 +28,7 @@ import org.bonitasoft.engine.test.persistence.repository.ConnectorInstanceReposi
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -43,10 +42,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ConnectorInstanceQueriesTest {
 
-    @Inject
+    @Autowired
     private ConnectorInstanceRepository repository;
 
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private SAbstractConnectorInstance expectedConnector1;

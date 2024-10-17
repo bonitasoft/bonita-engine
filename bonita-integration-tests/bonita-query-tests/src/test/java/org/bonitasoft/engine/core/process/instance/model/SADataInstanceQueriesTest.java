@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.data.instance.model.SBlobDataInstance;
 import org.bonitasoft.engine.data.instance.model.SBooleanDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -50,6 +48,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.SADataInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -61,9 +60,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class SADataInstanceQueriesTest {
 
     private static final long CONTAINER_ID = 12345L;
-    @Inject
+    @Autowired
     private SADataInstanceRepository repository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private void addSADataInstance(final int id, final String name, final int containerId, final String value,

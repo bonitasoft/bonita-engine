@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance;
@@ -34,6 +32,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -47,10 +46,10 @@ public class ArchiveProcessInstanceQueriesTest {
     private static final long PROCESS_INSTANCE_ID = 43578923425L;
     private static final long FLOW_NODE_INSTANCE_ID = 342678L;
 
-    @Inject
+    @Autowired
     private ProcessInstanceRepository repository;
 
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test

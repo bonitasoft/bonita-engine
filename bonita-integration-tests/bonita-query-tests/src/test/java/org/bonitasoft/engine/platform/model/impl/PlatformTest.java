@@ -18,13 +18,12 @@ import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.test.persistence.repository.PlatformRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -35,9 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PlatformTest {
 
-    @Inject
+    @Autowired
     private PlatformRepository repository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test
