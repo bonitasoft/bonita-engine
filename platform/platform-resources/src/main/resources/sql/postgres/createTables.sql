@@ -453,8 +453,8 @@ CREATE TABLE ref_biz_data_inst (
   	data_classname VARCHAR(255) NOT NULL
 );
 
-CREATE INDEX idx_biz_data_inst1 ON ref_biz_data_inst (tenantid, proc_inst_id);
-CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (tenantid, fn_inst_id);
+CREATE INDEX idx_biz_data_inst1 ON ref_biz_data_inst (proc_inst_id);
+CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (fn_inst_id);
 CREATE INDEX idx_biz_data_inst3 ON ref_biz_data_inst (proc_inst_id);
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (tenantid, id);
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE;
@@ -600,8 +600,8 @@ CREATE TABLE arch_data_instance (
 	PRIMARY KEY (tenantid, id)
 );
 
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId);
-CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId);
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (containerId, containerType, archiveDate, name, sourceObjectId);
+CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id);
 
 CREATE TABLE data_instance (
     tenantId INT8 NOT NULL,
@@ -625,7 +625,7 @@ CREATE TABLE data_instance (
 	discriminant VARCHAR(50) NOT NULL,
 	PRIMARY KEY (tenantid, id)
 );
-CREATE INDEX idx_datai_container ON data_instance (tenantId, containerId, containerType, name);
+CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, name);
 
 CREATE TABLE dependency (
   tenantid INT8 NOT NULL,
