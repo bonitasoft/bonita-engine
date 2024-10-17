@@ -19,11 +19,11 @@ import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.container.extras.DockerWaitHealthyContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
+import org.bonitasoft.engine.gradle.JVMModifier
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.testing.Test
-
 /**
  * Gradle plugin to start docker database containers and perform tests against them
  */
@@ -190,6 +190,8 @@ class DockerDatabaseContainerTasksCreator {
                 from databaseTestTask.get().reports.html.outputLocation.get().getAsFile()
             }
             project.afterEvaluate {
+                JVMModifier.setTestJVM(project, databaseTestTask)
+                JVMModifier.setJvmArgs(project, databaseTestTask)
                 databaseTestTask.configure {
                     if (extension.includes) {
                         include(extension.includes)
