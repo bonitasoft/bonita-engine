@@ -21,8 +21,6 @@ import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuild
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -30,6 +28,7 @@ import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserMembershipTest {
 
-    @Inject
+    @Autowired
     private UserMembershipRepository repository;
 
     //Those tests currently verify that the queries returning UserMemberships correctly retrieve the groupParentPath when building the Usermembership objects

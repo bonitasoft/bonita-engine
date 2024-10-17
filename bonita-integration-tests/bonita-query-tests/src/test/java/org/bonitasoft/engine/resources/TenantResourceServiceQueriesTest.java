@@ -19,11 +19,10 @@ import static org.bonitasoft.engine.test.persistence.builder.TenantResourceBuild
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.test.persistence.repository.TenantResourceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -34,10 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TenantResourceServiceQueriesTest {
 
-    @Inject
+    @Autowired
     private TenantResourceRepository repository;
 
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test

@@ -34,8 +34,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
@@ -53,6 +51,7 @@ import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceReposit
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -81,10 +80,10 @@ public class FlowNodeInstanceTest {
 
     private static final long NORMAL_HUMAN_INSTANCE_ID = 743L;
 
-    @Inject
+    @Autowired
     private FlowNodeInstanceRepository repository;
 
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Before

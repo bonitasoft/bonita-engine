@@ -16,11 +16,10 @@ package org.bonitasoft.engine.core.process.instance.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.test.persistence.builder.RoleBuilder.aRole;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.test.persistence.repository.RoleRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RoleTest {
 
-    @Inject
+    @Autowired
     private RoleRepository repository;
 
     @Test

@@ -19,11 +19,10 @@ import static org.bonitasoft.engine.test.persistence.builder.BARResourceBuilder.
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.test.persistence.repository.ProcessResourceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProcessResourceServiceQueriesTest {
 
-    @Inject
+    @Autowired
     private ProcessResourceRepository repository;
 
     @Test

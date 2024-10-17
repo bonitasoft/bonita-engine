@@ -19,12 +19,11 @@ import static org.assertj.core.data.MapEntry.entry;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.TestRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -35,9 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class QueriableLogTest {
 
-    @Inject
+    @Autowired
     TestRepository testRepository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test

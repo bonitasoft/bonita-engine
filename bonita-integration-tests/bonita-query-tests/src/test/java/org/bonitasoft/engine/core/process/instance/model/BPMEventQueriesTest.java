@@ -22,13 +22,12 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.test.persistence.repository.BPMEventRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -43,10 +42,10 @@ public class BPMEventQueriesTest {
 
     private static final int MORE_THAN_DEFAULT_PAGE_SIZE = 42;
 
-    @Inject
+    @Autowired
     private BPMEventRepository bPMEventRepository;
 
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test

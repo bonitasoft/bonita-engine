@@ -23,8 +23,6 @@ import static org.junit.Assert.fail;
 import java.util.Map;
 import java.util.Random;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
@@ -36,6 +34,7 @@ import org.bonitasoft.engine.test.persistence.repository.DependencyRepository;
 import org.bonitasoft.engine.test.persistence.repository.PlatformRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -49,11 +48,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DependencyServiceQueriesTest {
 
-    @Inject
+    @Autowired
     private DependencyRepository repository;
-    @Inject
+    @Autowired
     private PlatformRepository platformRepository;
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private static String getSaltString() {

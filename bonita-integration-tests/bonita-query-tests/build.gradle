@@ -10,7 +10,6 @@ dependencies {
     testImplementation libs.springTest
     testImplementation libs.springJdbc
     testImplementation libs.springOrm
-    testImplementation libs.jakartaInjectApi
     testImplementation project(":bpm:bonita-server")
     testImplementation project(":bpm:bonita-common")
 

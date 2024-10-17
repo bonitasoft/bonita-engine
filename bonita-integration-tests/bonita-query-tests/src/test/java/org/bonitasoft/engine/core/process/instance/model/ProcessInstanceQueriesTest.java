@@ -35,8 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -50,6 +48,7 @@ import org.bonitasoft.engine.test.persistence.jdbc.JdbcRowMapper;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -67,10 +66,10 @@ public class ProcessInstanceQueriesTest {
     private static final long PROCESS_INSTANCE_ID = 43578923425L;
     private static final long FLOW_NODE_INSTANCE_ID = 342678L;
 
-    @Inject
+    @Autowired
     private ProcessInstanceRepository repository;
 
-    @Inject
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test
