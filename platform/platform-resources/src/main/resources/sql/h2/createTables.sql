@@ -296,7 +296,6 @@ CREATE TABLE process_instance (
 CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (processdefinitionid, stateid);
 
 CREATE TABLE flownode_instance (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   flownodeDefinitionId BIGINT NOT NULL,
   kind VARCHAR(25) NOT NULL,
@@ -344,7 +343,7 @@ CREATE TABLE flownode_instance (
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
   tokenCount INT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (id)
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
@@ -456,7 +455,7 @@ CREATE INDEX idx_biz_data_inst3 ON ref_biz_data_inst (proc_inst_id);
 
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (tenantid, id);
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE;
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (fn_inst_id) REFERENCES flownode_instance(id) ON DELETE CASCADE;
 
 CREATE TABLE multi_biz_data (
 	tenantid BIGINT NOT NULL,
