@@ -822,19 +822,6 @@ CREATE TABLE queriable_log (
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE TABLE queriablelog_p (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  queriableLogId BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  stringValue VARCHAR(255),
-  blobId BIGINT,
-  valueType VARCHAR(30),
-  PRIMARY KEY (tenantid, id)
-);
-
-CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId);
-ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id);
 CREATE TABLE page (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -862,12 +849,6 @@ CREATE TABLE sequence (
   id BIGINT NOT NULL,
   nextid BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id)
-);
-CREATE TABLE blob_ (
-    tenantId BIGINT NOT NULL,
-	id BIGINT NOT NULL,
-	blobValue MEDIUMBLOB,
-	PRIMARY KEY (tenantid, id)
 );
 
 CREATE TABLE platform (

@@ -43,7 +43,6 @@ DELETE FROM user_login;
 DELETE FROM user_;
 DELETE FROM role;
 DELETE FROM group_;
-DELETE FROM queriablelog_p;
 DELETE FROM queriable_log;
 DELETE FROM page;
 DELETE FROM sequence WHERE tenantId <> -1;

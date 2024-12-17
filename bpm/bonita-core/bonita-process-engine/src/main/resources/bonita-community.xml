@@ -270,11 +270,6 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.30:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter" />
-        <constructor-arg name="sequenceId" value="31" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.31:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.scheduler.model.SJobDescriptor" />
         <constructor-arg name="sequenceId" value="70" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.70:${bonita.platform.sequence.defaultRangeSize}}" />
@@ -1033,7 +1028,6 @@
                 <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLog</value>
-                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.SBPMFailure</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.SABPMFailure</value>
             </set>
