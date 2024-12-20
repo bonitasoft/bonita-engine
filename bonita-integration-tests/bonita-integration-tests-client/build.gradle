@@ -21,6 +21,7 @@ dependencies {
     testImplementation libs.awaitility
     testImplementation libs.xmlunit
     testImplementation libs.mockitoCore
+    testImplementation libs.logback
 }
 
 test.doFirst {

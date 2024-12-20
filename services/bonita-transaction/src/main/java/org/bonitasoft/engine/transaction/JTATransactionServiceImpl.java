@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.transaction;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,8 @@ import javax.transaction.*;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.mdc.MDCConstants;
+import org.slf4j.MDC;
 
 @Slf4j
 public class JTATransactionServiceImpl implements TransactionService {
@@ -67,6 +70,9 @@ public class JTATransactionServiceImpl implements TransactionService {
                 txContext.stackTraceThatMadeLastBegin = generateCurrentStack();
             }
             txManager.begin();
+            Optional<String> transactionId = getTransactionId(txManager.getTransaction());
+            // we don't use AbstractMDC here, as we have the guarantee that complete() will close the transaction.
+            transactionId.ifPresent(id -> MDC.put(MDCConstants.TRANSACTION_ID, id));
             handleNumberOfActiveTransactions();
         } catch (final STransactionCreationException e) {
             resetTxContext(txContext);
@@ -74,6 +80,23 @@ public class JTATransactionServiceImpl implements TransactionService {
         } catch (final Throwable e) {
             resetTxContext(txContext);
             throw new STransactionCreationException(e);
+        }
+    }
+
+    private Optional<String> getTransactionId(Transaction transaction) {
+        /*
+         * Transaction is typically an instance of com.arjuna.ats.jta.transaction.Transaction with get_uid method.
+         * Be lenient on implementation class as long as we have the get_uid method...
+         */
+        try {
+            var method = transaction.getClass().getMethod("get_uid");
+            return Optional.of(method.invoke(transaction).toString());
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            log.warn(
+                    "Transaction {} is an instance of {} which does not have an accessible 'get_uid' method like com.arjuna.ats.jta.transaction.Transaction",
+                    transaction, transaction.getClass().getName());
+            return Optional.empty();
         }
     }
 
@@ -166,6 +189,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         } catch (final SystemException | HeuristicMixedException | HeuristicRollbackException | RollbackException e) {
             throw new STransactionCommitException(e);
         } finally {
+            MDC.remove(MDCConstants.TRANSACTION_ID);
             resetTxContext(txContext);
         }
     }

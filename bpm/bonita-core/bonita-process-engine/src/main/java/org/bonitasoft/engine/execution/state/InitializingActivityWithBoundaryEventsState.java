@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -47,10 +50,14 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.mdc.MDCConstants;
+import org.bonitasoft.engine.mdc.MDCHelper;
+import org.bonitasoft.engine.mdc.ProcessInstanceMDC;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -232,12 +239,25 @@ public class InitializingActivityWithBoundaryEventsState extends OnEnterConnecto
         final SExpressionContext context = new SExpressionContext(callerId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
 
-        final Map<String, Serializable> processInputs = evaluateContractInputExpression(
-                callActivityDefinition.getProcessStartContractInputs(), context);
+        /*
+         * We are already in the context of the call activity, so the new MDC will conflict with current one.
+         */
+        var parentContext = MDC.getCopyOfContextMap();
+        long rootProcessInstanceId = Optional.ofNullable(parentContext)
+                .map(c -> c.get(MDCConstants.ROOT_PROCESS_INSTANCE_ID)).filter(Objects::nonNull).map(Long::valueOf)
+                .orElse(0L);
+        // AbstractMDC will temporarily erase conflicting values
+        Supplier<ProcessInstanceMDC> processInstanceMDC = () -> new ProcessInstanceMDC(0, Optional.empty(),
+                Optional.empty(), targetProcessDefinitionId, Long.valueOf(rootProcessInstanceId));
+        return MDCHelper.tryWithMDC(processInstanceMDC, () -> {
+            final Map<String, Serializable> processInputs = evaluateContractInputExpression(
+                    callActivityDefinition.getProcessStartContractInputs(), context);
 
-        return processExecutor
-                .start(targetProcessDefinitionId, -1, 0, 0, context, callActivityDefinition.getDataInputOperations(),
-                        callerId, -1, processInputs);
+            return processExecutor
+                    .start(targetProcessDefinitionId, -1, 0, 0, context,
+                            callActivityDefinition.getDataInputOperations(),
+                            callerId, -1, processInputs);
+        });
     }
 
     protected Map<String, Serializable> evaluateContractInputExpression(Map<String, SExpression> contractInputs,

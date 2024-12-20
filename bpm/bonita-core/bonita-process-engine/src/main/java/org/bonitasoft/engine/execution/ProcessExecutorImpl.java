@@ -116,6 +116,7 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.mdc.MDCConstants;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -124,6 +125,7 @@ import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+import org.slf4j.MDC;
 
 /**
  * @author Baptiste Mesta
@@ -286,6 +288,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 .startedBy(starterId).startedBySubstitute(starterSubstituteId).callerId(callerId).callerType(callerType)
                 .rootProcessInstanceId(rootProcessInstanceId).build();
         processInstanceService.createProcessInstance(sProcessInstance);
+
+        // Context will be auto clear by parent method (call hierarchy is always using ProcessInstanceMDC)
+        MDC.put(MDCConstants.PROCESS_INSTANCE_ID, String.valueOf(sProcessInstance.getId()));
+        MDC.put(MDCConstants.ROOT_PROCESS_INSTANCE_ID, String.valueOf(sProcessInstance.getRootProcessInstanceId()));
         return sProcessInstance;
     }
 
@@ -667,6 +673,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         log.debug("The flow node <{}> with id<{}> of process instance <{}> finished",
                 childFlowNode.getName(), childFlowNode.getId(), processInstanceId);
         if (wasTheLastFlowNodeToExecute) {
+            // flow node has finished, now we want to log only process information in the context
+            MDC.remove(MDCConstants.FLOW_NODE_INSTANCE_ID);
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
             if (sProcessInstance.getInterruptingEventId() > 0) {
                 //if it's interrupted by an event (error event), the flow node is kept to be executed last and deleted in triggerErrorEvents()

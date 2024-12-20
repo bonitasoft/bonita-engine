@@ -1330,6 +1330,7 @@ public class ProcessAPIImplTest {
         inputValues.put("input2", "value");
         sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setAssigneeId(543L);
+        sUserTaskInstance.setExecutedBySubstitute(15);
         WorkDescriptor workDescriptor = WorkDescriptor.create("flownode");
         doReturn(workDescriptor).when(workFactory).createExecuteFlowNodeWorkDescriptor(sUserTaskInstance);
         //when

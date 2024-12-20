@@ -10,6 +10,7 @@ repositories {
 dependencies {
     implementation(project(":bpm:bonita-common"))
     implementation(project(":bpm:bonita-web-extensions"))
+    implementation(project(":services:bonita-commons"))
     implementation libs.commonsIO
     implementation libs.slf4jApi
     implementation libs.ehCache
@@ -39,6 +40,8 @@ dependencies {
     implementation libs.springWebMvc
     implementation libs.jgettext
     implementation libs.owaspHtmlSanitizer
+    // for MDCInsertingServletFilter
+    implementation libs.logback
 
     compileOnly libs.lombok
     annotationProcessor libs.lombok

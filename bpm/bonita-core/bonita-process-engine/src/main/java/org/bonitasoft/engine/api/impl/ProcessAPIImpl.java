@@ -23,8 +23,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -182,6 +194,7 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.lock.SLockTimeoutException;
 import org.bonitasoft.engine.log.LogMessageBuilder;
+import org.bonitasoft.engine.mdc.FlowNodeInstanceMDC;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
@@ -6125,76 +6138,84 @@ public class ProcessAPIImpl implements ProcessAPI {
         BPMWorkFactory workFactory = serviceAccessor.getBPMWorkFactory();
 
         SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-        if (shouldBeReadyTask) {
-            /*
-             * this is to protect from concurrent execution of the task when 2 users call execute user task at the same
-             * time
-             * it still might have concurrency issue but:
-             * - if the second client call execute with contract inputs, on commit there will be a constraint violation
-             * + rollback
-             * - if there is no contract input, the work will check that the activity is in ready state before calling
-             * execute.
-             * The only left issue is that on this last case the executor will change to the last one.
-             */
-            checkIsHumanTaskInReadyState(flowNodeInstance);
-        }
-        if (flowNodeInstance instanceof SUserTaskInstance) {
-            try {
-                throwContractViolationExceptionIfContractIsInvalid(inputs, serviceAccessor, flowNodeInstance);
-            } catch (SContractViolationException e) {
-                throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(),
-                        e.getCause());
-            }
-        }
-        if (flowNodeInstance instanceof SHumanTaskInstance
-                && ((SHumanTaskInstance) flowNodeInstance).getAssigneeId() <= 0) {
-            throw new SFlowNodeExecutionException("The user task " + flowNodeInstanceId + " is not assigned");
-        }
         final SSession session = getSession();
-        if (session != null) {
-            final long executerSubstituteUserId = session.getUserId();
-            final long executerUserId;
-            if (userId == 0) {
-                executerUserId = executerSubstituteUserId;
-            } else {
-                executerUserId = userId;
+        final Optional<Long> executerSubstituteUserId = Optional.ofNullable(session).map(SSession::getUserId);
+        final Optional<Long> executerUserId = session == null ? Optional.empty()
+                : userId == 0L ? executerSubstituteUserId : Optional.of(userId);
+        try (var flowNodeInstanceMDC = new FlowNodeInstanceMDC(flowNodeInstanceId,
+                executerUserId,
+                executerSubstituteUserId,
+                flowNodeInstance.getProcessDefinitionId(),
+                flowNodeInstance.getParentProcessInstanceId(),
+                flowNodeInstance.getRootProcessInstanceId())) {
+            if (shouldBeReadyTask) {
+                /*
+                 * this is to protect from concurrent execution of the task when 2 users call execute user task at the
+                 * same
+                 * time
+                 * it still might have concurrency issue but:
+                 * - if the second client call execute with contract inputs, on commit there will be a constraint
+                 * violation
+                 * + rollback
+                 * - if there is no contract input, the work will check that the activity is in ready state before
+                 * calling
+                 * execute.
+                 * The only left issue is that on this last case the executor will change to the last one.
+                 */
+                checkIsHumanTaskInReadyState(flowNodeInstance);
             }
-            final boolean isFirstState = flowNodeInstance.getStateId() == 0;
-
             if (flowNodeInstance instanceof SUserTaskInstance) {
-                contractDataService.addUserTaskData(flowNodeInstance.getId(), inputs);
-            }
-            // TODO: the following 4 instructions seem to be redundant with stepForward:
-            // Cannot we factorize this?
-            serviceAccessor.getBPMArchiverService().archiveFlowNodeInstance(flowNodeInstance);
-            // flag as executing
-            activityInstanceService.setExecuting(flowNodeInstance);
-            activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId);
-            activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
-            WorkDescriptor work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
-            workService.registerWork(work);
-            if (log.isInfoEnabled() && !isFirstState /*
-                                                      * don't log when create
-                                                      * subtask
-                                                      */) {
-                final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance,
-                        session.getUserName(), executerUserId,
-                        executerSubstituteUserId, inputs);
-                log.info(message);
-            } else if (log.isDebugEnabled()) {
-                log.debug("Executing state " + flowNodeInstance.getStateName() + " (" + flowNodeInstance.getStateId()
-                        + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
-            }
-            if (executerUserId != executerSubstituteUserId) {
                 try {
-                    final SUser executorUser = identityService.getUser(executerUserId);
-                    String stb = "The user " + session.getUserName() + " " + "acting as delegate of the user "
-                            + executorUser.getUserName() + " "
-                            + "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
-                    commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb);
-                } catch (final SBonitaException e) {
-                    log.error(
-                            "Error when adding a comment on the process instance.", e);
+                    throwContractViolationExceptionIfContractIsInvalid(inputs, serviceAccessor, flowNodeInstance);
+                } catch (SContractViolationException e) {
+                    throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(),
+                            e.getCause());
+                }
+            }
+            if (flowNodeInstance instanceof SHumanTaskInstance
+                    && ((SHumanTaskInstance) flowNodeInstance).getAssigneeId() <= 0) {
+                throw new SFlowNodeExecutionException("The user task " + flowNodeInstanceId + " is not assigned");
+            }
+
+            if (session != null) {
+                final boolean isFirstState = flowNodeInstance.getStateId() == 0;
+
+                if (flowNodeInstance instanceof SUserTaskInstance) {
+                    contractDataService.addUserTaskData(flowNodeInstance.getId(), inputs);
+                }
+                // TODO: the following 4 instructions seem to be redundant with stepForward:
+                // Cannot we factorize this?
+                serviceAccessor.getBPMArchiverService().archiveFlowNodeInstance(flowNodeInstance);
+                // flag as executing
+                activityInstanceService.setExecuting(flowNodeInstance);
+                activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId.orElse(0L));
+                activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId.orElse(0L));
+                WorkDescriptor work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
+                workService.registerWork(work);
+                if (log.isInfoEnabled() && !isFirstState /*
+                                                          * don't log when create
+                                                          * subtask
+                                                          */) {
+                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance,
+                            session.getUserName(), executerUserId.orElse(0L),
+                            executerSubstituteUserId.orElse(0L), inputs);
+                    log.info(message);
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Executing state " + flowNodeInstance.getStateName() + " ("
+                            + flowNodeInstance.getStateId()
+                            + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
+                }
+                if (!executerUserId.equals(executerSubstituteUserId)) {
+                    try {
+                        final SUser executorUser = identityService.getUser(executerUserId.orElse(0L));
+                        String stb = "The user " + session.getUserName() + " " + "acting as delegate of the user "
+                                + executorUser.getUserName() + " "
+                                + "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
+                        commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb);
+                    } catch (final SBonitaException e) {
+                        log.error(
+                                "Error when adding a comment on the process instance.", e);
+                    }
                 }
             }
         }

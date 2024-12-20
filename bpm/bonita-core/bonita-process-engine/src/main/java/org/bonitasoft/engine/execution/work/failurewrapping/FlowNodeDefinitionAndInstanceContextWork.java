@@ -14,12 +14,17 @@
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.bonitasoft.engine.commons.exceptions.ExceptionContext;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
+import org.bonitasoft.engine.mdc.AbstractMDC;
+import org.bonitasoft.engine.mdc.MDCConstants;
+import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
@@ -44,6 +49,15 @@ public class FlowNodeDefinitionAndInstanceContextWork extends TxInHandleFailureW
             final long flowNodeInstanceId) {
         super(wrappedWork);
         this.flowNodeInstanceId = flowNodeInstanceId;
+    }
+
+    @Override
+    public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
+        // the corresponding wrapping work will take care of adding other information...
+        Supplier<AbstractMDC> mdc = () -> new AbstractMDC(
+                Map.of(MDCConstants.FLOW_NODE_INSTANCE_ID, Long.toString(flowNodeInstanceId))) {
+        };
+        return MDCHelper.tryWithMDC(mdc, () -> super.work(context));
     }
 
     @Override

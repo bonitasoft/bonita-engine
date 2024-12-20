@@ -85,6 +85,7 @@ public class BPMWorkFactory implements WorkFactory {
     private BonitaWork createExecuteConnectorOfActivity(WorkDescriptor workDescriptor) {
         final long processDefinitionId = workDescriptor.getLong(PROCESS_DEFINITION_ID);
         final long processInstanceId = workDescriptor.getLong(PROCESS_INSTANCE_ID);
+        final long rootProcessInstanceId = workDescriptor.getLong(ROOT_PROCESS_INSTANCE_ID);
         final long flowNodeInstanceId = workDescriptor.getLong(FLOW_NODE_INSTANCE_ID);
         final long connectorInstanceId = workDescriptor.getLong(CONNECTOR_INSTANCE_ID);
         final String connectorDefinitionId = workDescriptor.getString(CONNECTOR_DEFINITION_ID);
@@ -96,18 +97,21 @@ public class BPMWorkFactory implements WorkFactory {
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(wrappedWork, connectorDefinitionId,
                 connectorDefinitionName,
                 connectorInstanceId, activationEvent);
-        wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, rootProcessInstanceId,
+                flowNodeInstanceId, wrappedWork);
         return withSession(wrappedWork);
     }
 
     public WorkDescriptor createExecuteConnectorOfActivityDescriptor(final long processDefinitionId,
-            final long processInstanceId, final long flowNodeDefinitionId,
+            final long processInstanceId, final long rootProcessInstanceId,
+            final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final long connectorInstanceId,
             final String connectorDefinitionId,
             final String connectorDefinitionName, final String activationEvent) {
         return WorkDescriptor.create(EXECUTE_ACTIVITY_CONNECTOR)
                 .withParameter(PROCESS_DEFINITION_ID, processDefinitionId)
                 .withParameter(PROCESS_INSTANCE_ID, processInstanceId)
+                .withParameter(ROOT_PROCESS_INSTANCE_ID, rootProcessInstanceId)
                 .withParameter(FLOW_NODE_DEFINITION_ID, flowNodeDefinitionId)
                 .withParameter(FLOW_NODE_INSTANCE_ID, flowNodeInstanceId)
                 .withParameter(CONNECTOR_INSTANCE_ID, connectorInstanceId)
@@ -149,7 +153,6 @@ public class BPMWorkFactory implements WorkFactory {
             return emptyList();
         }
         return stream(flowNodeIds.split(",")).map(Long::valueOf).collect(toList());
-
     }
 
     public WorkDescriptor createExecuteConnectorOfProcessDescriptor(final long processDefinitionId,
@@ -191,6 +194,7 @@ public class BPMWorkFactory implements WorkFactory {
         return WorkDescriptor.create(EXECUTE_FLOWNODE)
                 .withParameter(PROCESS_DEFINITION_ID, flowNodeInstance.getProcessDefinitionId())
                 .withParameter(PROCESS_INSTANCE_ID, flowNodeInstance.getParentProcessInstanceId())
+                .withParameter(ROOT_PROCESS_INSTANCE_ID, flowNodeInstance.getRootProcessInstanceId())
                 .withParameter(FLOW_NODE_INSTANCE_ID, flowNodeInstance.getId())
                 .withParameter(STATE_ID, flowNodeInstance.getStateId())
                 .withParameter(STATE_EXECUTING, flowNodeInstance.isStateExecuting())
@@ -200,6 +204,7 @@ public class BPMWorkFactory implements WorkFactory {
 
     private BonitaWork createExecuteFlowNodeWork(WorkDescriptor workDescriptor) {
         final long processInstanceId = workDescriptor.getLong(PROCESS_INSTANCE_ID);
+        final long rootProcessInstanceId = workDescriptor.getLong(ROOT_PROCESS_INSTANCE_ID);
         final long flowNodeInstanceId = workDescriptor.getLong(FLOW_NODE_INSTANCE_ID);
         if (processInstanceId <= 0) {
             throw new RuntimeException(
@@ -213,6 +218,7 @@ public class BPMWorkFactory implements WorkFactory {
                 workDescriptor.getBoolean(STATE_CANCELING));
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
         wrappedWork = withFlowNodeContext(workDescriptor.getLong(PROCESS_DEFINITION_ID), processInstanceId,
+                rootProcessInstanceId,
                 flowNodeInstanceId, wrappedWork);
         return withSession(wrappedWork);
     }
@@ -260,6 +266,7 @@ public class BPMWorkFactory implements WorkFactory {
     private BonitaWork createNotifyChildFinishedWork(WorkDescriptor workDescriptor) {
         final long processDefinitionId = workDescriptor.getLong(PROCESS_DEFINITION_ID);
         final long processInstanceId = workDescriptor.getLong(PROCESS_INSTANCE_ID);
+        final long rootProcessInstanceId = workDescriptor.getLong(ROOT_PROCESS_INSTANCE_ID);
         final long flowNodeInstanceId = workDescriptor.getLong(FLOW_NODE_INSTANCE_ID);
         BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId,
                 workDescriptor.getInteger(STATE_ID),
@@ -267,7 +274,8 @@ public class BPMWorkFactory implements WorkFactory {
                 workDescriptor.getBoolean(STATE_ABORTING),
                 workDescriptor.getBoolean(STATE_CANCELING));
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
-        wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, rootProcessInstanceId,
+                flowNodeInstanceId, wrappedWork);
         return withSession(wrappedWork);
     }
 
@@ -275,6 +283,7 @@ public class BPMWorkFactory implements WorkFactory {
         return WorkDescriptor.create(FINISH_FLOWNODE)
                 .withParameter(PROCESS_DEFINITION_ID, sFlowNodeInstance.getProcessDefinitionId())
                 .withParameter(PROCESS_INSTANCE_ID, sFlowNodeInstance.getParentProcessInstanceId())
+                .withParameter(ROOT_PROCESS_INSTANCE_ID, sFlowNodeInstance.getRootProcessInstanceId())
                 .withParameter(FLOW_NODE_INSTANCE_ID, sFlowNodeInstance.getId())
                 .withParameter(STATE_ID, sFlowNodeInstance.getStateId())
                 .withParameter(STATE_EXECUTING, sFlowNodeInstance.isStateExecuting())
@@ -291,11 +300,12 @@ public class BPMWorkFactory implements WorkFactory {
     }
 
     private BonitaWork withFlowNodeContext(final long processDefinitionId, final long processInstanceId,
+            final long rootProcessInstanceId,
             final long flowNodeInstanceId, final BonitaWork wrappedWork) {
         final ProcessDefinitionContextWork processDefinitionContextWork = new ProcessDefinitionContextWork(wrappedWork,
                 processDefinitionId);
         final ProcessInstanceContextWork processInstanceContextWork = new ProcessInstanceContextWork(
-                processDefinitionContextWork, processInstanceId);
+                processDefinitionContextWork, processInstanceId, rootProcessInstanceId);
         return new FlowNodeDefinitionAndInstanceContextWork(processInstanceContextWork, flowNodeInstanceId);
     }
 

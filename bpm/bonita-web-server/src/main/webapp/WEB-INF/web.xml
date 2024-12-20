@@ -23,6 +23,20 @@
         <location>/error/404</location>
     </error-page>
 
+    <!-- 
+        MDC Filters.
+        We do not need to override MDCInsertingServletFilter to use wrap with MDCHelper.tryWithMDC for exception handling,
+        because RequestIdFilter will do it right after anyway.
+    -->
+    <filter>
+        <filter-name>MDCInsertingServletFilter</filter-name>
+        <filter-class>ch.qos.logback.classic.helpers.MDCInsertingServletFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>RequestIdFilter</filter-name>
+        <filter-class>org.bonitasoft.console.common.server.filter.RequestIdFilter</filter-class>
+    </filter>
+
     <!-- No Cache Filter -->
     <filter>
         <filter-name>NoCacheFilter</filter-name>
@@ -188,6 +202,18 @@
         </init-param>
     </filter>
 
+    <filter-mapping>
+        <filter-name>MDCInsertingServletFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>RequestIdFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>NoCacheFilter</filter-name>
         <url-pattern>/portal/formsDocumentDownload</url-pattern>

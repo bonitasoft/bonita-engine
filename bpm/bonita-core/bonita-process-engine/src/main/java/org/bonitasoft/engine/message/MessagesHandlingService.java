@@ -42,6 +42,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.mdc.MDCTransmitingThreadPoolExecutor;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
@@ -104,11 +105,11 @@ public class MessagesHandlingService implements TenantLifecycleService {
     @Override
     public void start() {
         log.info("Starting BPMN messages matcher thread");
-        threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1L, TimeUnit.HOURS,
+        threadPoolExecutor = new MDCTransmitingThreadPoolExecutor(1, 1, 1L, TimeUnit.HOURS,
                 new ArrayBlockingQueue<>(5),
                 r -> new Thread(r, "Bonita-Message-Matching"),
                 (r, executor) -> log.debug("Message matching queue capacity reached"));
-        log.info("Thread that handle messages matching successfully started");
+        log.debug("Thread pool that handle messages matching successfully started");
     }
 
     @Override

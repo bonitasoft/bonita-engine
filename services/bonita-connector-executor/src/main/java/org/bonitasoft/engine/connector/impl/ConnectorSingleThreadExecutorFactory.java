@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.connector.impl;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -21,6 +21,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.bonitasoft.engine.connector.BonitaConnectorExecutorFactory;
+import org.bonitasoft.engine.mdc.MDCTransmitingThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +40,7 @@ public class ConnectorSingleThreadExecutorFactory implements BonitaConnectorExec
 
     @Override
     public ThreadPoolExecutor create() {
-        return new ThreadPoolExecutor(1, 1, 0L, MILLISECONDS,
+        return new MDCTransmitingThreadPoolExecutor(1, 1, 0L, MILLISECONDS,
                 new ArrayBlockingQueue<>(queueCapacity), new ConnectorExecutorThreadFactory("ConnectorExecutor"),
                 new QueueRejectedExecutionHandler());
     }

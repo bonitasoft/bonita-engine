@@ -16,7 +16,9 @@ package org.bonitasoft.engine.execution.event;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -65,6 +67,9 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
+import org.bonitasoft.engine.mdc.MDCHelper;
+import org.bonitasoft.engine.mdc.MDCHelper.CheckedRunnable2;
+import org.bonitasoft.engine.mdc.ProcessInstanceMDC;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -407,9 +412,17 @@ public class EventsHandler {
             processInstanceInterruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING,
                     subProcflowNodeInstance.getId());
         }
-        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(),
-                operations.getOperations(),
-                subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.
+
+        Supplier<ProcessInstanceMDC> processInstanceMDC = () -> new ProcessInstanceMDC(0, Optional.empty(),
+                Optional.empty(), processDefinitionId, rootProcessInstanceId);
+        MDCHelper.tryWithMDC(processInstanceMDC, () -> {
+
+            processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(),
+                    operations.getOperations(),
+                    subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.
+
+        });
+
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
     }
 
@@ -453,9 +466,15 @@ public class EventsHandler {
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId,
             final OperationsWithContext operations)
             throws SProcessInstanceCreationException, SContractViolationException {
-        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(),
-                operations.getOperations(), -1,
-                -1, null);
+        Supplier<ProcessInstanceMDC> processInstanceMDC = () -> new ProcessInstanceMDC(0, Optional.empty(),
+                Optional.empty(), processDefinitionId, 0);
+        CheckedRunnable2<SProcessInstanceCreationException, SContractViolationException> run = () -> {
+            processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(),
+                    operations.getOperations(), -1,
+                    -1, null);
+        };
+
+        MDCHelper.tryWithMDC(processInstanceMDC, run);
     }
 
     public EventHandlerStrategy getHandler(final SEventTriggerType triggerType) {

@@ -14,11 +14,16 @@
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.bonitasoft.engine.commons.exceptions.ExceptionContext;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.mdc.AbstractMDC;
+import org.bonitasoft.engine.mdc.MDCConstants;
+import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
@@ -42,6 +47,15 @@ public class ProcessDefinitionContextWork extends TxInHandleFailureWrappingWork 
     public ProcessDefinitionContextWork(final BonitaWork wrappedWork, final long processDefinitionId) {
         super(wrappedWork);
         this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
+    public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
+        // the corresponding wrapping work will take care of adding other information...
+        Supplier<AbstractMDC> mdc = () -> new AbstractMDC(Map.of(
+                MDCConstants.PROCESS_DEFINITION_ID, Long.toString(processDefinitionId))) {
+        };
+        return MDCHelper.tryWithMDC(mdc, () -> super.work(context));
     }
 
     @Override

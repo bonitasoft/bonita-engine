@@ -28,6 +28,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
+import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,64 +105,66 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
 
     @Override
     public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context, Throwable thrown) {
-        if (thrown instanceof LockException) {
-            if (thrown instanceof LockTimeoutException) {
-                //Can happen frequently, only log in debug
-                logger.debug("Tried to execute the work, but it was unable to acquire a lock {}", work);
-            } else {
-                //Caused
-                logger.warn("Tried to execute the work, but it was unable to acquire a lock {}",
-                        bonitaWork.getDescription(), thrown);
+        MDCHelper.tryWithMDC(thrown, () -> {
+            if (thrown instanceof LockException) {
+                if (thrown instanceof LockTimeoutException) {
+                    //Can happen frequently, only log in debug
+                    logger.debug("Tried to execute the work, but it was unable to acquire a lock {}", work);
+                } else {
+                    //Caused
+                    logger.warn("Tried to execute the work, but it was unable to acquire a lock {}",
+                            bonitaWork.getDescription(), thrown);
+                }
+                execute(work);
+                return;
             }
-            execute(work);
-            return;
-        }
-        logger.debug("Work {} failed because of ", work, thrown);
-        switch (exceptionRetryabilityEvaluator.evaluateRetryability(thrown)) {
-            case NOT_RETRYABLE:
-                if (thrown instanceof SWorkPreconditionException) {
-                    logger.warn("Work was not executed because preconditions were not met, {} : {}",
-                            bonitaWork.getDescription(), thrown.getMessage());
-                    decrementRetryCounterIfNeeded(work);
-                } else {
-                    logger.warn("Work {} failed. The element will be marked as failed. Exception is: {}",
-                            bonitaWork.getDescription(),
-                            printLightWeightStacktrace(thrown, numberOfFramesToLogInExceptions));
-                    handleFailure(work, bonitaWork, context, thrown);
-                }
-                break;
-            case UNCERTAIN_COMPLETION_OF_COMMIT:
-                // Do the same as retryable but add a warning log
-                logger.warn(
-                        "Work {} has failed and will be retried but the issue happened during the commit. We are uncertain that the "
-                                +
-                                "commit was really completed. If the retry fails with a SWorkPreconditionException it might indicate that "
-                                +
-                                "the work was already completed and the recovery mechanism will restart it. No manual action is required.",
-                        bonitaWork.getDescription());
-            case RETRYABLE:
-                if (work.getRetryCount() < maxRetry) {
-                    long delayInMillis = getDelayInMillis(work.getRetryCount());
+            logger.debug("Work {} failed because of ", work, thrown);
+            switch (exceptionRetryabilityEvaluator.evaluateRetryability(thrown)) {
+                case NOT_RETRYABLE:
+                    if (thrown instanceof SWorkPreconditionException) {
+                        logger.warn("Work was not executed because preconditions were not met, {} : {}",
+                                bonitaWork.getDescription(), thrown.getMessage());
+                        decrementRetryCounterIfNeeded(work);
+                    } else {
+                        logger.warn("Work {} failed. The element will be marked as failed. Exception is: {}",
+                                bonitaWork.getDescription(),
+                                printLightWeightStacktrace(thrown, numberOfFramesToLogInExceptions));
+                        handleFailure(work, bonitaWork, context, thrown);
+                    }
+                    break;
+                case UNCERTAIN_COMPLETION_OF_COMMIT:
+                    // Do the same as retryable but add a warning log
                     logger.warn(
-                            "Work {} failed because of {}. It will be retried. Attempt {} of {} with a delay of {} ms",
-                            bonitaWork.getDescription(),
-                            printRootCauseOnly(thrown),
-                            work.getRetryCount() + 1,
-                            maxRetry, delayInMillis);
-                    incrementRetryCounterIfNeeded(work);
-                    retry(work, delayInMillis);
-                } else {
-                    logger.warn("Work {} failed. It has already been retried {} times. " +
-                            "No more retries will be attempted, it will be marked as failed. Exception is: {}",
-                            bonitaWork.getDescription(), maxRetry,
-                            printLightWeightStacktrace(thrown, numberOfFramesToLogInExceptions));
-                    handleFailure(work, bonitaWork, context, thrown);
-                }
-                break;
-            default:
-                throw new IllegalStateException(
-                        "Unexpected value: " + exceptionRetryabilityEvaluator.evaluateRetryability(thrown));
-        }
+                            "Work {} has failed and will be retried but the issue happened during the commit. We are uncertain that the "
+                                    +
+                                    "commit was really completed. If the retry fails with a SWorkPreconditionException it might indicate that "
+                                    +
+                                    "the work was already completed and the recovery mechanism will restart it. No manual action is required.",
+                            bonitaWork.getDescription());
+                case RETRYABLE:
+                    if (work.getRetryCount() < maxRetry) {
+                        long delayInMillis = getDelayInMillis(work.getRetryCount());
+                        logger.warn(
+                                "Work {} failed because of {}. It will be retried. Attempt {} of {} with a delay of {} ms",
+                                bonitaWork.getDescription(),
+                                printRootCauseOnly(thrown),
+                                work.getRetryCount() + 1,
+                                maxRetry, delayInMillis);
+                        incrementRetryCounterIfNeeded(work);
+                        retry(work, delayInMillis);
+                    } else {
+                        logger.warn("Work {} failed. It has already been retried {} times. " +
+                                "No more retries will be attempted, it will be marked as failed. Exception is: {}",
+                                bonitaWork.getDescription(), maxRetry,
+                                printLightWeightStacktrace(thrown, numberOfFramesToLogInExceptions));
+                        handleFailure(work, bonitaWork, context, thrown);
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException(
+                            "Unexpected value: " + exceptionRetryabilityEvaluator.evaluateRetryability(thrown));
+            }
+        });
     }
 
     public void handleFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
@@ -234,7 +237,7 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
     @Override
     public void execute(WorkDescriptor work) {
         if (!isStopped()) {
-            logger.debug("Submitted work {}", work);
+            logger.debug("Submitted work");
             executor.submit(work);
         } else {
             logger.debug("Ignored work submission (service stopped) {}", work);

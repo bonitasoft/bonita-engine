@@ -171,7 +171,7 @@ public class BPMWorkFactoryTest {
     @Test
     public void createExecuteConnectorOfActivity() {
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory
-                .create(workFactory.createExecuteConnectorOfActivityDescriptor(1L, 3L, 4L, 5L, 6,
+                .create(workFactory.createExecuteConnectorOfActivityDescriptor(1L, 3L, 3L, 4L, 5L, 6,
                         "groovy",
                         "connectorDefName",
                         "ON_ENTER"));

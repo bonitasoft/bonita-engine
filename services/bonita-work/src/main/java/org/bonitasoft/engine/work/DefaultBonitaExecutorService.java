@@ -23,6 +23,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.time.EngineClock;
+import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +114,7 @@ public class DefaultBonitaExecutorService implements BonitaExecutorService {
             } catch (Exception e) {
                 executedWorkCounter.increment();
                 runningWorks.decrementAndGet();
-                workExecutionCallback.onFailure(work, bonitaWork, context, e);
+                MDCHelper.tryWithMDC(e, () -> workExecutionCallback.onFailure(work, bonitaWork, context, e));
                 return;
             }
 

@@ -568,6 +568,7 @@ public class StateBehaviors {
     }
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId,
+            final long rootProcessInstanceId,
             final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final SConnectorInstance connector,
             final SConnectorDefinition sConnectorDefinition)
@@ -578,7 +579,7 @@ public class StateBehaviors {
         try {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
             workService.registerWork(workFactory.createExecuteConnectorOfActivityDescriptor(processDefinitionId,
-                    processInstanceId, flowNodeDefinitionId,
+                    processInstanceId, rootProcessInstanceId, flowNodeDefinitionId,
                     flowNodeInstanceId, connectorInstanceId,
                     sConnectorDefinition.getConnectorId(),
                     connectorDefinitionName,
@@ -924,8 +925,11 @@ public class StateBehaviors {
     public void executeConnector(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance,
             List<SConnectorDefinition> connectorsOnEnter,
             SConnectorInstance connectorInstance) throws SActivityStateExecutionException {
-        executeConnectorInWork(processDefinition.getId(), flowNodeInstance.getParentProcessInstanceId(),
-                flowNodeInstance.getFlowNodeDefinitionId(), flowNodeInstance.getId(), connectorInstance,
+        executeConnectorInWork(processDefinition.getId(),
+                flowNodeInstance.getParentProcessInstanceId(),
+                flowNodeInstance.getRootProcessInstanceId(),
+                flowNodeInstance.getFlowNodeDefinitionId(),
+                flowNodeInstance.getId(), connectorInstance,
                 getConnectorDefinition(connectorInstance, connectorsOnEnter));
     }
 

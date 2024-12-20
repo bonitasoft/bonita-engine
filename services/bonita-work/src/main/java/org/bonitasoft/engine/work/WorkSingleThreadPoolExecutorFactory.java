@@ -15,6 +15,7 @@ package org.bonitasoft.engine.work;
 
 import java.util.concurrent.*;
 
+import org.bonitasoft.engine.mdc.MDCTransmitingThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +41,7 @@ public class WorkSingleThreadPoolExecutorFactory implements BonitaWorkExecutorFa
                 new WorkerThreadFactory("Bonita-Worker", tenantId));
     }
 
-    public static class SingleThreadPoolExecutor extends ThreadPoolExecutor {
+    public static class SingleThreadPoolExecutor extends MDCTransmitingThreadPoolExecutor {
 
         public SingleThreadPoolExecutor(final BlockingQueue<Runnable> workQueue,
                 final ThreadFactory threadFactory) {

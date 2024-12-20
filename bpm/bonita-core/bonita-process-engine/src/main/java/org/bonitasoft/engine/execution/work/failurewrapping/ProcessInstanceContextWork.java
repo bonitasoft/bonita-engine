@@ -14,12 +14,17 @@
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.bonitasoft.engine.commons.exceptions.ExceptionContext;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
+import org.bonitasoft.engine.mdc.AbstractMDC;
+import org.bonitasoft.engine.mdc.MDCConstants;
+import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
@@ -60,6 +65,17 @@ public class ProcessInstanceContextWork extends TxInHandleFailureWrappingWork {
         super(wrappedWork);
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
+    }
+
+    @Override
+    public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
+        // the corresponding wrapping work will take care of adding other information...
+        Supplier<AbstractMDC> mdc = () -> new AbstractMDC(Map.of(
+                MDCConstants.PROCESS_INSTANCE_ID, Long.toString(processInstanceId),
+                MDCConstants.ROOT_PROCESS_INSTANCE_ID,
+                Long.toString(rootProcessInstanceId == -1 ? processInstanceId : rootProcessInstanceId))) {
+        };
+        return MDCHelper.tryWithMDC(mdc, () -> super.work(context));
     }
 
     protected void setProcessInstanceId(final long id) {
