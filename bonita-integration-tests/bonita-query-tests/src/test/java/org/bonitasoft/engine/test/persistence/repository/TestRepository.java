@@ -68,6 +68,12 @@ public class TestRepository {
                 new PersistentObjectId(id, tenantId));
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends PlatformPersistentObject> T getById(final Class<? extends PlatformPersistentObject> clazz,
+            long id) {
+        return (T) getSession().get(clazz, id);
+    }
+
     public Long selectCount(String queryName, Pair... parameters) {
         Query namedQuery = getNamedQuery(queryName);
         setParameters(namedQuery, parameters);

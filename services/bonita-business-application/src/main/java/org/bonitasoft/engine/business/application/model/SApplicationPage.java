@@ -17,15 +17,13 @@ import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -36,9 +34,8 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "business_app_page")
-@IdClass(PersistentObjectId.class)
 @Cacheable(false)
-public class SApplicationPage implements PersistentObject {
+public class SApplicationPage implements PlatformPersistentObject {
 
     public static final String ID = "id";
     public static final String TOKEN = "token";
@@ -46,8 +43,6 @@ public class SApplicationPage implements PersistentObject {
     public static final String APPLICATION_ID = "applicationId";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private long applicationId;
     @Column

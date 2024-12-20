@@ -35,21 +35,21 @@ ALTER TABLE user_ DROP CONSTRAINT fk_user__tenantId;
 ALTER TABLE user_membership DROP CONSTRAINT fk_user_membership_tenantId;
 ALTER TABLE waiting_event DROP CONSTRAINT fk_waiting_event_tenantId;
 
-ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileId;
+ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileid;
 -- ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_process_instanceId;
 
 -- business application
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId;
-ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_appId;
-ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_pageId;
-ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_parentId;
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_business_app_menu_applicationid;
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_business_app_menu_applicationpageid;
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_business_app_menu_parentid;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId;
-ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
-ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
-ALTER TABLE business_app DROP CONSTRAINT fk_app_profileId;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_business_app_page_applicationid;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_business_app_page_pageid;
+ALTER TABLE business_app DROP CONSTRAINT fk_business_app_profileid;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
-ALTER TABLE business_app DROP CONSTRAINT fk_app_layoutId;
-ALTER TABLE business_app DROP CONSTRAINT fk_app_themeId;
+ALTER TABLE business_app DROP CONSTRAINT fk_business_app_layoutid;
+ALTER TABLE business_app DROP CONSTRAINT fk_business_app_themeid;
 
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------

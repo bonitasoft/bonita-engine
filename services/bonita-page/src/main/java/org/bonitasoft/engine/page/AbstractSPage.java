@@ -14,25 +14,20 @@
 package org.bonitasoft.engine.page;
 
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.MappedSuperclass;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @MappedSuperclass
-@IdClass(PersistentObjectId.class)
-public class AbstractSPage implements PersistentObject {
+public class AbstractSPage implements PlatformPersistentObject {
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
 

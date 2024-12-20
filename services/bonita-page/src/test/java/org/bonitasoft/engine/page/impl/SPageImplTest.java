@@ -61,8 +61,7 @@ public class SPageImplTest {
                 .hasContentType(SContentType.PAGE)
                 .hasLastUpdatedBy(LAST_UPDATED_BY)
                 .hasInstalledBy(INSTALLED_BY)
-                .hasId(ID)
-                .hasTenantId(TENANT_ID);
+                .hasId(ID);
 
     }
 

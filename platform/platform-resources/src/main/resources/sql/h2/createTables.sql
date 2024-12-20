@@ -502,8 +502,53 @@ CREATE TABLE processsupervisor (
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE TABLE business_app (
+CREATE TABLE page (
+  id BIGINT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255) NOT NULL,
+  description LONGVARCHAR,
+  installationDate BIGINT NOT NULL,
+  installedBy BIGINT NOT NULL,
+  provided BOOLEAN,
+  editable BOOLEAN,
+  removable BOOLEAN,
+  lastModificationDate BIGINT NOT NULL,
+  lastUpdatedBy BIGINT NOT NULL,
+  contentName VARCHAR(280) NOT NULL,
+  content LONGBLOB,
+  contentType VARCHAR(50) NOT NULL,
+  processDefinitionId BIGINT NOT NULL,
+  pageHash VARCHAR(32),
+  CONSTRAINT pk_page PRIMARY KEY (id),
+  CONSTRAINT uk_page_name_processdefinitionid UNIQUE (name, processDefinitionId)
+);
+
+CREATE TABLE profile (
+  id BIGINT NOT NULL,
+  isDefault BOOLEAN NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description LONGVARCHAR,
+  creationDate BIGINT NOT NULL,
+  createdBy BIGINT NOT NULL,
+  lastUpdateDate BIGINT NOT NULL,
+  lastUpdatedBy BIGINT NOT NULL,
+  CONSTRAINT uk_profile_name UNIQUE (name),
+  CONSTRAINT pk_profile PRIMARY KEY (id)
+);
+
+CREATE TABLE profilemember (
   tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  profileId BIGINT NOT NULL,
+  userId BIGINT NOT NULL,
+  groupId BIGINT NOT NULL,
+  roleId BIGINT NOT NULL,
+  UNIQUE (tenantId, profileId, userId, groupId, roleId),
+  PRIMARY KEY (tenantId, id)
+);
+ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_profileid FOREIGN KEY (profileId) REFERENCES profile(id);
+
+CREATE TABLE business_app (
   id BIGINT NOT NULL,
   token VARCHAR(50) NOT NULL,
   version VARCHAR(50) NOT NULL,
@@ -523,41 +568,48 @@ CREATE TABLE business_app (
   displayName VARCHAR(255) NOT NULL,
   editable BOOLEAN,
   internalProfile VARCHAR(255),
-  isLink BOOLEAN DEFAULT FALSE
+  isLink BOOLEAN DEFAULT FALSE,
+  CONSTRAINT pk_business_app PRIMARY KEY (id),
+  CONSTRAINT uk_business_app_token_version UNIQUE (token, version)
 );
-
-ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version);
+ALTER TABLE business_app ADD CONSTRAINT fk_business_app_profileid FOREIGN KEY (profileId) REFERENCES profile (id);
+ALTER TABLE business_app ADD CONSTRAINT fk_business_app_layoutid FOREIGN KEY (layoutId) REFERENCES page (id);
+ALTER TABLE business_app ADD CONSTRAINT fk_business_app_themeid FOREIGN KEY (themeId) REFERENCES page (id);
 
 CREATE INDEX idx_app_token ON business_app (token);
 CREATE INDEX idx_app_profile ON business_app (profileId);
 CREATE INDEX idx_app_homepage ON business_app (homePageId);
 
 CREATE TABLE business_app_page (
-  tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   applicationId BIGINT NOT NULL,
   pageId BIGINT NOT NULL,
-  token VARCHAR(255) NOT NULL
+  token VARCHAR(255) NOT NULL,
+  CONSTRAINT pk_business_app_page PRIMARY KEY (id),
+  CONSTRAINT uk_business_app_page_applicationid_token UNIQUE (applicationId, token)
 );
-
-ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token);
+ALTER TABLE business_app_page ADD CONSTRAINT fk_business_app_page_applicationid FOREIGN KEY (applicationId) REFERENCES business_app (id) ON DELETE CASCADE;
+ALTER TABLE business_app_page ADD CONSTRAINT fk_business_app_page_pageid FOREIGN KEY (pageId) REFERENCES page (id);
 
 CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token);
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId);
 
 CREATE TABLE business_app_menu (
-  tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   displayName VARCHAR(255) NOT NULL,
   applicationId BIGINT NOT NULL,
   applicationPageId BIGINT,
   parentId BIGINT,
-  index_ BIGINT
+  index_ BIGINT,
+  CONSTRAINT pk_business_app_menu PRIMARY KEY (id)
 );
-
-ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id);
+-- cannot have both fk_business_app_menu_applicationid and fk_business_app_menu_applicationpageid because this create to path for deletion of business_app_menu elements:
+-- business_app -> business_app_menu
+-- business_app -> business_app_page -> business_app_menu
+-- this is not allowed in SQL Server
+ALTER TABLE business_app_menu ADD CONSTRAINT fk_business_app_menu_applicationid FOREIGN KEY (applicationId) REFERENCES business_app (id);
+ALTER TABLE business_app_menu ADD CONSTRAINT fk_business_app_menu_applicationpageid FOREIGN KEY (applicationPageId) REFERENCES business_app_page (id);
+ALTER TABLE business_app_menu ADD CONSTRAINT fk_business_app_menu_parentid FOREIGN KEY (parentId) REFERENCES business_app_menu (id);
 
 CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId);
 CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId);
@@ -823,28 +875,6 @@ CREATE TABLE queriable_log (
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE TABLE page (
-  tenantId BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  displayName VARCHAR(255) NOT NULL,
-  description LONGVARCHAR,
-  installationDate BIGINT NOT NULL,
-  installedBy BIGINT NOT NULL,
-  provided BOOLEAN,
-  editable BOOLEAN,
-  removable BOOLEAN,
-  lastModificationDate BIGINT NOT NULL,
-  lastUpdatedBy BIGINT NOT NULL,
-  contentName VARCHAR(280) NOT NULL,
-  content LONGBLOB,
-  contentType VARCHAR(50) NOT NULL,
-  processDefinitionId BIGINT NOT NULL,
-  pageHash VARCHAR(32)
-);
-ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
-ALTER TABLE page ADD CONSTRAINT uk_page UNIQUE (tenantId, name, processDefinitionId);
-
 CREATE TABLE sequence (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -882,30 +912,6 @@ CREATE TABLE platformCommand (
   name VARCHAR(50) NOT NULL UNIQUE,
   description LONGVARCHAR,
   IMPLEMENTATION VARCHAR(100) NOT NULL
-);
-CREATE TABLE profile (
-  tenantId BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  isDefault BOOLEAN NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  description LONGVARCHAR,
-  creationDate BIGINT NOT NULL,
-  createdBy BIGINT NOT NULL,
-  lastUpdateDate BIGINT NOT NULL,
-  lastUpdatedBy BIGINT NOT NULL,
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
-);
-
-CREATE TABLE profilemember (
-  tenantId BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  profileId BIGINT NOT NULL,
-  userId BIGINT NOT NULL,
-  groupId BIGINT NOT NULL,
-  roleId BIGINT NOT NULL,
-  UNIQUE (tenantId, profileId, userId, groupId, roleId),
-  PRIMARY KEY (tenantId, id)
 );
 CREATE TABLE job_desc (
   tenantid BIGINT NOT NULL,
