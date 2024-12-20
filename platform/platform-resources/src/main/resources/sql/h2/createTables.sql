@@ -35,27 +35,28 @@ ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (kind, sc
 CREATE INDEX idx_acd_kind_scope_name ON arch_contract_data (kind, scopeId, name);
 
 CREATE TABLE actor (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   scopeId BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   displayName VARCHAR(75),
   description TEXT,
   initiator BOOLEAN,
-  UNIQUE (tenantid, id, scopeId, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT uk_actor_id_scopeid_name UNIQUE (id, scopeId, name),
+  CONSTRAINT pk_actor PRIMARY KEY (id)
 );
 
 CREATE TABLE actormember (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   actorId BIGINT NOT NULL,
   userId BIGINT NOT NULL,
   groupId BIGINT NOT NULL,
   roleId BIGINT NOT NULL,
-  UNIQUE (tenantid, actorid, userId, groupId, roleId),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT uk_actormember_actorid_userid_groupid_roleid UNIQUE (actorId, userId, groupId, roleId),
+  CONSTRAINT pk_actormember PRIMARY KEY (id)
 );
+
+ALTER TABLE actormember ADD CONSTRAINT fk_actormember_actorid FOREIGN KEY (actorId) REFERENCES actor(id);
+
 CREATE TABLE category (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
