@@ -103,10 +103,23 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
                 ProcessInstanceSearchDescriptor.LAST_UPDATE);
         addLongFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_PROCESS_ID,
                 ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID);
+        addLongFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_ROOT_CASE_ID,
+                ProcessInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
+        addAddDifferentFromRootIdFilterIfNecessary(filters, builder);
         addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_PROCESS_NAME,
                 ProcessInstanceSearchDescriptor.NAME);
         addLongFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_STARTED_BY_USER_ID,
                 ProcessInstanceSearchDescriptor.STARTED_BY);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_1_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_1);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_2_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_2);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_3_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_3);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_4_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_4);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_5_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_5);
         addCallerFilterToSearchBuilderIfNecessary(filters, builder);
         builder.differentFrom(ProcessInstanceSearchDescriptor.STATE_ID, ProcessInstanceState.COMPLETED.getId());
         builder.differentFrom(ProcessInstanceSearchDescriptor.STATE_ID, ProcessInstanceState.CANCELLED.getId());
@@ -114,7 +127,19 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
         return builder;
     }
 
-    void addCallerFilterToSearchBuilderIfNecessary(final Map<String, String> filters,
+    protected void addAddDifferentFromRootIdFilterIfNecessary(Map<String, String> filters,
+            SearchOptionsBuilder builder) {
+        /*
+         * When filtering on Root Case Id, we want all the subprocesses of the root case to be returned.
+         * Not the root case itself.
+         */
+        if (filters.containsKey(CaseItem.ATTRIBUTE_ROOT_CASE_ID)) {
+            builder.differentFrom(ProcessInstanceSearchDescriptor.ID,
+                    MapUtil.getValueAsLong(filters, CaseItem.ATTRIBUTE_ROOT_CASE_ID));
+        }
+    }
+
+    protected void addCallerFilterToSearchBuilderIfNecessary(final Map<String, String> filters,
             final SearchOptionsBuilder builder) {
         /*
          * By default we add a caller filter of -1 to avoid having sub processes.
@@ -128,7 +153,7 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
         }
     }
 
-    private SearchResult<ProcessInstance> searchProcessInstances(final Map<String, String> filters,
+    protected SearchResult<ProcessInstance> searchProcessInstances(final Map<String, String> filters,
             final SearchOptions searchOptions) throws BonitaException {
         final ProcessAPI processAPI = getProcessAPI();
 

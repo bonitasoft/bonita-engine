@@ -49,6 +49,11 @@ public class ArchivedProcessInstancesSearchDescriptor {
     public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
 
     /**
+     * The field corresponding to the identifier of the root process instance.
+     */
+    public static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInstanceId";
+
+    /**
      * The field corresponding to the identifier of the state of the archived process instance.
      */
     public static final String STATE_ID = "stateId";

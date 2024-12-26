@@ -98,7 +98,9 @@ public class TestProcessFactory {
                 .addDescription("This a default process")
                 .addStartEvent("Start")
                 .addUserTask("Activity 1", "Employees")
-                .addEndEvent("Finish");
+                .addEndEvent("Finish")
+                .addTransition("Start", "Activity 1")
+                .addTransition("Activity 1", "Finish");
         return processDefinitionBuidler;
     }
 
@@ -111,8 +113,9 @@ public class TestProcessFactory {
         processDefinitionBuidler.addActor("Employees", true)
                 .addStartEvent("Start")
                 .addUserTask("Activity 1", "Employees")
-                .addEndEvent("Finish");
-
+                .addEndEvent("Finish")
+                .addTransition("Start", "Activity 1")
+                .addTransition("Activity 1", "Finish");
         try {
             return new BusinessArchiveBuilder().createNewBusinessArchive()
                     .setFormMappings(TestProcess.createDefaultProcessFormMapping(processDefinitionBuidler.getProcess()))
@@ -147,7 +150,9 @@ public class TestProcessFactory {
         processDefinitionBuidler.addActor("Employees", true)
                 .addStartEvent("Start")
                 .addCallActivity("Call Activity", expressionName, expressionVersion)
-                .addEndEvent("Finish");
+                .addEndEvent("Finish")
+                .addTransition("Start", "Call Activity")
+                .addTransition("Call Activity", "Finish");
         return processDefinitionBuidler;
     }
 
@@ -180,7 +185,9 @@ public class TestProcessFactory {
                 .addData("variable3", Date.class.getName(),
                         new ExpressionBuilder().createConstantDateExpression("428558400000"))
 
-                .addEndEvent("Finish");
+                .addEndEvent("Finish")
+                .addTransition("Start", "Activity 1")
+                .addTransition("Activity 1", "Finish");
         final TestProcess testProcess = new TestProcess(processDefinitionBuidler);
         getInstance().getProcessList().put(processName, testProcess);
         return testProcess.addActor(initiator).enable().startCase().getNextHumanTask().assignTo(initiator);

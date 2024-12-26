@@ -50,6 +50,7 @@ public class SProcessInstance implements PlatformPersistentObject {
     public static final String LAST_UPDATE_KEY = "lastUpdate";
     public static final String INTERRUPTING_EVENT_ID_KEY = "interruptingEventId";
     public static final String ID_KEY = "id";
+    public static final String ROOT_PROCESS_INSTANCE_ID_KEY = "rootProcessInstanceId";
     public static final String NAME_KEY = "name";
     public static final String PROCESSDEF_ID_KEY = "processDefinitionId";
     public static final String STATE_ID_KEY = "stateId";
