@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.ProcessStarter;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
@@ -216,9 +217,12 @@ public class ProcessExecutionLogIT extends CommonAPIIT {
 
         // set debug level to get execution logs on service tasks and process end
         final Logger exeLogger = (Logger) LoggerFactory.getLogger(ProcessExecutorImpl.class);
-        Level oldLogLevel = exeLogger.getLevel();
+        Level oldExeLogLevel = exeLogger.getLevel();
+        final Logger apiLogger = (Logger) LoggerFactory.getLogger(ProcessAPIImpl.class);
+        Level oldApiLogLevel = apiLogger.getLevel();
         try {
             exeLogger.setLevel(Level.DEBUG);
+            apiLogger.setLevel(Level.INFO);
 
             // when
             systemOutRule.clearLog();
@@ -271,7 +275,8 @@ public class ProcessExecutionLogIT extends CommonAPIIT {
         } finally {
             disableAndDeleteProcess(processDef);
             // restore old log level
-            exeLogger.setLevel(oldLogLevel);
+            exeLogger.setLevel(oldExeLogLevel);
+            apiLogger.setLevel(oldApiLogLevel);
         }
 
     }

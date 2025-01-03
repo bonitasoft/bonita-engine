@@ -237,7 +237,13 @@ public class MDCHelper {
     public static <V, E1 extends Throwable, E2 extends Throwable, E3 extends Throwable, E4 extends Throwable> V tryWithMDC(
             Object usingObject, CheckedCallable4<V, E1, E2, E3, E4> callable) throws E1, E2, E3, E4 {
         try (var mdc = getMDC(usingObject)) {
-            return callable.call();
+            try {
+                return callable.call();
+            } catch (Throwable exception) {
+                // attach context to exception before rethrowing it
+                supplyMDC(makeCurrentContextSupplier(), exception, false);
+                throw exception;
+            }
         }
     }
 
