@@ -1,7 +1,5 @@
 -- ------------------------------------------------ Foreign Keys -----------------------------------------------
-ALTER TABLE actor DROP CONSTRAINT fk_actor_tenantId;
-ALTER TABLE actormember DROP CONSTRAINT fk_actormember_tenantId;
-ALTER TABLE actormember DROP CONSTRAINT fk_actormember_actorId;
+ALTER TABLE actormember DROP CONSTRAINT fk_actormember_actorid;
 ALTER TABLE category DROP CONSTRAINT fk_category_tenantId;
 ALTER TABLE command DROP CONSTRAINT fk_command_tenantId;
 ALTER TABLE connector_instance DROP CONSTRAINT fk_connector_instance_tenantId;
