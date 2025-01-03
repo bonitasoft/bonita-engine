@@ -945,21 +945,7 @@ ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, j
 ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
 CREATE INDEX idx_job_log_jobdescid ON job_log(jobdescriptorid);
 
-CREATE TABLE form_mapping (
-  tenantId INT8 NOT NULL,
-  id INT8 NOT NULL,
-  process INT8 NOT NULL,
-  type INT NOT NULL,
-  task VARCHAR(255),
-  page_mapping_tenant_id INT8,
-  page_mapping_id INT8,
-  lastUpdateDate INT8,
-  lastUpdatedBy INT8,
-  target VARCHAR(16) NOT NULL,
-  PRIMARY KEY (tenantId, id)
-);
 CREATE TABLE page_mapping (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   key_ VARCHAR(255) NOT NULL,
   pageId INT8 NULL,
@@ -968,10 +954,23 @@ CREATE TABLE page_mapping (
   page_authoriz_rules TEXT NULL,
   lastUpdateDate INT8 NULL,
   lastUpdatedBy INT8 NULL,
-  CONSTRAINT UK_page_mapping UNIQUE (tenantId, key_),
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT uk_page_mapping_key UNIQUE (key_),
+  CONSTRAINT pk_page_mapping PRIMARY KEY (id)
 );
-ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id);
+
+CREATE TABLE form_mapping (
+  id INT8 NOT NULL,
+  process INT8 NOT NULL,
+  type INT NOT NULL,
+  task VARCHAR(255),
+  page_mapping_id INT8,
+  lastUpdateDate INT8,
+  lastUpdatedBy INT8,
+  target VARCHAR(16) NOT NULL,
+  CONSTRAINT pk_form_mapping PRIMARY KEY (id)
+);
+
+ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_id) REFERENCES page_mapping(id);
 
 CREATE TABLE proc_parameter (
   tenantId INT8 NOT NULL,
