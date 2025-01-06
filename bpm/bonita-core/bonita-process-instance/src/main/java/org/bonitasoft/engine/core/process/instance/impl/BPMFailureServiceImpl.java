@@ -31,6 +31,7 @@ import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
 import org.bonitasoft.engine.core.process.instance.model.SABPMFailure;
 import org.bonitasoft.engine.core.process.instance.model.SBPMFailure;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -61,6 +62,7 @@ public class BPMFailureServiceImpl implements BPMFailureService {
         var bpmFailure = SBPMFailure.builder()
                 .flowNodeInstanceId(flowNodeInstance.getId())
                 .processInstanceId(flowNodeInstance.getParentProcessInstanceId())
+                .rootProcessInstanceId(flowNodeInstance.getRootProcessInstanceId())
                 .processDefinitionId(flowNodeInstance.getProcessDefinitionId())
                 .scope(failure.scope())
                 .context(buildContext(failure.throwable()))
@@ -114,6 +116,89 @@ public class BPMFailureServiceImpl implements BPMFailureService {
         final Map<String, Object> parameters = Map.ofEntries(Map.entry("flowNodeInstanceId", flowNodeInstanceId));
         return persistenceService.selectList(new SelectListDescriptor<>("getArchivedFlowNodeFailures", parameters,
                 SABPMFailure.class, queryOptions));
+    }
+
+    @Override
+    public SBPMFailure createProcessInstanceFailure(SProcessInstance processInstance, Failure failure)
+            throws SPersistenceException {
+        log.debug("Registering failure for process instance {}", processInstance.getId());
+        var bpmFailure = SBPMFailure.builder()
+                .processInstanceId(processInstance.getId())
+                .processDefinitionId(processInstance.getProcessDefinitionId())
+                .rootProcessInstanceId(processInstance.getRootProcessInstanceId())
+                .scope(failure.scope())
+                .context(buildContext(failure.throwable()))
+                .errorMessage(ExceptionUtils.getRootCauseMessage(failure.throwable()))
+                .stackTrace(ExceptionUtils.getStackTrace(failure.throwable()))
+                .build();
+        return persistenceService.insert(bpmFailure);
+    }
+
+    @Override
+    public List<SBPMFailure> getProcessInstanceFailures(long processInstanceId, int maxResults)
+            throws SBonitaReadException {
+        final QueryOptions queryOptions = new QueryOptions(0, maxResults);
+        final Map<String, Object> parameters = Map.ofEntries(Map.entry("processInstanceId", processInstanceId));
+        return persistenceService.selectList(new SelectListDescriptor<>("getProcessInstanceFailures", parameters,
+                SBPMFailure.class, queryOptions));
+    }
+
+    @Override
+    public void archiveProcessInstanceFailures(long processInstanceId, long archiveDate) throws SBonitaException {
+        log.debug("Archiving failures of process instance {}", processInstanceId);
+        archiveService.recordInserts(archiveDate, getProcessInstanceFailures(processInstanceId, Integer.MAX_VALUE)
+                .stream()
+                .map(SABPMFailure::new)
+                .map(ArchiveInsertRecord::new)
+                .toArray(ArchiveInsertRecord[]::new));
+    }
+
+    @Override
+    public void deleteProcessInstanceFailures(long processInstanceId) throws SBonitaException {
+        log.debug("Deleting failures of process instance {}", processInstanceId);
+        persistenceService.delete(getProcessInstanceFailures(processInstanceId, Integer.MAX_VALUE)
+                .stream()
+                .map(SBPMFailure::getId)
+                .toList(),
+                SBPMFailure.class);
+    }
+
+    @Override
+    public void deleteArchivedProcessInstanceFailures(List<Long> processInstanceIds) throws SBonitaException {
+        if (!processInstanceIds.isEmpty()) {
+            log.debug("Deleting archived failures of process instances {}", processInstanceIds);
+            archiveService.deleteFromQuery("deleteArchivedBPMFailuresByProcessInstanceIds",
+                    Map.ofEntries(Map.entry("processInstanceIds", processInstanceIds)));
+        }
+    }
+
+    @Override
+    public List<SABPMFailure> getArchivedProcessInstanceFailures(long processInstanceId, int maxResults)
+            throws SBonitaReadException {
+        final QueryOptions queryOptions = new QueryOptions(0, maxResults);
+        final Map<String, Object> parameters = Map.ofEntries(Map.entry("processInstanceId", processInstanceId));
+        return persistenceService
+                .selectList(new SelectListDescriptor<>("getArchivedProcessInstanceFailures", parameters,
+                        SABPMFailure.class, queryOptions));
+    }
+
+    @Override
+    public List<SBPMFailure> getSubProcessInstanceFailures(long rootProcessInstanceId, int maxResults)
+            throws SBonitaReadException {
+        final QueryOptions queryOptions = new QueryOptions(0, maxResults);
+        final Map<String, Object> parameters = Map.ofEntries(Map.entry("rootProcessInstanceId", rootProcessInstanceId));
+        return persistenceService.selectList(new SelectListDescriptor<>("getSubProcessInstanceFailures", parameters,
+                SBPMFailure.class, queryOptions));
+    }
+
+    @Override
+    public List<SABPMFailure> getArchivedSubProcessInstanceFailures(long rootProcessInstanceId, int maxResults)
+            throws SBonitaReadException {
+        final QueryOptions queryOptions = new QueryOptions(0, maxResults);
+        final Map<String, Object> parameters = Map.ofEntries(Map.entry("rootProcessInstanceId", rootProcessInstanceId));
+        return persistenceService
+                .selectList(new SelectListDescriptor<>("getArchivedSubProcessInstanceFailures", parameters,
+                        SABPMFailure.class, queryOptions));
     }
 
     private static String buildContext(Throwable e) {

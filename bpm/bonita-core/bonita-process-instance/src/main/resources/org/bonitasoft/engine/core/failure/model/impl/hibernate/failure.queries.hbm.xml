@@ -28,4 +28,40 @@
         ORDER BY f.failureDate DESC
     </query>
 
+    <query name="getProcessInstanceFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SBPMFailure AS f
+        WHERE f.processInstanceId = :processInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+    <query name="deleteArchivedBPMFailuresByProcessInstanceIds">
+        DELETE
+        FROM org.bonitasoft.engine.core.process.instance.model.SABPMFailure AS f
+        WHERE f.processInstanceId IN (:processInstanceIds)
+    </query>
+
+    <query name="getArchivedProcessInstanceFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SABPMFailure AS f
+        WHERE f.processInstanceId = :processInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+    <query name="getSubProcessInstanceFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SBPMFailure AS f
+        WHERE f.rootProcessInstanceId = :rootProcessInstanceId
+        AND f.processInstanceId != f.rootProcessInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+    <query name="getArchivedSubProcessInstanceFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SABPMFailure AS f
+        WHERE f.rootProcessInstanceId = :rootProcessInstanceId
+        AND f.processInstanceId != f.rootProcessInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
 </hibernate-mapping>

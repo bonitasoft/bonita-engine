@@ -18,11 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.process.ActivationState;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -30,24 +26,21 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class FlowNodeFailureIT extends TestWithUser {
 
     private ServiceAccessor serviceAccessor;
+    private ProcessDefinition processDefinition;
 
     @Override
     @Before
     public void before() throws Exception {
         super.before();
         serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
-    }
-
-    @Test
-    public void create_a_failure_on_flownode_operation_exception() throws Exception {
-        // Given a process failing on a flownode operation
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+        DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_failed_flownode", PROCESS_VERSION)
                 .addActor(ACTOR_NAME)
                 .addAutomaticTask("step1")
@@ -58,8 +51,18 @@ public class FlowNodeFailureIT extends TestWithUser {
                                 .createGroovyScriptExpression("my-failing-script",
                                         "throw new RuntimeException('Failed !')", String.class.getName()))
                 .getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
-                user);
+        processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+    }
+
+    @After
+    public void after() throws Exception {
+        disableAndDeleteProcess(processDefinition);
+        super.after();
+    }
+
+    @Test
+    public void create_a_failure_on_flownode_operation_exception() throws Exception {
+        // Given a process failing on a flownode operation
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
@@ -81,7 +84,12 @@ public class FlowNodeFailureIT extends TestWithUser {
                 .isEqualTo("expression::my-failing-script");
         assertThat(failure.getErrorMessage())
                 .isEqualTo("RuntimeException: Failed !");
-        disableAndDeleteProcess(processDefinition);
+
+        var processInstanceFailures = serviceAccessor.getTransactionService()
+                .executeInTransaction(() -> failureService.getProcessInstanceFailures(processInstance.getId(), 5));
+        assertThat(processInstanceFailures).hasSize(1);
+        assertThat(processInstanceFailures.get(0))
+                .isEqualTo(failures.get(0));
     }
 
 }

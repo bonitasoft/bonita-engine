@@ -19,6 +19,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.model.SABPMFailure;
 import org.bonitasoft.engine.core.process.instance.model.SBPMFailure;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.services.SPersistenceException;
 
@@ -36,6 +37,26 @@ public interface BPMFailureService {
     void deleteArchivedFlowNodeFailures(List<Long> flowNodeInstanceIds) throws SBonitaException;
 
     List<SABPMFailure> getArchivedFlowNodeFailures(long flowNodeInstanceId, int maxResults) throws SBonitaReadException;
+
+    SBPMFailure createProcessInstanceFailure(SProcessInstance processInstance, Failure failure)
+            throws SPersistenceException;
+
+    List<SBPMFailure> getProcessInstanceFailures(long processInstanceId, int maxResults) throws SBonitaReadException;
+
+    void archiveProcessInstanceFailures(long processInstanceId, long archiveDate) throws SBonitaException;
+
+    void deleteProcessInstanceFailures(long processInstanceId) throws SBonitaException;
+
+    void deleteArchivedProcessInstanceFailures(List<Long> processInstanceIds) throws SBonitaException;
+
+    List<SABPMFailure> getArchivedProcessInstanceFailures(long processInstanceId, int maxResults)
+            throws SBonitaReadException;
+
+    List<SBPMFailure> getSubProcessInstanceFailures(long rootProcessInstanceId, int maxResults)
+            throws SBonitaReadException;
+
+    List<SABPMFailure> getArchivedSubProcessInstanceFailures(long rootProcessInstanceId, int maxResults)
+            throws SBonitaReadException;
 
     record Failure(String scope, Throwable throwable){}
 }

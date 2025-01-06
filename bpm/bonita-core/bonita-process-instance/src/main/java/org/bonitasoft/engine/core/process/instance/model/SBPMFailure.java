@@ -38,6 +38,7 @@ public class SBPMFailure implements PlatformPersistentObject {
     private long id;
     private long processDefinitionId;
     private long processInstanceId;
+    private long rootProcessInstanceId;
     private long flowNodeInstanceId;
     private String scope;
     private String context;

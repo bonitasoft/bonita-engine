@@ -37,6 +37,7 @@ public class SABPMFailure implements ArchivedPersistentObject {
     private long id;
     private long processDefinitionId;
     private long processInstanceId;
+    private long rootProcessInstanceId;
     private long flowNodeInstanceId;
     private String scope;
     private String context;
@@ -51,6 +52,7 @@ public class SABPMFailure implements ArchivedPersistentObject {
         this.sourceObjectId = bpmFailure.getId();
         this.processDefinitionId = bpmFailure.getProcessDefinitionId();
         this.processInstanceId = bpmFailure.getProcessInstanceId();
+        this.rootProcessInstanceId = bpmFailure.getRootProcessInstanceId();
         this.flowNodeInstanceId = bpmFailure.getFlowNodeInstanceId();
         this.scope = bpmFailure.getScope();
         this.context = bpmFailure.getContext();

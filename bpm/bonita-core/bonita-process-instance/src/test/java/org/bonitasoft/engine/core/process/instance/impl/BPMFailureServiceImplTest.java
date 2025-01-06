@@ -35,6 +35,7 @@ import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
 import org.bonitasoft.engine.core.process.instance.model.SABPMFailure;
 import org.bonitasoft.engine.core.process.instance.model.SBPMFailure;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -67,7 +68,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void createFlowNodeFailure() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_proper_content() throws Exception {
         var now = Instant.now();
         var flowNodeInstance = createFlowNodeInstance();
         var failure = new BPMFailureService.Failure("scope", new Throwable("error message"));
@@ -78,6 +79,25 @@ class BPMFailureServiceImplTest {
         assertThat(bpmFailure.getFlowNodeInstanceId()).isEqualTo(flowNodeInstance.getId());
         assertThat(bpmFailure.getProcessDefinitionId()).isEqualTo(flowNodeInstance.getProcessDefinitionId());
         assertThat(bpmFailure.getProcessInstanceId()).isEqualTo(flowNodeInstance.getParentProcessInstanceId());
+        assertThat(bpmFailure.getRootProcessInstanceId()).isEqualTo(flowNodeInstance.getRootProcessInstanceId());
+        assertThat(bpmFailure.getScope()).isEqualTo("scope");
+        assertThat(bpmFailure.getErrorMessage()).isEqualTo("Throwable: error message");
+        assertThat(bpmFailure.getStackTrace()).isEqualTo(ExceptionUtils.getStackTrace(failure.throwable()));
+        assertThat(Instant.ofEpochMilli(bpmFailure.getFailureDate())).isCloseTo(now, within(1000, ChronoUnit.MILLIS));
+    }
+
+    @Test
+    void should_createProcessInstanceFailure_record_failure_with_proper_content() throws Exception {
+        var now = Instant.now();
+        var processInstance = createProcessInstance();
+        var failure = new BPMFailureService.Failure("scope", new Throwable("error message"));
+
+        var bpmFailure = service.createProcessInstanceFailure(processInstance, failure);
+
+        verify(persistenceService).insert(bpmFailure);
+        assertThat(bpmFailure.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(bpmFailure.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
+        assertThat(bpmFailure.getRootProcessInstanceId()).isEqualTo(processInstance.getRootProcessInstanceId());
         assertThat(bpmFailure.getScope()).isEqualTo("scope");
         assertThat(bpmFailure.getErrorMessage()).isEqualTo("Throwable: error message");
         assertThat(bpmFailure.getStackTrace()).isEqualTo(ExceptionUtils.getStackTrace(failure.throwable()));
@@ -89,11 +109,20 @@ class BPMFailureServiceImplTest {
         when(flowNodeInstance.getId()).thenReturn(1L);
         when(flowNodeInstance.getParentProcessInstanceId()).thenReturn(2L);
         when(flowNodeInstance.getProcessDefinitionId()).thenReturn(3L);
+        when(flowNodeInstance.getRootProcessInstanceId()).thenReturn(4L);
         return flowNodeInstance;
     }
 
+    private static SProcessInstance createProcessInstance() {
+        SProcessInstance processInstance = Mockito.mock(SProcessInstance.class);
+        when(processInstance.getId()).thenReturn(10L);
+        when(processInstance.getProcessDefinitionId()).thenReturn(11L);
+        when(processInstance.getRootProcessInstanceId()).thenReturn(12L);
+        return processInstance;
+    }
+
     @Test
-    void failureWithExpressionContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_expression_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var failure = new BPMFailureService.Failure("scope",
                 new SExpressionEvaluationException(new RuntimeException("error in expression"), "expressionName"));
@@ -104,7 +133,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void failureWithMessageContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_message_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var errorInMessage = new SBonitaRuntimeException("error in message");
         errorInMessage.setMessageInstanceNameOnContext("messageName");
@@ -116,7 +145,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void failureWithConnectorContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_connector_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var errorInConnector = new SBonitaRuntimeException("error in connector");
         errorInConnector.setConnectorDefinitionIdOnContext("rest-connector");
@@ -130,7 +159,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void failureWithConnectorInputContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_connector_input_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var errorInConnector = new SBonitaRuntimeException("error in connector");
         errorInConnector.setConnectorDefinitionIdOnContext("rest-connector");
@@ -145,7 +174,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void failureWithConnectorInputExpressionContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_connector_input_expression_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var errorInConnector = new SBonitaRuntimeException(new SExpressionEvaluationException(
                 new RuntimeException("error in input expression"), "expressionName"));
@@ -162,7 +191,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void failureWithConnectorOutputExpressionContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_connector_output_expression_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var errorInConnector = new SBonitaRuntimeException(
                 new SOperationExecutionException(new SExpressionEvaluationException(
@@ -179,7 +208,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void failureWithConnectorValidationContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_connector_validation_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var errorInConnector = new SBonitaRuntimeException(new ConnectorValidationException("error in validation"));
         errorInConnector.setConnectorDefinitionIdOnContext("rest-connector");
@@ -193,7 +222,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void failureWithNamedTransitionContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_named_transition_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var errorInTransition = new SBonitaRuntimeException(new SExpressionEvaluationException(
                 new RuntimeException("error in consition expression"), "expressionName"));
@@ -208,7 +237,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void failureWithUnnamedTransitionContext() throws Exception {
+    void should_createFlowNodeFailure_record_failure_with_unnamed_transition_context() throws Exception {
         var flowNodeInstance = createFlowNodeInstance();
         var errorInTransition = new SBonitaRuntimeException(new SExpressionEvaluationException(
                 new RuntimeException("error in consition expression"), "expressionName"));
@@ -222,7 +251,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void getFlowNodeFailures() throws Exception {
+    void should_getFlowNodeFailures_call_the_right_query_with_proper_parameters() throws Exception {
         service.getFlowNodeFailures(1, 10);
 
         ArgumentCaptor<SelectListDescriptor<SBPMFailure>> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
@@ -237,11 +266,27 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void archiveFlowNodeFailures() throws Exception {
+    void should_getProcessInstanceFailures_call_the_right_query_with_proper_parameters() throws Exception {
+        service.getProcessInstanceFailures(1, 10);
+
+        ArgumentCaptor<SelectListDescriptor<SBPMFailure>> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
+        verify(persistenceService).selectList(captor.capture());
+
+        var descriptor = captor.getValue();
+        assertThat(descriptor.getQueryName()).isEqualTo("getProcessInstanceFailures");
+        assertThat(descriptor.getInputParameter("processInstanceId")).isEqualTo(1L);
+        assertThat(descriptor.getReturnType()).isEqualTo(SBPMFailure.class);
+        assertThat(descriptor.getStartIndex()).isZero();
+        assertThat(descriptor.getPageSize()).isEqualTo(10);
+    }
+
+    @Test
+    void should_archiveFlowNodeFailures_call_archive_service_with_proper_parameters() throws Exception {
         var failureDate = Instant.now().toEpochMilli();
         doReturn(List.of(SBPMFailure.builder()
                 .failureDate(failureDate)
                 .flowNodeInstanceId(1L)
+                .rootProcessInstanceId(1L)
                 .processDefinitionId(1L)
                 .processInstanceId(1L)
                 .scope("scope")
@@ -267,7 +312,37 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void deleteFlowNodeFailures() throws Exception {
+    void should_archiveProcessInstanceFailures_call_archive_service_with_proper_parameters() throws Exception {
+        var failureDate = Instant.now().toEpochMilli();
+        doReturn(List.of(SBPMFailure.builder()
+                .failureDate(failureDate)
+                .rootProcessInstanceId(1L)
+                .processDefinitionId(1L)
+                .processInstanceId(1L)
+                .scope("scope")
+                .context("context")
+                .errorMessage("errorMessage")
+                .stackTrace("stackTrace")
+                .build())).when(service).getProcessInstanceFailures(1L, Integer.MAX_VALUE);
+        long archiveDate = Instant.now().toEpochMilli();
+
+        service.archiveProcessInstanceFailures(1L, archiveDate);
+
+        var captor = ArgumentCaptor.forClass(ArchiveInsertRecord.class);
+        verify(archiveService).recordInserts(eq(archiveDate), captor.capture());
+
+        var archiveInsertRecord = captor.getValue();
+        var entity = archiveInsertRecord.getEntity();
+        assertThat(entity).isInstanceOf(SABPMFailure.class);
+        var archiveBPMFailure = (SABPMFailure) entity;
+        assertThat(archiveBPMFailure.getFailureDate()).isEqualTo(failureDate);
+        assertThat(archiveBPMFailure.getRootProcessInstanceId()).isEqualTo(1L);
+        assertThat(archiveBPMFailure.getProcessDefinitionId()).isEqualTo(1L);
+        assertThat(archiveBPMFailure.getProcessInstanceId()).isEqualTo(1L);
+    }
+
+    @Test
+    void should_deleteFlowNodeFailures_call_persistence_service_with_proper_parameters() throws Exception {
         doReturn(List.of(SBPMFailure.builder()
                 .id(1L)
                 .build(),
@@ -285,7 +360,25 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void deleteArchivedFlowNodeFailures() throws Exception {
+    void should_deleteProcessInstanceFailures_call_persistence_service_with_proper_parameters() throws Exception {
+        doReturn(List.of(SBPMFailure.builder()
+                .id(1L)
+                .build(),
+                SBPMFailure.builder()
+                        .id(2L)
+                        .build()))
+                .when(service).getProcessInstanceFailures(1L, Integer.MAX_VALUE);
+
+        service.deleteProcessInstanceFailures(1L);
+
+        ArgumentCaptor<List<Long>> captor = ArgumentCaptor.forClass(List.class);
+        verify(persistenceService).delete(captor.capture(), eq(SBPMFailure.class));
+
+        assertThat(captor.getValue()).contains(1L, 2L);
+    }
+
+    @Test
+    void should_deleteArchivedFlowNodeFailures_call_the_right_query_with_proper_parameters() throws Exception {
         service.deleteArchivedFlowNodeFailures(List.of(1L, 2L));
 
         verify(archiveService).deleteFromQuery("deleteArchivedBPMFailuresByFlowNodeInstanceIds",
@@ -293,7 +386,7 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void getArchivedFlowNodeFailures() throws Exception {
+    void should_getArchivedFlowNodeFailures_call_the_right_query_with_proper_parameters() throws Exception {
         service.getArchivedFlowNodeFailures(1L, 10);
 
         ArgumentCaptor<SelectListDescriptor<SABPMFailure>> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
@@ -302,6 +395,59 @@ class BPMFailureServiceImplTest {
         var descriptor = captor.getValue();
         assertThat(descriptor.getQueryName()).isEqualTo("getArchivedFlowNodeFailures");
         assertThat(descriptor.getInputParameter("flowNodeInstanceId")).isEqualTo(1L);
+        assertThat(descriptor.getReturnType()).isEqualTo(SABPMFailure.class);
+        assertThat(descriptor.getStartIndex()).isZero();
+        assertThat(descriptor.getPageSize()).isEqualTo(10);
+    }
+
+    @Test
+    void should_deleteArchivedProcessInstanceFailures_call_the_right_query_with_proper_parameters() throws Exception {
+        service.deleteArchivedProcessInstanceFailures(List.of(1L, 2L));
+
+        verify(archiveService).deleteFromQuery("deleteArchivedBPMFailuresByProcessInstanceIds",
+                Map.ofEntries(Map.entry("processInstanceIds", List.of(1L, 2L))));
+    }
+
+    @Test
+    void should_getArchivedProcessInstanceFailures_call_the_right_query_with_proper_parameters() throws Exception {
+        service.getArchivedProcessInstanceFailures(1L, 10);
+
+        ArgumentCaptor<SelectListDescriptor<SABPMFailure>> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
+        verify(persistenceService).selectList(captor.capture());
+
+        var descriptor = captor.getValue();
+        assertThat(descriptor.getQueryName()).isEqualTo("getArchivedProcessInstanceFailures");
+        assertThat(descriptor.getInputParameter("processInstanceId")).isEqualTo(1L);
+        assertThat(descriptor.getReturnType()).isEqualTo(SABPMFailure.class);
+        assertThat(descriptor.getStartIndex()).isZero();
+        assertThat(descriptor.getPageSize()).isEqualTo(10);
+    }
+
+    @Test
+    void should_getSubProcessInstanceFailures_call_the_right_query_with_proper_parameters() throws Exception {
+        service.getSubProcessInstanceFailures(1, 10);
+
+        ArgumentCaptor<SelectListDescriptor<SBPMFailure>> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
+        verify(persistenceService).selectList(captor.capture());
+
+        var descriptor = captor.getValue();
+        assertThat(descriptor.getQueryName()).isEqualTo("getSubProcessInstanceFailures");
+        assertThat(descriptor.getInputParameter("rootProcessInstanceId")).isEqualTo(1L);
+        assertThat(descriptor.getReturnType()).isEqualTo(SBPMFailure.class);
+        assertThat(descriptor.getStartIndex()).isZero();
+        assertThat(descriptor.getPageSize()).isEqualTo(10);
+    }
+
+    @Test
+    void should_getArchivedSubProcessInstanceFailures_call_the_right_query_with_proper_parameters() throws Exception {
+        service.getArchivedSubProcessInstanceFailures(1L, 10);
+
+        ArgumentCaptor<SelectListDescriptor<SABPMFailure>> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
+        verify(persistenceService).selectList(captor.capture());
+
+        var descriptor = captor.getValue();
+        assertThat(descriptor.getQueryName()).isEqualTo("getArchivedSubProcessInstanceFailures");
+        assertThat(descriptor.getInputParameter("rootProcessInstanceId")).isEqualTo(1L);
         assertThat(descriptor.getReturnType()).isEqualTo(SABPMFailure.class);
         assertThat(descriptor.getStartIndex()).isZero();
         assertThat(descriptor.getPageSize()).isEqualTo(10);

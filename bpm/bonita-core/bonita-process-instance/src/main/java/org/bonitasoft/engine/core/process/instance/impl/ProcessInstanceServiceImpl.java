@@ -283,6 +283,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         commentService.deleteArchivedComments(sourceProcessInstanceIds);
         refBusinessDataService.deleteArchivedRefBusinessDataInstance(sourceProcessInstanceIds);
         contractDataService.deleteArchivedProcessData(sourceProcessInstanceIds);
+        bpmFailureService.deleteArchivedProcessInstanceFailures(sourceProcessInstanceIds);
     }
 
     private void deleteArchivedFlowNodeInstancesAndElements(List<Long> sourceProcessInstanceIds)
@@ -389,6 +390,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         deleteConnectorInstancesIfNecessary(processInstance, processDefinition);
         commentService.deleteComments(processInstance.getId());
         deleteEventSubprocessWaitingEvents(processInstance, processDefinition);
+        bpmFailureService.deleteProcessInstanceFailures(processInstance.getId());
     }
 
     private void deleteEventSubprocessWaitingEvents(SProcessInstance processInstance,

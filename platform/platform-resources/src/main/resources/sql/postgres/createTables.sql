@@ -1027,6 +1027,7 @@ CREATE TABLE bpm_failure (
   id INT8 NOT NULL,
   processDefinitionId INT8 NOT NULL,
   processInstanceId INT8 NOT NULL,
+  rootProcessInstanceId INT8,
   flowNodeInstanceId INT8,
   scope VARCHAR(255),
   context VARCHAR(1024),
@@ -1037,12 +1038,14 @@ CREATE TABLE bpm_failure (
 );
 CREATE INDEX idx_flownode_instance_id ON bpm_failure (flowNodeInstanceId);
 CREATE INDEX idx_process_instance_id ON bpm_failure (processInstanceId);
+CREATE INDEX idx_root_process_instance_id ON bpm_failure (rootProcessInstanceId);
 CREATE INDEX idx_process_definition_id ON bpm_failure (processDefinitionId);
 
 CREATE TABLE arch_bpm_failure (
   id INT8 NOT NULL,
   processDefinitionId INT8 NOT NULL,
   processInstanceId INT8 NOT NULL,
+  rootProcessInstanceId INT8,
   flowNodeInstanceId INT8,
   scope VARCHAR(255),
   context VARCHAR(1024),
@@ -1055,4 +1058,5 @@ CREATE TABLE arch_bpm_failure (
 );
 CREATE INDEX idx_arch_flownode_instance_id ON arch_bpm_failure (flowNodeInstanceId);
 CREATE INDEX idx_arch_process_instance_id ON arch_bpm_failure (processInstanceId);
+CREATE INDEX idx_arch_root_process_instance_id ON arch_bpm_failure (rootProcessInstanceId);
 CREATE INDEX idx_arch_process_definition_id ON arch_bpm_failure (processDefinitionId);

@@ -166,6 +166,9 @@ public class BPMArchiverService {
 
             archiveRefBusinessDataInstances(processInstance.getId());
 
+            //process instance failures
+            archiveProcessInstanceFailures(processInstance, archiveDate);
+
             // Archive
             archiveAndDeleteProcessInstanceObject(processDefinition, processInstance, saProcessInstance, archiveDate);
         } finally {
@@ -336,6 +339,15 @@ public class BPMArchiverService {
         final SFlowNodeInstance flowNodeInstance2 = activityInstanceService
                 .getFlowNodeInstance(flowNodeInstance.getId());
         processInstanceService.deleteFlowNodeInstance(flowNodeInstance2, processDefinition);
+    }
+
+    private void archiveProcessInstanceFailures(SProcessInstance processInstance, long archiveDate)
+            throws SArchivingException {
+        try {
+            bpmFailureService.archiveProcessInstanceFailures(processInstance.getId(), archiveDate);
+        } catch (SBonitaException e) {
+            throw new SArchivingException(e);
+        }
     }
 
     private void archiveFlowNodeFailures(SFlowNodeInstance flowNodeInstance, long archiveDate)

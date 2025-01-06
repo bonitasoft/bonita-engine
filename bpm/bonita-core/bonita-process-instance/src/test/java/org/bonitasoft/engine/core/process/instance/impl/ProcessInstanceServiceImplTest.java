@@ -228,7 +228,21 @@ public class ProcessInstanceServiceImplTest {
         verify(processInstanceService, times(1))
                 .deleteArchivedProcessInstances(Collections.singletonList(sProcessInstance.getId()));
         verify(activityInstanceService, times(1)).deleteArchivedFlowNodeInstances(asList(4L, 5L, 6L));
-        verify(bpmFailureService, times(1)).deleteArchivedFlowNodeFailures(asList(4L, 5L, 6L));
+        verify(bpmFailureService).deleteArchivedFlowNodeFailures(asList(4L, 5L, 6L));
+    }
+
+    @Test
+    public void testDeleteProcessInstance_delete_failures() throws Exception {
+        final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        when(classLoaderService.getClassLoader(identifier(ScopeType.PROCESS, sProcessInstance.getId())))
+                .thenReturn(classLoader);
+        doReturn(new HashSet<>()).when(activityInstanceService)
+                .getSourceObjectIdsOfArchivedFlowNodeInstances(any());
+        processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
+        verify(bpmFailureService).deleteProcessInstanceFailures(sProcessInstance.getId());
+        verify(bpmFailureService)
+                .deleteArchivedProcessInstanceFailures(Collections.singletonList(sProcessInstance.getId()));
     }
 
     @Test
