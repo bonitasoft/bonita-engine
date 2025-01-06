@@ -911,39 +911,35 @@ CREATE TABLE platformCommand (
   description TEXT,
   IMPLEMENTATION VARCHAR(100) NOT NULL
 );
+
 CREATE TABLE job_desc (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   jobclassname VARCHAR(100) NOT NULL,
   jobname VARCHAR(100) NOT NULL,
   description VARCHAR(50),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_job_desc PRIMARY KEY (id)
 );
-CREATE INDEX idx_job_desc_id ON job_desc(id);
 
 CREATE TABLE job_param (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   jobDescriptorId INT8 NOT NULL,
   key_ VARCHAR(50) NOT NULL,
   value_ BYTEA NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_job_param PRIMARY KEY (id)
 );
+ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobdescriptorid FOREIGN KEY (jobDescriptorId) REFERENCES job_desc(id) ON DELETE CASCADE;
 CREATE INDEX idx_job_param_jobid ON job_param(jobDescriptorId);
 
 CREATE TABLE job_log (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   jobDescriptorId INT8 NOT NULL,
   retryNumber INT8,
   lastUpdateDate INT8,
   lastMessage TEXT,
-  PRIMARY KEY (tenantid, id, jobDescriptorId)
+  CONSTRAINT pk_job_log PRIMARY KEY (id),
+  CONSTRAINT uk_job_log_jobdescriptorid UNIQUE (jobDescriptorId)
 );
-
-ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
-ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
-CREATE INDEX idx_job_log_jobdescid ON job_log(jobdescriptorid);
+ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobdescriptorid FOREIGN KEY (jobDescriptorId) REFERENCES job_desc(id) ON DELETE CASCADE;
 
 CREATE TABLE page_mapping (
   id INT8 NOT NULL,
