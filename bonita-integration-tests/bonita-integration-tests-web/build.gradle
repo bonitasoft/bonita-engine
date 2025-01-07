@@ -18,7 +18,7 @@ dependencies {
     testImplementation libs.mockitoCore
     testImplementation libs.assertj
     testImplementation libs.restlet
-    testIm    testImplementaawaitility
+    testImplementation libs.awaitility
 }
 
 java {
