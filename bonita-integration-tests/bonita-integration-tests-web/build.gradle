@@ -17,6 +17,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.restlet.jse:org.restlet:${Deps.restletVersion}"
+    testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
 }
 
 java {
