@@ -157,9 +157,17 @@ public class ArchivedCaseDatastore extends CommonDatastore<ArchivedCaseItem, Arc
                                 MapUtil.getValueAsLong(filters, ArchivedCaseItem.FILTER_SUPERVISOR_ID), builder.done());
             }
 
-            if (filters.containsKey(CaseItem.FILTER_CALLER)) {
-                builder.filter(ArchivedProcessInstancesSearchDescriptor.STATE_ID,
-                        ProcessInstanceState.COMPLETED.getId());
+            if (filters.containsKey(CaseItem.FILTER_CALLER) && !filters.containsKey(CaseItem.FILTER_STATE)) {
+                builder.leftParenthesis()
+                        .filter(ArchivedProcessInstancesSearchDescriptor.STATE_ID,
+                                ProcessInstanceState.COMPLETED.getId())
+                        .or()
+                        .filter(ArchivedProcessInstancesSearchDescriptor.STATE_ID,
+                                ProcessInstanceState.ABORTED.getId())
+                        .or()
+                        .filter(ArchivedProcessInstancesSearchDescriptor.STATE_ID,
+                                ProcessInstanceState.CANCELLED.getId())
+                        .rightParenthesis();
                 return processAPI.searchArchivedProcessInstancesInAllStates(builder.done());
             }
 

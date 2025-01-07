@@ -1441,8 +1441,15 @@ public class ProcessAPIImpl implements ProcessAPI {
         return searchProcessInstances.getResult();
     }
 
+    @Deprecated
     @Override
     public List<ArchivedProcessInstance> getArchivedProcessInstances(final int startIndex, final int maxResults,
+            final ProcessInstanceCriterion criterion) {
+        return getCompletedProcessInstances(startIndex, maxResults, criterion);
+    }
+
+    @Override
+    public List<ArchivedProcessInstance> getCompletedProcessInstances(final int startIndex, final int maxResults,
             final ProcessInstanceCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
@@ -1473,8 +1480,14 @@ public class ProcessAPIImpl implements ProcessAPI {
                 searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
     }
 
+    @Deprecated
     @Override
     public long getNumberOfArchivedProcessInstances() {
+        return getNumberOfCompletedProcessInstances();
+    }
+
+    @Override
+    public long getNumberOfCompletedProcessInstances() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
@@ -3870,10 +3883,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessInstance> searchOpenProcessInstances(final SearchOptions searchOptions)
             throws SearchException {
-        // To select all process instances completed, without subprocess
+        // To select all finished process instances, without subprocess
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(searchOptions);
         searchOptionsBuilder.differentFrom(ProcessInstanceSearchDescriptor.STATE_ID,
-                ProcessInstanceState.COMPLETED.getId());
+                ProcessInstanceState.COMPLETED.getId())
+                .differentFrom(ProcessInstanceSearchDescriptor.STATE_ID, ProcessInstanceState.ABORTED.getId())
+                .differentFrom(ProcessInstanceSearchDescriptor.STATE_ID, ProcessInstanceState.CANCELLED.getId());
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.CALLER_ID, -1);
         try {
             return searchProcessInstances(getTenantAccessor(), searchOptionsBuilder.done());
