@@ -15,14 +15,21 @@ package org.bonitasoft.console.common.server.filter;
 
 import static org.bonitasoft.engine.mdc.MDCConstants.CORRELATION_REQUEST_ID;
 import static org.bonitasoft.engine.mdc.MDCConstants.REQUEST_ID;
+import static org.bonitasoft.engine.mdc.MDCConstants.REQUEST_METHOD;
+import static org.bonitasoft.engine.mdc.MDCConstants.REQUEST_QUERY_STRING;
+import static org.bonitasoft.engine.mdc.MDCConstants.REQUEST_REMOTE_HOST_MDC_KEY;
+import static org.bonitasoft.engine.mdc.MDCConstants.REQUEST_REQUEST_URI;
+import static org.bonitasoft.engine.mdc.MDCConstants.REQUEST_REQUEST_URL;
+import static org.bonitasoft.engine.mdc.MDCConstants.REQUEST_USER_AGENT_MDC_KEY;
+import static org.bonitasoft.engine.mdc.MDCConstants.REQUEST_X_FORWARDED_FOR;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -31,12 +38,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import ch.qos.logback.classic.ClassicConstants;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.bonitasoft.engine.mdc.AbstractMDC;
 import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.web.toolkit.client.common.util.StringUtil;
-import org.slf4j.MDC;
 
 public class RequestIdFilter implements Filter {
 
@@ -52,10 +57,6 @@ public class RequestIdFilter implements Filter {
      */
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        // clean MDC from null request values inserted by MDCInsertingServletFilter...
-        var nullable = Stream.of(ClassicConstants.REQUEST_QUERY_STRING, ClassicConstants.REQUEST_USER_AGENT_MDC_KEY,
-                ClassicConstants.REQUEST_X_FORWARDED_FOR);
-        nullable.filter(k -> MDC.get(k) == null).forEach(MDC::remove);
         // get request id already attached
         var attachedReqIdAtt = Optional.ofNullable((String) request.getAttribute(requestIdAttributeName));
         var requestId = attachedReqIdAtt.orElseGet(() -> {
@@ -87,7 +88,7 @@ public class RequestIdFilter implements Filter {
             return id;
         });
 
-        Supplier<AbstractMDC> mdc = () -> new AbstractMDC(buildContextMap(requestId, correlationId)) {
+        Supplier<AbstractMDC> mdc = () -> new AbstractMDC(buildContextMap(requestId, correlationId, request)) {
         };
 
         MDCHelper.CheckedRunnable2<IOException, ServletException> call = () -> {
@@ -99,16 +100,26 @@ public class RequestIdFilter implements Filter {
     }
 
     private static Map<String, String> buildContextMap(String requestId,
-            Optional<String> correlationId) {
+            Optional<String> correlationId, ServletRequest request) {
+        Map<String, String> map = new HashMap<String, String>(9);
+        // insert request id and correlation id
+        map.put(REQUEST_ID, Objects.requireNonNull(requestId));
         Predicate<String> isBlank = StringUtil::isBlank;
-        if (correlationId.filter(isBlank.negate()).isPresent()) {
-            return Map.of(
-                    REQUEST_ID, Objects.requireNonNull(requestId),
-                    CORRELATION_REQUEST_ID, Objects.requireNonNull(correlationId.orElse(null)));
-        } else {
-            return Map.of(
-                    REQUEST_ID, Objects.requireNonNull(requestId));
+        correlationId.filter(isBlank.negate())
+                .ifPresent(id -> map.put(CORRELATION_REQUEST_ID, Objects.requireNonNull(id)));
+        // insert extra information similar to ch.qos.logback.classic.helpers.MDCInsertingServletFilter
+        map.put(REQUEST_REMOTE_HOST_MDC_KEY, request.getRemoteHost());
+        if (request instanceof HttpServletRequest http) {
+            map.put(REQUEST_REQUEST_URI, http.getRequestURI());
+            Optional.ofNullable(http.getRequestURL()).ifPresent(url -> map.put(REQUEST_REQUEST_URL, url.toString()));
+            map.put(REQUEST_METHOD, http.getMethod());
+            Optional.ofNullable(http.getQueryString()).ifPresent(str -> map.put(REQUEST_QUERY_STRING, str));
+            Optional.ofNullable(http.getHeader("User-Agent"))
+                    .ifPresent(agent -> map.put(REQUEST_USER_AGENT_MDC_KEY, agent));
+            Optional.ofNullable(http.getHeader("X-Forwarded-For"))
+                    .ifPresent(forwarded -> map.put(REQUEST_X_FORWARDED_FOR, forwarded));
         }
+        return map;
     }
 
 }

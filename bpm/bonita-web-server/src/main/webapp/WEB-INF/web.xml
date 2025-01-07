@@ -24,14 +24,8 @@
     </error-page>
 
     <!-- 
-        MDC Filters.
-        We do not need to override MDCInsertingServletFilter to use wrap with MDCHelper.tryWithMDC for exception handling,
-        because RequestIdFilter will do it right after anyway.
+        MDC Filter for requests.
     -->
-    <filter>
-        <filter-name>MDCInsertingServletFilter</filter-name>
-        <filter-class>ch.qos.logback.classic.helpers.MDCInsertingServletFilter</filter-class>
-    </filter>
     <filter>
         <filter-name>RequestIdFilter</filter-name>
         <filter-class>org.bonitasoft.console.common.server.filter.RequestIdFilter</filter-class>

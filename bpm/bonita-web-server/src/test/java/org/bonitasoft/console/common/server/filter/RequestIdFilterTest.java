@@ -109,8 +109,8 @@ class RequestIdFilterTest {
 
         // method chain was called once and put REQUEST_ID & CORRELATION_REQUEST_ID in context
         verify(chain, times(1)).doFilter(any(ServletRequest.class), any(ServletResponse.class));
-        assertThat(contextMap.get(MDCConstants.REQUEST_ID)).isEqualTo(requestId);
-        assertThat(contextMap.get(MDCConstants.CORRELATION_REQUEST_ID)).isEqualTo(correlationId);
+        assertThat(contextMap).containsEntry(MDCConstants.REQUEST_ID, requestId);
+        assertThat(contextMap).containsEntry(MDCConstants.CORRELATION_REQUEST_ID, correlationId);
     }
 
     @Test
@@ -133,7 +133,44 @@ class RequestIdFilterTest {
 
         // method chain was called once and put REQUEST_ID & CORRELATION_REQUEST_ID in context
         verify(chain, times(1)).doFilter(any(ServletRequest.class), any(ServletResponse.class));
-        assertThat(contextMap.get(MDCConstants.REQUEST_ID)).isEqualTo(requestId);
-        assertThat(contextMap.get(MDCConstants.CORRELATION_REQUEST_ID)).isEqualTo(correlationId);
+        assertThat(contextMap).containsEntry(MDCConstants.REQUEST_ID, requestId);
+        assertThat(contextMap).containsEntry(MDCConstants.CORRELATION_REQUEST_ID, correlationId);
+    }
+
+    @Test
+    void shouldDetectUserAgent() throws Exception {
+        String userAgent = "PostmanRuntime/7.43.0";
+        when(httpRequest.getHeader("User-Agent")).thenReturn(userAgent);
+
+        Map<String, String> contextMap = new HashMap<>();
+        doAnswer(invocation -> {
+            contextMap.putAll(MDC.getCopyOfContextMap());
+            return null;
+        }).when(chain).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+
+        requestIdFilter.init(filterConfig);
+        requestIdFilter.doFilter(httpRequest, httpResponse, chain);
+
+        // method chain was called once and put REQUEST_USER_AGENT_MDC_KEY in context
+        verify(chain, times(1)).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+        assertThat(contextMap).containsEntry(MDCConstants.REQUEST_USER_AGENT_MDC_KEY, userAgent);
+    }
+
+    @Test
+    void shouldIgnoreNullUserAgent() throws Exception {
+        when(httpRequest.getHeader("User-Agent")).thenReturn(null);
+
+        Map<String, String> contextMap = new HashMap<>();
+        doAnswer(invocation -> {
+            contextMap.putAll(MDC.getCopyOfContextMap());
+            return null;
+        }).when(chain).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+
+        requestIdFilter.init(filterConfig);
+        requestIdFilter.doFilter(httpRequest, httpResponse, chain);
+
+        // method chain was called once and put REQUEST_USER_AGENT_MDC_KEY in context
+        verify(chain, times(1)).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+        assertThat(contextMap).doesNotContainKey(MDCConstants.REQUEST_USER_AGENT_MDC_KEY);
     }
 }

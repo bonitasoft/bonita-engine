@@ -15,7 +15,8 @@ package org.bonitasoft.engine.mdc;
 
 /**
  * <p>These constants are used as logging keys for Mapped Diagnostic Context (MDC).</p>
- * <p>In addition, you may also use <code>REQUEST_*</code> constants in ch.qos.logback.classic.ClassicConstants:
+ * <p>The <code>REQUEST_*</code> constants are the same as in ch.qos.logback.classic.ClassicConstants (but with no
+ * dependency):
  * <ul><li>req.remoteHost</li><li>req.userAgent</li><li>req.requestURI</li><li>req.queryString</li><li>req.requestURL</li><li>req.method</li><li>req.xForwardedFor</li></ul>
  * </p>
  */
@@ -39,5 +40,13 @@ public interface MDCConstants {
     String REQUEST_ID = "req.requestId";
     /** The correlation ID identifying a larger operation than the HTTP request. */
     String CORRELATION_REQUEST_ID = "req.correlationId";
+
+    public static final String REQUEST_REMOTE_HOST_MDC_KEY = "req.remoteHost";
+    public static final String REQUEST_USER_AGENT_MDC_KEY = "req.userAgent";
+    public static final String REQUEST_REQUEST_URI = "req.requestURI";
+    public static final String REQUEST_QUERY_STRING = "req.queryString";
+    public static final String REQUEST_REQUEST_URL = "req.requestURL";
+    public static final String REQUEST_METHOD = "req.method";
+    public static final String REQUEST_X_FORWARDED_FOR = "req.xForwardedFor";
 
 }

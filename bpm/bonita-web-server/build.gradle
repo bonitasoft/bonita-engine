@@ -40,8 +40,6 @@ dependencies {
     implementation libs.springWebMvc
     implementation libs.jgettext
     implementation libs.owaspHtmlSanitizer
-    // for MDCInsertingServletFilter
-    implementation libs.logback
 
     compileOnly libs.lombok
     annotationProcessor libs.lombok
