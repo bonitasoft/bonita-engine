@@ -179,7 +179,7 @@ public interface ProcessRuntimeAPI {
     List<ProcessInstance> getProcessInstances(int startIndex, int maxResults, ProcessInstanceCriterion criterion);
 
     /**
-     * Get a paged list of archived process instances.
+     * Get a paged list of archived completed process instances.
      *
      * @param startIndex
      *        The index of the first result (starting from 0).
@@ -189,9 +189,26 @@ public interface ProcessRuntimeAPI {
      *        The sort criterion.
      * @return The list of archived process instances.
      * @since 6.0
+     * @deprecated since 10.3 use {@link #getCompletedProcessInstances(int, int, ProcessInstanceCriterion)} instead
      */
+    @Deprecated(since = "10.3.0", forRemoval = true)
     List<ArchivedProcessInstance> getArchivedProcessInstances(int startIndex, int maxResults,
             ProcessInstanceCriterion criterion);
+
+    /**
+     * Get a paged list of archived completed process instances.
+     *
+     * @param startIndex
+     *        The index of the first result (starting from 0).
+     * @param maxResults
+     *        The maximum number of results per page.
+     * @param criterion
+     *        The sort criterion.
+     * @return The list of archived process instances.
+     * @since 10.3
+     */
+    List<ArchivedProcessInstance> getCompletedProcessInstances(final int startIndex, final int maxResults,
+            final ProcessInstanceCriterion criterion);
 
     /**
      * Get a paged list of archived activity instances for a process instance.
@@ -251,14 +268,26 @@ public interface ProcessRuntimeAPI {
     long getNumberOfProcessInstances();
 
     /**
-     * Get the number of archived process instances.
+     * Get the number of archived completed process instances.
      * Root process instances in state COMPLETED are counted. Process instances started by call activities won't be
      * counted.
      *
      * @return The number of archived process instances.
      * @since 6.0
+     * @deprecated since 10.3 use {@link #getNumberOfCompletedProcessInstances()} instead
      */
+    @Deprecated(since = "10.3.0", forRemoval = true)
     long getNumberOfArchivedProcessInstances();
+
+    /**
+     * Get the number of archived completed process instances.
+     * Root process instances in state COMPLETED are counted. Process instances started by call activities won't be
+     * counted.
+     *
+     * @return The number of archived process instances.
+     * @since 10.3
+     */
+    long getNumberOfCompletedProcessInstances();
 
     /**
      * Delete the specified process instance.
