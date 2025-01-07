@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.web.rest.server.datastore.bpm.cases;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.test.toolkit.bpm.TestCase;
 import org.bonitasoft.test.toolkit.bpm.TestProcess;
@@ -23,6 +25,7 @@ import org.bonitasoft.test.toolkit.bpm.TestProcessFactory;
 import org.bonitasoft.test.toolkit.organization.TestUser;
 import org.bonitasoft.test.toolkit.organization.TestUserFactory;
 import org.bonitasoft.web.rest.model.bpm.cases.ArchivedCaseItem;
+import org.bonitasoft.web.rest.model.bpm.cases.CaseItem;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.test.AbstractConsoleTest;
 import org.junit.Test;
@@ -54,29 +57,72 @@ public class ArchivedCaseDatastoreIT extends AbstractConsoleTest {
 
     @Test
     public void twoPoolsWithOneWithACallActivityArchivedCaseTest() throws Exception {
-        TestProcess process1 = TestProcessFactory.getDefaultHumanTaskProcess();
-        process1.addActor(getInitiator()).enable().startCase();
+        TestProcess subprocess = TestProcessFactory.getDefaultHumanTaskProcess();
+        subprocess.addActor(getInitiator()).enable();
 
-        // start process1 case via call activity
-        TestProcess process2 = TestProcessFactory.getCallActivityProcess(process1.getProcessDefinition());
-        process2.addActor(getInitiator()).enable().startCase();
-        Thread.sleep(1000); // asynchronous, wait process1 to start
+        // start root process case via call activity
+        TestProcess rootProcess = TestProcessFactory.getCallActivityProcess(subprocess.getProcessDefinition());
+        var rootInstance = rootProcess.addActor(getInitiator()).enable().startCase();
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !rootProcess.listOpenCases().isEmpty());
 
         // archive process 1 case
-        TestCase testCaseProcess1 = process1.listOpenCases().get(0);
-        testCaseProcess1.getNextHumanTask().assignTo(getInitiator()).archive();
-        Thread.sleep(1000); // asynchronous, wait process2 to be archived
+        TestCase testCaseRootProcess = rootProcess.listOpenCases().get(0);
+        testCaseRootProcess.getNextHumanTask().assignTo(getInitiator()).archive();
+        // asynchronous, wait subprocess to be archived
+        await().atMost(5, TimeUnit.SECONDS).until(() -> rootInstance.getArchive() != null);
 
-        // Filters for archived Cases
-        ItemSearchResult<ArchivedCaseItem> itemSearchResult = archivedCaseDatastore.search(0, 100, null, null,
+        // Search for archived Cases
+        ItemSearchResult<ArchivedCaseItem> searchResult = archivedCaseDatastore.search(0, 100, null, null,
                 new HashMap<>());
 
-        assertEquals("2 cases started but one via call activity so only 1 should be archived", 1,
-                itemSearchResult.getResults().size());
+        assertEquals("2 cases started but one via call activity so only 1 should be retrieved", 1,
+                searchResult.getResults().size());
 
-        TestProcessFactory.getInstance().delete(process2);
-        TestProcessFactory.getInstance().delete(process1);
+        // Search for archived Cases with caller any filter
+        HashMap<String, String> filters = new HashMap<>();
+        filters.put(CaseItem.FILTER_CALLER, "any");
+        ItemSearchResult<ArchivedCaseItem> anyCallerSearchResult = archivedCaseDatastore.search(0, 100, null, null,
+                filters);
 
+        assertEquals("Subprocesses should be retrieved as well", 2,
+                anyCallerSearchResult.getResults().size());
+
+        TestProcessFactory.getInstance().delete(rootProcess);
+        TestProcessFactory.getInstance().delete(subprocess);
     }
 
+    @Test
+    public void search_cancelled_archived_case() throws Exception {
+        TestProcess process = TestProcessFactory.getDefaultHumanTaskProcess();
+
+        // start process
+        var processInstance = process.addActor(getInitiator()).enable().startCase();
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !process.listOpenCases().isEmpty());
+
+        // archive process 1 case
+        TestCase testCaseProcess = process.listOpenCases().get(0);
+
+        // cancel the case
+        processInstance.cancel();
+        // asynchronous, wait process to be archived
+        await().atMost(5, TimeUnit.SECONDS).until(() -> processInstance.getArchive() != null);
+
+        // Search for cancelled archived Cases
+        ItemSearchResult<ArchivedCaseItem> searchResult = archivedCaseDatastore.search(0, 100, null, null,
+                new HashMap<>());
+
+        assertEquals(1,
+                searchResult.getResults().size());
+
+        // Search for cancelled archived Cases with caller any filter
+        HashMap<String, String> filters = new HashMap<>();
+        filters.put(CaseItem.FILTER_CALLER, "any");
+        ItemSearchResult<ArchivedCaseItem> anyCallerSearchResult = archivedCaseDatastore.search(0, 100, null, null,
+                filters);
+
+        assertEquals(1,
+                anyCallerSearchResult.getResults().size());
+
+        TestProcessFactory.getInstance().delete(process);
+    }
 }

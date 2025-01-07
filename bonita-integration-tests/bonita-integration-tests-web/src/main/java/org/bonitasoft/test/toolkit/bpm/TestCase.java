@@ -20,7 +20,9 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -201,5 +203,17 @@ public class TestCase {
 
     public void addComment(final String content) {
         addComment(TestToolkitCtx.getInstance().getInitiator(), content);
+    }
+
+    public void cancel() {
+        TestUser testUser = TestToolkitCtx.getInstance().getInitiator();
+        final ProcessAPI processAPI = TestProcess.getProcessAPI(testUser.getSession());
+        try {
+            processAPI.cancelProcessInstance(processInstance.getId());
+        } catch (ProcessInstanceNotFoundException e) {
+            throw new TestToolkitException("Can't get process instance <" + getId() + ">", e);
+        } catch (UpdateException e) {
+            throw new TestToolkitException("Can't update process instance <" + getId() + ">", e);
+        }
     }
 }
