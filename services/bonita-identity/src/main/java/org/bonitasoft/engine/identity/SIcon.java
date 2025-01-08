@@ -16,14 +16,12 @@ package org.bonitasoft.engine.identity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.hibernate.annotations.Type;
 
 /**
@@ -34,11 +32,8 @@ import org.hibernate.annotations.Type;
 @NoArgsConstructor
 @Entity
 @Table(name = "icon")
-@IdClass(PersistentObjectId.class)
-public class SIcon implements PersistentObject {
+public class SIcon implements PlatformPersistentObject {
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
     @Column(name = "mimetype")

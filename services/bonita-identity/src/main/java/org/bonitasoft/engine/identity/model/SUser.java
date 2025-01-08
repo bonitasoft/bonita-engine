@@ -17,7 +17,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -27,8 +26,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Anthony Birembaut
@@ -44,8 +42,7 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "user_")
-@IdClass(PersistentObjectId.class)
-public class SUser implements PersistentObject, SHavingIcon {
+public class SUser implements PlatformPersistentObject, SHavingIcon {
 
     public static final String ID = "id";
     public static final String MANAGER_USER_ID = "managerUserId";
@@ -62,8 +59,6 @@ public class SUser implements PersistentObject, SHavingIcon {
     public static final String ENABLED = "enabled";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private String firstName;
     @Column

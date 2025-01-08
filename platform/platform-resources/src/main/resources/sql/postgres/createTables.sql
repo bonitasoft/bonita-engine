@@ -729,8 +729,8 @@ CREATE TABLE external_identity_mapping (
   UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
 );
+
 CREATE TABLE group_ (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(125) NOT NULL,
   parentPath VARCHAR(255),
@@ -740,12 +740,11 @@ CREATE TABLE group_ (
   creationDate INT8,
   lastUpdate INT8,
   iconid INT8,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_group PRIMARY KEY (id)
 );
 CREATE INDEX idx_group_name ON group_ (parentPath, name);
 
 CREATE TABLE role (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(255) NOT NULL,
   displayName VARCHAR(255),
@@ -754,14 +753,11 @@ CREATE TABLE role (
   creationDate INT8,
   lastUpdate INT8,
   iconid INT8,
-  UNIQUE (tenantid, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_role PRIMARY KEY (id),
+  CONSTRAINT uk_role_name UNIQUE (name)
 );
 
-CREATE INDEX idx_role_name ON role (name);
-
 CREATE TABLE user_ (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   enabled BOOLEAN NOT NULL,
   userName VARCHAR(255) NOT NULL,
@@ -775,21 +771,17 @@ CREATE TABLE user_ (
   creationDate INT8,
   lastUpdate INT8,
   iconid INT8,
-  UNIQUE (tenantid, userName),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_user PRIMARY KEY (id),
+  CONSTRAINT uk_user_username UNIQUE (userName)
 );
 
-CREATE INDEX idx_user_name ON user_ (userName);
-
 CREATE TABLE user_login (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   lastConnection INT8,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_user_login PRIMARY KEY (id)
 );
 
 CREATE TABLE user_contactinfo (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   userId INT8 NOT NULL,
   email VARCHAR(255),
@@ -805,47 +797,48 @@ CREATE TABLE user_contactinfo (
   country VARCHAR(255),
   website VARCHAR(255),
   personal BOOLEAN NOT NULL,
-  UNIQUE (tenantid, userId, personal),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_user_contactinfo PRIMARY KEY (id),
+  CONSTRAINT uk_user_contactinfo_userid_personal UNIQUE (userId, personal)
 );
-ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
-CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, personal);
-
+ALTER TABLE user_contactinfo ADD CONSTRAINT fk_user_contactinfo_userid FOREIGN KEY (userId) REFERENCES user_ (id) ON DELETE CASCADE;
 
 CREATE TABLE custom_usr_inf_def (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(75) NOT NULL,
   description TEXT,
-  UNIQUE (tenantid, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_custom_usr_inf_def PRIMARY KEY (id),
+  CONSTRAINT uk_custom_usr_inf_def_name UNIQUE (name)
 );
-
-CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name);
 
 CREATE TABLE custom_usr_inf_val (
   id INT8 NOT NULL,
-  tenantid INT8 NOT NULL,
   definitionId INT8 NOT NULL,
   userId INT8 NOT NULL,
   value VARCHAR(255),
-  UNIQUE (tenantid, definitionId, userId),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_custom_usr_inf_val PRIMARY KEY (id),
+  CONSTRAINT uk_custom_usr_inf_val_definitionid_userid UNIQUE (definitionId, userId)
 );
-ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
-ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_definition_id FOREIGN KEY (tenantid, definitionId) REFERENCES custom_usr_inf_def (tenantid, id) ON DELETE CASCADE;
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_custom_usr_inf_val_userid FOREIGN KEY (userId) REFERENCES user_ (id) ON DELETE CASCADE;
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_custom_usr_inf_val_definitionid FOREIGN KEY (definitionId) REFERENCES custom_usr_inf_def (id) ON DELETE CASCADE;
 
 CREATE TABLE user_membership (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   userId INT8 NOT NULL,
   roleId INT8 NOT NULL,
   groupId INT8 NOT NULL,
   assignedBy INT8,
   assignedDate INT8,
-  UNIQUE (tenantid, userId, roleId, groupId),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_user_membership PRIMARY KEY (id),
+  CONSTRAINT uk_user_membership_userid_roleid_groupid UNIQUE (userId, roleId, groupId)
 );
+
+CREATE TABLE icon (
+  id INT8 NOT NULL,
+  mimetype VARCHAR(255) NOT NULL,
+  content BYTEA NOT NULL,
+  CONSTRAINT pk_icon PRIMARY KEY (id)
+);
+
 CREATE TABLE queriable_log (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
@@ -1014,14 +1007,6 @@ CREATE TABLE tenant_resource (
   PRIMARY KEY (tenantId, id)
 );
 CREATE INDEX idx_tenant_resource ON tenant_resource (type, name);
-
-CREATE TABLE icon (
-  tenantId INT8 NOT NULL,
-  id INT8 NOT NULL,
-  mimetype VARCHAR(255) NOT NULL,
-  content BYTEA NOT NULL,
-  CONSTRAINT pk_icon PRIMARY KEY (tenantId, id)
-);
 
 CREATE TABLE bpm_failure (
   id INT8 NOT NULL,

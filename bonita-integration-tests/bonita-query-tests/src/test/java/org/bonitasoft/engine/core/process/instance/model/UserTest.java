@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.instance.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 
 import org.bonitasoft.engine.identity.model.SUser;
@@ -45,8 +44,7 @@ public class UserTest {
         SUser user = aUser().withId(124L).withUserName("walter.bates").build();
         repository.add(user);
         repository.flush();
-        SUserLogin userLogin = SUserLogin.builder().id(124L).tenantId(DEFAULT_TENANT_ID).lastConnection(1234567L)
-                .sUser(user).build();
+        SUserLogin userLogin = SUserLogin.builder().id(124L).lastConnection(1234567L).sUser(user).build();
         user.setSUserLogin(userLogin);
         repository.add(userLogin);
         repository.flush();

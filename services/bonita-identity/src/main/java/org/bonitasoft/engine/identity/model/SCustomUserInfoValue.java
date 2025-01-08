@@ -17,15 +17,13 @@ import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Anthony Birembaut
@@ -38,9 +36,8 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "custom_usr_inf_val")
-@IdClass(PersistentObjectId.class)
 @Cacheable(false)
-public class SCustomUserInfoValue implements PersistentObject {
+public class SCustomUserInfoValue implements PlatformPersistentObject {
 
     public static final String ID = "id";
     public static final String USER_ID = "userId";
@@ -48,8 +45,6 @@ public class SCustomUserInfoValue implements PersistentObject {
     public static final String VALUE = "value";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     protected long userId;
     @Column

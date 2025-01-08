@@ -800,7 +800,7 @@ class ModelConvertorTest {
     void should_set_the_parentPath_when_creating_a_UserMembership() {
         //given
         SUserMembership sUserMembership = new SUserMembership(257L, 157L, 357L, 457L, 557L, 190119993L,
-                "dummy rolename", "dummy groupname", "dummy username", "Bonita/dummy");
+                "Bonita/dummy", "dummy rolename", "dummy groupname", "dummy username");
 
         //when
         UserMembershipImpl userMembership = (UserMembershipImpl) toUserMembership(sUserMembership);
