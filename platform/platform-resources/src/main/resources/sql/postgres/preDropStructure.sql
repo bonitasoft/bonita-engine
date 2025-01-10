@@ -10,7 +10,6 @@ ALTER TABLE document DROP CONSTRAINT fk_document_tenantId;
 ALTER TABLE document_mapping DROP CONSTRAINT fk_document_mapping_tenantId;
 ALTER TABLE document_mapping DROP CONSTRAINT fk_docmap_docid;
 ALTER TABLE event_trigger_instance DROP CONSTRAINT fk_event_trigger_instance_tenantId;
-ALTER TABLE external_identity_mapping DROP CONSTRAINT fk_external_identity_mapping_tenantId;
 ALTER TABLE message_instance DROP CONSTRAINT fk_message_instance_tenantId;
 ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_tenantId;
 ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_flownode_instanceId;

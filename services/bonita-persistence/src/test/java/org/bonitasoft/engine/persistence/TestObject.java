@@ -16,7 +16,7 @@ package org.bonitasoft.engine.persistence;
 /**
  * @author Baptiste Mesta
  */
-public class TestObject implements PersistentObject {
+public class TestObject implements PlatformPersistentObject {
 
     @Override
     public long getId() {
@@ -25,11 +25,6 @@ public class TestObject implements PersistentObject {
 
     @Override
     public void setId(long id) {
-
-    }
-
-    @Override
-    public void setTenantId(long id) {
 
     }
 }

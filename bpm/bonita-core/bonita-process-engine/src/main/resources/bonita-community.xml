@@ -443,11 +443,6 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10060:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" />
-        <constructor-arg name="sequenceId" value="10070" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10070:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" />
         <constructor-arg name="sequenceId" value="10080" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.bonitasoft:${bonita.platform.sequence.defaultRangeSize}}" />
@@ -713,8 +708,6 @@
                 <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.queries.hbm.xml</value>
                 <!-- identity -->
                 <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
-                <!-- external identity -->
-                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.queries.hbm.xml</value>
                 <!-- document -->
                 <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
                 <!-- archived document -->
@@ -836,8 +829,6 @@
                 <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="user_membership" />
                 <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="contactinfo" />
                 <entry key="org.bonitasoft.engine.identity.SIcon" value="icon" />
-                <!-- external identity -->
-                <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="ext_ident_mapping" />
                 <!-- document -->
                 <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="doc" />
                 <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="doc" />
@@ -890,7 +881,6 @@
                 <value>org.bonitasoft.engine.identity.model.SUser</value>
                 <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
-                <value>org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActor</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActorMember</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationWithIcon</value>
@@ -1332,11 +1322,6 @@
         <property name="sourceList">
             <list>
                 <ref bean="searchSCommentSupervisedBy" />
-                <ref bean="addEntityMemberCommand" />
-                <ref bean="removeEntityMemberCommand" />
-                <ref bean="searchEntityMembersCommand" />
-                <ref bean="searchEntityMembersForUserCommand" />
-                <ref bean="deleteEntityMembersCommand" />
                 <ref bean="searchWaitingEventsCommand" />
                 <ref bean="advancedStartProcessCommand" />
                 <ref bean="executeBDMQuery" />
@@ -1389,82 +1374,6 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.external.comment.SearchCommentsSupervisedBy</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="addEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>addEntityMemberCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Adds a Entity member to the provided identity notions. Parameter keys: EXTERNAL_ID_KEY: Entity member
-                id provided as is by the external system,
-                userId: -1 is not needed, roleId: -1 is not needed, groupId: -1 is not needed
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.AddEntityMemberCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="removeEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>removeEntityMemberCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Removes a Entity member mapping: ENTITY_MEMBER_ID_KEY: Entity member id to remove</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.RemoveEntityMemberCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="searchEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>searchEntityMembersCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Searches Entity member mappings: Parameter keys: DISCRIMINATOR_ID_KEY: the discriminator to isolate
-                the different functional notions,
-                SEARCH_OPTIONS_KEY: the Search options to filter and sort the results, MEMBER_TYPE_KEY: Member Type to
-                search for (USER, GROUP, ROLE, or MEMBERSHIP).
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.SearchEntityMembersCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="searchEntityMembersForUserCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>searchEntityMembersForUserCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Searches Entity member mappings: Parameter keys: USER_ID_KEY: the ID of the user to search Entity
-                members for (directly associated, or through role or
-                group), DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions,
-                SEARCH_OPTIONS_KEY: the Search options to filter and sort the
-                results.
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.SearchEntityMembersForUserCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="deleteEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>deleteEntityMembersCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Delete all Entity member mappings associated with provided externalId, for specific Discriminator.
-                Parameter keys: EXTERNAL_ID_KEY: external id
-                provided as is by the external system, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different
-                functional notions.
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.DeleteEntityMembersCommand</value>
         </constructor-arg>
     </bean>
 
@@ -1914,13 +1823,6 @@
 
     <!--  Used to inject the bean referenced by property 'authentication.service.ref.name' in SecuredLoginServiceImpl: -->
     <alias name="${authentication.service.ref.name:authenticationService}" alias="entryPointAuthenticationService"  />
-
-    <bean id="externalIdentityMappingService"
-          class="org.bonitasoft.engine.external.identity.mapping.impl.ExternalIdentityMappingServiceImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-    </bean>
 
     <bean id="expressionResolverService"
           class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl">

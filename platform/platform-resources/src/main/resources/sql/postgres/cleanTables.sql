@@ -33,7 +33,6 @@ DELETE FROM arch_data_instance;
 DELETE FROM data_instance;
 DELETE FROM dependencymapping;
 DELETE FROM dependency;
-DELETE FROM external_identity_mapping;
 DELETE FROM user_membership;
 DELETE FROM custom_usr_inf_val;
 DELETE FROM custom_usr_inf_def;

@@ -24,6 +24,7 @@ import java.util.UUID;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
@@ -94,9 +95,9 @@ public class RecorderImplTest {
         return new MyPersistentObject();
     }
 
-    private static class MyPersistentObject implements PersistentObject {
+    private static class MyPersistentObject implements PlatformPersistentObject {
 
-        private long id = UUID.randomUUID().getLeastSignificantBits();
+        private final long id = UUID.randomUUID().getLeastSignificantBits();
 
         @Override
         public long getId() {
@@ -107,8 +108,5 @@ public class RecorderImplTest {
         public void setId(long id) {
         }
 
-        @Override
-        public void setTenantId(long id) {
-        }
     }
 }

@@ -718,17 +718,6 @@ CREATE TABLE pdependencymapping (
 );
 CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid);
 ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;
-CREATE TABLE external_identity_mapping (
-  tenantid INT8 NOT NULL,
-  id INT8 NOT NULL,
-  kind VARCHAR(25) NOT NULL,
-  externalId VARCHAR(50) NOT NULL,
-  userId INT8 NOT NULL,
-  groupId INT8 NOT NULL,
-  roleId INT8 NOT NULL,
-  UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
-  PRIMARY KEY (tenantid, id)
-);
 
 CREATE TABLE group_ (
   id INT8 NOT NULL,

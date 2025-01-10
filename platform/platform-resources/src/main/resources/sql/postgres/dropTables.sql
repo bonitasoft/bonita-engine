@@ -36,7 +36,6 @@ DROP TABLE IF EXISTS dependencymapping;
 DROP TABLE IF EXISTS dependency;
 DROP TABLE IF EXISTS pdependencymapping;
 DROP TABLE IF EXISTS pdependency;
-DROP TABLE IF EXISTS external_identity_mapping;
 DROP TABLE IF EXISTS user_membership;
 DROP TABLE IF EXISTS custom_usr_inf_val;
 DROP TABLE IF EXISTS custom_usr_inf_def;

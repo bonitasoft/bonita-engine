@@ -67,7 +67,6 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.IconService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
@@ -345,11 +344,6 @@ public class SpringServiceAccessor implements ServiceAccessor {
     @Override
     public ContainerRegistry getContainerRegistry() {
         return beanAccessor.getService(ContainerRegistry.class);
-    }
-
-    @Override
-    public ExternalIdentityMappingService getExternalIdentityMappingService() {
-        return beanAccessor.getService(ExternalIdentityMappingService.class);
     }
 
     @Override

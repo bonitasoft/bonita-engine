@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.junit.jupiter.api.Test;
@@ -103,7 +104,7 @@ class AbstractSearchEntityTest {
             return null;
         }
 
-        private static class TestEntity implements PersistentObject {
+        private static class TestEntity implements PlatformPersistentObject {
 
             @Override
             public long getId() {
@@ -114,9 +115,6 @@ class AbstractSearchEntityTest {
             public void setId(long id) {
             }
 
-            @Override
-            public void setTenantId(long id) {
-            }
         }
     }
 }

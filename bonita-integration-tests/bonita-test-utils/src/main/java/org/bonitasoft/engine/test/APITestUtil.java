@@ -42,6 +42,7 @@ import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.MaintenanceAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -1507,6 +1508,10 @@ public class APITestUtil extends PlatformTestUtil {
 
     public TenantAdministrationAPI getTenantAdministrationAPI() {
         return getApiClient().getTenantAdministrationAPI();
+    }
+
+    public MaintenanceAPI getMaintenanceAPI() {
+        return getApiClient().getMaintenanceAPI();
     }
 
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {

@@ -66,7 +66,6 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.IconService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
@@ -186,8 +185,6 @@ public interface ServiceAccessor {
     OperationService getOperationService();
 
     SupervisorMappingService getSupervisorService();
-
-    ExternalIdentityMappingService getExternalIdentityMappingService();
 
     UserFilterService getUserFilterService();
 
