@@ -79,8 +79,8 @@ CREATE TABLE processcategorymapping (
 );
 
 ALTER TABLE processcategorymapping ADD CONSTRAINT fk_catmapping_catid FOREIGN KEY (tenantid, categoryid) REFERENCES category(tenantid, id) ON DELETE CASCADE;
+
 CREATE TABLE arch_process_comment(
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   userId BIGINT,
   processInstanceId BIGINT NOT NULL,
@@ -88,20 +88,19 @@ CREATE TABLE arch_process_comment(
   content VARCHAR(512) NOT NULL,
   archiveDate BIGINT NOT NULL,
   sourceObjectId BIGINT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_process_comment PRIMARY KEY (id)
 );
-
 CREATE INDEX idx1_arch_process_comment on arch_process_comment (sourceobjectid);
 CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate);
+
 CREATE TABLE process_comment (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   kind VARCHAR(25) NOT NULL,
   userId BIGINT,
   processInstanceId BIGINT NOT NULL,
   postDate BIGINT NOT NULL,
   content VARCHAR(512) NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_process_comment PRIMARY KEY (id)
 );
 CREATE INDEX idx1_process_comment on process_comment (processInstanceId);
 

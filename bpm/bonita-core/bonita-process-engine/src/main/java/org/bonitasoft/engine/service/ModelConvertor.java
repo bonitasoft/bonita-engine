@@ -1688,7 +1688,6 @@ public class ModelConvertor {
 
     public static Comment toComment(final SComment sComment) {
         final CommentImpl commentImpl = new CommentImpl();
-        commentImpl.setTenantId(sComment.getTenantId());
         commentImpl.setId(sComment.getId());
         commentImpl.setUserId(sComment.getUserId());
         commentImpl.setProcessInstanceId(sComment.getProcessInstanceId());

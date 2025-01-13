@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 Bonitasoft S.A.
+ * Copyright (C) 2025 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,15 +14,11 @@
 package org.bonitasoft.engine.persistence;
 
 /**
- * Interface for all {@link PersistentObject} that are not at tenant level.
+ * Interface for all {@link ArchivedPersistentObject} that are not at tenant level.
  * <p>/!\ When tenant is completely removed, remove this class and simplify class hierarchy.</p>
  *
- * @author Emmanuel Duchastenier
+ * @see PlatformPersistentObject
  */
-public interface PlatformPersistentObject extends PersistentObject {
-
-    @Override
-    default void setTenantId(long id) {
-        // do nothing at platform level
-    }
+public interface ArchivedPlatformPersistentObject extends ArchivedPersistentObject, PlatformPersistentObject {
+    // See Also: PlatformPersistentObject#setTenantId(long)
 }
