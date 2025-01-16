@@ -13,14 +13,16 @@
  **/
 package org.bonitasoft.engine.core.category.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Yanyan Liu
@@ -33,8 +35,7 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "category")
-@IdClass(PersistentObjectId.class)
-public class SCategory implements PersistentObject {
+public class SCategory implements PlatformPersistentObject {
 
     public static final String ID = "id";
     public static final String NAME = "name";
@@ -42,8 +43,6 @@ public class SCategory implements PersistentObject {
     public static final String CREATOR = "creator";
     public static final String CREATION_DATE = "creationDate";
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
-    @Id
-    private long tenantId;
     @Id
     private long id;
     @Column

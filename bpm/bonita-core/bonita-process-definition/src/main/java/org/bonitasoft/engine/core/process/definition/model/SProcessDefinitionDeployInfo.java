@@ -15,9 +15,7 @@ package org.bonitasoft.engine.core.process.definition.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -25,17 +23,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@IdClass(PersistentObjectId.class)
 @Table(name = "process_definition")
-public class SProcessDefinitionDeployInfo implements PersistentObject {
+public class SProcessDefinitionDeployInfo implements PlatformPersistentObject {
 
     public static final String DESCRIPTION = "description";
     public static final String ID_KEY = "id";
@@ -62,16 +58,12 @@ public class SProcessDefinitionDeployInfo implements PersistentObject {
     private String description;
     private String configurationState;
     private String activationState;
-    @Id
-    private long tenantId;
     private long processId;
     private String displayName;
     private long lastUpdateDate;
     private String iconPath;
     private String displayDescription;
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "content_tenantid", referencedColumnName = "tenantid"),
-            @JoinColumn(name = "content_id", referencedColumnName = "id") })
+    @JoinColumn(name = "content_id", referencedColumnName = "id")
     private SProcessDefinitionDesignContent designContent;
 }

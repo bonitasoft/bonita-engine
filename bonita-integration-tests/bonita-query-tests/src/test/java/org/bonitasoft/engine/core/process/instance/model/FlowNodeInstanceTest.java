@@ -105,7 +105,6 @@ public class FlowNodeInstanceTest {
         sProcessDefinitionDeployInfo.setName(processName);
         sProcessDefinitionDeployInfo.setVersion("version");
         sProcessDefinitionDeployInfo.setProcessId(processDefinitionId);
-        sProcessDefinitionDeployInfo.setTenantId(1L);
         repository.add(sProcessDefinitionDeployInfo);
     }
 

@@ -58,27 +58,24 @@ CREATE TABLE actormember (
 ALTER TABLE actormember ADD CONSTRAINT fk_actormember_actorid FOREIGN KEY (actorId) REFERENCES actor(id);
 
 CREATE TABLE category (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   creator BIGINT,
   description LONGVARCHAR,
   creationDate BIGINT NOT NULL,
   lastUpdateDate BIGINT NOT NULL,
-  UNIQUE (tenantid, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_category PRIMARY KEY (id),
+  CONSTRAINT uk_category_name UNIQUE (name)
 );
 
 CREATE TABLE processcategorymapping (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   categoryid BIGINT NOT NULL,
   processid BIGINT NOT NULL,
-  UNIQUE (tenantid, categoryid, processid),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_processcategorymapping PRIMARY KEY (id),
+  CONSTRAINT uk_processcategorymapping_categoryid_processid UNIQUE (categoryid, processid)
 );
-
-ALTER TABLE processcategorymapping ADD CONSTRAINT fk_catmapping_catid FOREIGN KEY (tenantid, categoryid) REFERENCES category(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE processcategorymapping ADD CONSTRAINT fk_processcategorymapping_categoryid FOREIGN KEY (categoryid) REFERENCES category(id) ON DELETE CASCADE;
 
 CREATE TABLE arch_process_comment(
   id BIGINT NOT NULL,
@@ -104,8 +101,13 @@ CREATE TABLE process_comment (
 );
 CREATE INDEX idx1_process_comment on process_comment (processInstanceId);
 
+CREATE TABLE process_content (
+  id BIGINT NOT NULL,
+  content MEDIUMTEXT NOT NULL,
+  CONSTRAINT pk_process_content PRIMARY KEY (id)
+);
+
 CREATE TABLE process_definition (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   processId BIGINT NOT NULL,
   name VARCHAR(150) NOT NULL,
@@ -120,17 +122,11 @@ CREATE TABLE process_definition (
   lastUpdateDate BIGINT,
   categoryId BIGINT,
   iconPath VARCHAR(255),
-  content_tenantid BIGINT NOT NULL,
   content_id BIGINT NOT NULL,
-  PRIMARY KEY (tenantid, id),
-  UNIQUE (tenantid, name, version)
+  CONSTRAINT pk_process_definition PRIMARY KEY (id),
+  CONSTRAINT uk_process_definition_name_version UNIQUE (name, version)
 );
-CREATE TABLE process_content (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  content MEDIUMTEXT NOT NULL,
-  PRIMARY KEY (tenantid, id)
-);
+ALTER TABLE process_definition ADD CONSTRAINT fk_process_definition_content_id FOREIGN KEY (content_id) REFERENCES process_content(id);
 
 CREATE TABLE arch_document_mapping (
   tenantid BIGINT NOT NULL,
@@ -491,14 +487,13 @@ ALTER TABLE arch_multi_biz_data ADD CONSTRAINT pk_arch_rbdi_mbd PRIMARY KEY (ten
 ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE processsupervisor (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   processDefId BIGINT NOT NULL,
   userId BIGINT NOT NULL,
   groupId BIGINT NOT NULL,
   roleId BIGINT NOT NULL,
-  UNIQUE (tenantid, processDefId, userId, groupId, roleId),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_processsupervisor PRIMARY KEY (id),
+  CONSTRAINT uk_processsupervisor_processdefid_userid_groupid_roleid UNIQUE (processDefId, userId, groupId, roleId)
 );
 
 CREATE TABLE page (
