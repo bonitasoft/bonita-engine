@@ -21,7 +21,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -30,15 +29,10 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Entity
 @Table(name = "pdependencymapping")
 @Cacheable(false)
-public class SPlatformDependencyMapping extends SAbstractDependencyMapping implements PlatformPersistentObject {
+public class SPlatformDependencyMapping extends SAbstractDependencyMapping {
 
     public SPlatformDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super(artifactId, artifactType, dependencyId);
-    }
-
-    @Override
-    public void setTenantId(long id) {
-        //no tenantId
     }
 
 }

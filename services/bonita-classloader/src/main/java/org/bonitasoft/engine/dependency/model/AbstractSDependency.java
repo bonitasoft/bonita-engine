@@ -24,14 +24,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-public abstract class AbstractSDependency implements PersistentObject {
+public abstract class AbstractSDependency implements PlatformPersistentObject {
 
     public static final String DESCRIPTION = "description";
     public static final String FILE_NAME = "fileName";

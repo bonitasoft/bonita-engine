@@ -672,48 +672,47 @@ CREATE TABLE data_instance (
 CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, name);
 
 CREATE TABLE dependency (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   name VARCHAR(150) NOT NULL,
   description LONGVARCHAR,
   filename VARCHAR(255) NOT NULL,
   value_ LONGVARBINARY NOT NULL,
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_dependency PRIMARY KEY (id),
+  CONSTRAINT uk_dependency_name UNIQUE (name)
 );
-CREATE INDEX idx_dependency_name ON dependency (name);
 
 CREATE TABLE dependencymapping (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   artifactid BIGINT NOT NULL,
   artifacttype VARCHAR(50) NOT NULL,
   dependencyid BIGINT NOT NULL,
-  UNIQUE (tenantid, dependencyid, artifactid, artifacttype),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_dependencymapping PRIMARY KEY (id),
+  CONSTRAINT uk_dependencymapping_dependencyid_artifactid_artifacttype UNIQUE (dependencyid, artifactid, artifacttype)
 );
 CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid);
-ALTER TABLE dependencymapping ADD CONSTRAINT fk_depmapping_depid FOREIGN KEY (tenantid, dependencyid) REFERENCES dependency(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE dependencymapping ADD CONSTRAINT fk_dependencymapping_dependencyid FOREIGN KEY (dependencyid) REFERENCES dependency(id) ON DELETE CASCADE;
+
 CREATE TABLE pdependency (
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL UNIQUE,
+  name VARCHAR(50) NOT NULL,
   description LONGVARCHAR,
   filename VARCHAR(255) NOT NULL,
   value_ LONGVARBINARY NOT NULL,
-  PRIMARY KEY (id)
+  CONSTRAINT pk_pdependency PRIMARY KEY (id),
+  CONSTRAINT uk_pdependency_name UNIQUE (name)
 );
-CREATE INDEX idx_pdependency_name ON pdependency (name);
 
 CREATE TABLE pdependencymapping (
   id BIGINT NOT NULL,
   artifactid BIGINT NOT NULL,
   artifacttype VARCHAR(50) NOT NULL,
   dependencyid BIGINT NOT NULL,
-  UNIQUE (dependencyid, artifactid, artifacttype),
-  PRIMARY KEY (id)
+  CONSTRAINT pk_pdependencymapping PRIMARY KEY (id),
+  CONSTRAINT uk_pdependencymapping_dependencyid_artifactid_artifacttype UNIQUE (dependencyid, artifactid, artifacttype)
 );
 CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid);
-ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;
+ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdependencymapping_dependencyid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;
+
 
 CREATE TABLE group_ (
   id BIGINT NOT NULL,

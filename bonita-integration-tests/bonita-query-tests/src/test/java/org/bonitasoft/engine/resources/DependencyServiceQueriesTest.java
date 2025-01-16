@@ -140,11 +140,10 @@ public class DependencyServiceQueriesTest {
         PersistentObject dependencyFromQuery = repository.selectOne("getDependencyByName",
                 pair("name", "dependencyName"));
         Map<String, Object> dependencyAsMap = jdbcTemplate.queryForObject("SELECT * FROM dependency",
-                new JdbcRowMapper("TENANTID", "ID"));
+                new JdbcRowMapper("ID"));
 
         assertThat(dependencyFromQuery).isEqualTo(aDependency);
         assertThat(dependencyAsMap).containsOnly(
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", aDependency.getId()),
                 entry("NAME", "dependencyName"),
                 entry("DESCRIPTION", "description of the jar"),
@@ -168,11 +167,10 @@ public class DependencyServiceQueriesTest {
                 pair("dependencyId", aDependency.getId()));
         Map<String, Object> dependencyMappingAsMap = jdbcTemplate
                 .queryForObject("SELECT * FROM dependencymapping WHERE dependencyId=" + aDependency.getId(),
-                        new JdbcRowMapper("TENANTID", "ID", "ARTIFACTID", "DEPENDENCYID"));
+                        new JdbcRowMapper("ID", "ARTIFACTID", "DEPENDENCYID"));
 
         assertThat(dependencyMappingFromQuery).isEqualTo(dependencyMapping);
         assertThat(dependencyMappingAsMap).containsOnly(
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", dependencyMapping.getId()),
                 entry("ARTIFACTID", 567L),
                 entry("ARTIFACTTYPE", "PROCESS"),

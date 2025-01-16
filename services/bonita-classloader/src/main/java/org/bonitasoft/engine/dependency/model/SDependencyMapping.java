@@ -15,28 +15,21 @@ package org.bonitasoft.engine.dependency.model;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@IdClass(PersistentObjectId.class)
 @Table(name = "dependencymapping")
 @Cacheable(false)
 public class SDependencyMapping extends SAbstractDependencyMapping {
-
-    @Id
-    private long tenantId;
 
     public SDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super(artifactId, artifactType, dependencyId);

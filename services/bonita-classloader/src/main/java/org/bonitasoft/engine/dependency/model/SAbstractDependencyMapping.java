@@ -22,14 +22,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-public abstract class SAbstractDependencyMapping implements PersistentObject {
+public abstract class SAbstractDependencyMapping implements PlatformPersistentObject {
 
     @Id
     private long id;
@@ -38,7 +38,7 @@ public abstract class SAbstractDependencyMapping implements PersistentObject {
     private ScopeType artifactType;
     private long dependencyId;
 
-    public SAbstractDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
+    protected SAbstractDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super();
         this.artifactId = artifactId;
         this.artifactType = artifactType;
