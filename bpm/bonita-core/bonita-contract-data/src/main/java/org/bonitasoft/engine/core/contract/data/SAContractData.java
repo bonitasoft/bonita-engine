@@ -17,30 +17,40 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.contract.FileInputValue;
+import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
 import org.hibernate.annotations.Type;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Emmanuel Duchastenier
  */
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")
 @Table(name = "arch_contract_data")
-public abstract class SAContractData extends SAPersistenceObjectImpl {
+public abstract class SAContractData implements ArchivedPlatformPersistentObject {
 
+    @Id
+    protected long id;
+    @Column
+    protected long archiveDate;
+    @Column
+    protected long sourceObjectId;
     @Column
     protected String name;
     @Column(name = "val")
@@ -50,7 +60,7 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
     protected long scopeId;
 
     protected SAContractData(long sourceObjectId, String name, Serializable value, long scopeId) {
-        super(sourceObjectId);
+        this.sourceObjectId = sourceObjectId;
         this.name = name;
         this.scopeId = scopeId;
         this.value = clearFileInputContent(value);

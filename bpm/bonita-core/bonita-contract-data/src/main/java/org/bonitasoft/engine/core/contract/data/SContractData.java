@@ -15,13 +15,18 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.hibernate.annotations.Type;
 
 /**
@@ -31,16 +36,13 @@ import org.hibernate.annotations.Type;
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")
 @Table(name = "contract_data")
 @SuperBuilder
-public abstract class SContractData implements PersistentObject {
+public abstract class SContractData implements PlatformPersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private String name;
     @Column(name = "val")
@@ -49,8 +51,7 @@ public abstract class SContractData implements PersistentObject {
     @Column
     private long scopeId;
 
-    public SContractData(final String name, final Serializable value, long scopeId) {
-        super();
+    protected SContractData(final String name, final Serializable value, long scopeId) {
         this.name = name;
         this.scopeId = scopeId;
         this.value = value;

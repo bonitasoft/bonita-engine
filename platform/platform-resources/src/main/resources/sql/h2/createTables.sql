@@ -7,32 +7,27 @@ CREATE TABLE configuration (
 ALTER TABLE configuration ADD CONSTRAINT pk_configuration PRIMARY KEY (tenant_id, content_type, resource_name);
 CREATE INDEX idx_configuration ON configuration (tenant_id, content_type);
 
-
 CREATE TABLE contract_data (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   kind VARCHAR(20) NOT NULL,
   scopeId BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  val CLOB
+  val CLOB,
+  CONSTRAINT pk_contract_data PRIMARY KEY (id, scopeId),
+  CONSTRAINT uk_contract_data_kind_scopeid_name UNIQUE (kind, scopeId, name)
 );
-ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id, scopeId);
-ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (kind, scopeId, name, tenantid);
-CREATE INDEX idx_cd_kind_scope_name ON contract_data (kind, scopeId, name);
 
 CREATE TABLE arch_contract_data (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   kind VARCHAR(20) NOT NULL,
   scopeId BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   val CLOB,
   archiveDate BIGINT NOT NULL,
-  sourceObjectId BIGINT NOT NULL
+  sourceObjectId BIGINT NOT NULL,
+  CONSTRAINT pk_arch_contract_data PRIMARY KEY (id, scopeId),
+  CONSTRAINT uk_arch_contract_data_kind_scopeid_name UNIQUE (kind, scopeId, name)
 );
-ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id, scopeId);
-ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (kind, scopeId, name, tenantid);
-CREATE INDEX idx_acd_kind_scope_name ON arch_contract_data (kind, scopeId, name);
 
 CREATE TABLE actor (
   id BIGINT NOT NULL,

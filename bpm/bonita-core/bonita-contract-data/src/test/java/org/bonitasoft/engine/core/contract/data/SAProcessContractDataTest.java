@@ -76,18 +76,16 @@ class SAProcessContractDataTest {
     @Test
     void creatingSAProcessContractDataShouldCopyNonArchivedValues() {
         long processInstanceId = 555L;
-        String some_name = "some_name";
+        String someName = "some_name";
         long value = 999999L;
-        final SProcessContractData processContractData = new SProcessContractData(processInstanceId, some_name, value);
+        final SProcessContractData processContractData = new SProcessContractData(processInstanceId, someName, value);
         long originalProcessDataId = 7548463269L;
         processContractData.setId(originalProcessDataId);
-        processContractData.setTenantId(1L);
 
         final SAProcessContractData saProcessContractData = new SAProcessContractData(processContractData);
 
-        assertThat(saProcessContractData.getTenantId()).isZero(); // not set yet by Persistence service
         assertThat(saProcessContractData.getId()).isZero();
-        assertThat(saProcessContractData.getName()).isEqualTo(some_name);
+        assertThat(saProcessContractData.getName()).isEqualTo(someName);
         assertThat(saProcessContractData.getScopeId()).isEqualTo(processInstanceId);
         assertThat(saProcessContractData.getArchiveDate()).isZero();
         assertThat(saProcessContractData.getSourceObjectId()).isEqualTo(originalProcessDataId);
