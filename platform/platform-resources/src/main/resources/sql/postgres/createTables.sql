@@ -360,17 +360,15 @@ CREATE TABLE connector_instance (
 CREATE INDEX idx_ci_container_activation ON connector_instance (containerId, containerType, activationEvent);
 
 CREATE TABLE event_trigger_instance (
-	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
   	eventInstanceId INT8 NOT NULL,
   	eventInstanceName VARCHAR(50),
   	executionDate INT8,
   	jobTriggerName VARCHAR(255),
-  	PRIMARY KEY (tenantid, id)
+    CONSTRAINT pk_event_trigger_instance PRIMARY KEY (id)
 );
 
 CREATE TABLE waiting_event (
-	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
   	kind VARCHAR(15) NOT NULL,
   	eventType VARCHAR(50),
@@ -394,13 +392,12 @@ CREATE TABLE waiting_event (
   	correlation3 VARCHAR(128),
   	correlation4 VARCHAR(128),
   	correlation5 VARCHAR(128),
-  	PRIMARY KEY (tenantid, id)
+    CONSTRAINT pk_waiting_event PRIMARY KEY (id)
 );
 CREATE INDEX idx_waiting_event ON waiting_event (progress, kind, locked, active);
 CREATE INDEX idx_waiting_event_correl ON waiting_event (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE message_instance (
-	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
   	messageName VARCHAR(255) NOT NULL,
   	targetProcess VARCHAR(255) NOT NULL,
@@ -415,7 +412,7 @@ CREATE TABLE message_instance (
   	correlation4 VARCHAR(128),
   	correlation5 VARCHAR(128),
   	creationDate INT8 NOT NULL,
-  	PRIMARY KEY (tenantid, id)
+    CONSTRAINT pk_message_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
 CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5);

@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.trigger;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -26,16 +27,13 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Data
 @NoArgsConstructor
 @Entity
-@IdClass(PersistentObjectId.class)
 @Table(name = "event_trigger_instance")
-public class STimerEventTriggerInstance implements PersistentObject {
+public class STimerEventTriggerInstance implements PlatformPersistentObject {
 
     public static final String EXECUTION_DATE = "executionDate";
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private long eventInstanceId;
 
     /**

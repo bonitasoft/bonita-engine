@@ -15,14 +15,14 @@ package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 @Data
 @NoArgsConstructor
-public class SMessageEventCouple implements PersistentObject {
+public class SMessageEventCouple implements PlatformPersistentObject {
 
     private long waitingMessageId;
     private SBPMEventType waitingMessageEventType;
@@ -44,10 +44,4 @@ public class SMessageEventCouple implements PersistentObject {
     public void setId(final long id) {
         throw new IllegalArgumentException();
     }
-
-    @Override
-    public void setTenantId(final long id) {
-        throw new IllegalArgumentException();
-    }
-
 }
