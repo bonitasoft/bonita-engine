@@ -16,15 +16,13 @@ package org.bonitasoft.engine.command.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -32,16 +30,13 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "command")
-@IdClass(PersistentObjectId.class)
-public class SCommand implements PersistentObject {
+public class SCommand implements PlatformPersistentObject {
 
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
     public static final String IMPLEMENTATION = "implementation";
     public static final String SYSTEM = "isSystem";
-    @Id
-    private long tenantId;
     @Id
     private long id;
     @Column

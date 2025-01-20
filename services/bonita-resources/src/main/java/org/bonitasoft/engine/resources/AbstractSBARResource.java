@@ -17,13 +17,11 @@ import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.MappedSuperclass;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Baptiste Mesta
@@ -31,14 +29,10 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Data
 @NoArgsConstructor
 @MappedSuperclass
-@IdClass(PersistentObjectId.class)
-public class AbstractSBARResource implements PersistentObject {
+public class AbstractSBARResource implements PlatformPersistentObject {
 
     @Id
     private long id;
-    @Id
-
-    private long tenantId;
 
     protected String name;
 

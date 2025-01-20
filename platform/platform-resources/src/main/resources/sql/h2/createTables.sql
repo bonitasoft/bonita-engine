@@ -602,14 +602,13 @@ CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId);
 CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId);
 
 CREATE TABLE command (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   description LONGVARCHAR,
   IMPLEMENTATION VARCHAR(100) NOT NULL,
   isSystem BOOLEAN,
-  UNIQUE (tenantid, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_command PRIMARY KEY (id),
+  CONSTRAINT uk_command_name UNIQUE (name)
 );
 CREATE TABLE arch_data_instance (
     tenantId BIGINT NOT NULL,
@@ -946,16 +945,14 @@ CREATE TABLE proc_parameter (
   PRIMARY KEY (tenantId, id)
 );
 CREATE TABLE bar_resource (
-  tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   process_id BIGINT NOT NULL,
   name VARCHAR(255) NOT NULL,
   type VARCHAR(16) NOT NULL,
   content LONGBLOB NOT NULL,
-  UNIQUE (tenantId, process_id, name, type),
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT pk_bar_resource PRIMARY KEY (id),
+  CONSTRAINT uk_bar_resource_processid_name_type UNIQUE (process_id, name, type)
 );
-CREATE INDEX idx_bar_resource ON bar_resource (process_id, type, name);
 
 CREATE TABLE temporary_content (
   id BIGINT NOT NULL,
@@ -970,7 +967,6 @@ CREATE TABLE temporary_content (
 CREATE INDEX idx_temporary_content ON temporary_content (key_);
 
 CREATE TABLE tenant_resource (
-  tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   name VARCHAR(255) NOT NULL,
   type VARCHAR(16) NOT NULL,
@@ -978,10 +974,9 @@ CREATE TABLE tenant_resource (
   lastUpdatedBy BIGINT NOT NULL,
   lastUpdateDate BIGINT,
   state VARCHAR(50) NOT NULL,
-  CONSTRAINT UK_tenant_resource UNIQUE (tenantId, name, type),
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT pk_tenant_resource PRIMARY KEY (id),
+  CONSTRAINT uk_tenant_resource_name_type UNIQUE (name, type)
 );
-CREATE INDEX idx_tenant_resource ON tenant_resource (type, name);
 
 CREATE TABLE bpm_failure (
   id BIGINT NOT NULL,
