@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -99,6 +100,8 @@ public class ServerAPIImpl implements ServerAPI {
     private static final Logger logger = LoggerFactory.getLogger(ServerAPIImpl.class);
 
     private static final String SESSION = "session";
+
+    @Serial
     private static final long serialVersionUID = -161775388604256321L;
 
     private final APIAccessResolver accessResolver;
@@ -221,20 +224,12 @@ public class ServerAPIImpl implements ServerAPI {
         if (session != null) {
             final SessionType sessionType = getSessionType(session);
             sessionAccessor = serviceAccessorFactory.createSessionAccessor();
-            switch (sessionType) {
-                case PLATFORM:
-                    serverClassLoader = beforeInvokeMethodForPlatformSession(sessionAccessor, serviceAccessor,
-                            session);
-                    break;
-
-                case API:
-                    serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, serviceAccessor,
-                            session);
-                    break;
-
-                default:
-                    throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
-            }
+            serverClassLoader = switch (sessionType) {
+                case PLATFORM -> beforeInvokeMethodForPlatformSession(sessionAccessor, serviceAccessor,
+                        session);
+                case API -> beforeInvokeMethodForAPISession(sessionAccessor, serviceAccessor,
+                        session);
+            };
         } else if (needSession(api)) {
             throw new InvalidSessionException("Session is null!");
         }
@@ -307,7 +302,7 @@ public class ServerAPIImpl implements ServerAPI {
             Supplier<String> failureMessage = () -> MessageFormat.format(
                     "Operation ''{0}.{1}'' requires exclusive access. Another operation is already launched with the same ''{2}'' access scope. You may try again after the other operation has finished.",
                     apiInterfaceName, methodName, lockKey.orElse(""));
-            try (AutoCloseable ignored = withEventualLock(lockKey, session, failureMessage)) {
+            try (AutoCloseable ignored = withEventualLock(lockKey, failureMessage)) {
                 // No session required means that there is no transaction
                 if (method.isAnnotationPresent(CustomTransactions.class)
                         || Class.forName(apiInterfaceName).isAnnotationPresent(NoSessionRequired.class)) {
@@ -324,25 +319,23 @@ public class ServerAPIImpl implements ServerAPI {
      *
      * @param lockKey the functional key for the lock scope or an empty
      *        optional when no lock is necessary
-     * @param session the user session
      * @param failureMessage builds the failure message when lock is already taken
      * @return the auto-closeable resource or a stub ineffective resource when
      *         lockKey is empty
      * @throws UnavailableLockException error with built message when
      *         lock is already taken.
      */
-    private AutoCloseable withEventualLock(final Optional<String> lockKey, final Session session,
-            Supplier<String> failureMessage) throws Throwable {
+    private AutoCloseable withEventualLock(final Optional<String> lockKey, Supplier<String> failureMessage)
+            throws Throwable {
         if (lockKey.isPresent()) {
             // try and acquire a lock with this scope
-            final long tenantId = (session instanceof APISession) ? ((APISession) session).getTenantId() : 1L;
             LockService lockService = getServiceAccessorFactoryInstance().createServiceAccessor().getLockService();
-            BonitaLock lock = lockService.tryLock(1L, lockKey.get(), 1L, TimeUnit.MILLISECONDS, tenantId);
+            BonitaLock lock = lockService.tryLock(1L, lockKey.get(), 1L, TimeUnit.MILLISECONDS);
             if (lock == null) {
                 // timeout expired, we should not pursue this way
                 throw new UnavailableLockException(failureMessage.get());
             }
-            return () -> lockService.unlock(lock, tenantId);
+            return () -> lockService.unlock(lock);
         } else {
             // ineffective resource
             return () -> {
@@ -428,10 +421,8 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     /**
-     * @param session
-     *        the session to user
-     * @param isAlreadyInTransaction
-     *        if the request is made in a transaction
+     * @param session the session to user
+     * @param isAlreadyInTransaction if the request is made in a transaction
      * @return true if the maintenance mode is enabled, false otherwise
      */
     protected boolean isMaintenanceModeEnabled(final Session session, boolean isAlreadyInTransaction) {
@@ -488,16 +479,10 @@ public class ServerAPIImpl implements ServerAPI {
         UserTransactionService transactionService;
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
         final ServiceAccessor serviceAccessor = serviceAccessorFactory.createServiceAccessor();
-        switch (sessionType) {
-            case PLATFORM:
-                transactionService = serviceAccessor.getTransactionService();
-                break;
-            case API:
-                transactionService = serviceAccessor.getUserTransactionService();
-                break;
-            default:
-                throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
-        }
+        transactionService = switch (sessionType) {
+            case PLATFORM -> serviceAccessor.getTransactionService();
+            case API -> serviceAccessor.getUserTransactionService();
+        };
         return transactionService;
     }
 

@@ -352,13 +352,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void releaseLocks(final LockService lockService, final List<BonitaLock> locks, final long tenantId) {
+    private void releaseLocks(final LockService lockService, final List<BonitaLock> locks) {
         if (locks == null) {
             return;
         }
         for (final BonitaLock lock : locks) {
             try {
-                lockService.unlock(lock, tenantId);
+                lockService.unlock(lock);
             } catch (final SLockException e) {
                 logError(e);
             }
@@ -3355,8 +3355,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final String objectType = SFlowElementsContainerType.PROCESS.name();
             List<BonitaLock> locks = null;
             try {
-                locks = createLockProcessInstances(lockService, objectType, processInstancesWithChildrenIds,
-                        serviceAccessor.getTenantId());
+                locks = createLockProcessInstances(lockService, objectType, processInstancesWithChildrenIds);
                 return userTxService.executeInTransaction(() -> {
                     final List<SProcessInstance> sProcessInstances = new ArrayList<>(
                             processInstancesWithChildrenIds.keySet());
@@ -3369,7 +3368,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
                 });
             } finally {
-                releaseLocks(lockService, locks, serviceAccessor.getTenantId());
+                releaseLocks(lockService, locks);
             }
 
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
@@ -3620,8 +3619,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<BonitaLock> createLockProcessInstances(final LockService lockService, final String objectType,
-            final Map<SProcessInstance, List<Long>> sProcessInstances,
-            final long tenantId) throws SLockException, SLockTimeoutException {
+            final Map<SProcessInstance, List<Long>> sProcessInstances) throws SLockException, SLockTimeoutException {
         final List<BonitaLock> locks = new ArrayList<>();
         final HashSet<Long> uniqueIds = new HashSet<>();
         for (final Entry<SProcessInstance, List<Long>> processInstanceWithChildrenIds : sProcessInstances.entrySet()) {
@@ -3629,7 +3627,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             uniqueIds.addAll(processInstanceWithChildrenIds.getValue());
         }
         for (final Long id : uniqueIds) {
-            final BonitaLock childLock = lockService.lock(id, objectType, tenantId);
+            final BonitaLock childLock = lockService.lock(id, objectType);
             locks.add(childLock);
         }
         return locks;
@@ -3643,7 +3641,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         BonitaLock lock = null;
         try {
-            lock = lockService.lock(processInstanceId, objectType, serviceAccessor.getTenantId());
+            lock = lockService.lock(processInstanceId, objectType);
             deleteProcessInstanceInTransaction(serviceAccessor, processInstanceId);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
@@ -3654,7 +3652,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } finally {
             if (lock != null) {
                 try {
-                    lockService.unlock(lock, serviceAccessor.getTenantId());
+                    lockService.unlock(lock);
                 } catch (final SLockException e) {
                     throw new DeletionException(
                             "Lock was not released. Object type: " + objectType + ", id: " + processInstanceId, e);
@@ -4887,8 +4885,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         BonitaLock lock = null;
         try {
             // lock process execution
-            lock = lockService.lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(),
-                    serviceAccessor.getTenantId());
+            lock = lockService.lock(processInstanceId, SFlowElementsContainerType.PROCESS.name());
             inTx(() -> {
                 try {
                     return processInstanceInterruptor.interruptProcessInstance(processInstanceId,
@@ -4907,7 +4904,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } finally {
             // unlock process execution
             try {
-                lockService.unlock(lock, serviceAccessor.getTenantId());
+                lockService.unlock(lock);
             } catch (final SLockException e) {
                 // ignore it
             }

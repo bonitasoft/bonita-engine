@@ -90,27 +90,26 @@ public class ExecuteConnectorWorkTest {
 
         @Override
         protected void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition,
-                Throwable Exception) throws SBonitaException {
+                Throwable Exception) {
         }
 
         @Override
         protected SThrowEventInstance createThrowErrorEventInstance(Map<String, Object> context,
-                SEndEventDefinition eventDefinition) throws SBonitaException {
+                SEndEventDefinition eventDefinition) {
             return null;
         }
 
         @Override
-        protected SConnectorDefinition getSConnectorDefinition(ProcessDefinitionService processDefinitionService)
-                throws SBonitaException {
+        protected SConnectorDefinition getSConnectorDefinition(ProcessDefinitionService processDefinitionService) {
             return sConnectorDefinition;
         }
 
         @Override
-        protected void setContainerInFail(Map<String, Object> context, Throwable t) throws SBonitaException {
+        protected void setContainerInFail(Map<String, Object> context, Throwable t) {
         }
 
         @Override
-        protected void continueFlow(Map<String, Object> context) throws SBonitaException {
+        protected void continueFlow(Map<String, Object> context) {
         }
 
         @Override
@@ -158,10 +157,9 @@ public class ExecuteConnectorWorkTest {
 
         //then
         InOrder inOrder = inOrder(lockService, userTransactionService);
-        inOrder.verify(lockService).lock(eq(PROCESS_INSTANCE_ID), eq(SFlowElementsContainerType.PROCESS.name()),
-                eq(TENANT_ID));
+        inOrder.verify(lockService).lock(eq(PROCESS_INSTANCE_ID), eq(SFlowElementsContainerType.PROCESS.name()));
         inOrder.verify(userTransactionService).executeInTransaction(any());
-        inOrder.verify(lockService).unlock(nullable(BonitaLock.class), eq(TENANT_ID));
+        inOrder.verify(lockService).unlock(nullable(BonitaLock.class));
     }
 
     @Test

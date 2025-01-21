@@ -15,13 +15,16 @@ package org.bonitasoft.engine.work;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
@@ -53,8 +56,7 @@ public class DefaultBonitaExecutorService implements BonitaExecutorService {
             final EngineClock engineClock,
             final WorkExecutionCallback workExecutionCallback,
             final WorkExecutionAuditor workExecutionAuditor,
-            final MeterRegistry meterRegistry,
-            final long tenantId) {
+            final MeterRegistry meterRegistry) {
         this.executor = executor;
         this.workFactory = workFactory;
         this.engineClock = engineClock;
@@ -62,15 +64,14 @@ public class DefaultBonitaExecutorService implements BonitaExecutorService {
         this.workExecutionAuditor = workExecutionAuditor;
         this.meterRegistry = meterRegistry;
 
-        Tags tags = Tags.of("tenant", String.valueOf(tenantId));
         numberOfWorksPending = Gauge.builder(NUMBER_OF_WORKS_PENDING, executor.getQueue(), Collection::size)
-                .tags(tags).baseUnit(WORKS_UNIT).description("Works pending in the execution queue")
+                .baseUnit(WORKS_UNIT).description("Works pending in the execution queue")
                 .register(meterRegistry);
         numberOfWorksRunning = Gauge.builder(NUMBER_OF_WORKS_RUNNING, runningWorks, AtomicLong::get)
-                .tags(tags).baseUnit(WORKS_UNIT).description("Works currently executing")
+                .baseUnit(WORKS_UNIT).description("Works currently executing")
                 .register(meterRegistry);
         executedWorkCounter = Counter.builder(NUMBER_OF_WORKS_EXECUTED)
-                .tags(tags).baseUnit(WORKS_UNIT).description("total works executed since last server start")
+                .baseUnit(WORKS_UNIT).description("total works executed since last server start")
                 .register(meterRegistry);
     }
 

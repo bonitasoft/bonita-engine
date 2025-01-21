@@ -27,18 +27,16 @@ import org.springframework.stereotype.Component;
 public class WorkSingleThreadPoolExecutorFactory implements BonitaWorkExecutorFactory {
 
     private final int queueCapacity;
-    private final long tenantId;
 
-    public WorkSingleThreadPoolExecutorFactory(@Value("${tenantId}") long tenantId,
+    public WorkSingleThreadPoolExecutorFactory(
             @Value("${bonita.tenant.work.queueCapacity}") int queueCapacity) {
         this.queueCapacity = queueCapacity;
-        this.tenantId = tenantId;
     }
 
     @Override
     public ThreadPoolExecutor create() {
         return new SingleThreadPoolExecutor(new ArrayBlockingQueue<>(queueCapacity),
-                new WorkerThreadFactory("Bonita-Worker", tenantId));
+                new WorkerThreadFactory("Bonita-Worker"));
     }
 
     public static class SingleThreadPoolExecutor extends MDCTransmitingThreadPoolExecutor {

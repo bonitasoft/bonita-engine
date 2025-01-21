@@ -179,10 +179,10 @@ public class MessagesHandlingServiceTest {
     }
 
     @Test
-    public void should_have_tenant_id_in_all_meters() {
-        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_EXECUTED)).isNotNull();
-        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)).isNotNull();
-        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)).isNotNull();
+    public void should_counters_be_present() {
+        assertThat(counter(NUMBER_OF_MESSAGES_EXECUTED)).isNotNull();
+        assertThat(counter(NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)).isNotNull();
+        assertThat(counter(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)).isNotNull();
     }
 
     @Test
@@ -204,7 +204,7 @@ public class MessagesHandlingServiceTest {
     }
 
     @Test
-    public void should_increment_metric_on_retriggered_taskls_when_matching_more_couples_than_the_maximum()
+    public void should_increment_metric_on_retriggered_tasks_when_matching_more_couples_than_the_maximum()
             throws Exception {
         doReturn(new SWaitingMessageEvent()).when(eventInstanceService).getWaitingMessage(anyLong());
         doReturn(new SMessageInstance()).when(eventInstanceService).getMessageInstance(anyLong());
@@ -222,8 +222,8 @@ public class MessagesHandlingServiceTest {
     // UTILS
     // =================================================================================================================
 
-    private Counter counterForDefaultTenant(String counterName) {
-        return meterRegistry.find(counterName).tag("tenant", String.valueOf(TENANT_ID)).counter();
+    private Counter counter(String counterName) {
+        return meterRegistry.find(counterName).counter();
     }
 
     private double counterValue(String counterName) {

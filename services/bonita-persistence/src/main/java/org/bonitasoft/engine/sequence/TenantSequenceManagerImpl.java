@@ -160,7 +160,7 @@ public class TenantSequenceManagerImpl {
 
     private void unlock(BonitaLock lock) {
         try {
-            lockService.unlock(lock, tenantId);
+            lockService.unlock(lock);
         } catch (SLockException e) {
             throw new SBonitaRuntimeException(
                     "Unable to unlock the lock require to get next id of sequences from database", e);
@@ -170,7 +170,7 @@ public class TenantSequenceManagerImpl {
     private BonitaLock createLock(long sequenceId) {
         BonitaLock lock;
         try {
-            lock = lockService.lock(sequenceId, SEQUENCE, tenantId);
+            lock = lockService.lock(sequenceId, SEQUENCE);
         } catch (SLockException | SLockTimeoutException e) {
             throw new SBonitaRuntimeException(
                     "Unable to acquire lock in order to update get the next id from database of the sequence "

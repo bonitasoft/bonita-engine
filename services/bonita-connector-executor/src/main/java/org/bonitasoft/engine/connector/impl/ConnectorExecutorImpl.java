@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.connector.BonitaConnectorExecutorFactory;
@@ -43,7 +42,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 
@@ -71,7 +69,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     private final TimeTracker timeTracker;
     private final MeterRegistry meterRegistry;
-    private final long tenantId;
     private final ExecutorServiceMetricsProvider executorServiceMetricsProvider;
 
     private final AtomicLong runningWorks = new AtomicLong();
@@ -83,14 +80,12 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             final SessionService sessionService,
             final TimeTracker timeTracker,
             final MeterRegistry meterRegistry,
-            @Value("${tenantId}") long tenantId,
             ExecutorServiceMetricsProvider executorServiceMetricsProvider,
             BonitaConnectorExecutorFactory bonitaConnectorExecutorFactory) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.timeTracker = timeTracker;
         this.meterRegistry = meterRegistry;
-        this.tenantId = tenantId;
         this.executorServiceMetricsProvider = executorServiceMetricsProvider;
         this.bonitaConnectorExecutorFactory = bonitaConnectorExecutorFactory;
     }
@@ -261,18 +256,16 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             executorService = executorServiceMetricsProvider
                     .bind(meterRegistry,
                             threadPoolExecutor,
-                            "bonita-connector-executor",
-                            tenantId);
-            Tags tags = Tags.of("tenant", String.valueOf(tenantId));
+                            "bonita-connector-executor");
             numberOfConnectorsPending = Gauge
                     .builder(NUMBER_OF_CONNECTORS_PENDING, threadPoolExecutor.getQueue(), Collection::size)
-                    .tags(tags).baseUnit(CONNECTORS_UNIT).description("Connectors pending in the execution queue")
+                    .baseUnit(CONNECTORS_UNIT).description("Connectors pending in the execution queue")
                     .register(meterRegistry);
             numberOfConnectorsRunning = Gauge.builder(NUMBER_OF_CONNECTORS_RUNNING, runningWorks, AtomicLong::get)
-                    .tags(tags).baseUnit(CONNECTORS_UNIT).description("Connectors currently executing")
+                    .baseUnit(CONNECTORS_UNIT).description("Connectors currently executing")
                     .register(meterRegistry);
             executedWorkCounter = Counter.builder(NUMBER_OF_CONNECTORS_EXECUTED)
-                    .tags(tags).baseUnit(CONNECTORS_UNIT)
+                    .baseUnit(CONNECTORS_UNIT)
                     .description("Total connectors executed since last server start")
                     .register(meterRegistry);
         }
@@ -289,7 +282,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             meterRegistry.remove(executedWorkCounter);
             meterRegistry.remove(numberOfConnectorsRunning);
             meterRegistry.remove(numberOfConnectorsPending);
-            executorServiceMetricsProvider.unbind(meterRegistry, "bonita-connector-executor", tenantId);
+            executorServiceMetricsProvider.unbind(meterRegistry, "bonita-connector-executor");
 
             executorService.shutdown();
             try {

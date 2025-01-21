@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -86,17 +85,14 @@ public class MessagesHandlingService implements TenantLifecycleService {
         this.sessionAccessor = sessionAccessor;
         this.workFactory = workFactory;
         executedMessagesCounter = Counter.builder(NUMBER_OF_MESSAGES_EXECUTED)
-                .tags(Tags.of("tenant", String.valueOf(tenantId)))
                 .baseUnit("messages")
                 .description("BPMN message couples executed")
                 .register(meterRegistry);
         matchedPotentialMessagesCounter = Counter.builder(NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)
-                .tags(Tags.of("tenant", String.valueOf(tenantId)))
                 .baseUnit("messages")
                 .description("BPMN message couples potentially matched")
                 .register(meterRegistry);
         retriggeredMatchingTasksCounter = Counter.builder(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)
-                .tags(Tags.of("tenant", String.valueOf(tenantId)))
                 .baseUnit("messages matching tasks")
                 .description("BPMN message matching tasks retriggered")
                 .register(meterRegistry);
@@ -294,7 +290,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
             try {
                 log.debug("Starting messages matching");
                 // we use a lock in order to have only one execution at a time even in cluster
-                BonitaLock eventLock = lockService.tryLock(1L, LOCK_TYPE, 1L, TimeUnit.MILLISECONDS, tenantId);
+                BonitaLock eventLock = lockService.tryLock(1L, LOCK_TYPE, 1L, TimeUnit.MILLISECONDS);
                 if (eventLock == null) {
                     // It could happen that some messages were still not triggered because the work that is currently
                     // executing was started after the last message execution
@@ -306,7 +302,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
                     sessionAccessor.setTenantId(tenantId);
                     matchEventCoupleAndTriggerExecution();
                 } finally {
-                    lockService.unlock(eventLock, tenantId);
+                    lockService.unlock(eventLock);
                 }
                 log.debug("Messages matching completed");
             } catch (Exception e) {

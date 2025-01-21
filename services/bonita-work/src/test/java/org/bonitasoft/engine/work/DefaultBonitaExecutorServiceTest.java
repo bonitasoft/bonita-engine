@@ -58,10 +58,10 @@ public class DefaultBonitaExecutorServiceTest {
     public void before() {
         var threadPoolExecutor = new WorkSingleThreadPoolExecutorFactory.SingleThreadPoolExecutor(
                 new LinkedBlockingQueue<>(10),
-                new WorkerThreadFactory("test-worker", 1, 1));
+                new WorkerThreadFactory("test-worker", 1));
         bonitaExecutorService = new DefaultBonitaExecutorService(threadPoolExecutor, workFactory, engineClock,
                 workExecutionCallback, workExecutionAuditor,
-                meterRegistry, TENANT_ID);
+                meterRegistry);
     }
 
     @Test
@@ -144,16 +144,6 @@ public class DefaultBonitaExecutorServiceTest {
         bonitaExecutorService.shutdownAndEmptyQueue();
 
         assertThat(meterRegistry.getMeters()).isEmpty();
-    }
-
-    @Test
-    public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(DefaultBonitaExecutorService.NUMBER_OF_WORKS_EXECUTED)
-                .tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
-        assertThat(meterRegistry.find(DefaultBonitaExecutorService.NUMBER_OF_WORKS_RUNNING)
-                .tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
-        assertThat(meterRegistry.find(DefaultBonitaExecutorService.NUMBER_OF_WORKS_PENDING)
-                .tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
     }
 
     @Test

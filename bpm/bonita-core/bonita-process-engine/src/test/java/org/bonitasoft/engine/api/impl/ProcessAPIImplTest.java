@@ -382,8 +382,8 @@ public class ProcessAPIImplTest {
             processAPI.cancelProcessInstance(PROCESS_INSTANCE_ID);
             fail("The process instance does not exists");
         } catch (final ProcessInstanceNotFoundException pinfe) {
-            verify(lockService).lock(PROCESS_INSTANCE_ID, SFlowElementsContainerType.PROCESS.name(), TENANT_ID);
-            verify(lockService).unlock(nullable(BonitaLock.class), eq(TENANT_ID));
+            verify(lockService).lock(PROCESS_INSTANCE_ID, SFlowElementsContainerType.PROCESS.name());
+            verify(lockService).unlock(nullable(BonitaLock.class));
         }
     }
 

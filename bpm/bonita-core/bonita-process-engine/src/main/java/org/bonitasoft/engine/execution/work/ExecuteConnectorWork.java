@@ -189,7 +189,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             throws Exception {
         // evaluate output and trigger the execution of the flow node
         BonitaLock lock = serviceAccessor.getLockService().lock(processInstanceId,
-                SFlowElementsContainerType.PROCESS.name(), getTenantId());
+                SFlowElementsContainerType.PROCESS.name());
         try {
             userTransactionService.executeInTransaction(() -> {
                 evaluateOutput(context, r, sConnectorDefinition);
@@ -197,7 +197,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                 return null;
             });
         } finally {
-            serviceAccessor.getLockService().unlock(lock, getTenantId());
+            serviceAccessor.getLockService().unlock(lock);
         }
     }
 

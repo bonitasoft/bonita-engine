@@ -81,7 +81,7 @@ public class TenantSequenceManagerImplTest {
         classNameToSequenceId.put(OBJECT_w_100, SEQUENCE_w_100);
         classNameToSequenceId.put(OBJECT_w_1000, SEQUENCE_w_1000);
 
-        doReturn(lock).when(lockService).lock(anyLong(), anyString(), anyLong());
+        doReturn(lock).when(lockService).lock(anyLong(), anyString());
 
         tenantSequenceManager = new TenantSequenceManagerImpl(TENANT_ID, lockService, sequenceIdToRangeSize,
                 classNameToSequenceId, dataSource, RETRIES, 1, 1) {
@@ -177,11 +177,11 @@ public class TenantSequenceManagerImplTest {
 
         tenantSequenceManager.getNextId(OBJECT_w_5);
 
-        inOrder.verify(lockService).lock(SEQUENCE_w_5, TenantSequenceManagerImpl.SEQUENCE, TENANT_ID);
+        inOrder.verify(lockService).lock(SEQUENCE_w_5, TenantSequenceManagerImpl.SEQUENCE);
         inOrder.verify(sequenceDAO).selectById(SEQUENCE_w_5);
         inOrder.verify(sequenceDAO).updateSequence(105L, SEQUENCE_w_5);
         inOrder.verify(connection).commit();
-        inOrder.verify(lockService).unlock(lock, TENANT_ID);
+        inOrder.verify(lockService).unlock(lock);
     }
 
     @Test

@@ -41,7 +41,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ConnectorExecutorImplIT {
+public class ConnectorExecutionTest {
 
     @Mock
     private SessionAccessor sessionAccessor;
@@ -60,7 +60,6 @@ public class ConnectorExecutorImplIT {
                 sessionService,
                 timeTracker,
                 new SimpleMeterRegistry(),
-                12L,
                 new DefaultExecutorServiceMetricsProvider(),
                 new ConnectorSingleThreadExecutorFactory(10));
         connectorExecutor.start();
@@ -122,7 +121,6 @@ public class ConnectorExecutorImplIT {
 
         @Override
         public void validate() throws SConnectorValidationException {
-
         }
 
         @Override
@@ -138,12 +136,10 @@ public class ConnectorExecutorImplIT {
 
         @Override
         public void connect() throws SConnectorException {
-
         }
 
         @Override
         public void disconnect() throws SConnectorException {
-
         }
     }
 }
