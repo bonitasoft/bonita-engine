@@ -13,14 +13,16 @@
  **/
 package org.bonitasoft.engine.profile.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -28,8 +30,7 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "profilemember")
-@IdClass(PersistentObjectId.class)
-public class SProfileMember implements PersistentObject {
+public class SProfileMember implements PlatformPersistentObject {
 
     public static final String DISPLAY_NAME_PART3 = "displayNamePart3";
     public static final String DISPLAY_NAME_PART2 = "displayNamePart2";
@@ -41,8 +42,6 @@ public class SProfileMember implements PersistentObject {
     public static final String ID = "id";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private long profileId;
     @Column

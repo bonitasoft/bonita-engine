@@ -1,5 +1,7 @@
 -- ------------------------------------------------ Foreign Keys -----------------------------------------------
 ALTER TABLE actormember DROP CONSTRAINT fk_actormember_actorid;
+ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileid;
+
 ALTER TABLE connector_instance DROP CONSTRAINT fk_connector_instance_tenantId;
 ALTER TABLE data_instance DROP CONSTRAINT fk_data_instance_tenantId;
 ALTER TABLE document DROP CONSTRAINT fk_document_tenantId;
@@ -8,12 +10,8 @@ ALTER TABLE document_mapping DROP CONSTRAINT fk_docmap_docid;
 ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_tenantId;
 ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_flownode_instanceId;
 ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_content_id;
-ALTER TABLE profile DROP CONSTRAINT fk_profile_tenantId;
-ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId;
 ALTER TABLE multi_biz_data DROP CONSTRAINT fk_multi_biz_data_tenantId;
 ALTER TABLE ref_biz_data_inst DROP CONSTRAINT fk_ref_biz_data_inst_tenantId;
-
-ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileid;
 
 -- business application
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId;

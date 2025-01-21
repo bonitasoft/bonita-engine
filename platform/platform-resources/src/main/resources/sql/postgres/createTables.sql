@@ -522,14 +522,13 @@ CREATE TABLE profile (
 );
 
 CREATE TABLE profilemember (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   profileId INT8 NOT NULL,
   userId INT8 NOT NULL,
   groupId INT8 NOT NULL,
   roleId INT8 NOT NULL,
-  UNIQUE (tenantId, profileId, userId, groupId, roleId),
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT pk_profilemember PRIMARY KEY (id),
+  CONSTRAINT uk_profilemember_profileid_userid_groupid_roleid UNIQUE (profileId, userId, groupId, roleId)
 );
 ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_profileid FOREIGN KEY (profileId) REFERENCES profile(id);
 
