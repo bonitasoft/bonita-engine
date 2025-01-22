@@ -15,15 +15,13 @@ package org.bonitasoft.engine.core.document.model;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.MappedSuperclass;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Emmanuel Duchastenier
@@ -33,11 +31,8 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Data
 @SuperBuilder
 @MappedSuperclass
-@IdClass(PersistentObjectId.class)
-public class AbstractSDocument implements PersistentObject {
+public class AbstractSDocument implements PlatformPersistentObject {
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
 

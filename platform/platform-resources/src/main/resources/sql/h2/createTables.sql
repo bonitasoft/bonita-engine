@@ -123,8 +123,31 @@ CREATE TABLE process_definition (
 );
 ALTER TABLE process_definition ADD CONSTRAINT fk_process_definition_content_id FOREIGN KEY (content_id) REFERENCES process_content(id);
 
+CREATE TABLE document (
+  id BIGINT NOT NULL,
+  author BIGINT,
+  creationdate BIGINT NOT NULL,
+  hascontent BOOLEAN NOT NULL,
+  filename VARCHAR(255),
+  mimetype VARCHAR(255),
+  url VARCHAR(1024),
+  content LONGBLOB NULL,
+  CONSTRAINT pk_document PRIMARY KEY (id)
+);
+
+CREATE TABLE document_mapping (
+  id BIGINT NOT NULL,
+  processinstanceid BIGINT NOT NULL,
+  documentid BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  version VARCHAR(50) NOT NULL,
+  index_ INT NOT NULL,
+  CONSTRAINT pk_document_mapping PRIMARY KEY (id)
+);
+ALTER TABLE document_mapping ADD CONSTRAINT fk_document_mapping_documentid FOREIGN KEY (documentid) REFERENCES document(id) ON DELETE CASCADE;
+
 CREATE TABLE arch_document_mapping (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   sourceObjectId BIGINT,
   processinstanceid BIGINT NOT NULL,
@@ -134,32 +157,11 @@ CREATE TABLE arch_document_mapping (
   version VARCHAR(50) NOT NULL,
   index_ INT NOT NULL,
   archiveDate BIGINT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_document_mapping PRIMARY KEY (id)
 );
 CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid);
-CREATE TABLE document (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  author BIGINT,
-  creationdate BIGINT NOT NULL,
-  hascontent BOOLEAN NOT NULL,
-  filename VARCHAR(255),
-  mimetype VARCHAR(255),
-  url VARCHAR(1024),
-  content LONGBLOB NULL,
-  PRIMARY KEY (tenantid, id)
-);
-CREATE TABLE document_mapping (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  processinstanceid BIGINT NOT NULL,
-  documentid BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  description TEXT,
-  version VARCHAR(50) NOT NULL,
-  index_ INT NOT NULL,
-  PRIMARY KEY (tenantid, id)
-);
+ALTER TABLE arch_document_mapping ADD CONSTRAINT fk_arch_document_mapping_documentid FOREIGN KEY (documentid) REFERENCES document(id) ON DELETE CASCADE;
+
 CREATE TABLE arch_process_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,

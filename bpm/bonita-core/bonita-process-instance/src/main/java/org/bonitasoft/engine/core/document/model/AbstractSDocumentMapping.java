@@ -15,15 +15,13 @@ package org.bonitasoft.engine.core.document.model;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.MappedSuperclass;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * Mapping for a document
@@ -38,13 +36,10 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-@IdClass(PersistentObjectId.class)
-public class AbstractSDocumentMapping implements PersistentObject {
+public class AbstractSDocumentMapping implements PlatformPersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
 
     @Column(name = "processinstanceid")
     private long processInstanceId;

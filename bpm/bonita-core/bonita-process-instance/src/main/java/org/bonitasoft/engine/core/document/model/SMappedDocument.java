@@ -44,7 +44,6 @@ public class SMappedDocument extends AbstractSMappedDocument {
         this.setIndex(documentMapping.getIndex());
         this.document = SLightDocument.builder()
                 .id(document.getId())
-                .tenantId(document.getTenantId())
                 .fileName(document.getFileName())
                 .hasContent(document.hasContent())
                 .mimeType(document.getMimeType())

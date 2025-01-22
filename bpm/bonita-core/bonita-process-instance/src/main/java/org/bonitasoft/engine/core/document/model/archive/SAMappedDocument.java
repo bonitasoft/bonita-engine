@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -38,7 +38,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @Table(name = "arch_document_mapping")
 @Cacheable(false)
-public class SAMappedDocument extends AbstractSMappedDocument implements ArchivedPersistentObject {
+public class SAMappedDocument extends AbstractSMappedDocument implements ArchivedPlatformPersistentObject {
 
     private long archiveDate;
     private long sourceObjectId;
