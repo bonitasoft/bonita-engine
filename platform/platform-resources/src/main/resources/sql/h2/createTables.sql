@@ -430,55 +430,48 @@ CREATE TABLE pending_mapping (
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (activityId, userId, actorId);
 
 CREATE TABLE ref_biz_data_inst (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	kind VARCHAR(15) NOT NULL,
-  	name VARCHAR(255) NOT NULL,
-  	proc_inst_id BIGINT,
-  	fn_inst_id BIGINT,
-  	data_id BIGINT,
-  	data_classname VARCHAR(255) NOT NULL
+  id BIGINT NOT NULL,
+  kind VARCHAR(15) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  proc_inst_id BIGINT,
+  fn_inst_id BIGINT,
+  data_id BIGINT,
+  data_classname VARCHAR(255) NOT NULL,
+  CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (id)
 );
-
 CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (fn_inst_id);
 CREATE INDEX idx_biz_data_inst3 ON ref_biz_data_inst (proc_inst_id);
-
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (tenantid, id);
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE;
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (fn_inst_id) REFERENCES flownode_instance(id) ON DELETE CASCADE;
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_inst_proc_inst_id FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE;
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_inst_fn_inst_id FOREIGN KEY (fn_inst_id) REFERENCES flownode_instance(id) ON DELETE CASCADE;
 
 CREATE TABLE multi_biz_data (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	idx BIGINT NOT NULL,
-  	data_id BIGINT NOT NULL,
-  	PRIMARY KEY (tenantid, id, data_id)
+  id BIGINT NOT NULL,
+  idx BIGINT NOT NULL,
+  data_id BIGINT NOT NULL,
+  CONSTRAINT pk_multi_biz_data PRIMARY KEY (id, data_id)
 );
-
-ALTER TABLE multi_biz_data ADD CONSTRAINT fk_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE multi_biz_data ADD CONSTRAINT fk_multi_biz_data_id FOREIGN KEY (id) REFERENCES ref_biz_data_inst(id) ON DELETE CASCADE;
 
 CREATE TABLE arch_ref_biz_data_inst (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	kind VARCHAR(15) NOT NULL,
-  	name VARCHAR(255) NOT NULL,
-  	orig_proc_inst_id BIGINT,
-  	orig_fn_inst_id BIGINT,
-  	data_id BIGINT,
-  	data_classname VARCHAR(255) NOT NULL
+  id BIGINT NOT NULL,
+  kind VARCHAR(15) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  orig_proc_inst_id BIGINT,
+  orig_fn_inst_id BIGINT,
+  data_id BIGINT,
+  data_classname VARCHAR(255) NOT NULL,
+  CONSTRAINT pk_arch_ref_biz_data_inst PRIMARY KEY (id)
 );
 CREATE INDEX idx_arch_biz_data_inst1 ON arch_ref_biz_data_inst (orig_proc_inst_id);
 CREATE INDEX idx_arch_biz_data_inst2 ON arch_ref_biz_data_inst (orig_fn_inst_id);
-ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT pk_arch_ref_biz_data_inst PRIMARY KEY (tenantid, id);
 
 CREATE TABLE arch_multi_biz_data (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	idx BIGINT NOT NULL,
-  	data_id BIGINT NOT NULL
+  id BIGINT NOT NULL,
+  idx BIGINT NOT NULL,
+  data_id BIGINT NOT NULL,
+  CONSTRAINT pk_arch_multi_biz_data PRIMARY KEY (id, data_id)
 );
-ALTER TABLE arch_multi_biz_data ADD CONSTRAINT pk_arch_rbdi_mbd PRIMARY KEY (tenantid, id, data_id);
-ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_multi_biz_data_id FOREIGN KEY (id) REFERENCES arch_ref_biz_data_inst(id) ON DELETE CASCADE;
 
 CREATE TABLE processsupervisor (
   id BIGINT NOT NULL,
@@ -611,55 +604,53 @@ CREATE TABLE command (
   CONSTRAINT pk_command PRIMARY KEY (id),
   CONSTRAINT uk_command_name UNIQUE (name)
 );
-CREATE TABLE arch_data_instance (
-    tenantId BIGINT NOT NULL,
-	id BIGINT NOT NULL,
-	name VARCHAR(50),
-	description VARCHAR(50),
-	transientData BOOLEAN,
-	className VARCHAR(100),
-	containerId BIGINT,
-	containerType VARCHAR(60),
-	namespace VARCHAR(100),
-	element VARCHAR(60),
-	intValue INT,
-	longValue BIGINT,
-	shortTextValue VARCHAR(255),
-	booleanValue BOOLEAN,
-	doubleValue NUMERIC(19,5),
-	floatValue REAL,
-	blobValue MEDIUMBLOB,
-	clobValue CLOB,
-	discriminant VARCHAR(50) NOT NULL,
-	archiveDate BIGINT NOT NULL,
-	sourceObjectId BIGINT NOT NULL,
-	PRIMARY KEY (tenantid, id)
-);
 
+CREATE TABLE arch_data_instance (
+  id BIGINT NOT NULL,
+  name VARCHAR(50),
+  description VARCHAR(50),
+  transientData BOOLEAN,
+  className VARCHAR(100),
+  containerId BIGINT,
+  containerType VARCHAR(60),
+  namespace VARCHAR(100),
+  element VARCHAR(60),
+  intValue INT,
+  longValue BIGINT,
+  shortTextValue VARCHAR(255),
+  booleanValue BOOLEAN,
+  doubleValue NUMERIC(19,5),
+  floatValue REAL,
+  blobValue MEDIUMBLOB,
+  clobValue CLOB,
+  discriminant VARCHAR(50) NOT NULL,
+  archiveDate BIGINT NOT NULL,
+  sourceObjectId BIGINT NOT NULL,
+  CONSTRAINT pk_arch_data_instance PRIMARY KEY (id)
+);
 CREATE INDEX idx1_arch_data_instance ON arch_data_instance (containerId, containerType, archiveDate, name, sourceObjectId);
 CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id);
 
 CREATE TABLE data_instance (
-    tenantId BIGINT NOT NULL,
-	id BIGINT NOT NULL,
-	name VARCHAR(50),
-	description VARCHAR(50),
-	transientData BOOLEAN,
-	className VARCHAR(100),
-	containerId BIGINT,
-	containerType VARCHAR(60),
-	namespace VARCHAR(100),
-	element VARCHAR(60),
-	intValue INT,
-	longValue BIGINT,
-	shortTextValue VARCHAR(255),
-	booleanValue BOOLEAN,
-	doubleValue NUMERIC(19,5),
-	floatValue REAL,
-	blobValue MEDIUMBLOB,
-	clobValue CLOB,
-	discriminant VARCHAR(50) NOT NULL,
-	PRIMARY KEY (tenantid, id)
+  id BIGINT NOT NULL,
+  name VARCHAR(50),
+  description VARCHAR(50),
+  transientData BOOLEAN,
+  className VARCHAR(100),
+  containerId BIGINT,
+  containerType VARCHAR(60),
+  namespace VARCHAR(100),
+  element VARCHAR(60),
+  intValue INT,
+  longValue BIGINT,
+  shortTextValue VARCHAR(255),
+  booleanValue BOOLEAN,
+  doubleValue NUMERIC(19,5),
+  floatValue REAL,
+  blobValue MEDIUMBLOB,
+  clobValue CLOB,
+  discriminant VARCHAR(50) NOT NULL,
+  CONSTRAINT pk_data_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, name);
 
