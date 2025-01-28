@@ -83,7 +83,7 @@ public class ScriptExecutor {
 
     public void createTables() throws PlatformException {
         try {
-            executeSQLResources(asList("createTables.sql", "createQuartzTables.sql", "postCreateStructure.sql"),
+            executeSQLResources(asList("createTables.sql", "createQuartzTables.sql"),
                     FAIL_ON_ERROR);
         } catch (final IOException e) {
             throw new PlatformException(e);

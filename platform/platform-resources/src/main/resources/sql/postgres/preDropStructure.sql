@@ -19,5 +19,3 @@ ALTER TABLE business_app DROP CONSTRAINT fk_business_app_themeid;
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_documentid;
-ALTER TABLE arch_flownode_instance DROP CONSTRAINT fk_arch_flownode_instance_tenantId;
-ALTER TABLE arch_process_instance DROP CONSTRAINT fk_arch_process_instance_tenantId;

@@ -163,7 +163,6 @@ CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid);
 ALTER TABLE arch_document_mapping ADD CONSTRAINT fk_arch_document_mapping_documentid FOREIGN KEY (documentid) REFERENCES document(id) ON DELETE CASCADE;
 
 CREATE TABLE arch_process_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(75) NOT NULL,
   processDefinitionId INT8 NOT NULL,
@@ -183,14 +182,13 @@ CREATE TABLE arch_process_instance (
   stringIndex3 VARCHAR(255),
   stringIndex4 VARCHAR(255),
   stringIndex5 VARCHAR(255),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_process_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx1_arch_process_instance ON arch_process_instance (sourceObjectId, rootProcessInstanceId, callerId);
 CREATE INDEX idx2_arch_process_instance ON arch_process_instance (processDefinitionId, archiveDate);
 CREATE INDEX idx3_arch_process_instance ON arch_process_instance (sourceObjectId, callerId, stateId);
 
 CREATE TABLE arch_flownode_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   flownodeDefinitionId INT8 NOT NULL,
   kind VARCHAR(25) NOT NULL,
@@ -236,7 +234,7 @@ CREATE TABLE arch_flownode_instance (
   aborting BOOLEAN NOT NULL,
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_flownode_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(logicalGroup2, kind, executedBy);
 CREATE INDEX idx_afi_kind_lg3 ON arch_flownode_instance(kind, logicalGroup3);

@@ -18,23 +18,17 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
-import org.bonitasoft.engine.archive.ArchivingStrategy;
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
-import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 
 public class ArchiveServiceImplTest {
 
-    // Only one test has to survive !
     @Test
     public void should_recordInserts_register_beforeCommitCallable_v2() throws Exception {
-        final PersistenceService definitiveArchivePersistenceService = null;
-        final ArchivingStrategy archivingStrategy = null;
         final UserTransactionService transactionService = mock(UserTransactionService.class);
 
-        ArchiveServiceImpl archiveService = spy(
-                new ArchiveServiceImpl(definitiveArchivePersistenceService, archivingStrategy, transactionService));
+        ArchiveServiceImpl archiveService = spy(new ArchiveServiceImpl(null, null, transactionService));
 
         final ArchivedPersistentObjectWithSetter mockArchivedPersistentObject = mock(
                 ArchivedPersistentObjectWithSetter.class);
@@ -48,14 +42,14 @@ public class ArchiveServiceImplTest {
         archiveService.recordInserts(archiveDate, record);
 
         verify(mockArchivedPersistentObject).setArchiveDate(eq(archiveDate));
-        verify(transactionService, times(1)).registerBeforeCommitCallable(eq(mockBatchArchiveCallable));
+        verify(transactionService).registerBeforeCommitCallable(eq(mockBatchArchiveCallable));
     }
 
     // Test with exception on TxService
 
     // Seen with Nicolas C. for this "interface extension" :)
     // Needed as the implementation calls setArchiveDate through reflection.
-    interface ArchivedPersistentObjectWithSetter extends ArchivedPersistentObject {
+    interface ArchivedPersistentObjectWithSetter extends ArchivedPlatformPersistentObject {
 
         void setArchiveDate(long archiveDate);
     }
