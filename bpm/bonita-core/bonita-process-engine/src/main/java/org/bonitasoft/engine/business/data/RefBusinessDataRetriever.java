@@ -137,7 +137,7 @@ public class RefBusinessDataRetriever {
      * get the first process in hierarchy that can contains business data, i.e. the process instance itself or its
      * parent if it is an event subprocess
      */
-    private long getProcessInstanceIdThatCanContainBusinessData(long processInstanceId)
+    public long getProcessInstanceIdThatCanContainBusinessData(long processInstanceId)
             throws SProcessInstanceReadException, SBonitaReadException, SProcessInstanceNotFoundException,
             SFlowNodeReadException, SFlowNodeNotFoundException {
         try {
