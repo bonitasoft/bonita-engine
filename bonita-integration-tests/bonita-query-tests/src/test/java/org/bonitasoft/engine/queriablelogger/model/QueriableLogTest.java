@@ -76,7 +76,7 @@ public class QueriableLogTest {
         testRepository.flush();
 
         List<Map<String, Object>> queriableLogs = jdbcTemplate.query("SELECT * from queriable_log",
-                new JdbcRowMapper("ID", "TENANTID", "NUMERICINDEX1", "NUMERICINDEX2", "NUMERICINDEX3",
+                new JdbcRowMapper("ID", "NUMERICINDEX1", "NUMERICINDEX2", "NUMERICINDEX3",
                         "NUMERICINDEX4", "NUMERICINDEX5", "THREADNUMBER", "LOG_TIMESTAMP"));
 
         assertThat(queriableLogs).hasSize(2);
@@ -93,7 +93,6 @@ public class QueriableLogTest {
                 entry("PRODUCTVERSION", "productVersion1"),
                 entry("SEVERITY", "BUSINESS"),
                 entry("RAWMESSAGE", "message1"),
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("THREADNUMBER", queriableLog.getThreadNumber()),
                 entry("USERID", "userId1"),
                 entry("WEEKOFYEAR", queriableLog.getWeekOfYear()),
@@ -117,7 +116,6 @@ public class QueriableLogTest {
                 entry("PRODUCTVERSION", "productVersion2"),
                 entry("SEVERITY", "BUSINESS"),
                 entry("RAWMESSAGE", "message2"),
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("THREADNUMBER", queriableLog.getThreadNumber()),
                 entry("USERID", "userId2"),
                 entry("WEEKOFYEAR", queriableLog1.getWeekOfYear()),

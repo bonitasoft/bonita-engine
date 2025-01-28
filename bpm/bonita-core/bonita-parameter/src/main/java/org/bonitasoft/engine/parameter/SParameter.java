@@ -13,12 +13,14 @@
  **/
 package org.bonitasoft.engine.parameter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.hibernate.annotations.Type;
 
 /**
@@ -28,13 +30,10 @@ import org.hibernate.annotations.Type;
 @NoArgsConstructor
 @Entity
 @Table(name = "proc_parameter")
-@IdClass(PersistentObjectId.class)
-public class SParameter implements PersistentObject {
+public class SParameter implements PlatformPersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
 
     private String name;
     @Column

@@ -21,24 +21,21 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-@IdClass(PersistentObjectId.class)
 @Table(name = "queriable_log")
-public class SQueriableLog implements PersistentObject {
+public class SQueriableLog implements PlatformPersistentObject {
 
     public static final int STATUS_FAIL = 0;
     public static final int STATUS_OK = 1;
@@ -64,8 +61,6 @@ public class SQueriableLog implements PersistentObject {
     public static final String NUMERIC_INDEX4 = "numericIndex4";
     public static final String NUMERIC_INDEX5 = "numericIndex5";
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
     @Column(name = "log_timestamp")

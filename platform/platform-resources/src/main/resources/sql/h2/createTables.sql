@@ -803,7 +803,6 @@ CREATE TABLE icon (
 );
 
 CREATE TABLE queriable_log (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   log_timestamp BIGINT NOT NULL,
   whatYear SMALLINT NOT NULL,
@@ -826,7 +825,7 @@ CREATE TABLE queriable_log (
   numericIndex3 BIGINT,
   numericIndex4 BIGINT,
   numericIndex5 BIGINT,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_queriable_log PRIMARY KEY (id)
 );
 
 CREATE TABLE sequence (
@@ -925,13 +924,13 @@ CREATE TABLE form_mapping (
 ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_id) REFERENCES page_mapping(id);
 
 CREATE TABLE proc_parameter (
-  tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   process_id BIGINT NOT NULL,
   name VARCHAR(255) NOT NULL,
   value CLOB NULL,
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT pk_proc_parameter PRIMARY KEY (id)
 );
+
 CREATE TABLE bar_resource (
   id BIGINT NOT NULL,
   process_id BIGINT NOT NULL,
