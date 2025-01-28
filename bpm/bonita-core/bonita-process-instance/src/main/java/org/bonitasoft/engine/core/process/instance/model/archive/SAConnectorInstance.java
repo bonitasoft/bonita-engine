@@ -17,30 +17,25 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
-@IdClass(PersistentObjectId.class)
 @Entity
 @Table(name = "arch_connector_instance")
-public class SAConnectorInstance implements ArchivedPersistentObject {
+public class SAConnectorInstance implements ArchivedPlatformPersistentObject {
 
     private static final String FLOWNODE_TYPE = "flowNode";
     private static final String PROCESS_TYPE = "process";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private long archiveDate;
     private long sourceObjectId;
     private String name;

@@ -13,14 +13,15 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * Used to get pending activities of a user.
@@ -39,16 +40,13 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "pending_mapping")
-@IdClass(PersistentObjectId.class)
-public class SPendingActivityMapping implements PersistentObject {
+public class SPendingActivityMapping implements PlatformPersistentObject {
 
     public static final String ACTOR_ID = "actorId";
     public static final String ACTIVITY_ID = "activityId";
     public static final String USER_ID = "userId";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     /**
      * the id of the activity
      */

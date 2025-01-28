@@ -13,23 +13,24 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
-import javax.persistence.*;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@IdClass(PersistentObjectId.class)
 @MappedSuperclass
-public abstract class SAbstractConnectorInstance implements PersistentObject {
+public abstract class SAbstractConnectorInstance implements PlatformPersistentObject {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -45,8 +46,6 @@ public abstract class SAbstractConnectorInstance implements PersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private String name;
     private long containerId;
     private String connectorId;

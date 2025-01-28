@@ -246,7 +246,6 @@ CREATE INDEX idx1_afi_root_parent ON arch_flownode_instance (rootContainerId, pa
 CREATE INDEX idx_lg4_lg2 on arch_flownode_instance(logicalGroup4, logicalGroup2);
 
 CREATE TABLE arch_connector_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   containerId INT8 NOT NULL,
   containerType VARCHAR(10) NOT NULL,
@@ -257,10 +256,10 @@ CREATE TABLE arch_connector_instance (
   state VARCHAR(50),
   sourceObjectId INT8,
   archiveDate INT8 NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_connector_instance PRIMARY KEY (id)
 );
-
 CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (containerId, containerType);
+
 CREATE TABLE process_instance (
   id INT8 NOT NULL,
   name VARCHAR(75) NOT NULL,
@@ -345,7 +344,6 @@ CREATE INDEX idx_fn_lg2_state ON flownode_instance (logicalGroup2, stateName);
 CREATE INDEX idx_fni_activity_instance_id_kind ON flownode_instance(activityInstanceId, kind);
 
 CREATE TABLE connector_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   containerId INT8 NOT NULL,
   containerType VARCHAR(10) NOT NULL,
@@ -357,7 +355,7 @@ CREATE TABLE connector_instance (
   executionOrder INT,
   exceptionMessage VARCHAR(255),
   stackTrace TEXT,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_connector_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx_ci_container_activation ON connector_instance (containerId, containerType, activationEvent);
 
@@ -420,14 +418,14 @@ CREATE INDEX idx_message_instance ON message_instance (messageName, targetProces
 CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE pending_mapping (
-	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
   	activityId INT8 NOT NULL,
   	actorId INT8,
   	userId INT8,
-  	PRIMARY KEY (tenantid, id)
+  	CONSTRAINT pk_pending_mapping PRIMARY KEY (id),
+    CONSTRAINT uk_pending_mapping_activityid_userid_actorid UNIQUE (activityId, userId, actorId)
 );
-CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (activityId, userId, actorId);
+ALTER TABLE pending_mapping ADD CONSTRAINT fk_pending_mapping_activityid FOREIGN KEY (activityId) REFERENCES flownode_instance(id);
 
 CREATE TABLE ref_biz_data_inst (
   id INT8 NOT NULL,
