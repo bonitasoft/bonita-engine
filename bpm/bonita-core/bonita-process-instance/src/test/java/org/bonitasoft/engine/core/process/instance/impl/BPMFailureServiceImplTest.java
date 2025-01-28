@@ -424,14 +424,14 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void should_getSubProcessInstanceFailures_call_the_right_query_with_proper_parameters() throws Exception {
-        service.getSubProcessInstanceFailures(1, 10);
+    void should_getChildProcessInstancesFailures_call_the_right_query_with_proper_parameters() throws Exception {
+        service.getChildProcessInstancesFailures(1, 10);
 
         ArgumentCaptor<SelectListDescriptor<SBPMFailure>> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
         verify(persistenceService).selectList(captor.capture());
 
         var descriptor = captor.getValue();
-        assertThat(descriptor.getQueryName()).isEqualTo("getSubProcessInstanceFailures");
+        assertThat(descriptor.getQueryName()).isEqualTo("getChildProcessInstancesFailures");
         assertThat(descriptor.getInputParameter("rootProcessInstanceId")).isEqualTo(1L);
         assertThat(descriptor.getReturnType()).isEqualTo(SBPMFailure.class);
         assertThat(descriptor.getStartIndex()).isZero();
@@ -439,14 +439,15 @@ class BPMFailureServiceImplTest {
     }
 
     @Test
-    void should_getArchivedSubProcessInstanceFailures_call_the_right_query_with_proper_parameters() throws Exception {
-        service.getArchivedSubProcessInstanceFailures(1L, 10);
+    void should_getArchivedChildProcessInstancesFailures_call_the_right_query_with_proper_parameters()
+            throws Exception {
+        service.getArchivedChildProcessInstancesFailures(1L, 10);
 
         ArgumentCaptor<SelectListDescriptor<SABPMFailure>> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
         verify(persistenceService).selectList(captor.capture());
 
         var descriptor = captor.getValue();
-        assertThat(descriptor.getQueryName()).isEqualTo("getArchivedSubProcessInstanceFailures");
+        assertThat(descriptor.getQueryName()).isEqualTo("getArchivedChildProcessInstancesFailures");
         assertThat(descriptor.getInputParameter("rootProcessInstanceId")).isEqualTo(1L);
         assertThat(descriptor.getReturnType()).isEqualTo(SABPMFailure.class);
         assertThat(descriptor.getStartIndex()).isZero();

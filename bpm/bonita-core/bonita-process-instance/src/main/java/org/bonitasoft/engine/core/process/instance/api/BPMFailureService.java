@@ -52,10 +52,10 @@ public interface BPMFailureService {
     List<SABPMFailure> getArchivedProcessInstanceFailures(long processInstanceId, int maxResults)
             throws SBonitaReadException;
 
-    List<SBPMFailure> getSubProcessInstanceFailures(long rootProcessInstanceId, int maxResults)
+    List<SBPMFailure> getChildProcessInstancesFailures(long rootProcessInstanceId, int maxResults)
             throws SBonitaReadException;
 
-    List<SABPMFailure> getArchivedSubProcessInstanceFailures(long rootProcessInstanceId, int maxResults)
+    List<SABPMFailure> getArchivedChildProcessInstancesFailures(long rootProcessInstanceId, int maxResults)
             throws SBonitaReadException;
 
     record Failure(String scope, Throwable throwable){}

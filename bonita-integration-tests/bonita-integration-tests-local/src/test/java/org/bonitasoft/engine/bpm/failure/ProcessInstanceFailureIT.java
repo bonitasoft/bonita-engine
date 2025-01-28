@@ -109,7 +109,8 @@ public class ProcessInstanceFailureIT extends TestWithUser {
 
         //There are no subprocess so no subprocess failure should be retrieved
         var subProcessInstanceFailures = serviceAccessor.getTransactionService()
-                .executeInTransaction(() -> failureService.getSubProcessInstanceFailures(processInstance.getId(), 5));
+                .executeInTransaction(
+                        () -> failureService.getChildProcessInstancesFailures(processInstance.getId(), 5));
         assertThat(subProcessInstanceFailures).hasSize(0);
     }
 
@@ -147,7 +148,7 @@ public class ProcessInstanceFailureIT extends TestWithUser {
             var failureService = ServiceAccessorFactory.getInstance().createServiceAccessor().getBpmFailureService();
             var subProcessInstanceFailures = serviceAccessor.getTransactionService()
                     .executeInTransaction(
-                            () -> failureService.getSubProcessInstanceFailures(processInstance.getId(), 5));
+                            () -> failureService.getChildProcessInstancesFailures(processInstance.getId(), 5));
             assertThat(subProcessInstanceFailures).hasSize(1);
             var failure = subProcessInstanceFailures.get(0);
             assertThat(failure.getScope())
@@ -170,7 +171,7 @@ public class ProcessInstanceFailureIT extends TestWithUser {
             // Now let's check the archived version, for sub-process...
             var archSubProcessInstanceFailures = serviceAccessor.getTransactionService()
                     .executeInTransaction(
-                            () -> failureService.getArchivedSubProcessInstanceFailures(processInstance.getId(), 5));
+                            () -> failureService.getArchivedChildProcessInstancesFailures(processInstance.getId(), 5));
             assertThat(archSubProcessInstanceFailures).hasSize(1);
 
             // ... and for the main process:

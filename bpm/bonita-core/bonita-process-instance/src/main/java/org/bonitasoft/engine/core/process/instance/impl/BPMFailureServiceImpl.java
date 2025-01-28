@@ -183,21 +183,21 @@ public class BPMFailureServiceImpl implements BPMFailureService {
     }
 
     @Override
-    public List<SBPMFailure> getSubProcessInstanceFailures(long rootProcessInstanceId, int maxResults)
+    public List<SBPMFailure> getChildProcessInstancesFailures(long rootProcessInstanceId, int maxResults)
             throws SBonitaReadException {
         final QueryOptions queryOptions = new QueryOptions(0, maxResults);
         final Map<String, Object> parameters = Map.ofEntries(Map.entry("rootProcessInstanceId", rootProcessInstanceId));
-        return persistenceService.selectList(new SelectListDescriptor<>("getSubProcessInstanceFailures", parameters,
+        return persistenceService.selectList(new SelectListDescriptor<>("getChildProcessInstancesFailures", parameters,
                 SBPMFailure.class, queryOptions));
     }
 
     @Override
-    public List<SABPMFailure> getArchivedSubProcessInstanceFailures(long rootProcessInstanceId, int maxResults)
+    public List<SABPMFailure> getArchivedChildProcessInstancesFailures(long rootProcessInstanceId, int maxResults)
             throws SBonitaReadException {
         final QueryOptions queryOptions = new QueryOptions(0, maxResults);
         final Map<String, Object> parameters = Map.ofEntries(Map.entry("rootProcessInstanceId", rootProcessInstanceId));
         return persistenceService
-                .selectList(new SelectListDescriptor<>("getArchivedSubProcessInstanceFailures", parameters,
+                .selectList(new SelectListDescriptor<>("getArchivedChildProcessInstancesFailures", parameters,
                         SABPMFailure.class, queryOptions));
     }
 
