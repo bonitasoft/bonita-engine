@@ -26,6 +26,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -58,10 +59,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.*;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -158,6 +156,8 @@ public class BPMInstancesCreator {
 
     private final RefBusinessDataService refBusinessDataService;
 
+    private final RefBusinessDataRetriever refBusinessDataRetriever;
+
     private FlowNodeStateManager stateManager;
 
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService,
@@ -165,7 +165,8 @@ public class BPMInstancesCreator {
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
             final DataInstanceService dataInstanceService, final TransientDataService transientDataService,
-            final ParentContainerResolver parentContainerResolver, RefBusinessDataService refBusinessDataService) {
+            final ParentContainerResolver parentContainerResolver, RefBusinessDataService refBusinessDataService,
+            final RefBusinessDataRetriever refBusinessDataRetriever) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.actorMappingService = actorMappingService;
@@ -177,6 +178,7 @@ public class BPMInstancesCreator {
         this.transientDataService = transientDataService;
         this.parentContainerResolver = parentContainerResolver;
         this.refBusinessDataService = refBusinessDataService;
+        this.refBusinessDataRetriever = refBusinessDataRetriever;
     }
 
     public void setStateManager(final FlowNodeStateManager stateManager) {
@@ -936,7 +938,9 @@ public class BPMInstancesCreator {
             try {
                 final SProcessMultiRefBusinessDataInstance loopDataRefInstance = (SProcessMultiRefBusinessDataInstance) refBusinessDataService
                         .getRefBusinessDataInstance(
-                                miLoop.getLoopDataInputRef(), flowNodeInstance.getParentProcessInstanceId());
+                                miLoop.getLoopDataInputRef(),
+                                refBusinessDataRetriever.getProcessInstanceIdThatCanContainBusinessData(
+                                        flowNodeInstance.getParentProcessInstanceId()));
                 final List<Long> dataIds = loopDataRefInstance.getDataIds();
                 final SRefBusinessDataInstance inputRefInstance = instanceFactory
                         .createNewInstanceForFlowNode(inputBusinessData.getName(),
@@ -944,7 +948,9 @@ public class BPMInstancesCreator {
                                 inputBusinessData.getClassName())
                         .done();
                 addRefBusinessData(inputRefInstance);
-            } catch (final SRefBusinessDataInstanceNotFoundException | SBonitaReadException e) {
+            } catch (final SRefBusinessDataInstanceNotFoundException | SBonitaReadException
+                    | SProcessInstanceReadException | SProcessInstanceNotFoundException | SFlowNodeReadException
+                    | SFlowNodeNotFoundException e) {
                 throw new SDataInstanceException(e);
             }
         }
