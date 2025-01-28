@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -65,12 +66,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefi
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.*;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -139,6 +135,7 @@ public class StateBehaviors {
     private final IdentityService identityService;
     private final WaitingEventsInterrupter waitingEventsInterrupter;
     private final RefBusinessDataService refBusinessDataService;
+    private final RefBusinessDataRetriever refBusinessDataRetriever;
     private final BPMWorkFactory workFactory;
     private ProcessInstanceInterruptor processInstanceInterruptor;
 
@@ -153,8 +150,9 @@ public class StateBehaviors {
             final SCommentService commentService,
             final IdentityService identityService, final ParentContainerResolver parentContainerResolver,
             final WaitingEventsInterrupter waitingEventsInterrupter,
-            final RefBusinessDataService refBusinessDataService, BPMWorkFactory workFactory,
-            ProcessInstanceInterruptor processInstanceInterruptor) {
+            final RefBusinessDataService refBusinessDataService,
+            final RefBusinessDataRetriever refBusinessDataRetriever,
+            final BPMWorkFactory workFactory, final ProcessInstanceInterruptor processInstanceInterruptor) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -173,6 +171,7 @@ public class StateBehaviors {
         this.identityService = identityService;
         this.parentContainerResolver = parentContainerResolver;
         this.refBusinessDataService = refBusinessDataService;
+        this.refBusinessDataRetriever = refBusinessDataRetriever;
         this.waitingEventsInterrupter = waitingEventsInterrupter;
         this.workFactory = workFactory;
         this.processInstanceInterruptor = processInstanceInterruptor;
@@ -739,8 +738,10 @@ public class StateBehaviors {
         }
         try {
             return refBusinessDataService.getNumberOfDataOfMultiRefBusinessData(businessData.getName(),
-                    flowNodeInstance.getParentProcessInstanceId());
-        } catch (final SBonitaReadException sbre) {
+                    refBusinessDataRetriever.getProcessInstanceIdThatCanContainBusinessData(
+                            flowNodeInstance.getParentProcessInstanceId()));
+        } catch (final SBonitaReadException | SProcessInstanceReadException | SProcessInstanceNotFoundException
+                | SFlowNodeReadException | SFlowNodeNotFoundException sbre) {
             throw new SActivityStateExecutionException(sbre);
         }
 

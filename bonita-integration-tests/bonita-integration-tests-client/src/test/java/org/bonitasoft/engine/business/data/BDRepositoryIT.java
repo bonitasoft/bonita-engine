@@ -78,6 +78,7 @@ import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -86,14 +87,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
-import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
-import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.*;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
@@ -1979,6 +1973,69 @@ public class BDRepositoryIT extends CommonAPIIT {
         employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
         assertThat(lastNames(employeeToString)).containsExactly("Doe", "Doe");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    @Test
+    public void should_subprocess_get_bdm_from_parent_process_instance_when_using_task_loop() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
+                "createNewEmployees",
+                new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
+                        .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
+                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];")
+                        .toString(),
+                List.class.getName());
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, employeeExpression)
+                .setMultiple(true);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME)
+                .addExpectedDuration(new ExpressionBuilder().createConstantLongExpression(10000L));
+
+        //setup subprocess with loop
+        SubProcessDefinitionBuilder subProcessDefinitionBuilder = processDefinitionBuilder
+                .addSubProcess("subProcess", true).getSubProcessBuilder();
+        subProcessDefinitionBuilder.addStartEvent("subStart")
+                .addTimerEventTriggerDefinition(TimerType.DURATION,
+                        new ExpressionBuilder().createConstantLongExpression(1000L));
+        subProcessDefinitionBuilder.addManualTask("subStep1", ACTOR_NAME)
+                .addBusinessData("employee", EMPLOYEE_QUALIFIED_NAME)
+                .addOperation(new OperationBuilder().createBusinessDataSetAttributeOperation("employee", "setLastName",
+                        String.class.getName(), new ExpressionBuilder().createConstantStringExpression("Smith")))
+                .addMultiInstance(false, "myEmployees").addDataInputItemRef("employee");
+        subProcessDefinitionBuilder.addEndEvent("subEnd");
+        subProcessDefinitionBuilder.addTransition("subStart", "subStep1");
+        subProcessDefinitionBuilder.addTransition("subStep1", "subEnd");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, testUser);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+
+        waitForUserTask(instance, "step1");
+        String employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
+        assertThat(lastNames(employeeToString)).containsExactly("Doe", "Doe");
+
+        // wait for the subprocess user task - first time
+        long activityInstanceId1 = waitForUserTask("subStep1");
+        // execute the task
+        getProcessAPI().assignUserTask(activityInstanceId1, testUser.getId());
+        getProcessAPI().executeFlowNode(activityInstanceId1);
+
+        // wait for the subprocess user task - second time
+        long activityInstanceId2 = waitForUserTask("subStep1");
+        ActivityInstance activityInstance2 = getProcessAPI().getActivityInstance(activityInstanceId2);
+        // execute the task
+        getProcessAPI().assignUserTask(activityInstanceId2, testUser.getId());
+        getProcessAPI().executeFlowNode(activityInstanceId2);
+
+        // wait for the subprocess to end
+        waitForProcessToFinish(activityInstance2.getParentProcessInstanceId());
+        employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(lastNames(employeeToString)).containsExactly("Smith", "Smith");
 
         disableAndDeleteProcess(definition.getId());
     }
