@@ -78,6 +78,7 @@ public class ArchivedCaseDatastore extends CommonDatastore<ArchivedCaseItem, Arc
         result.setSearchIndex3Value(item.getStringIndexValue(3));
         result.setSearchIndex4Value(item.getStringIndexValue(4));
         result.setSearchIndex5Value(item.getStringIndexValue(5));
+        result.setCallerId(item.getCallerId());
         return result;
     }
 
