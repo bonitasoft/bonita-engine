@@ -15,9 +15,14 @@ package org.bonitasoft.engine.sequence;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Charles Souillard
  */
+@Setter
+@Getter
 public class SequenceMappingProvider {
 
     private List<SequenceMapping> sequenceMappings;
@@ -25,18 +30,8 @@ public class SequenceMappingProvider {
     public SequenceMappingProvider() {
     }
 
-    public void setSequenceMappings(final List<SequenceMapping> sequenceMappings) {
-        this.sequenceMappings = sequenceMappings;
-    }
-
-    public List<SequenceMapping> getSequenceMappings() {
-        return sequenceMappings;
-    }
-
     @Override
     public String toString() {
-        return "SequenceMappingProvider{" +
-                "sequenceMappings=" + sequenceMappings +
-                '}';
+        return "SequenceMappingProvider{sequenceMappings=" + sequenceMappings + '}';
     }
 }

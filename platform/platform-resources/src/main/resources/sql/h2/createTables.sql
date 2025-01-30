@@ -829,10 +829,9 @@ CREATE TABLE queriable_log (
 );
 
 CREATE TABLE sequence (
-  tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   nextid BIGINT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_sequence PRIMARY KEY (id)
 );
 
 CREATE TABLE platform (

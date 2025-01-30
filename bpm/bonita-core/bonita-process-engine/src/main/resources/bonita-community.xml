@@ -657,21 +657,9 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
     </bean>
 
-
-
-    <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
-        <constructor-arg name="sequenceMappingProvider" ref="sequenceMappingProvider" />
-        <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
-        <constructor-arg name="retries" value="${bonita.platform.sequence.retries}" />
-        <constructor-arg name="delay" value="${bonita.platform.sequence.delay}" />
-        <constructor-arg name="delayFactor" value="${bonita.platform.sequence.delayFactor}" />
-    </bean>
-
-
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
         <constructor-arg name="txManager" ref="transactionManager" />
     </bean>
-
 
     <bean id="communityHbmResourcesProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
         <property name="resources">

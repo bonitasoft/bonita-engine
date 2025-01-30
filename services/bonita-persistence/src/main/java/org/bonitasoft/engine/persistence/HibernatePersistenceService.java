@@ -536,10 +536,6 @@ public class HibernatePersistenceService implements PersistenceService {
         return builder.toString();
     }
 
-    protected SequenceManager getSequenceManager() {
-        return sequenceManager;
-    }
-
     protected void setId(final PersistentObject entity) throws SPersistenceException {
         if (entity == null) {
             return;
@@ -553,8 +549,7 @@ public class HibernatePersistenceService implements PersistenceService {
         }
         if (id == null || id == -1 || id == 0) {
             try {
-                final long tenantId = entity instanceof PlatformPersistentObject ? -1 : getTenantId();
-                id = getSequenceManager().getNextId(entity.getClass().getName(), tenantId);
+                id = sequenceManager.getNextId(entity.getClass().getName());
                 ClassReflector.invokeSetter(entity, "setId", long.class, id);
             } catch (final Exception e) {
                 throw new SPersistenceException("Problem while saving entity: " + entity + " with id: " + id, e);
@@ -620,7 +615,7 @@ public class HibernatePersistenceService implements PersistenceService {
         parameters.forEach(query::setParameter);
         query.executeUpdate();
         if (getLogger().isDebugEnabled()) {
-            getLogger().debug("[Tenant] Deleting all instance of class " + entityClass.getSimpleName());
+            getLogger().debug("[Tenant] Deleting all instance of class {}", entityClass.getSimpleName());
         }
     }
 }

@@ -43,7 +43,7 @@ DELETE FROM role;
 DELETE FROM group_;
 DELETE FROM queriable_log;
 DELETE FROM page;
-DELETE FROM sequence WHERE tenantId <> -1;
+DELETE FROM sequence;
 DELETE FROM profilemember;
 DELETE FROM profile;
 DELETE FROM job_log;
