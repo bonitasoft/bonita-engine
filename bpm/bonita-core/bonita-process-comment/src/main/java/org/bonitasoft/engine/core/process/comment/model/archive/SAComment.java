@@ -20,14 +20,14 @@ import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "arch_process_comment")
-public class SAComment implements ArchivedPlatformPersistentObject {
+public class SAComment implements ArchivedPersistentObject {
 
     public static final String ID_KEY = "id";
     public static final String USERID_KEY = "userId";

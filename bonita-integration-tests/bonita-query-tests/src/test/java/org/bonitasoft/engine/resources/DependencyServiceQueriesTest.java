@@ -185,7 +185,8 @@ public class DependencyServiceQueriesTest {
                 .description("description of the jar")
                 .value_("jarContent".getBytes()).build());
 
-        PersistentObject dependencyFromQuery = platformRepository.selectOneOnPlatform("getPlatformDependencyByName",
+        PersistentObject dependencyFromQuery = platformRepository.selectOneOnPlatform(
+                "getPlatformDependencyByName",
                 pair("name", "dependencyName"));
         Map<String, Object> dependencyAsMap = jdbcTemplate.queryForObject("SELECT * FROM pdependency",
                 new JdbcRowMapper("ID"));

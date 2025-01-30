@@ -21,7 +21,7 @@ import javax.persistence.MappedSuperclass;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
@@ -29,7 +29,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Data
 @NoArgsConstructor
 @MappedSuperclass
-public class AbstractSBARResource implements PlatformPersistentObject {
+public class AbstractSBARResource implements PersistentObject {
 
     @Id
     private long id;

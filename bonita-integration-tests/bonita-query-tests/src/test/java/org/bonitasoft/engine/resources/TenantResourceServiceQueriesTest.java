@@ -119,7 +119,7 @@ public class TenantResourceServiceQueriesTest {
                 .withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
 
         // This resources should be excluded by the type filter:
-        repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes())
+        repository.add(aTenantResource().withName("excluded").withContent("binary".getBytes())
                 .withType(TenantResourceType.BDM_ACCESS_CTRL).build());
 
         STenantResource resource2 = repository.add(aTenantResource().withName("MyResource2")

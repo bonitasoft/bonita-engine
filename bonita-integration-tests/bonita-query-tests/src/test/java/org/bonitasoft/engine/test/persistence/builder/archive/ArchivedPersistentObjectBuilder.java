@@ -19,8 +19,6 @@ import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 
 public abstract class ArchivedPersistentObjectBuilder<T extends ArchivedPersistentObject, B extends ArchivedPersistentObjectBuilder<T, B>> {
 
-    public static final long DEFAULT_TENANT_ID = 1L;
-
     protected long id = new Random().nextLong();
 
     protected T persistentObject;
@@ -39,7 +37,6 @@ public abstract class ArchivedPersistentObjectBuilder<T extends ArchivedPersiste
 
     protected T fill(T persistent) {
         persistent.setId(id);
-        persistent.setTenantId(DEFAULT_TENANT_ID);
         return persistent;
     }
 

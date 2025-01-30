@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Anthony Birembaut
@@ -35,7 +35,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "user_membership")
-public class SUserMembership implements PlatformPersistentObject {
+public class SUserMembership implements PersistentObject {
 
     public static final String ID = "id";
     public static final String USER_ID = "userId";

@@ -19,7 +19,7 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -28,7 +28,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @NoArgsConstructor
 @Entity
 @Table(name = "event_trigger_instance")
-public class STimerEventTriggerInstance implements PlatformPersistentObject {
+public class STimerEventTriggerInstance implements PersistentObject {
 
     public static final String EXECUTION_DATE = "executionDate";
 

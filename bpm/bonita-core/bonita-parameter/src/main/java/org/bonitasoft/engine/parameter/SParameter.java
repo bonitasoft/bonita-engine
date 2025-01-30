@@ -20,7 +20,7 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.annotations.Type;
 
 /**
@@ -30,7 +30,7 @@ import org.hibernate.annotations.Type;
 @NoArgsConstructor
 @Entity
 @Table(name = "proc_parameter")
-public class SParameter implements PlatformPersistentObject {
+public class SParameter implements PersistentObject {
 
     @Id
     private long id;

@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.annotations.Type;
 
 @Data
@@ -32,7 +32,7 @@ import org.hibernate.annotations.Type;
 @Builder
 @Entity
 @Table(name = "bpm_failure")
-public class SBPMFailure implements PlatformPersistentObject {
+public class SBPMFailure implements PersistentObject {
 
     @Id
     private long id;

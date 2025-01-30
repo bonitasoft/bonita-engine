@@ -23,14 +23,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "arch_connector_instance")
-public class SAConnectorInstance implements ArchivedPlatformPersistentObject {
+public class SAConnectorInstance implements ArchivedPersistentObject {
 
     private static final String FLOWNODE_TYPE = "flowNode";
     private static final String PROCESS_TYPE = "process";

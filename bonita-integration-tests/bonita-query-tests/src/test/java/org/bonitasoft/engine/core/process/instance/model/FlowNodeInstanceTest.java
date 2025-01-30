@@ -44,7 +44,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThro
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
 import org.junit.Before;
@@ -675,7 +674,7 @@ public class FlowNodeInstanceTest {
     public void should_have_loopCounter_on_loop_Activity() {
         // Given
         final SLoopActivityInstance sLoopActivityInstance = (SLoopActivityInstance) repository
-                .add((PlatformPersistentObject) aLoopActivity().withLoopCounter(6).build());
+                .add((PersistentObject) aLoopActivity().withLoopCounter(6).build());
         repository.flush();
         final int loopCounter = jdbcTemplate.queryForObject("select loop_counter from flownode_instance",
                 Integer.class);

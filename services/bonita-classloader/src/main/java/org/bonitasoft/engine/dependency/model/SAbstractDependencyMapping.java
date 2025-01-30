@@ -22,14 +22,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-public abstract class SAbstractDependencyMapping implements PlatformPersistentObject {
+public abstract class SAbstractDependencyMapping implements PersistentObject {
 
     @Id
     private long id;

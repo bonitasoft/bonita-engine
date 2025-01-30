@@ -16,7 +16,7 @@ package org.bonitasoft.engine.persistence;
 /**
  * @author Baptiste Mesta
  */
-public class TestObject implements PlatformPersistentObject {
+public class TestObject implements PersistentObject {
 
     @Override
     public long getId() {

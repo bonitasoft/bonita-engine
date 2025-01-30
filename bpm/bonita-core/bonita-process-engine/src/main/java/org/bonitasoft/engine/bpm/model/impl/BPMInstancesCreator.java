@@ -635,7 +635,8 @@ public class BPMInstancesCreator {
         }
     }
 
-    public void createConnectorInstances(final PersistentObject container, final List<SConnectorDefinition> connectors,
+    public void createConnectorInstances(final PersistentObject container,
+            final List<SConnectorDefinition> connectors,
             final String containerType)
             throws SBonitaException {
         final List<SConnectorInstance> connectorInstances = new ArrayList<>(connectors.size());

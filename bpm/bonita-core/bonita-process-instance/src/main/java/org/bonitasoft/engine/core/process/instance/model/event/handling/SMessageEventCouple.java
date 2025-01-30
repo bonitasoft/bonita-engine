@@ -15,14 +15,14 @@ package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 @Data
 @NoArgsConstructor
-public class SMessageEventCouple implements PlatformPersistentObject {
+public class SMessageEventCouple implements PersistentObject {
 
     private long waitingMessageId;
     private SBPMEventType waitingMessageEventType;

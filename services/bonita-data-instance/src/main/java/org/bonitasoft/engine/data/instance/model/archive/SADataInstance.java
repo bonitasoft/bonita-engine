@@ -26,7 +26,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
@@ -36,7 +36,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINANT")
 @Table(name = "arch_data_instance")
-public abstract class SADataInstance implements ArchivedPlatformPersistentObject {
+public abstract class SADataInstance implements ArchivedPersistentObject {
 
     @Id
     private long id;

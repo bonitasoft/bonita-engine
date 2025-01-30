@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -30,7 +30,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "actor")
-public class SActor implements PlatformPersistentObject {
+public class SActor implements PersistentObject {
 
     @Id
     private long id;

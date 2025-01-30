@@ -28,7 +28,7 @@ import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Feng Hui
@@ -42,7 +42,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Table(name = "flownode_instance")
 @DiscriminatorColumn(name = "kind")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class SFlowNodeInstance implements PlatformPersistentObject {
+public abstract class SFlowNodeInstance implements PersistentObject {
 
     @Id
     private long id;

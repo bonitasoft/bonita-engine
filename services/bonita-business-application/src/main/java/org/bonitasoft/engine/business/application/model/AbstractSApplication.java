@@ -19,12 +19,12 @@ import javax.persistence.MappedSuperclass;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
 @MappedSuperclass
-public abstract class AbstractSApplication implements PlatformPersistentObject {
+public abstract class AbstractSApplication implements PersistentObject {
 
     public static final String ID = "id";
     public static final String TOKEN = "token";

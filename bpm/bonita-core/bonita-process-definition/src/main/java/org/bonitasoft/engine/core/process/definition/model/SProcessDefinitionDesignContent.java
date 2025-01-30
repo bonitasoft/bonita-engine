@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -29,7 +29,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Entity
 @Table(name = "process_content")
 @Builder
-public class SProcessDefinitionDesignContent implements PlatformPersistentObject {
+public class SProcessDefinitionDesignContent implements PersistentObject {
 
     @Id
     private long id;

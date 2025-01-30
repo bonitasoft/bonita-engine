@@ -25,7 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -33,7 +33,7 @@ import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
 @Table(name = "arch_flownode_instance")
 @DiscriminatorColumn(name = "kind")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class SAFlowNodeInstance implements ArchivedPlatformPersistentObject {
+public abstract class SAFlowNodeInstance implements ArchivedPersistentObject {
 
     @Id
     private long id;

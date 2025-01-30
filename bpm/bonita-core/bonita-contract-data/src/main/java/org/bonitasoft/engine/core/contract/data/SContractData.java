@@ -26,7 +26,7 @@ import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.annotations.Type;
 
 /**
@@ -39,7 +39,7 @@ import org.hibernate.annotations.Type;
 @DiscriminatorColumn(name = "kind")
 @Table(name = "contract_data")
 @SuperBuilder
-public abstract class SContractData implements PlatformPersistentObject {
+public abstract class SContractData implements PersistentObject {
 
     @Id
     private long id;

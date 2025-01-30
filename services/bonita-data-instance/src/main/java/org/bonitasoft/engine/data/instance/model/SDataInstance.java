@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -36,7 +36,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINANT")
 @Table(name = "data_instance")
-public abstract class SDataInstance implements PlatformPersistentObject {
+public abstract class SDataInstance implements PersistentObject {
 
     public static final String ID = "id";
     public static final String NAME = "name";

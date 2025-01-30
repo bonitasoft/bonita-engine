@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 
@@ -49,7 +49,7 @@ public class ArchiveServiceImplTest {
 
     // Seen with Nicolas C. for this "interface extension" :)
     // Needed as the implementation calls setArchiveDate through reflection.
-    interface ArchivedPersistentObjectWithSetter extends ArchivedPlatformPersistentObject {
+    interface ArchivedPersistentObjectWithSetter extends ArchivedPersistentObject {
 
         void setArchiveDate(long archiveDate);
     }

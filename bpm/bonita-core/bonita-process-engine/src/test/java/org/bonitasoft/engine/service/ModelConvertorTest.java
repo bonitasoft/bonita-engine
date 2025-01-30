@@ -284,7 +284,6 @@ class ModelConvertorTest {
         sProcessInstance.setStringIndex3("stringIndex3");
         sProcessInstance.setStringIndex4("stringIndex4");
         sProcessInstance.setStringIndex5("stringIndex5");
-        sProcessInstance.setTenantId(514L);
 
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("name", "version");
         sProcessDefinition.setStringIndex(1, "label1", null);
@@ -343,7 +342,6 @@ class ModelConvertorTest {
         sProcessInstance.setStringIndex3("stringIndex3");
         sProcessInstance.setStringIndex4("stringIndex4");
         sProcessInstance.setStringIndex5("stringIndex5");
-        sProcessInstance.setTenantId(514L);
 
         // Then
         final ProcessInstance processInstance = ModelConvertor
@@ -396,7 +394,6 @@ class ModelConvertorTest {
         saProcessInstance.setStringIndex3("stringIndex3");
         saProcessInstance.setStringIndex4("stringIndex4");
         saProcessInstance.setStringIndex5("stringIndex5");
-        saProcessInstance.setTenantId(514L);
 
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("name", "version");
         sProcessDefinition.setStringIndex(1, "label1", null);
@@ -458,7 +455,6 @@ class ModelConvertorTest {
         saProcessInstance.setStringIndex3("stringIndex3");
         saProcessInstance.setStringIndex4("stringIndex4");
         saProcessInstance.setStringIndex5("stringIndex5");
-        saProcessInstance.setTenantId(514L);
 
         // Then
         final ArchivedProcessInstance archivedProcessInstance = ModelConvertor

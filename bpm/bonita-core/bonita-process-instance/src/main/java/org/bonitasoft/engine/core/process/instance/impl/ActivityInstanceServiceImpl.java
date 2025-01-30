@@ -770,7 +770,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<SAActivityInstance> searchArchivedActivityInstances(final Class<? extends PersistentObject> entityClass,
+    public List<SAActivityInstance> searchArchivedActivityInstances(
+            final Class<? extends PersistentObject> entityClass,
             final QueryOptions searchOptions)
             throws SBonitaReadException {
         final ReadPersistenceService persistenceService = getArchiveService()

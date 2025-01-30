@@ -60,7 +60,7 @@ public class MultiThreadCallsIT extends CommonAPIIT {
     @Test
     public void supportMultiThreadingClients() throws Exception {
         final int nbOfThreads = 5;
-        final List<CallAPIMethodsThread> threads = new ArrayList<MultiThreadCallsIT.CallAPIMethodsThread>(nbOfThreads);
+        final List<CallAPIMethodsThread> threads = new ArrayList<>(nbOfThreads);
         for (int i = 0; i < nbOfThreads; i++) {
             threads.add(new CallAPIMethodsThread());
         }

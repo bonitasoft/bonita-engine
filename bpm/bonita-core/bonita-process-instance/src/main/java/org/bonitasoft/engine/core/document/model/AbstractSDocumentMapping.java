@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * Mapping for a document
@@ -36,7 +36,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-public class AbstractSDocumentMapping implements PlatformPersistentObject {
+public class AbstractSDocumentMapping implements PersistentObject {
 
     @Id
     private long id;

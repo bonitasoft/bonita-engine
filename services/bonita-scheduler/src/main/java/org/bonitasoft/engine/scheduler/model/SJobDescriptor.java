@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -29,7 +29,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "job_desc")
-public class SJobDescriptor implements PlatformPersistentObject {
+public class SJobDescriptor implements PersistentObject {
 
     public static final String JOB_NAME = "jobName";
     public static final String JOB_CLASS_NAME = "jobClassName";

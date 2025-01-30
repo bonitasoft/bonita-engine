@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.annotations.Type;
 
 @Data
@@ -35,7 +35,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "job_param")
 @Cacheable(false)
-public class SJobParameter implements PlatformPersistentObject {
+public class SJobParameter implements PersistentObject {
 
     public static final String JOB_DESCRIPTOR_ID = "jobDescriptorId";
     public static final String KEY = "key";

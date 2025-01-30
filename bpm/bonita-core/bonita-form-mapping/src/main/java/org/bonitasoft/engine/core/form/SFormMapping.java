@@ -26,7 +26,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.SPageMapping;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Entity
 @Data
@@ -34,7 +34,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @NoArgsConstructor
 @Builder
 @Table(name = "form_mapping")
-public class SFormMapping implements PlatformPersistentObject {
+public class SFormMapping implements PersistentObject {
 
     public static final String TARGET_INTERNAL = "INTERNAL";
     public static final String TARGET_URL = "URL";

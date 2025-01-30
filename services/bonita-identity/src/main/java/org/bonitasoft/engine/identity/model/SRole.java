@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Anthony Birembaut
@@ -36,7 +36,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "role")
-public class SRole implements PlatformPersistentObject, SHavingIcon {
+public class SRole implements PersistentObject, SHavingIcon {
 
     public static final String ID = "id";
     public static final String NAME = "name";

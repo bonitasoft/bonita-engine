@@ -19,7 +19,7 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -28,7 +28,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @NoArgsConstructor
 @Entity
 @Table(name = "message_instance")
-public class SMessageInstance implements PlatformPersistentObject {
+public class SMessageInstance implements PersistentObject {
 
     @Id
     private long id;

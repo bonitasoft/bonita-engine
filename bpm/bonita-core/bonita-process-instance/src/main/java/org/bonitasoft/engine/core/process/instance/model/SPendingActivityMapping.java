@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * Used to get pending activities of a user.
@@ -40,7 +40,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "pending_mapping")
-public class SPendingActivityMapping implements PlatformPersistentObject {
+public class SPendingActivityMapping implements PersistentObject {
 
     public static final String ACTOR_ID = "actorId";
     public static final String ACTIVITY_ID = "activityId";

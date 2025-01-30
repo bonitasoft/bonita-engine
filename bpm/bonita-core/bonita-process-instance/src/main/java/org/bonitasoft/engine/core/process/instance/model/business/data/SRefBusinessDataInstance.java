@@ -21,7 +21,7 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
@@ -31,7 +31,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Entity
 @Table(name = "ref_biz_data_inst")
 @DiscriminatorColumn(name = "kind")
-public abstract class SRefBusinessDataInstance implements PlatformPersistentObject {
+public abstract class SRefBusinessDataInstance implements PersistentObject {
 
     @Id
     private long id;

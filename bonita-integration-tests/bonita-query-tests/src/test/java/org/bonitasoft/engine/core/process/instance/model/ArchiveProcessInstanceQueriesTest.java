@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.mapOf;
 import static org.bonitasoft.engine.commons.Pair.pair;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -184,7 +183,6 @@ public class ArchiveProcessInstanceQueriesTest {
         final SAProcessInstance saProcessInstance = new SAProcessInstance();
         saProcessInstance.setId(id);
         saProcessInstance.setSourceObjectId(id);
-        saProcessInstance.setTenantId(DEFAULT_TENANT_ID);
         saProcessInstance.setName("process" + id);
         return saProcessInstance;
     }

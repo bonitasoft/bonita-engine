@@ -658,7 +658,8 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @return number of archived activity instances for the specific entity class
      * @throws SBonitaReadException
      */
-    long getNumberOfArchivedActivityInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions)
+    long getNumberOfArchivedActivityInstances(Class<? extends PersistentObject> entityClass,
+            QueryOptions searchOptions)
             throws SBonitaReadException;
 
     /***

@@ -42,7 +42,6 @@ public class SPageImplTest {
     public void should_set_all_fields() {
         //given
         final SPage sPage = new SPage(NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, CONTENT_ZIP);
-        sPage.setTenantId(TENANT_ID);
         sPage.setId(ID);
         sPage.setDisplayName(DISPLAY_NAME);
         sPage.setDescription(DESCRIPTION);

@@ -46,8 +46,6 @@ public class ConnectorInstanceBuilder
 
     private String name;
 
-    private long tenantId;
-
     public static ConnectorInstanceBuilder aConnectorInstance() {
         return new ConnectorInstanceBuilder();
     }
@@ -75,7 +73,6 @@ public class ConnectorInstanceBuilder
         connectorInstance.setVersion(version);
         connectorInstance.setExecutionOrder(executionOrder);
         connectorInstance.setName(name);
-        connectorInstance.setTenantId(tenantId);
         return connectorInstance;
     }
 
@@ -101,11 +98,6 @@ public class ConnectorInstanceBuilder
 
     public ConnectorInstanceBuilder setActivationEvent(final ConnectorEvent activationEvent) {
         this.activationEvent = activationEvent;
-        return this;
-    }
-
-    public ConnectorInstanceBuilder setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
         return this;
     }
 

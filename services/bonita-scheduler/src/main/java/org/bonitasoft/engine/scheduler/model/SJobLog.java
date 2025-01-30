@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Celine Souchet
@@ -34,7 +34,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Entity
 @Table(name = "job_log")
 @Cacheable(false)
-public class SJobLog implements PlatformPersistentObject {
+public class SJobLog implements PersistentObject {
 
     @Id
     private long id;

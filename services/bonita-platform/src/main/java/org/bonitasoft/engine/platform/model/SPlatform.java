@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.annotations.Type;
 
 @Data
@@ -31,7 +31,7 @@ import org.hibernate.annotations.Type;
 @Builder
 @Entity
 @Table(name = "platform")
-public class SPlatform implements PlatformPersistentObject {
+public class SPlatform implements PersistentObject {
 
     public static final String CREATED_BY = "createdBy";
     public static final String CREATED = "created";
@@ -74,8 +74,4 @@ public class SPlatform implements PlatformPersistentObject {
         this.created = created;
     }
 
-    @Override
-    public void setTenantId(long id) {
-        //no tenant id
-    }
 }

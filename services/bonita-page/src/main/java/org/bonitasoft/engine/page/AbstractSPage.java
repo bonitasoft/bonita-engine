@@ -20,13 +20,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @MappedSuperclass
-public class AbstractSPage implements PlatformPersistentObject {
+public class AbstractSPage implements PersistentObject {
 
     @Id
     private long id;

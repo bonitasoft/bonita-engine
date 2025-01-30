@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.annotations.Type;
 
@@ -31,7 +31,7 @@ import org.hibernate.annotations.Type;
 @Builder
 @Entity
 @Table(name = "arch_bpm_failure")
-public class SABPMFailure implements ArchivedPlatformPersistentObject {
+public class SABPMFailure implements ArchivedPersistentObject {
 
     @Id
     private long id;

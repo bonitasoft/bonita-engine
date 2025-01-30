@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Anthony Birembaut
@@ -37,7 +37,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Entity
 @Table(name = "custom_usr_inf_val")
 @Cacheable(false)
-public class SCustomUserInfoValue implements PlatformPersistentObject {
+public class SCustomUserInfoValue implements PersistentObject {
 
     public static final String ID = "id";
     public static final String USER_ID = "userId";

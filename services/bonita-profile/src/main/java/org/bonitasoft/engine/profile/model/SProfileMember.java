@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -30,7 +30,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "profilemember")
-public class SProfileMember implements PlatformPersistentObject {
+public class SProfileMember implements PersistentObject {
 
     public static final String DISPLAY_NAME_PART3 = "displayNamePart3";
     public static final String DISPLAY_NAME_PART2 = "displayNamePart2";

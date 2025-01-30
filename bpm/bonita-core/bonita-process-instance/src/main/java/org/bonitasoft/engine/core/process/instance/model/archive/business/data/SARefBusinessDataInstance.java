@@ -22,7 +22,7 @@ import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -33,7 +33,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @Table(name = "arch_ref_biz_data_inst")
 @DiscriminatorColumn(name = "kind")
-public abstract class SARefBusinessDataInstance implements ArchivedPlatformPersistentObject {
+public abstract class SARefBusinessDataInstance implements ArchivedPersistentObject {
 
     @Id
     protected long id;

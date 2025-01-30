@@ -20,13 +20,13 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "actormember")
-public class SActorMember implements PlatformPersistentObject {
+public class SActorMember implements PersistentObject {
 
     @Id
     private long id;

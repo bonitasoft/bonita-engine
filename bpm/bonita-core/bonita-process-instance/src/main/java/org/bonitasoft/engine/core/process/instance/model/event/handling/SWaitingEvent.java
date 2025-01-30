@@ -24,7 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Zhao Na
@@ -37,7 +37,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Entity
 @Table(name = "waiting_event")
 @DiscriminatorColumn(name = "kind")
-public abstract class SWaitingEvent implements PlatformPersistentObject {
+public abstract class SWaitingEvent implements PersistentObject {
 
     @Id
     private long id;

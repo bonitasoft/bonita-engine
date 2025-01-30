@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,15 +27,12 @@ import javax.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -64,8 +60,7 @@ public class HibernatePersistenceService implements PersistenceService {
     @Getter
     private final SessionFactory sessionFactory;
 
-    private final ReadSessionAccessor sessionAccessor;
-
+    @Getter
     private final Map<String, String> classAliasMappings;
 
     @Getter // for testing purposes
@@ -79,12 +74,10 @@ public class HibernatePersistenceService implements PersistenceService {
     private int stat_display_count;
     private final QueryBuilderFactory queryBuilderFactory;
 
-    public HibernatePersistenceService(final ReadSessionAccessor sessionAccessor,
-            final HibernateConfigurationProvider hbmConfigurationProvider,
+    public HibernatePersistenceService(final HibernateConfigurationProvider hbmConfigurationProvider,
             final Properties extraHibernateProperties, final SequenceManager sequenceManager,
             final QueryBuilderFactory queryBuilderFactory, HibernateMetricsBinder hibernateMetricsBinder) {
         this.sequenceManager = sequenceManager;
-        this.sessionAccessor = sessionAccessor;
         hbmConfigurationProvider.bootstrap(extraHibernateProperties);
         sessionFactory = hbmConfigurationProvider.getSessionFactory();
 
@@ -142,8 +135,8 @@ public class HibernatePersistenceService implements PersistenceService {
     @Override
     public <T extends PersistentObject> void delete(final T entity) throws SPersistenceException {
         if (getLogger().isDebugEnabled()) {
-            getLogger().debug(
-                    "Deleting instance of class " + entity.getClass().getSimpleName() + " with id=" + entity.getId());
+            getLogger().debug("Deleting instance of class {} with id={}", entity.getClass().getSimpleName(),
+                    entity.getId());
         }
         final Session session = getSession();
         try {
@@ -151,16 +144,13 @@ public class HibernatePersistenceService implements PersistenceService {
                 session.delete(entity);
             } else {
                 final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
-                final Serializable id = (entity instanceof PlatformPersistentObject)
-                        ? entity.getId()
-                        : new PersistentObjectId(entity.getId(), getTenantId());
                 // Deletion must be performed on the session entity and not on a potential transitional entity.
-                final Object pe = session.get(mappedClass, id);
+                final Object pe = session.get(mappedClass, entity.getId());
                 session.delete(pe);
             }
         } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
             throw new SRetryableException(e);
-        } catch (final STenantIdNotSetException | HibernateException e) {
+        } catch (final HibernateException e) {
             throw new SPersistenceException(e);
         }
     }
@@ -200,9 +190,6 @@ public class HibernatePersistenceService implements PersistenceService {
 
     @Override
     public <T extends PersistentObject> T insert(final T entity) throws SPersistenceException {
-        if (!(entity instanceof PlatformPersistentObject)) {
-            setTenant(entity);
-        }
         final Class<? extends PersistentObject> entityClass = entity.getClass();
         checkClassMapping(entityClass);
         final Session session = getSession();
@@ -222,9 +209,6 @@ public class HibernatePersistenceService implements PersistenceService {
         if (!entities.isEmpty()) {
             final Session session = getSession();
             for (final PersistentObject entity : entities) {
-                if (!(entity instanceof PlatformPersistentObject)) {
-                    setTenant(entity);
-                }
                 final Class<? extends PersistentObject> entityClass = entity.getClass();
                 checkClassMapping(entityClass);
                 setId(entity);
@@ -326,20 +310,7 @@ public class HibernatePersistenceService implements PersistenceService {
     @SuppressWarnings("unchecked")
     <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor)
             throws SBonitaReadException {
-        if (PlatformPersistentObject.class.isAssignableFrom(selectDescriptor.getEntityType())) {
-            return selectObjectById(session, selectDescriptor);
-        }
-        try {
-            final PersistentObjectId id = new PersistentObjectId(selectDescriptor.getId(), getTenantId());
-            Class<? extends PersistentObject> mappedClass = getMappedClass(selectDescriptor.getEntityType());
-            return (T) session.get(mappedClass, id);
-        } catch (final STenantIdNotSetException e) {
-            return selectObjectById(session, selectDescriptor);
-        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
-            throw new SRetryableException(e);
-        } catch (final SPersistenceException | HibernateException e) {
-            throw new SBonitaReadException(e);
-        }
+        return selectObjectById(session, selectDescriptor);
     }
 
     @SuppressWarnings("unchecked")
@@ -428,10 +399,6 @@ public class HibernatePersistenceService implements PersistenceService {
         }
     }
 
-    public Map<String, String> getClassAliasMappings() {
-        return classAliasMappings;
-    }
-
     @Override
     public void delete(final long id, final Class<? extends PersistentObject> entityClass)
             throws SPersistenceException {
@@ -488,7 +455,7 @@ public class HibernatePersistenceService implements PersistenceService {
         }
         final String queryName = getQueryName("getNumberOf", querySuffix, entityClass, filters);
 
-        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>(queryName, parameters, entityClass,
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<>(queryName, parameters, entityClass,
                 Long.class, options);
         return selectList(descriptor).get(0);
     }
@@ -505,7 +472,7 @@ public class HibernatePersistenceService implements PersistenceService {
             final QueryOptions options,
             final Map<String, Object> parameters) throws SBonitaReadException {
         final String queryName = getQueryName("search", querySuffix, entityClass, options.getFilters());
-        final SelectListDescriptor<T> descriptor = new SelectListDescriptor<T>(queryName, parameters, entityClass,
+        final SelectListDescriptor<T> descriptor = new SelectListDescriptor<>(queryName, parameters, entityClass,
                 options);
         return selectList(descriptor);
     }
@@ -513,7 +480,7 @@ public class HibernatePersistenceService implements PersistenceService {
     private <T extends PersistentObject> String getQueryName(final String prefix, final String suffix,
             final Class<T> entityClass,
             final List<FilterOption> filters) {
-        final SortedSet<String> query = new TreeSet<String>();
+        final SortedSet<String> query = new TreeSet<>();
         for (final FilterOption filter : filters) {
             // if filter is just an operator, PersistentClass is not defined:
             if (filter.getPersistentClass() != null) {
@@ -561,37 +528,8 @@ public class HibernatePersistenceService implements PersistenceService {
         return log;
     }
 
-    protected long getTenantId() throws STenantIdNotSetException {
-        return sessionAccessor.getTenantId();
-    }
-
-    protected void setTenant(final PersistentObject entity) throws SPersistenceException {
-        if (entity == null) {
-            return;
-        }
-        // if this entity has no id, set it
-        Long tenantId = null;
-        try {
-            tenantId = ClassReflector.invokeGetter(entity, "getTenantId");
-        } catch (final Exception e) {
-            // this is a new object to save
-        }
-        if (tenantId == null || tenantId == -1 || tenantId == 0) {
-            setTenantByClassReflector(entity, tenantId);
-        }
-    }
-
-    private void setTenantByClassReflector(final PersistentObject entity, Long tenantId) throws SPersistenceException {
-        try {
-            tenantId = getTenantId();
-            ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
-        } catch (final SReflectException | STenantIdNotSetException e) {
-            throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
-        }
-    }
-
     @Override
-    public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters)
+    public void deleteAll(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters)
             throws SPersistenceException {
         final Session session = getSession();
         final String entityClassName = entityClass.getCanonicalName();
@@ -615,7 +553,8 @@ public class HibernatePersistenceService implements PersistenceService {
         parameters.forEach(query::setParameter);
         query.executeUpdate();
         if (getLogger().isDebugEnabled()) {
-            getLogger().debug("[Tenant] Deleting all instance of class {}", entityClass.getSimpleName());
+            getLogger().debug("Deleting all instances of class {} matching the provided filters",
+                    entityClass.getSimpleName());
         }
     }
 }

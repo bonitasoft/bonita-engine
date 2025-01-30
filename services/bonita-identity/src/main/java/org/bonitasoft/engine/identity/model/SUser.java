@@ -26,7 +26,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Anthony Birembaut
@@ -42,7 +42,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "user_")
-public class SUser implements PlatformPersistentObject, SHavingIcon {
+public class SUser implements PersistentObject, SHavingIcon {
 
     public static final String ID = "id";
     public static final String MANAGER_USER_ID = "managerUserId";

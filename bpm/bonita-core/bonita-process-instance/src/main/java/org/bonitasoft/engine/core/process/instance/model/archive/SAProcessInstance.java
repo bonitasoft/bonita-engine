@@ -20,14 +20,14 @@ import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "arch_process_instance")
-public class SAProcessInstance implements ArchivedPlatformPersistentObject {
+public class SAProcessInstance implements ArchivedPersistentObject {
 
     @Id
     private long id;

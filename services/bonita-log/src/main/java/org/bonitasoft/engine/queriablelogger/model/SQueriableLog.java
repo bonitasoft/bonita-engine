@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Entity
 @Data
@@ -35,7 +35,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Table(name = "queriable_log")
-public class SQueriableLog implements PlatformPersistentObject {
+public class SQueriableLog implements PersistentObject {
 
     public static final int STATUS_FAIL = 0;
     public static final int STATUS_OK = 1;

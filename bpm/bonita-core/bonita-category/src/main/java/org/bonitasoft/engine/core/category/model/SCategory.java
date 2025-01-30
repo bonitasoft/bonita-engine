@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Yanyan Liu
@@ -35,7 +35,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "category")
-public class SCategory implements PlatformPersistentObject {
+public class SCategory implements PersistentObject {
 
     public static final String ID = "id";
     public static final String NAME = "name";

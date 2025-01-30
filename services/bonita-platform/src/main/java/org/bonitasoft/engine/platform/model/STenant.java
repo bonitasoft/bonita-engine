@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -29,7 +29,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "tenant")
-public class STenant implements PlatformPersistentObject {
+public class STenant implements PersistentObject {
 
     public static final String PAUSED = "PAUSED";
     public static final String DEACTIVATED = "DEACTIVATED";
@@ -82,8 +82,4 @@ public class STenant implements PlatformPersistentObject {
         return PAUSED.equals(status);
     }
 
-    @Override
-    public void setTenantId(long id) {
-        //no tenant id
-    }
 }

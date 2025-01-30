@@ -203,7 +203,6 @@ public class ApplicationModelConverterTest {
                 currentDate, CREATOR_ID, state);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
-        sApp.setTenantId(TENANT_ID);
         sApp.setIconPath(ICON_PATH);
         sApp.setHomePageId(HOME_PAGE_ID);
         sApp.setProfileId(PROFILE_ID);

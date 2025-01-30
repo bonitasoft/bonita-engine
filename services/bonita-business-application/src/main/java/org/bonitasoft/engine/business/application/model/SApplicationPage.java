@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -35,7 +35,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Entity
 @Table(name = "business_app_page")
 @Cacheable(false)
-public class SApplicationPage implements PlatformPersistentObject {
+public class SApplicationPage implements PersistentObject {
 
     public static final String ID = "id";
     public static final String TOKEN = "token";

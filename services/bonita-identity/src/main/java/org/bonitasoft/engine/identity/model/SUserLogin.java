@@ -26,7 +26,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
@@ -39,7 +39,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_login")
-public class SUserLogin implements PlatformPersistentObject {
+public class SUserLogin implements PersistentObject {
 
     @Id
     private long id;

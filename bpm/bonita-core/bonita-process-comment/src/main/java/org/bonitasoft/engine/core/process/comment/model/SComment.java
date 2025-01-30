@@ -23,7 +23,7 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -34,7 +34,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "kind")
 @Table(name = "process_comment")
-public class SComment implements PlatformPersistentObject {
+public class SComment implements PersistentObject {
 
     public static final String ID_KEY = "id";
     public static final String USERID_KEY = "userId";

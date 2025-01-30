@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Anthony Birembaut
@@ -35,7 +35,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "group_")
-public class SGroup implements PlatformPersistentObject, SHavingIcon {
+public class SGroup implements PersistentObject, SHavingIcon {
 
     public static final String PARENT_PATH = "parentPath";
     public static final String ID = "id";

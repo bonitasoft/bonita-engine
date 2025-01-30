@@ -96,7 +96,7 @@ public class RecorderImpl implements Recorder {
     @Override
     public void recordDeleteAll(final DeleteAllRecord deleteAllRecord) throws SRecorderException {
         try {
-            persistenceService.deleteByTenant(deleteAllRecord.getEntityClass(), deleteAllRecord.getFilters());
+            persistenceService.deleteAll(deleteAllRecord.getEntityClass(), deleteAllRecord.getFilters());
         } catch (final Exception e) {
             logExceptionsFromHandlers(e);
             throw new SRecorderException(e);

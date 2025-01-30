@@ -16,11 +16,8 @@ package org.bonitasoft.engine.test.persistence.repository;
 import java.util.List;
 import java.util.Random;
 
-import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -51,26 +48,8 @@ public class TestRepository {
         getSession().flush();
     }
 
-    private Long getTenantId(PersistentObject entity) {
-        Long tenantId = null;
-        try {
-            tenantId = ClassReflector.invokeGetter(entity, "getTenantId");
-        } catch (final Exception ignored) {
-            //not set
-        }
-        return tenantId;
-    }
-
     @SuppressWarnings("unchecked")
-    public <T extends PersistentObject> T getById(final Class<? extends PersistentObject> clazz, long id,
-            long tenantId) {
-        return (T) getSession().get(clazz,
-                new PersistentObjectId(id, tenantId));
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends PlatformPersistentObject> T getById(final Class<? extends PlatformPersistentObject> clazz,
-            long id) {
+    public <T extends PersistentObject> T getById(final Class<? extends PersistentObject> clazz, long id) {
         return (T) getSession().get(clazz, id);
     }
 
@@ -108,31 +87,17 @@ public class TestRepository {
         return getSession().createSQLQuery(sqlQuery).addEntity(type).list();
     }
 
-    public <T extends PersistentObject> T add(T entity) {
-        if (entity.getId() <= 0) {
-            entity.setId(new Random().nextLong());
-        }
-        getSession().save(entity);
-        return (T) getSession().get(entity.getClass(), new PersistentObjectId(entity.getId(), getTenantId(entity)));
-    }
-
     public <T extends PersistentObject> void add(T... entities) {
         for (T entity : entities) {
             add(entity);
         }
     }
 
-    public <T extends PlatformPersistentObject> T add(T entity) {
+    public <T extends PersistentObject> T add(T entity) {
         if (entity.getId() <= 0) {
             entity.setId(new Random().nextLong());
         }
         getSession().save(entity);
         return (T) getSession().get(entity.getClass(), entity.getId());
-    }
-
-    public <T extends PlatformPersistentObject> void add(T... entities) {
-        for (T entity : entities) {
-            add(entity);
-        }
     }
 }

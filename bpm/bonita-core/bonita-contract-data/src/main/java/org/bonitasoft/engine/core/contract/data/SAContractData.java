@@ -29,7 +29,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.contract.FileInputValue;
-import org.bonitasoft.engine.persistence.ArchivedPlatformPersistentObject;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.annotations.Type;
 
@@ -43,7 +43,7 @@ import org.hibernate.annotations.Type;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "kind")
 @Table(name = "arch_contract_data")
-public abstract class SAContractData implements ArchivedPlatformPersistentObject {
+public abstract class SAContractData implements ArchivedPersistentObject {
 
     @Id
     protected long id;

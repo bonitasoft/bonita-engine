@@ -21,7 +21,7 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
@@ -31,7 +31,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Entity
 @Table(name = "processcategorymapping")
 @Cacheable(false)
-public class SProcessCategoryMapping implements PlatformPersistentObject {
+public class SProcessCategoryMapping implements PersistentObject {
 
     @Id
     private long id;

@@ -21,7 +21,7 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.annotations.Type;
 
 /**
@@ -32,7 +32,7 @@ import org.hibernate.annotations.Type;
 @NoArgsConstructor
 @Entity
 @Table(name = "icon")
-public class SIcon implements PlatformPersistentObject {
+public class SIcon implements PersistentObject {
 
     @Id
     private long id;

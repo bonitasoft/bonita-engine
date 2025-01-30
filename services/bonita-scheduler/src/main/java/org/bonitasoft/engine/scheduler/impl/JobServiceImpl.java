@@ -89,7 +89,6 @@ public class JobServiceImpl implements JobService {
         final SJobDescriptor sJobDescriptorToRecord = new SJobDescriptor(sJobDescriptor.getJobClassName(),
                 sJobDescriptor.getJobName(),
                 sJobDescriptor.getDescription());
-        sJobDescriptorToRecord.setTenantId(tenantId);
 
         try {
             create(sJobDescriptorToRecord, JOB_DESCRIPTOR);
@@ -192,7 +191,6 @@ public class JobServiceImpl implements JobService {
         final SJobParameter sJobParameterToRecord = SJobParameter.builder()
                 .key(sJobParameter.getKey())
                 .value(sJobParameter.getValue()).jobDescriptorId(jobDescriptorId).build();
-        sJobParameterToRecord.setTenantId(tenantId);
 
         try {
             create(sJobParameterToRecord, JOB_PARAMETER);
@@ -308,11 +306,13 @@ public class JobServiceImpl implements JobService {
         return readPersistenceService.searchEntity(SJobLog.class, queryOptions, null);
     }
 
-    private void delete(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
+    private void delete(final PersistentObject persistentObject, final String eventType)
+            throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(persistentObject), eventType);
     }
 
-    private void create(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
+    private void create(final PersistentObject persistentObject, final String eventType)
+            throws SRecorderException {
         recorder.recordInsert(new InsertRecord(persistentObject), eventType);
     }
 

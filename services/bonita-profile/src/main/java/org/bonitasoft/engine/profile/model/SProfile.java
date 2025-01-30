@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -30,7 +30,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "profile")
-public class SProfile implements PlatformPersistentObject {
+public class SProfile implements PersistentObject {
 
     public static final String PROFILE_IDS = "profileIds";
     public static final String ICON_PATH = "iconPath";

@@ -28,7 +28,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
@@ -40,7 +40,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = "authorizationRules")
 @Table(name = "page_mapping")
-public class SPageMapping implements PlatformPersistentObject {
+public class SPageMapping implements PersistentObject {
 
     public static final String COMMA_DELIMITER = ",";
 

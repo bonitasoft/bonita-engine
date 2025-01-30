@@ -23,14 +23,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-public abstract class SAbstractConnectorInstance implements PlatformPersistentObject {
+public abstract class SAbstractConnectorInstance implements PersistentObject {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
