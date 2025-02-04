@@ -317,17 +317,10 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         try {
             userTransactionService.registerBonitaSynchronization((BonitaTransactionSynchronization) i -> {
                 if (i != Status.STATUS_COMMITTED) {
-                    try {
-                        log.warn("The transaction was not committed. Refreshing classloader on tenantId "
-                                + sessionAccessor.getTenantId() + " to return to a clean state.");
-                        classLoaderUpdater.refreshClassloaders(this, sessionAccessor.getTenantId(),
-                                Collections.singleton(identifier));
-                    } catch (STenantIdNotSetException e) {
-                        //sessionAccessor.getTenantId() is called by getDependencies in refreshClassLoaderImmediately
-                        // In other words this should never happen
-                        log.error("Cannot find the tenantID to refresh classloader on. This should not happen.");
-                        throw new BonitaRuntimeException(e);
-                    }
+                    log.warn("The transaction was not committed. Refreshing classloader on tenantId "
+                            + 1L + " to return to a clean state.");
+                    classLoaderUpdater.refreshClassloaders(this, 1L, // FIXME remove completely the tenantId
+                            Collections.singleton(identifier));
                 }
             });
         } catch (STransactionNotFoundException e) {
@@ -342,7 +335,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 resources = platformDependencyService.getDependenciesResources(identifier.getType(),
                         identifier.getId());
             } else {
-                long tenantId = sessionAccessor.getTenantId();
+                long tenantId = 1L; // FIXME remove completely the tenantId
                 TenantDependencyService tenantDependencyService = dependencyServicesByTenant.get(tenantId);
                 if (tenantDependencyService == null) {
                     log.warn("No dependency service is initialized on tenant {}. Initializing empty classloader",
@@ -351,7 +344,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 }
                 resources = tenantDependencyService.getDependenciesResources(identifier.getType(), identifier.getId());
             }
-        } catch (STenantIdNotSetException | SDependencyException e) {
+        } catch (SDependencyException e) {
             throw new SClassLoaderException(e);
         }
         return resources;
@@ -413,7 +406,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private Long getTenantId(ScopeType type) throws STenantIdNotSetException {
         Long tenantId = null;
         if (ScopeType.GLOBAL != type) {
-            tenantId = sessionAccessor.getTenantId();
+            tenantId = 1L; // FIXME remove completely the tenantId
         }
         return tenantId;
     }

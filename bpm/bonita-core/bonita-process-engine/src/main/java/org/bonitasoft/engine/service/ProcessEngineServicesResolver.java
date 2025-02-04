@@ -29,15 +29,4 @@ public class ProcessEngineServicesResolver implements ServicesLookup {
         }
     }
 
-    @Override
-    public <T> T lookupOnTenant(Long tenantId, final String serviceName) {
-        if (tenantId == null) {
-            return lookupOnPlatform(serviceName);
-        }
-        try {
-            return ServiceAccessorSingleton.getInstance().lookup(serviceName);
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to find the service " + serviceName, e);
-        }
-    }
 }

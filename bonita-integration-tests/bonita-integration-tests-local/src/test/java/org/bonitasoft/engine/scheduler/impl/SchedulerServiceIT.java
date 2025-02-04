@@ -137,7 +137,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
         // pause
         getTransactionService().begin();
-        schedulerService.pauseJobs(sessionAccessor.getTenantId());
+        schedulerService.pauseJobs();
         getTransactionService().complete();
         Thread.sleep(100);
         ReleaseWaitersJob.checkNotExecutedDuring(1500);

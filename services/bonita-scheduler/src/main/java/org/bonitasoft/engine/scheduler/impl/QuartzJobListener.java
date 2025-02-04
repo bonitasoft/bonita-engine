@@ -13,19 +13,7 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.BOS_JOB;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.JOB_DATAS;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.JOB_DESCRIPTOR_ID;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.JOB_GROUP;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.JOB_NAME;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.JOB_RESULT;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.JOB_TYPE;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.REFIRE_COUNT;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.TENANT_ID;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.TRIGGER_GROUP;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.TRIGGER_NAME;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.TRIGGER_NEXT_FIRE_TIME;
-import static org.bonitasoft.engine.scheduler.BonitaJobListener.TRIGGER_PREVIOUS_FIRE_TIME;
+import static org.bonitasoft.engine.scheduler.BonitaJobListener.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -40,7 +28,6 @@ import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.model.SJobData;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDataImpl;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -53,13 +40,10 @@ import org.quartz.TriggerKey;
 @Slf4j
 public class QuartzJobListener implements JobListener {
 
-    private final SessionAccessor sessionAccessor;
     private final List<BonitaJobListener> bonitaJobListeners;
 
-    QuartzJobListener(final List<BonitaJobListener> bonitaJobListeners,
-            final SessionAccessor sessionAccessor) {
+    QuartzJobListener(final List<BonitaJobListener> bonitaJobListeners) {
         this.bonitaJobListeners = bonitaJobListeners;
-        this.sessionAccessor = sessionAccessor;
     }
 
     @Override
@@ -73,10 +57,9 @@ public class QuartzJobListener implements JobListener {
 
     @Override
     public void jobToBeExecuted(final JobExecutionContext context) {
-        final Map<String, Serializable> mapContext = buildMapContext(context);
-        inTenantSession(mapContext, () -> {
-            for (final BonitaJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
-                abstractBonitaTenantJobListener.jobToBeExecuted(mapContext);
+        executeCallable(() -> {
+            for (final BonitaJobListener bonitaJobListener : bonitaJobListeners) {
+                bonitaJobListener.jobToBeExecuted();
             }
             return null;
         });
@@ -84,10 +67,9 @@ public class QuartzJobListener implements JobListener {
 
     @Override
     public void jobExecutionVetoed(final JobExecutionContext context) {
-        final Map<String, Serializable> mapContext = buildMapContext(context);
-        inTenantSession(mapContext, () -> {
-            for (final BonitaJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
-                abstractBonitaTenantJobListener.jobExecutionVetoed(mapContext);
+        executeCallable(() -> {
+            for (final BonitaJobListener bonitaJobListener : bonitaJobListeners) {
+                bonitaJobListener.jobExecutionVetoed();
             }
             return null;
         });
@@ -96,19 +78,15 @@ public class QuartzJobListener implements JobListener {
     @Override
     public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
         final Map<String, Serializable> mapContext = buildMapContext(context);
-        inTenantSession(mapContext, () -> {
-            for (final BonitaJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
-                abstractBonitaTenantJobListener.jobWasExecuted(mapContext, jobException);
+        executeCallable(() -> {
+            for (final BonitaJobListener bonitaJobListener : bonitaJobListeners) {
+                bonitaJobListener.jobWasExecuted(mapContext, jobException);
             }
             return null;
         });
     }
 
-    private void inTenantSession(Map<String, Serializable> context, Callable<Void> callable) {
-        Long tenantId = ((Long) context.get(BonitaJobListener.TENANT_ID));
-        if (tenantId != null) {
-            sessionAccessor.setTenantId(tenantId);
-        }
+    private void executeCallable(Callable<Void> callable) {
         try {
             callable.call();
         } catch (Throwable e) {
@@ -118,10 +96,6 @@ public class QuartzJobListener implements JobListener {
 
     private Long getJobDescriptorId(final JobDetail jobDetail) {
         return Long.valueOf((String) jobDetail.getJobDataMap().getWrappedMap().get("jobId"));
-    }
-
-    protected Long getTenantId(final JobDetail jobDetail) {
-        return Long.valueOf((String) jobDetail.getJobDataMap().getWrappedMap().get("tenantId"));
     }
 
     private StatelessJob getBosJob(final JobExecutionContext context) {
@@ -170,7 +144,6 @@ public class QuartzJobListener implements JobListener {
         final Map<String, Serializable> mapContext = new HashMap<>();
         mapContext.put(BOS_JOB, getBosJob(context));
         mapContext.put(JOB_DESCRIPTOR_ID, getJobDescriptorId(jobDetail));
-        mapContext.put(TENANT_ID, getTenantId(jobDetail));
         mapContext.put(JOB_TYPE, getJobType(context.getJobInstance()));
         mapContext.put(JOB_NAME, jobKey.getName());
         mapContext.put(JOB_GROUP, jobKey.getGroup());

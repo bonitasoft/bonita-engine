@@ -127,7 +127,7 @@ public class TenantStateManager {
             throw new UpdateException("Can't pause a tenant in state " + tenant.getStatus());
         }
         pauseTenantInTransaction();
-        pauseSchedulerJobsInTransaction(tenantId);
+        pauseSchedulerJobsInTransaction();
         tenantServicesManager.pause();
         pauseServicesOnOtherNodes();
         LOGGER.info("Paused tenant {}", tenantId);
@@ -154,21 +154,21 @@ public class TenantStateManager {
             throw e;
         }
         resumeServicesOnOtherNodes();
-        resumeSchedulerJobsInTransaction(tenantId);
+        resumeSchedulerJobsInTransaction();
 
         LOGGER.info("Resumed tenant {}", tenantId);
     }
 
-    private void resumeSchedulerJobsInTransaction(long tenantId) throws Exception {
+    private void resumeSchedulerJobsInTransaction() throws Exception {
         transactionService.executeInTransaction(() -> {
-            schedulerService.resumeJobs(tenantId);
+            schedulerService.resumeJobs();
             return null;
         });
     }
 
-    private void pauseSchedulerJobsInTransaction(long tenantId) throws Exception {
+    private void pauseSchedulerJobsInTransaction() throws Exception {
         transactionService.executeInTransaction(() -> {
-            schedulerService.pauseJobs(tenantId);
+            schedulerService.pauseJobs();
             return null;
         });
     }
@@ -212,7 +212,7 @@ public class TenantStateManager {
         activateTenantInTransaction();
         tenantServicesManager.start();
         startServicesOnOtherNodes();
-        resumeSchedulerJobsInTransaction(tenantId);
+        resumeSchedulerJobsInTransaction();
         LOGGER.info("Activated tenant {}", tenantId);
     }
 
@@ -265,7 +265,7 @@ public class TenantStateManager {
         sessionService.deleteSessionsOfTenant(tenantId);
         deactivateTenantInTransaction();
         if (previousStatus.equals(STenant.ACTIVATED)) {
-            pauseSchedulerJobsInTransaction(tenantId);
+            pauseSchedulerJobsInTransaction();
             tenantServicesManager.stop();
             stopServicesOnOtherNodes();
         }

@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
@@ -71,11 +71,10 @@ class ServicesResolverTest {
         final BeanThatNeedMyService beanThatNeedMyService = new BeanThatNeedMyService();
 
         final Object myService = new Object();
-        when(servicesLookup.lookupOnTenant(123L, "myService")).thenReturn(myService);
+        when(servicesLookup.lookupOnPlatform("myService")).thenReturn(myService);
 
-        servicesResolver.injectServices(123L, beanThatNeedMyService);
+        servicesResolver.injectServices(beanThatNeedMyService);
 
-        assertEquals(myService, beanThatNeedMyService.getMyService());
-
+        assertThat(beanThatNeedMyService.getMyService()).isEqualTo(myService);
     }
 }

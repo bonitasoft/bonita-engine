@@ -86,15 +86,4 @@ public class ClassLoaderUpdaterTest {
         verifyNoInteractions(sessionAccessor);
     }
 
-    @Test
-    public void should_create_a_session_when_there_is_a_tenant_id() throws Exception {
-        doReturn(completedFuture(null)).when(bonitaTaskExecutor).execute(callableGivenToTheTaskExecutor.capture());
-
-        classLoaderUpdater.refreshClassloaders(classLoaderService, 54L, singleton(identifier(PROCESS, 4L)));
-
-        callableGivenToTheTaskExecutor.getValue().call();
-
-        verify(sessionAccessor).setTenantId(54L);
-    }
-
 }

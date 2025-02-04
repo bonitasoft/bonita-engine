@@ -15,15 +15,12 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Collections.singletonList;
 import static org.bonitasoft.engine.scheduler.impl.JobUtils.createJobDetails;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.nullable;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Date;
 
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,10 +48,6 @@ import org.quartz.spi.TriggerFiredBundle;
 @RunWith(MockitoJUnitRunner.class)
 public class QuartzJobListenerTest {
 
-    public static final long TENANT_ID = 86L;
-    @Mock
-    private SessionAccessor sessionAccessor;
-
     private QuartzJobListener quartzJobListener;
 
     @Mock
@@ -66,12 +59,11 @@ public class QuartzJobListenerTest {
 
     @Before
     public void setUp() {
-        quartzJobListener = new QuartzJobListener(singletonList(bonitaJobListener), sessionAccessor);
+        quartzJobListener = new QuartzJobListener(singletonList(bonitaJobListener));
 
         final Scheduler scheduler = new RemoteScheduler("schedId", "host", 1589);
         final JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.getWrappedMap().put("jobId", "96");
-        jobDataMap.getWrappedMap().put("tenantId", String.valueOf(TENANT_ID));
         final JobDetail jobDetail = JobBuilder.newJob().withIdentity("jobName", "jobGroup").setJobData(jobDataMap)
                 .ofType(LogJob.class).build();
 
@@ -94,16 +86,15 @@ public class QuartzJobListenerTest {
         quartzJobListener.jobToBeExecuted(context);
 
         // then
-        verify(bonitaJobListener).jobToBeExecuted(anyMap());
+        verify(bonitaJobListener).jobToBeExecuted();
     }
 
     @Test
-    public final void jobExecutionVetoed() throws Exception {
+    public final void jobExecutionVetoed() {
         // Given
         final Scheduler scheduler = new RemoteScheduler("schedId", "host", 1589);
         final JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.getWrappedMap().put("jobId", "96");
-        jobDataMap.getWrappedMap().put("tenantId", "86");
         final JobDetail jobDetail = JobBuilder.newJob().withIdentity("jobName", "jobGroup").setJobData(jobDataMap)
                 .ofType(LogJob.class).build();
 
@@ -114,14 +105,14 @@ public class QuartzJobListenerTest {
                 new Date(), new Date());
         final ConcurrentQuartzJob job = new ConcurrentQuartzJob();
         job.setSchedulerService(schedulerService);
-        job.setJobDetails(createJobDetails(1, 2));
+        job.setJobDetails(createJobDetails(2));
         final JobExecutionContext context = new JobExecutionContextImpl(scheduler, firedBundle, job);
 
         // When
         quartzJobListener.jobExecutionVetoed(context);
 
         // then
-        verify(bonitaJobListener).jobExecutionVetoed(anyMap());
+        verify(bonitaJobListener).jobExecutionVetoed();
     }
 
     @Test

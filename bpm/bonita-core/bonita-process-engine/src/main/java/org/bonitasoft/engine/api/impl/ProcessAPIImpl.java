@@ -4827,9 +4827,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 throw new TimerEventTriggerInstanceNotFoundException(timerEventTriggerInstanceId);
             }
             eventInstanceService.updateEventTriggerInstance(sTimerEventTriggerInstance, descriptor);
-            return schedulerService
-                    .rescheduleJob(sTimerEventTriggerInstance.getJobTriggerName(),
-                            String.valueOf(getServiceAccessor().getTenantId()), executionDate);
+            return schedulerService.rescheduleJob(sTimerEventTriggerInstance.getJobTriggerName(), executionDate);
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
         }

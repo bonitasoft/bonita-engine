@@ -64,7 +64,7 @@ public class TestUtil {
                     try {
                         scheduler.deleteJobs();
                     } catch (SSchedulerException e) {
-                        if (!scheduler.getAllJobs().isEmpty()) {
+                        if (!scheduler.getJobs().isEmpty()) {
                             LOGGER.error("There are still some jobs not deleted!");
                             throw e;
                         }

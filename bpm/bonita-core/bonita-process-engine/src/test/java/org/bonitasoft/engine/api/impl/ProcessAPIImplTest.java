@@ -141,7 +141,6 @@ public class ProcessAPIImplTest {
 
     private static final int MAX_RESULT = 10;
     private static final int START_INDEX = 0;
-    private static final long TENANT_ID = 1;
     private static final long ACTOR_ID = 100;
     private static final long PROCESS_DEFINITION_ID = 110;
     private static final long PROCESS_INSTANCE_ID = 45;
@@ -227,7 +226,6 @@ public class ProcessAPIImplTest {
     @Before
     public void setup() throws Exception {
         doReturn(serviceAccessor).when(processAPI).getServiceAccessor();
-        when(serviceAccessor.getTenantId()).thenReturn(TENANT_ID);
         when(serviceAccessor.getDataInstanceService()).thenReturn(dataInstanceService);
         when(serviceAccessor.getOperationService()).thenReturn(operationService);
         when(serviceAccessor.getActorMappingService()).thenReturn(actorMappingService);
@@ -1091,8 +1089,8 @@ public class ProcessAPIImplTest {
         doReturn(sTimerEventTriggerInstance).when(eventInstanceService)
                 .getEventTriggerInstance(STimerEventTriggerInstance.class, timerEventTriggerInstanceId);
 
-        doThrow(new SSchedulerException(new Exception(""))).when(schedulerService).rescheduleJob(nullable(String.class),
-                nullable(String.class), eq(date));
+        doThrow(new SSchedulerException(new Exception(""))).when(schedulerService)
+                .rescheduleJob(nullable(String.class), eq(date));
 
         // When
         processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, date);

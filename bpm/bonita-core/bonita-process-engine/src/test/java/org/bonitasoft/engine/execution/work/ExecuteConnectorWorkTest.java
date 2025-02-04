@@ -137,7 +137,6 @@ public class ExecuteConnectorWorkTest {
         doReturn(userTransactionService).when(serviceAccessor).getUserTransactionService();
         doAnswer(args -> ((Callable) args.getArgument(0)).call()).when(userTransactionService)
                 .executeInTransaction(any());
-        executeConnectorWork.setTenantId(TENANT_ID);
         doReturn(classLoaderService).when(serviceAccessor).getClassLoaderService();
         doReturn(this.getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
         doReturn(timeTracker).when(serviceAccessor).getTimeTracker();

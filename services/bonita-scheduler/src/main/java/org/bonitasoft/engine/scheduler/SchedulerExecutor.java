@@ -46,61 +46,55 @@ public interface SchedulerExecutor {
      */
     void shutdown() throws SSchedulerException;
 
-    boolean mayFireAgain(String groupName, String jobName) throws SSchedulerException;
+    boolean mayFireAgain(String jobName) throws SSchedulerException;
 
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
-    boolean delete(String jobName, String groupName) throws SSchedulerException;
+    boolean delete(String jobName) throws SSchedulerException;
 
-    void deleteJobs(String groupName) throws SSchedulerException;
+    void deleteJobs() throws SSchedulerException;
 
-    List<String> getJobs(String groupName) throws SSchedulerException;
+    List<String> getJobs() throws SSchedulerException;
 
     void setBOSSchedulerService(SchedulerServiceImpl schedulerService);
 
-    List<String> getAllJobs() throws SSchedulerException;
-
-    void schedule(long jobId, String groupName, String jobName, Trigger trigger, boolean disallowConcurrentExecution)
+    void schedule(long jobId, String jobName, Trigger trigger, boolean disallowConcurrentExecution)
             throws SSchedulerException;
 
-    void executeAgain(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution,
+    void executeAgain(long jobId, String jobName, boolean disallowConcurrentExecution,
             int delayInMillis) throws SSchedulerException;
 
-    void pauseJobs(String groupName) throws SSchedulerException;
+    void pauseJobs() throws SSchedulerException;
 
-    void resumeJobs(String groupName) throws SSchedulerException;
+    void resumeJobs() throws SSchedulerException;
 
     /**
      * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the given key, and store the new given one -
      * which must be associated
-     * with the same job (the new trigger must have the job name & group specified)
+     * with the same job (the new trigger must have the job name specified)
      * - however, the new trigger need not have the same name as the old trigger.
      *
      * @param triggerName
      *        The name of the trigger to replace
-     * @param groupName
-     *        The group name of the trigger to replace
      * @param triggerStartTime
      *        The start date of the new trigger
      * @return <code>null</code> if a <code>Trigger</code> with the given
-     *         name & group was not found and removed from the store (and the
+     *         name was not found and removed from the store (and the
      *         new trigger is therefore not stored), otherwise
      *         the first fire time of the newly scheduled trigger is returned.
      * @throws SSchedulerException
      * @since 6.4.0
      */
-    Date rescheduleJob(String triggerName, String groupName, Date triggerStartTime) throws SSchedulerException;
+    Date rescheduleJob(String triggerName, Date triggerStartTime) throws SSchedulerException;
 
     /**
      * Check if a job exists.
      *
      * @param jobName
      *        The name of the job
-     * @param groupName
-     *        The group of the job
      * @return True if the job exists, else False.
      * @throws SSchedulerException
      * @since 6.4.0
      */
-    boolean isExistingJob(String jobName, String groupName) throws SSchedulerException;
+    boolean isExistingJob(String jobName) throws SSchedulerException;
 }

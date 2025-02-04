@@ -44,12 +44,9 @@ public class LockProcessInstanceWorkTest {
 
     private LockService lockService;
 
-    private static final long TENANT_ID = 1;
-
     @Before
     public void before() {
         lockProcessInstanceWork = new LockProcessInstanceWork(wrappedWork, processInstanceId);
-        when(wrappedWork.getTenantId()).thenReturn(TENANT_ID);
         serviceAccessor = mock(ServiceAccessor.class);
         lockService = mock(LockService.class);
         WorkExecutorService workService = mock(WorkExecutorService.class);
@@ -88,18 +85,6 @@ public class LockProcessInstanceWorkTest {
         Exception e = new Exception();
         lockProcessInstanceWork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
-    }
-
-    @Test
-    public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12L);
-        assertEquals(12, lockProcessInstanceWork.getTenantId());
-    }
-
-    @Test
-    public void setTenantId() {
-        lockProcessInstanceWork.setTenantId(12L);
-        verify(wrappedWork).setTenantId(12L);
     }
 
     @Test

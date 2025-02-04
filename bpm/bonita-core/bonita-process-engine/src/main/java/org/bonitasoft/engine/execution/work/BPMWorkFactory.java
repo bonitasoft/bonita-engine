@@ -368,10 +368,6 @@ public class BPMWorkFactory implements WorkFactory {
                 work = createFromExtension(workDescriptor);
                 break;
         }
-        Long tenantId = workDescriptor.getTenantId();
-        if (tenantId != null) {
-            work.setTenantId(tenantId);
-        }
         return work;
     }
 

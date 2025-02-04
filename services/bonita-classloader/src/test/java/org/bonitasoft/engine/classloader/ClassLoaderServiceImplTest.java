@@ -21,13 +21,7 @@ import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 
@@ -89,7 +83,7 @@ public class ClassLoaderServiceImplTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private final long PROCESS_ID = 12;
-    private final long TENANT_ID = 13;
+    private final long TENANT_ID = 1L;
 
     @Before
     public void before() throws Exception {
@@ -100,7 +94,6 @@ public class ClassLoaderServiceImplTest {
 
         when(classLoaderUpdater.initializeClassLoader(eq(classLoaderService), any()))
                 .thenAnswer(a -> classLoaderService.createClassloader(a.getArgument(1)));
-        doReturn(TENANT_ID).when(sessionAccessor).getTenantId();
         classLoaderService.registerDependencyServiceOfTenant(TENANT_ID, tenantDependencyService);
         processClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, PROCESS_ID));
         classLoaderService.getClassLoader(identifier(TENANT, TENANT_ID));
@@ -140,7 +133,7 @@ public class ClassLoaderServiceImplTest {
 
         assertThatThrownBy(() -> classLoaderService.removeLocalClassloader(identifier(TENANT, TENANT_ID)))
                 .hasMessageContaining(
-                        "Unable to delete classloader TENANT:13 because it has children: [BonitaClassLoader[id=PROCESS:12");
+                        "Unable to delete classloader TENANT:1 because it has children: [BonitaClassLoader[id=PROCESS:12");
     }
 
     @Test
@@ -315,19 +308,10 @@ public class ClassLoaderServiceImplTest {
     }
 
     @Test
-    public void should_only_warn_when_refreshing_classloader_on_not_existing_tenant() throws Exception {
-        doReturn(55L).when(sessionAccessor).getTenantId();
-        systemOutRule.clearLog();
+    public void should_initialize_process_class_loader_when_getting_it() {
+        classLoaderService.getClassLoader(identifier(PROCESS, 42));
 
-        classLoaderService.refreshClassLoaderImmediately(identifier(TENANT, 55L));
-        assertThat(systemOutRule.getLog()).contains("No dependency service is initialized");
-    }
-
-    @Test
-    public void should_initialize_class_loader_when_getting_it() {
-        classLoaderService.getClassLoader(identifier(TENANT, 43L));
-
-        verify(classLoaderUpdater).initializeClassLoader(classLoaderService, identifier(TENANT, 43L));
+        verify(classLoaderUpdater).initializeClassLoader(classLoaderService, identifier(PROCESS, 42));
     }
 
     @Test

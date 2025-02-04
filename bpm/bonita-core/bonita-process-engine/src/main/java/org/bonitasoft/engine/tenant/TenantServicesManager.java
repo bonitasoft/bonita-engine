@@ -32,6 +32,7 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.RunnableWithException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,7 +235,13 @@ public class TenantServicesManager {
         if (sessionAccessor.isTenantSession()) {
             runnable.run();
         } else { // is a platform session: create a tenant session to run that
-            long currentSessionId = sessionAccessor.getSessionId();
+            long currentSessionId;
+            try {
+                currentSessionId = sessionAccessor.getSessionId();
+            } catch (SessionIdNotSetException e) {
+                runnable.run();
+                return;
+            }
             try {
                 final long sessionId = createSession(tenantId, sessionService);
                 sessionAccessor.deleteSessionId();
@@ -242,7 +249,7 @@ public class TenantServicesManager {
                 runnable.run();
                 sessionService.deleteSession(sessionId);
             } finally {
-                sessionAccessor.setSessionInfo(currentSessionId, -1);
+                sessionAccessor.setSessionInfo(currentSessionId, tenantId);
             }
         }
     }

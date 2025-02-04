@@ -15,78 +15,30 @@ package org.bonitasoft.engine.scheduler;
 
 import java.io.Serializable;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 /**
  * @author Baptiste Mesta
  */
+@Getter
+@EqualsAndHashCode
 public class JobIdentifier implements Serializable {
 
     private static final long serialVersionUID = 5950749851853932753L;
 
     private final long id;
 
-    private final long tenantId;
-
     private final String jobName;
 
-    public JobIdentifier(final long jobId, final long tenantId, final String jobName) {
+    public JobIdentifier(final long jobId, final String jobName) {
         id = jobId;
-        this.tenantId = tenantId;
         this.jobName = jobName;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    public String getJobName() {
-        return jobName;
     }
 
     @Override
     public String toString() {
-        return "jobName=" + jobName + ";jobId=" + id + ";tenantId=" + tenantId;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (jobName == null ? 0 : jobName.hashCode());
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final JobIdentifier other = (JobIdentifier) obj;
-        if (id != other.id) {
-            return false;
-        }
-        if (jobName == null) {
-            if (other.jobName != null) {
-                return false;
-            }
-        } else if (!jobName.equals(other.jobName)) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        return true;
+        return "jobName=" + jobName + ";jobId=" + id;
     }
 
 }

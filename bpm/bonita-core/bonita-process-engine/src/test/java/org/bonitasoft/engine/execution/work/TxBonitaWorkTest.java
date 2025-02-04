@@ -72,18 +72,6 @@ public class TxBonitaWorkTest {
     }
 
     @Test
-    public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12L);
-        assertEquals(12, txBonitawork.getTenantId());
-    }
-
-    @Test
-    public void setTenantId() {
-        txBonitawork.setTenantId(12L);
-        verify(wrappedWork).setTenantId(12L);
-    }
-
-    @Test
     public void getWrappedWork() {
         assertEquals(wrappedWork, txBonitawork.getWrappedWork());
     }

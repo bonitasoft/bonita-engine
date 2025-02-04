@@ -15,13 +15,11 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +38,6 @@ import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +48,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class SchedulerServiceImplTest {
 
-    private static final long TENANT_ID = 1L;
     private static final long JOB_DESCRIPTOR_ID = 32187L;
 
     private SchedulerServiceImpl schedulerService;
@@ -62,8 +58,6 @@ public class SchedulerServiceImplTest {
     @Mock
     private EventService eventService;
     @Mock
-    private SessionAccessor sessionAccessor;
-    @Mock
     private PersistenceService persistenceService;
     @Mock
     private ServicesResolver servicesResolver;
@@ -71,16 +65,11 @@ public class SchedulerServiceImplTest {
     private TransactionService transactionService;
 
     @Before
-    public void setUp() throws Exception {
-        initMocks(this);
+    public void setUp() {
         transactionService = mock(TransactionService.class);
 
-        given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
-
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, eventService,
-                transactionService, sessionAccessor, servicesResolver,
-                persistenceService);
-
+                transactionService, servicesResolver, persistenceService);
     }
 
     @Test
@@ -141,7 +130,7 @@ public class SchedulerServiceImplTest {
 
         schedulerService.delete(jobName);
 
-        verify(schedulerExecutor).delete(jobName, String.valueOf(TENANT_ID));
+        verify(schedulerExecutor).delete(jobName);
         verify(jobService).deleteJobDescriptorByJobName(jobName);
     }
 
@@ -149,7 +138,7 @@ public class SchedulerServiceImplTest {
     public void delete_return_schedulerexecutor_deletion_status() throws Exception {
         final boolean expectedDeletionStatus = new Random().nextBoolean();
         final String jobName = "jobName";
-        when(schedulerExecutor.delete(jobName, String.valueOf(TENANT_ID))).thenReturn(expectedDeletionStatus);
+        when(schedulerExecutor.delete(jobName)).thenReturn(expectedDeletionStatus);
 
         final boolean deletionStatus = schedulerService.delete(jobName);
 
@@ -167,7 +156,7 @@ public class SchedulerServiceImplTest {
     @Test(expected = SSchedulerException.class)
     public void cannot_schedule_a_null_job() throws Exception {
         final Trigger trigger = mock(Trigger.class);
-        when(jobService.createJobDescriptor(nullable(SJobDescriptor.class), any(Long.class)))
+        when(jobService.createJobDescriptor(nullable(SJobDescriptor.class)))
                 .thenThrow(new SJobDescriptorCreationException(""));
 
         schedulerService.schedule(null, trigger);
@@ -181,25 +170,22 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void should_pauseJobs_of_tenant_call_schedulerExecutor() throws Exception {
-        schedulerService.resumeJobs(123L);
-        verify(schedulerExecutor).resumeJobs("123");
+    public void should_pauseJobs_call_schedulerExecutor() throws Exception {
+        schedulerService.resumeJobs();
+        verify(schedulerExecutor).resumeJobs();
     }
 
     @Test
-    public void should_pauseJobs_of_tenant_call_schedulerExecutor_rethrow_exception() throws Exception {
-        final SSchedulerException theException = new SSchedulerException("My exception");
-        doThrow(theException).when(schedulerExecutor).resumeJobs("123");
-        try {
-            schedulerService.resumeJobs(123L);
-            fail("should have rethrown the exception");
-        } catch (final SSchedulerException e) {
-            assertEquals(theException, e);
-        }
+    public void should_pauseJobs_call_schedulerExecutor_rethrow_exception() throws Exception {
+        doThrow(new SSchedulerException("My exception")).when(schedulerExecutor).resumeJobs();
+
+        assertThatExceptionOfType(SSchedulerException.class)
+                .isThrownBy(() -> schedulerService.resumeJobs())
+                .withMessage("My exception");
     }
 
     @Test
-    public void schedule_should_store_jobDescriptor_store_parameters_and_call_executor_schedule_using_tenantId()
+    public void schedule_should_store_jobDescriptor_store_parameters_and_call_executor_schedule()
             throws Exception {
         // given
         final long jogDescriptorId = 7L;
@@ -207,7 +193,7 @@ public class SchedulerServiceImplTest {
         final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
         given(jobDescriptor.getId()).willReturn(jogDescriptorId);
         given(jobDescriptor.getJobName()).willReturn(jobName);
-        given(jobService.createJobDescriptor(jobDescriptor, TENANT_ID)).willReturn(jobDescriptor);
+        given(jobService.createJobDescriptor(jobDescriptor)).willReturn(jobDescriptor);
         final Trigger trigger = mock(Trigger.class);
         final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
 
@@ -215,17 +201,16 @@ public class SchedulerServiceImplTest {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
 
         // then
-        verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
-        verify(jobService, times(1)).createJobParameters(parameters, TENANT_ID, jogDescriptorId);
-        verify(schedulerExecutor, times(1)).schedule(jogDescriptorId, String.valueOf(TENANT_ID), jobName, trigger,
-                false);
+        verify(jobService).createJobDescriptor(jobDescriptor);
+        verify(jobService).createJobParameters(parameters, jogDescriptorId);
+        verify(schedulerExecutor).schedule(jogDescriptorId, jobName, trigger, false);
     }
 
     @Test
-    public void should_delete_all_jobs_for_a_given_tenant() throws Exception {
+    public void should_delete_all_jobs() throws Exception {
         schedulerService.deleteJobs();
 
-        verify(schedulerExecutor).deleteJobs(String.valueOf(TENANT_ID));
+        verify(schedulerExecutor).deleteJobs();
         verify(jobService).deleteAllJobDescriptors();
     }
 
@@ -233,14 +218,13 @@ public class SchedulerServiceImplTest {
     public void rescheduleJob_should_call_rescheduleJob() throws Exception {
         // Given
         final String triggerName = "triggerName";
-        final String groupName = "groupName";
         final Date triggerStartTime = new Date();
 
         // When
-        schedulerService.rescheduleJob(triggerName, groupName, triggerStartTime);
+        schedulerService.rescheduleJob(triggerName, triggerStartTime);
 
         // Then
-        verify(schedulerExecutor).rescheduleJob(triggerName, groupName, triggerStartTime);
+        verify(schedulerExecutor).rescheduleJob(triggerName, triggerStartTime);
     }
 
     @Test
@@ -253,8 +237,8 @@ public class SchedulerServiceImplTest {
 
         schedulerService.executeAgain(JOB_DESCRIPTOR_ID, 5000);
 
-        verify(jobService, never()).setJobParameters(anyLong(), anyLong(), any());
-        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 5000);
+        verify(jobService, never()).setJobParameters(anyLong(), any());
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, "jobName", false, 5000);
         verify(jobService, never()).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 
@@ -268,8 +252,8 @@ public class SchedulerServiceImplTest {
 
         schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID);
 
-        verify(jobService, never()).setJobParameters(anyLong(), anyLong(), any());
-        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 0);
+        verify(jobService, never()).setJobParameters(anyLong(), any());
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, "jobName", false, 0);
         verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 
@@ -285,8 +269,8 @@ public class SchedulerServiceImplTest {
 
         schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID, parameters);
 
-        verify(jobService).setJobParameters(TENANT_ID, JOB_DESCRIPTOR_ID, parameters);
-        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 0);
+        verify(jobService).setJobParameters(JOB_DESCRIPTOR_ID, parameters);
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, "jobName", false, 0);
         verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 }

@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.quartz.JobKey.jobKey;
-import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
+import static org.quartz.impl.matchers.GroupMatcher.anyJobGroup;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,7 +32,6 @@ import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.CronTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -58,14 +57,13 @@ import org.slf4j.LoggerFactory;
  */
 public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
-    private Logger logger = LoggerFactory.getLogger(QuartzSchedulerExecutor.class);
+    private final Logger logger = LoggerFactory.getLogger(QuartzSchedulerExecutor.class);
+
     private Scheduler scheduler;
 
     private final BonitaSchedulerFactory schedulerFactory;
 
     private final TransactionService transactionService;
-
-    private final SessionAccessor sessionAccessor;
 
     private final boolean useOptimization;
 
@@ -74,10 +72,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     private List<BonitaJobListener> jobListeners = new ArrayList<>();
 
     public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory,
-            final TransactionService transactionService,
-            final SessionAccessor sessionAccessor, final boolean useOptimization) {
+            final TransactionService transactionService, final boolean useOptimization) {
         this.transactionService = transactionService;
-        this.sessionAccessor = sessionAccessor;
         this.useOptimization = useOptimization;
         this.schedulerFactory = schedulerFactory;
     }
@@ -93,14 +89,14 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void schedule(final long jobId, final String groupName, final String jobName, final Trigger trigger,
+    public void schedule(final long jobId, final String jobName, final Trigger trigger,
             final boolean disallowConcurrentExecution)
             throws SSchedulerException {
         try {
             checkSchedulerState();
-            final JobDetail jobDetail = createJobDetails(jobId, groupName, jobName, disallowConcurrentExecution);
+            final JobDetail jobDetail = createJobDetails(jobId, jobName, disallowConcurrentExecution);
             final JobKey jobKey = jobDetail.getKey();
-            final org.quartz.Trigger quartzTrigger = getQuartzTrigger(trigger, jobKey.getName(), jobKey.getGroup());
+            final org.quartz.Trigger quartzTrigger = getQuartzTrigger(trigger, jobKey.getName());
             scheduler.scheduleJob(jobDetail, quartzTrigger);
             if (useOptimization) {
                 transactionService.registerBonitaSynchronization(
@@ -133,7 +129,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    private JobDetail createJobDetails(final long jobId, final String groupName, final String jobName,
+    private JobDetail createJobDetails(final long jobId, final String jobName,
             final boolean disallowConcurrentExecution) {
         Class<? extends AbstractQuartzJob> jobClass;
         if (disallowConcurrentExecution) {
@@ -141,27 +137,24 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         } else {
             jobClass = ConcurrentQuartzJob.class;
         }
-        final JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, groupName).build();
-        jobDetail.getJobDataMap().put("tenantId", groupName);
+        final JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName).build();
         jobDetail.getJobDataMap().put("jobId", String.valueOf(jobId));
         jobDetail.getJobDataMap().put("jobName", jobName);
         return jobDetail;
     }
 
     @Override
-    public void executeAgain(final long jobId, final String groupName, final String jobName,
-            final boolean disallowConcurrentExecution, int delayInMillis)
-            throws SSchedulerException {
+    public void executeAgain(final long jobId, final String jobName, final boolean disallowConcurrentExecution,
+            int delayInMillis) throws SSchedulerException {
         checkSchedulerState();
         try {
-            JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobName, String.valueOf(groupName)));
+            JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobName));
             if (jobDetail == null) {
-                logger.debug(
-                        "Re-execute job {} named {} of group {}, there was no quartz job and no triggers left (one shot triggered that failed and was deleted)",
-                        jobId, jobName, groupName);
+                logger.debug("Re-execute job {} named {}, there was no quartz job and no triggers left " +
+                        "(one shot triggered that failed and was deleted)", jobId, jobName);
                 // The quartz job itself was deleted because the trigger that failed was the only one and was a one shot trigger
-                scheduler.scheduleJob(createJobDetails(jobId, groupName, jobName, disallowConcurrentExecution),
-                        createOneShotTrigger(groupName, jobName, delayInMillis));
+                scheduler.scheduleJob(createJobDetails(jobId, jobName, disallowConcurrentExecution),
+                        createOneShotTrigger(jobName, delayInMillis));
             } else {
                 List<? extends org.quartz.Trigger> triggersOfJob = scheduler.getTriggersOfJob(jobDetail.getKey());
                 // We retrieve the first trigger that will not fire again
@@ -169,19 +162,16 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                         .filter(t -> !t.mayFireAgain()).findFirst();
                 if (firstTriggerThatWillNotFire.isPresent()) {
                     // if there is one, we reschedule the job by replacing it
-                    logger.debug(
-                            "Re-execute job {} named {} of group {}, reuse existing trigger {} because it will not fire again."
-                                    +
-                                    "(most likely a one shot trigger that failed and was not correctly deleted)",
-                            jobId, jobName, groupName, firstTriggerThatWillNotFire.get());
+                    logger.debug("Re-execute job {} named {}, reuse existing trigger {} because it will not fire again."
+                            + "(most likely a one shot trigger that failed and was not correctly deleted)",
+                            jobId, jobName, firstTriggerThatWillNotFire.get());
                     scheduler.rescheduleJob(firstTriggerThatWillNotFire.get().getKey(),
-                            createOneShotTrigger(groupName, jobName, delayInMillis));
+                            createOneShotTrigger(jobName, delayInMillis));
                 } else {
                     // in the other case we create a new trigger to schedule the job (it means other triggers are likely cron triggers)
-                    logger.debug("Re-execute job {} named {} of group {}, create a new trigger for that. " +
-                            "(The job that failed was most likely triggered by a cron trigger)", jobId, jobName,
-                            groupName);
-                    scheduler.scheduleJob(createOneShotTrigger(groupName, jobName, delayInMillis));
+                    logger.debug("Re-execute job {} named {}, create a new trigger for that. " +
+                            "(The job that failed was most likely triggered by a cron trigger)", jobId, jobName);
+                    scheduler.scheduleJob(createOneShotTrigger(jobName, delayInMillis));
                 }
             }
             if (useOptimization) {
@@ -193,17 +183,17 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    private org.quartz.Trigger createOneShotTrigger(String groupName, String jobName, int delayInMillis) {
+    private org.quartz.Trigger createOneShotTrigger(String jobName, int delayInMillis) {
         return TriggerBuilder.newTrigger()
-                .withIdentity("OneShotTrigger" + UUID.randomUUID().getLeastSignificantBits(), String.valueOf(groupName))
-                .forJob(jobName, String.valueOf(groupName))
+                .withIdentity("OneShotTrigger" + UUID.randomUUID().getLeastSignificantBits())
+                .forJob(jobName)
                 .startAt(new Date(Instant.now().plusMillis(delayInMillis).toEpochMilli())).build();
     }
 
-    org.quartz.Trigger getQuartzTrigger(final Trigger trigger, final String jobName, final String tenantId) {
+    org.quartz.Trigger getQuartzTrigger(final Trigger trigger, final String jobName) {
         final TriggerBuilder<? extends org.quartz.Trigger> triggerBuilder;
-        final TriggerBuilder<org.quartz.Trigger> base = TriggerBuilder.newTrigger().forJob(jobName, tenantId)
-                .withIdentity(trigger.getName(), tenantId)
+        final TriggerBuilder<org.quartz.Trigger> base = TriggerBuilder.newTrigger().forJob(jobName)
+                .withIdentity(trigger.getName())
                 .startNow();
         if (trigger instanceof CronTrigger cronTrigger) {
             final CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder
@@ -302,10 +292,10 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public boolean delete(final String jobName, final String groupName) throws SSchedulerException {
+    public boolean delete(final String jobName) throws SSchedulerException {
         try {
             checkSchedulerState();
-            final JobKey jobKey = jobKey(jobName, groupName);
+            final JobKey jobKey = jobKey(jobName);
             scheduler.pauseJob(jobKey);
             return scheduler.deleteJob(jobKey);
         } catch (final SchedulerException e) {
@@ -314,10 +304,10 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void deleteJobs(final String groupName) throws SSchedulerException {
+    public void deleteJobs() throws SSchedulerException {
         try {
             checkSchedulerState();
-            final Set<JobKey> jobNames = scheduler.getJobKeys(jobGroupEquals(groupName));
+            final Set<JobKey> jobNames = scheduler.getJobKeys(anyJobGroup());
             for (final JobKey jobKey : jobNames) {
                 scheduler.pauseJob(jobKey);
                 scheduler.deleteJob(jobKey);
@@ -328,10 +318,10 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public boolean isExistingJob(final String jobName, final String groupName) throws SSchedulerException {
+    public boolean isExistingJob(final String jobName) throws SSchedulerException {
         try {
             checkSchedulerState();
-            final JobKey jobKey = jobKey(jobName, groupName);
+            final JobKey jobKey = jobKey(jobName);
             return scheduler.getJobDetail(jobKey) != null;
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
@@ -339,11 +329,11 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public List<String> getJobs(final String groupName) throws SSchedulerException {
+    public List<String> getJobs() throws SSchedulerException {
         try {
             checkSchedulerState();
-            final Set<JobKey> jobKeys = scheduler.getJobKeys(jobGroupEquals(groupName));
-            final List<String> jobsNames = new ArrayList<String>(jobKeys.size());
+            final Set<JobKey> jobKeys = scheduler.getJobKeys(anyJobGroup());
+            final List<String> jobsNames = new ArrayList<>(jobKeys.size());
             for (final JobKey jobKey : jobKeys) {
                 jobsNames.add(jobKey.getName());
             }
@@ -354,25 +344,11 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public List<String> getAllJobs() throws SSchedulerException {
-        try {
-            final Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.jobGroupStartsWith(""));
-            final List<String> jobsNames = new ArrayList<String>(jobKeys.size());
-            for (final JobKey jobKey : jobKeys) {
-                jobsNames.add(jobKey.getName());
-            }
-            return jobsNames;
-        } catch (final SchedulerException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public boolean mayFireAgain(final String groupName, final String jobName) throws SSchedulerException {
+    public boolean mayFireAgain(final String jobName) throws SSchedulerException {
         try {
             checkSchedulerState();
             List<? extends org.quartz.Trigger> triggersOfJob = scheduler
-                    .getTriggersOfJob(new JobKey(jobName, groupName));
+                    .getTriggersOfJob(new JobKey(jobName));
             return triggersOfJob.stream()
                     .anyMatch(org.quartz.Trigger::mayFireAgain);
         } catch (final SchedulerException e) {
@@ -384,15 +360,10 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public void rescheduleErroneousTriggers() throws SSchedulerException {
         checkSchedulerState();
         try {
-            final List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
-            for (final String triggerGroupName : triggerGroupNames) {
-                for (final TriggerKey triggerKey : scheduler
-                        .getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroupName))) {
-                    if (TriggerState.ERROR.equals(scheduler.getTriggerState(triggerKey))) {
-                        scheduler.pauseTrigger(triggerKey);
-                        scheduler.resumeTrigger(triggerKey);
-                    }
-
+            for (final TriggerKey triggerKey : scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup())) {
+                if (TriggerState.ERROR.equals(scheduler.getTriggerState(triggerKey))) {
+                    scheduler.pauseTrigger(triggerKey);
+                    scheduler.resumeTrigger(triggerKey);
                 }
             }
         } catch (final SchedulerException e) {
@@ -401,32 +372,30 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void pauseJobs(final String groupName) throws SSchedulerException {
+    public void pauseJobs() throws SSchedulerException {
         checkSchedulerState();
-        final GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(groupName);
         try {
-            scheduler.pauseTriggers(groupEquals);
+            scheduler.pauseTriggers(GroupMatcher.anyTriggerGroup());
         } catch (final SchedulerException e) {
-            throw new SSchedulerException("Unable to put jobs of tenant " + groupName + " in pause", e);
+            throw new SSchedulerException("Unable to put jobs in pause", e);
         }
     }
 
     @Override
-    public void resumeJobs(final String groupName) throws SSchedulerException {
+    public void resumeJobs() throws SSchedulerException {
         checkSchedulerState();
-        final GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(groupName);
         try {
-            scheduler.resumeTriggers(groupEquals);
+            scheduler.resumeTriggers(GroupMatcher.anyTriggerGroup());
         } catch (final SchedulerException e) {
-            throw new SSchedulerException("Unable to resume jobs of tenant " + groupName, e);
+            throw new SSchedulerException("Unable to resume jobs", e);
         }
     }
 
     @Override
-    public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime)
+    public Date rescheduleJob(final String triggerName, final Date triggerStartTime)
             throws SSchedulerException {
         checkSchedulerState();
-        final TriggerKey triggerKey = new TriggerKey(triggerName, groupName);
+        final TriggerKey triggerKey = new TriggerKey(triggerName);
         try {
             final org.quartz.Trigger oldTrigger = scheduler.getTrigger(triggerKey);
             final org.quartz.Trigger newTrigger = oldTrigger.getTriggerBuilder().startAt(triggerStartTime).build();
@@ -436,8 +405,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                     transactionService.registerBonitaSynchronization(
                             new NotifyQuartzOfNewTrigger(triggerStartTime.getTime(), quartzScheduler));
                 } catch (STransactionNotFoundException e) {
-                    logger.error("Unable to register synchronization to optimize Quartz rescheduling, "
-                            + ExceptionUtils.printLightWeightStacktrace(e));
+                    logger.error("Unable to register synchronization to optimize Quartz rescheduling, {}",
+                            ExceptionUtils.printLightWeightStacktrace(e));
                 }
             }
             return date;
@@ -458,7 +427,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     private void addListeners() throws SSchedulerException {
         try {
             final ListenerManager listenerManager = scheduler.getListenerManager();
-            listenerManager.addJobListener(new QuartzJobListener(jobListeners, sessionAccessor));
+            listenerManager.addJobListener(new QuartzJobListener(jobListeners));
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }

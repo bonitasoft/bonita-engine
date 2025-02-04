@@ -90,7 +90,7 @@ public class TenantStateManagerTest {
 
         InOrder inOrder = inOrder(schedulerService, tenantServicesManager, platformService);
         inOrder.verify(platformService).pauseTenant(TENANT_ID);
-        inOrder.verify(schedulerService).pauseJobs(TENANT_ID);
+        inOrder.verify(schedulerService).pauseJobs();
         inOrder.verify(tenantServicesManager).pause();
     }
 
@@ -103,7 +103,7 @@ public class TenantStateManagerTest {
         InOrder inOrder = inOrder(platformService, tenantServicesManager, schedulerService);
         inOrder.verify(platformService).activateTenant(TENANT_ID);
         inOrder.verify(tenantServicesManager).resume();
-        inOrder.verify(schedulerService).resumeJobs(TENANT_ID);
+        inOrder.verify(schedulerService).resumeJobs();
     }
 
     @Test
@@ -239,7 +239,7 @@ public class TenantStateManagerTest {
         InOrder inOrder = inOrder(sessionService, platformService, tenantServicesManager, schedulerService);
         inOrder.verify(sessionService).deleteSessionsOfTenant(TENANT_ID);
         inOrder.verify(platformService).deactivateTenant(TENANT_ID);
-        inOrder.verify(schedulerService).pauseJobs(TENANT_ID);
+        inOrder.verify(schedulerService).pauseJobs();
         inOrder.verify(tenantServicesManager).stop();
     }
 
@@ -252,7 +252,7 @@ public class TenantStateManagerTest {
         InOrder inOrder = inOrder(platformService, tenantServicesManager, schedulerService);
         inOrder.verify(platformService).activateTenant(TENANT_ID);
         inOrder.verify(tenantServicesManager).start();
-        inOrder.verify(schedulerService).resumeJobs(TENANT_ID);
+        inOrder.verify(schedulerService).resumeJobs();
     }
 
     @Test
@@ -269,7 +269,7 @@ public class TenantStateManagerTest {
         InOrder inOrder = inOrder(sessionService, tenantServicesManager);
         inOrder.verify(sessionService).deleteSessions();
         inOrder.verify(tenantServicesManager).stop();
-        verify(schedulerService, never()).pauseJobs(TENANT_ID);
+        verify(schedulerService, never()).pauseJobs();
         verify(platformService, never()).deactivateTenant(TENANT_ID);
     }
 

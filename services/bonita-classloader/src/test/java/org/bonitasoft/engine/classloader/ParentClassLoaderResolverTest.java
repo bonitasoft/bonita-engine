@@ -17,12 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -51,26 +47,15 @@ public class ParentClassLoaderResolverTest {
         assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
 
-    @Test(expected = BonitaRuntimeException.class)
-    public void should_getParentClassLoaderIdentifier_throw_exception_on_process_if_no_tenant() throws Exception {
-        //given
-        doThrow(new STenantIdNotSetException("")).when(sessionAccessor).getTenantId();
-        final ClassLoaderIdentifier childId = identifier(PROCESS, 124);
-        //when
-        parentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
-        //then exception
-    }
-
     @Test
     public void should_getParentClassLoaderIdentifier_return_tenant() throws Exception {
         //given
-        doReturn(25l).when(sessionAccessor).getTenantId();
         final ClassLoaderIdentifier childId = identifier(PROCESS, 124);
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = parentClassLoaderResolver
                 .getParentClassLoaderIdentifier(childId);
         //then
-        assertThat(parentClassLoaderIdentifier).isEqualTo(identifier(TENANT, 25));
+        assertThat(parentClassLoaderIdentifier).isEqualTo(identifier(TENANT, 1L));
     }
 
     @Test

@@ -23,19 +23,19 @@ import org.apache.commons.lang3.text.WordUtils;
  */
 public class ServicesResolver {
 
-    private ServicesLookup servicesLookup;
+    private final ServicesLookup servicesLookup;
 
     public ServicesResolver(ServicesLookup servicesLookup) {
         this.servicesLookup = servicesLookup;
     }
 
-    public void injectServices(Long tenantId, Object target) throws InvocationTargetException, IllegalAccessException {
+    public void injectServices(Object target) throws InvocationTargetException, IllegalAccessException {
 
         final Method[] methods = target.getClass().getMethods();
         for (final Method method : methods) {
             if (method.getAnnotation(InjectedService.class) != null) {
                 String serviceName = WordUtils.uncapitalize(method.getName().substring(3));
-                final Object lookup = servicesLookup.lookupOnTenant(tenantId, serviceName);
+                final Object lookup = servicesLookup.lookupOnPlatform(serviceName);
                 method.invoke(target, lookup);
             }
         }

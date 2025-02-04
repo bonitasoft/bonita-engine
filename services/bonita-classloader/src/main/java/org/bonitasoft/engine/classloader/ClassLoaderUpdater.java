@@ -23,7 +23,6 @@ import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.stereotype.Component;
@@ -69,7 +68,7 @@ class ClassLoaderUpdater {
         Future<T> execute = bonitaTaskExecutor.execute(
                 inSession(tenantId, inTransaction(callable)));
         try {
-            return execute.get(5, TimeUnit.MINUTES);//hard coded timeout, it should never happen
+            return execute.get(5, TimeUnit.MINUTES); // hard coded timeout, it should never happen
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new SBonitaRuntimeException("Unable to refresh the classloaders", e);
         }
@@ -80,7 +79,7 @@ class ClassLoaderUpdater {
             return callable;
         }
         return () -> {
-            sessionAccessor.setTenantId(tenantId);
+            sessionAccessor.setTenantId(1L); // FIXME remove completely the tenantId
             try {
                 return callable.call();
             } finally {
@@ -94,11 +93,6 @@ class ClassLoaderUpdater {
     }
 
     private Long getTenantId() {
-        try {
-            return sessionAccessor.getTenantId();
-        } catch (STenantIdNotSetException ignored) {
-            //In a platform session
-        }
-        return null;
+        return 1L; // FIXME remove completely the tenantId
     }
 }

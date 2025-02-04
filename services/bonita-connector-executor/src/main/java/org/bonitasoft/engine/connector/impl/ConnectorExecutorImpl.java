@@ -37,7 +37,6 @@ import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -97,15 +96,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
         }
 
-        long tenantId;
-        try {
-            tenantId = sessionAccessor.getTenantId();
-        } catch (final STenantIdNotSetException tenantIdNotSetException) {
-            throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
-        }
-
-        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId,
-                classLoader);
+        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector, 1L,
+                classLoader); // FIXME remove completely the tenantId
         return execute(sConnector, task);
     }
 

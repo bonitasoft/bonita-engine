@@ -52,8 +52,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class JobServiceImplForJobDescriptorTest {
 
-    private static final int TENANT_ID = 46845;
-
     @Mock
     private EventService eventService;
 
@@ -79,7 +77,7 @@ public class JobServiceImplForJobDescriptorTest {
         doNothing().when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
-        final SJobDescriptor result = jobServiceImpl.createJobDescriptor(sJobDescriptor, TENANT_ID);
+        final SJobDescriptor result = jobServiceImpl.createJobDescriptor(sJobDescriptor);
 
         // Then
         assertNotNull(result);
@@ -91,7 +89,7 @@ public class JobServiceImplForJobDescriptorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void createJobDescriptor_should_throw_an_exception_if_the_descriptor_is_null() throws Exception {
-        jobServiceImpl.createJobDescriptor(null, TENANT_ID);
+        jobServiceImpl.createJobDescriptor(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -100,7 +98,7 @@ public class JobServiceImplForJobDescriptorTest {
         final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
 
         // When
-        jobServiceImpl.createJobDescriptor(jobDescriptor, TENANT_ID);
+        jobServiceImpl.createJobDescriptor(jobDescriptor);
     }
 
     @Test(expected = SJobDescriptorCreationException.class)
@@ -112,7 +110,7 @@ public class JobServiceImplForJobDescriptorTest {
         when(sJobDescriptor.getJobName()).thenReturn("jobName");
 
         //when
-        jobServiceImpl.createJobDescriptor(sJobDescriptor, TENANT_ID);
+        jobServiceImpl.createJobDescriptor(sJobDescriptor);
 
         //then exception
 
