@@ -344,36 +344,20 @@ public class BPMWorkFactory implements WorkFactory {
 
     @Override
     public BonitaWork create(WorkDescriptor workDescriptor) {
-        BonitaWork work;
-        switch (workDescriptor.getType()) {
-            case EXECUTE_ACTIVITY_CONNECTOR:
-                work = createExecuteConnectorOfActivity(workDescriptor);
-                break;
-            case EXECUTE_PROCESS_CONNECTOR:
-                work = createExecuteConnectorOfProcess(workDescriptor);
-                break;
-            case EXECUTE_FLOWNODE:
-                work = createExecuteFlowNodeWork(workDescriptor);
-                break;
-            case FINISH_FLOWNODE:
-                work = createNotifyChildFinishedWork(workDescriptor);
-                break;
-            case TRIGGER_SIGNAL:
-                work = createTriggerSignalWork(workDescriptor);
-                break;
-            case EXECUTE_MESSAGE:
-                work = createExecuteMessageCoupleWork(workDescriptor);
-                break;
-            default:
-                work = createFromExtension(workDescriptor);
-                break;
-        }
-        return work;
+        return switch (workDescriptor.getType()) {
+            case EXECUTE_ACTIVITY_CONNECTOR -> createExecuteConnectorOfActivity(workDescriptor);
+            case EXECUTE_PROCESS_CONNECTOR -> createExecuteConnectorOfProcess(workDescriptor);
+            case EXECUTE_FLOWNODE -> createExecuteFlowNodeWork(workDescriptor);
+            case FINISH_FLOWNODE -> createNotifyChildFinishedWork(workDescriptor);
+            case TRIGGER_SIGNAL -> createTriggerSignalWork(workDescriptor);
+            case EXECUTE_MESSAGE -> createExecuteMessageCoupleWork(workDescriptor);
+            default -> createFromExtension(workDescriptor);
+        };
     }
 
     private BonitaWork createFromExtension(WorkDescriptor workDescriptor) {
         if (!extensions.containsKey(workDescriptor.getType())) {
-            throw new IllegalArgumentException("Unkown type of work:" + workDescriptor.getType());
+            throw new IllegalArgumentException("Unknown type of work:" + workDescriptor.getType());
         }
         return extensions.get(workDescriptor.getType()).apply(workDescriptor);
     }

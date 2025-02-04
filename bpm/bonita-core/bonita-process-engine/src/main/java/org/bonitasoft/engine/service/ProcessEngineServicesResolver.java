@@ -21,7 +21,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 public class ProcessEngineServicesResolver implements ServicesLookup {
 
     @Override
-    public <T> T lookupOnPlatform(String serviceName) {
+    public <T> T lookupService(String serviceName) {
         try {
             return ServiceAccessorFactory.getInstance().createServiceAccessor().lookup(serviceName);
         } catch (Exception e) {

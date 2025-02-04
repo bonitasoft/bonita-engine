@@ -38,8 +38,6 @@ class ServicesResolverTest {
 
     private final class BeanThatNeedMyService {
 
-        private static final long serialVersionUID = 1L;
-
         private Object myService;
 
         @InjectedService
@@ -71,7 +69,7 @@ class ServicesResolverTest {
         final BeanThatNeedMyService beanThatNeedMyService = new BeanThatNeedMyService();
 
         final Object myService = new Object();
-        when(servicesLookup.lookupOnPlatform("myService")).thenReturn(myService);
+        when(servicesLookup.lookupService("myService")).thenReturn(myService);
 
         servicesResolver.injectServices(beanThatNeedMyService);
 

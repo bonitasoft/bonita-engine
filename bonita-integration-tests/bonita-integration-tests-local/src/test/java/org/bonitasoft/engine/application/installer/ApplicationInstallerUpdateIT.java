@@ -65,7 +65,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         applicationInstaller = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);

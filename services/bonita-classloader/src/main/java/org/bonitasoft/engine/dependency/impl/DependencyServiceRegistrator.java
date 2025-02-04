@@ -19,19 +19,17 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 
 public class DependencyServiceRegistrator {
 
-    private TenantDependencyService tenantDependencyService;
-    private ClassLoaderService classLoaderService;
-    private long tenantId;
+    private final TenantDependencyService tenantDependencyService;
+    private final ClassLoaderService classLoaderService;
 
     public DependencyServiceRegistrator(TenantDependencyService tenantDependencyService,
-            ClassLoaderService classLoaderService, long tenantId) {
+            ClassLoaderService classLoaderService) {
         this.tenantDependencyService = tenantDependencyService;
         this.classLoaderService = classLoaderService;
-        this.tenantId = tenantId;
     }
 
     @PostConstruct
     private void registerDependencyService() {
-        classLoaderService.registerDependencyServiceOfTenant(tenantId, tenantDependencyService);
+        classLoaderService.registerDependencyService(tenantDependencyService);
     }
 }

@@ -82,7 +82,7 @@ public class ConcurrencyTest {
         final UserTransactionService transactionService = mock(UserTransactionService.class);
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,
-                        configuration.getJpaConfiguration(), classLoaderService, 1L));
+                        configuration.getJpaConfiguration(), classLoaderService));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
 
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();

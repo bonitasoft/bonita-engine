@@ -47,11 +47,11 @@ public interface SessionService {
      *         if some error arrives while creating the session
      * @since 6.0
      */
-    SSession createSession(long tenantId, String userName) throws SSessionException;
+    SSession createSession(String userName) throws SSessionException;
 
-    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser) throws SSessionException;
+    SSession createSession(long userId, String userName, boolean technicalUser) throws SSessionException;
 
-    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser, List<String> profiles,
+    SSession createSession(long userId, String userName, boolean technicalUser, List<String> profiles,
             Set<String> permissions)
             throws SSessionException;
 

@@ -36,12 +36,9 @@ public interface BusinessDataModelRepository {
     /**
      * Undeploy Business Data Model from specified tenant
      *
-     * @param tenantId
-     *        the ID of the tenant to undeploy the Business Data Model from
-     * @throws SBusinessDataRepositoryException
-     *         if error occurs during undeployement
+     * @throws SBusinessDataRepositoryException if error occurs during undeployement
      */
-    void uninstall(long tenantId) throws SBusinessDataRepositoryException;
+    void uninstall() throws SBusinessDataRepositoryException;
 
     boolean isBDMDeployed();
 
@@ -54,7 +51,7 @@ public interface BusinessDataModelRepository {
      */
     byte[] getClientBDMZip() throws SBusinessDataRepositoryException;
 
-    void dropAndUninstall(long tenantId) throws SBusinessDataRepositoryException;
+    void dropAndUninstall() throws SBusinessDataRepositoryException;
 
     /**
      * Returns the currently deployed BDM version, or null if no BDM is deployed.

@@ -24,10 +24,21 @@ import static org.bonitasoft.engine.bpm.process.ActivationState.DISABLED;
 import static org.bonitasoft.engine.bpm.process.ConfigurationState.RESOLVED;
 import static org.bonitasoft.engine.business.application.ApplicationImportPolicy.FAIL_ON_DUPLICATES;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -51,15 +62,31 @@ import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDeployException;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
-import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.ApplicationInstallationException;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.ImportException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.io.FileOperations;
@@ -475,7 +502,7 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
         log.info("Uninstalling the currently deployed BDM");
         try {
             tenantStateManager.executeTenantManagementOperation("BDM Uninstallation", () -> {
-                bdmRepository.uninstall(tenantId);
+                bdmRepository.uninstall();
                 return null;
             });
             log.info("BDM successfully uninstalled");
@@ -824,15 +851,14 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
 
     @VisibleForTesting
     public <T> T inSession(Callable<T> callable) throws Exception {
-        final SSession session = sessionService.createSession(tenantId, SessionService.SYSTEM);
+        final SSession session = sessionService.createSession(SessionService.SYSTEM);
         final long sessionId = session.getId();
         log.trace("New session created with id {}", sessionId);
         try {
-            sessionAccessor.setSessionInfo(sessionId, tenantId);
+            sessionAccessor.setSessionId(sessionId);
             return callable.call();
         } finally {
             sessionAccessor.deleteSessionId();
-            sessionAccessor.deleteTenantId();
         }
     }
 

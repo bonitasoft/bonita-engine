@@ -35,10 +35,10 @@ public class MultiThreadCallsIT extends CommonAPIIT {
         public void run() {
             super.run();
             try {
-                apiTestUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
+                apiTestUtil.loginWithTechnicalUser();
                 apiTestUtil.getIdentityAPI().getNumberOfUsers();
                 apiTestUtil.getIdentityAPI().getNumberOfGroups();
-                apiTestUtil.logoutOnTenant();
+                apiTestUtil.logout();
             } catch (final Exception e) {
                 exception = e;
                 e.printStackTrace();

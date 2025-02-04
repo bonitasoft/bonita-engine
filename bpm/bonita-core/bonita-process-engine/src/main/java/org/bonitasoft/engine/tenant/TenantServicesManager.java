@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.tenant;
 
 import static java.text.MessageFormat.format;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.tenant.TenantServicesManager.ServiceAction.*;
 
 import java.util.ArrayList;
@@ -24,11 +23,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SLifecycleException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.RunnableWithException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -132,7 +131,7 @@ public class TenantServicesManager {
         } catch (Exception e) {
             abortStart(startAction, e);
             throw new SLifecycleException(
-                    "Unable to " + startAction + " a service. All services are STOPPED again. Error: " + e.getMessage(),
+                    "Unable to " + startAction + " a service. All services are kept STOPPED. Error: " + e.getMessage(),
                     e);
         }
         updateState(TenantServiceState.STARTED);
@@ -218,7 +217,7 @@ public class TenantServicesManager {
         try {
             // Set the right classloader only on start and resume because we destroy it on stop and pause anyway
             final ClassLoader serverClassLoader = classLoaderService.getClassLoader(
-                    identifier(ScopeType.TENANT, tenantId));
+                    ClassLoaderIdentifier.TENANT);
             Thread.currentThread().setContextClassLoader(serverClassLoader);
             runnable.run();
         } finally {
@@ -227,31 +226,32 @@ public class TenantServicesManager {
         }
     }
 
-    protected Long createSession(final long tenantId, final SessionService sessionService) throws SBonitaException {
-        return sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
+    protected Long createSession(final SessionService sessionService) throws SBonitaException {
+        return sessionService.createSession(SessionService.SYSTEM).getId();
     }
 
     private void inTenantSession(RunnableWithException runnable) throws Exception {
-        if (sessionAccessor.isTenantSession()) {
+        // FIXME: check if it is ok to remove the the commented code below:
+        //        if (sessionAccessor.isTenantSession()) {
+        //            runnable.run();
+        //        } else { // is a platform session: create a tenant session to run that
+        long currentSessionId;
+        try {
+            currentSessionId = sessionAccessor.getSessionId();
+        } catch (SessionIdNotSetException e) {
             runnable.run();
-        } else { // is a platform session: create a tenant session to run that
-            long currentSessionId;
-            try {
-                currentSessionId = sessionAccessor.getSessionId();
-            } catch (SessionIdNotSetException e) {
-                runnable.run();
-                return;
-            }
-            try {
-                final long sessionId = createSession(tenantId, sessionService);
-                sessionAccessor.deleteSessionId();
-                sessionAccessor.setSessionInfo(sessionId, tenantId);
-                runnable.run();
-                sessionService.deleteSession(sessionId);
-            } finally {
-                sessionAccessor.setSessionInfo(currentSessionId, tenantId);
-            }
+            return;
         }
+        try {
+            final long sessionId = createSession(sessionService);
+            sessionAccessor.deleteSessionId();
+            sessionAccessor.setSessionId(sessionId);
+            runnable.run();
+            sessionService.deleteSession(sessionId);
+        } finally {
+            sessionAccessor.setSessionId(currentSessionId);
+        }
+        //        }
     }
 
     public <T> void inTenantSessionTransaction(final Callable<T> callable) throws Exception {

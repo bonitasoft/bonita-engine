@@ -129,7 +129,7 @@ public class BusinessDataModelRepositoryImplTest {
 
     @Test
     public void uninstall_should_delete_a_dependency() throws Exception {
-        businessDataModelRepository.uninstall(45L);
+        businessDataModelRepository.uninstall();
 
         verify(dependencyService).deleteDependency("BDR");
     }
@@ -138,7 +138,7 @@ public class BusinessDataModelRepositoryImplTest {
     public void uninstall_should_ignore_exception_if_the_dependency_does_not_exist() throws Exception {
         doThrow(new SDependencyNotFoundException("error")).when(dependencyService).deleteDependency("BDR");
 
-        assertThatNoException().isThrownBy(() -> businessDataModelRepository.uninstall(45L));
+        assertThatNoException().isThrownBy(() -> businessDataModelRepository.uninstall());
     }
 
     @Test(expected = SBusinessDataRepositoryException.class)
@@ -146,7 +146,7 @@ public class BusinessDataModelRepositoryImplTest {
             throws Exception {
         doThrow(new SDependencyDeletionException("error")).when(dependencyService).deleteDependency("BDR");
 
-        businessDataModelRepository.uninstall(45L);
+        businessDataModelRepository.uninstall();
     }
 
     @Test

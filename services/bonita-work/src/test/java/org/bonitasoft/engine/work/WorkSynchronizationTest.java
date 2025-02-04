@@ -45,7 +45,6 @@ public class WorkSynchronizationTest {
     @Test
     public void should_submit_work_on_commit() {
         WorkSynchronization workSynchronization = new WorkSynchronization(userTransactionService, workExecutorService,
-                sessionAccessor,
                 workDescriptor1, 0);
 
         workSynchronization.afterCompletion(STATUS_COMMITTED);
@@ -56,7 +55,6 @@ public class WorkSynchronizationTest {
     @Test
     public void should_not_submit_work_on_transaction_not_in_committed_state() {
         WorkSynchronization workSynchronization = new WorkSynchronization(userTransactionService, workExecutorService,
-                sessionAccessor,
                 workDescriptor1, 0);
         workSynchronization.afterCompletion(STATUS_ROLLEDBACK);
 
@@ -66,7 +64,6 @@ public class WorkSynchronizationTest {
     @Test
     public void should_not_add_delay_when_the_workDelayOnMultipleXAResource_equal_0() {
         WorkSynchronization workSynchronization = new WorkSynchronization(userTransactionService, workExecutorService,
-                sessionAccessor,
                 workDescriptor1, 0);
 
         workSynchronization.afterCompletion(STATUS_COMMITTED);
@@ -77,7 +74,6 @@ public class WorkSynchronizationTest {
     @Test
     public void should_add_delay_when_the_workDelayOnMultipleXAResource_greater_than_0_and_multiple_resources() {
         WorkSynchronization workSynchronization = new WorkSynchronization(userTransactionService, workExecutorService,
-                sessionAccessor,
                 workDescriptor1, 10);
         when(userTransactionService.hasMultipleResources()).thenReturn(Optional.of(true));
 
@@ -89,7 +85,6 @@ public class WorkSynchronizationTest {
     @Test
     public void should_not_add_delay_when_the_workDelayOnMultipleXAResource_greater_than_0_and_no_multiple_resources() {
         WorkSynchronization workSynchronization = new WorkSynchronization(userTransactionService, workExecutorService,
-                sessionAccessor,
                 workDescriptor1, 10);
         when(userTransactionService.hasMultipleResources()).thenReturn(Optional.of(false));
 
@@ -101,7 +96,6 @@ public class WorkSynchronizationTest {
     @Test
     public void should_add_delay_when_the_workDelayOnMultipleXAResource_greater_than_0_and_multiple_resources_not_defined() {
         WorkSynchronization workSynchronization = new WorkSynchronization(userTransactionService, workExecutorService,
-                sessionAccessor,
                 workDescriptor1, 10);
         when(userTransactionService.hasMultipleResources()).thenReturn(Optional.empty());
 

@@ -18,7 +18,6 @@ import static java.util.Collections.singleton;
 import static javax.transaction.Status.*;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -48,7 +47,7 @@ public class RefreshClassloaderSynchronizationTest {
     @Before
     public void before() {
         refreshClassloaderSynchronization = new RefreshClassloaderSynchronization(classLoaderService, broadcastService,
-                refreshClassLoaderTask, classLoaderUpdater, 1L, identifier(ScopeType.PROCESS, 111L));
+                refreshClassLoaderTask, classLoaderUpdater, identifier(ScopeType.PROCESS, 111L));
     }
 
     @Test
@@ -61,21 +60,21 @@ public class RefreshClassloaderSynchronizationTest {
 
     @Test
     public void should_refresh_classloader_using_classLoaderUpdater() throws Exception {
-        doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any(), anyLong());
+        doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any());
 
         refreshClassloaderSynchronization.afterCompletion(STATUS_COMMITTED);
 
-        verify(classLoaderUpdater).refreshClassloaders(classLoaderService, 1L,
+        verify(classLoaderUpdater).refreshClassloaders(classLoaderService,
                 singleton(identifier(ScopeType.PROCESS, 111L)));
     }
 
     @Test
     public void should_refresh_classloader_on_other_nodes_after_commit() throws Exception {
-        doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any(), anyLong());
+        doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any());
 
         refreshClassloaderSynchronization.afterCompletion(STATUS_COMMITTED);
 
-        verify(broadcastService).executeOnOthersAndWait(refreshClassLoaderTask, 1L);
+        verify(broadcastService).executeOnOthersAndWait(refreshClassLoaderTask);
     }
 
     @Test

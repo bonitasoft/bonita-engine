@@ -215,7 +215,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     protected APIAccessor getConnectorApiAccessor() {
-        return new ConnectorAPIAccessorImpl(1L); // FIXME remove completely the tenantId from the APIAccessor
+        return new ConnectorAPIAccessorImpl();
     }
 
     long getLoggedUserFromSession(Map<String, Object> context, ContainerState containerState) {

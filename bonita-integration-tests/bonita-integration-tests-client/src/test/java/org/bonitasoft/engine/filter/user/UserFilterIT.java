@@ -77,7 +77,7 @@ public class UserFilterIT extends TestWithTechnicalUser {
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         james = createUser(JAMES, "bpm");
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(JOHN, "bpm");
     }
 

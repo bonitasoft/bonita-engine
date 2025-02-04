@@ -16,9 +16,7 @@ package org.bonitasoft.engine.activity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.flownode.EventCriterion.NAME_DESC;
 import static org.bonitasoft.engine.bpm.flownode.TimerType.DURATION;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -146,7 +144,7 @@ public class HumanTasksIT extends TestWithUser {
 
         final ProcessDefinition processDef = deployAndEnableProcessWithActor(designProcessDef, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final ActivityInstance task = waitForUserTaskAndAssignIt(processInstance, "initTask", user);
         try {

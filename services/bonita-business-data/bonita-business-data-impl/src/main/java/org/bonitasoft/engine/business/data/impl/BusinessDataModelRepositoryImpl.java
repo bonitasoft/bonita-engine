@@ -14,13 +14,18 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.apache.commons.lang3.StringUtils.strip;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
@@ -32,7 +37,11 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.SchemaManager;
 import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
 import org.bonitasoft.engine.business.data.generator.BDMJarGenerationException;
 import org.bonitasoft.engine.business.data.generator.client.ClientBDMJarBuilder;
@@ -178,7 +187,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                     BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
-            ClassLoaderIdentifier tenantClassLoader = identifier(ScopeType.TENANT, tenantId);
+            ClassLoaderIdentifier tenantClassLoader = ClassLoaderIdentifier.TENANT;
             classLoaderService.refreshClassLoaderImmediatelyWithRollback(tenantClassLoader);
             classLoaderService.refreshClassLoaderOnOtherNodes(tenantClassLoader);
             //replace the tenant classloader by the one that was just refreshed
@@ -304,11 +313,11 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     @Override
-    public void uninstall(final long tenantId) throws SBusinessDataRepositoryException {
+    public void uninstall() throws SBusinessDataRepositoryException {
         try {
             dependencyService.deleteDependency(BDR_DEPENDENCY_NAME);
-            classLoaderService.refreshClassLoaderImmediatelyWithRollback(identifier(ScopeType.TENANT, tenantId));
-            ClassLoader classLoader = classLoaderService.getClassLoader(identifier(ScopeType.TENANT, tenantId));
+            classLoaderService.refreshClassLoaderImmediatelyWithRollback(ClassLoaderIdentifier.TENANT);
+            ClassLoader classLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.TENANT);
             Thread.currentThread()
                     .setContextClassLoader(classLoader);
         } catch (final SDependencyNotFoundException sde) {
@@ -327,7 +336,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     @Override
-    public void dropAndUninstall(final long tenantId) throws SBusinessDataRepositoryException {
+    public void dropAndUninstall() throws SBusinessDataRepositoryException {
         final URL resource = Thread.currentThread().getContextClassLoader().getResource("bom.xml");
         if (resource != null) {
             try {
@@ -343,7 +352,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                                 "Drop of the schema failed due multiple exceptions: " + exceptions, exceptions.get(0));
                     }
                 }
-                uninstall(tenantId);
+                uninstall();
             } catch (final IOException | JAXBException | SAXException ioe) {
                 throw new SBusinessDataRepositoryException(ioe);
             }

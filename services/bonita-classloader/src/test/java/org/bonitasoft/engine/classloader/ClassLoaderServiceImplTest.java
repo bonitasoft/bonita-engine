@@ -15,10 +15,8 @@ package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.GLOBAL;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.*;
 import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
-import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -83,20 +81,19 @@ public class ClassLoaderServiceImplTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private final long PROCESS_ID = 12;
-    private final long TENANT_ID = 1L;
 
     @Before
     public void before() throws Exception {
-        classLoaderService = new ClassLoaderServiceImpl(new ParentClassLoaderResolver(sessionAccessor),
+        classLoaderService = new ClassLoaderServiceImpl(new ParentClassLoaderResolver(),
                 eventService,
-                platformDependencyService, sessionAccessor, userTransactionService, broadcastService,
+                platformDependencyService, userTransactionService, broadcastService,
                 classLoaderUpdater, Arrays.asList(platformClassLoaderListener1, platformClassLoaderListener2));
 
         when(classLoaderUpdater.initializeClassLoader(eq(classLoaderService), any()))
                 .thenAnswer(a -> classLoaderService.createClassloader(a.getArgument(1)));
-        classLoaderService.registerDependencyServiceOfTenant(TENANT_ID, tenantDependencyService);
+        classLoaderService.registerDependencyService(tenantDependencyService);
         processClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, PROCESS_ID));
-        classLoaderService.getClassLoader(identifier(TENANT, TENANT_ID));
+        classLoaderService.getClassLoader(TENANT);
         testClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(processClassLoader);
         myClassLoaderListener = new MyClassLoaderListener();
@@ -111,7 +108,7 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_addListener_add_on_specified_classloader_do_not_call_on_others() {
         //given
-        classLoaderService.addListener(identifier(TENANT, TENANT_ID), myClassLoaderListener);
+        classLoaderService.addListener(TENANT, myClassLoaderListener);
         //when
         processClassLoader.destroy();
         //then
@@ -131,16 +128,16 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_not_be_able_to_destroy_classloader_having_children() {
 
-        assertThatThrownBy(() -> classLoaderService.removeLocalClassloader(identifier(TENANT, TENANT_ID)))
+        assertThatThrownBy(() -> classLoaderService.removeLocalClassloader(TENANT))
                 .hasMessageContaining(
-                        "Unable to delete classloader TENANT:1 because it has children: [BonitaClassLoader[id=PROCESS:12");
+                        "Unable to delete classloader TENANT because it has children: [BonitaClassLoader[id=PROCESS:12");
     }
 
     @Test
     public void should_removeListener_remove_the_listener() {
         //given
-        classLoaderService.addListener(identifier(TENANT, TENANT_ID), myClassLoaderListener);
-        classLoaderService.removeListener(identifier(TENANT, TENANT_ID), myClassLoaderListener);
+        classLoaderService.addListener(TENANT, myClassLoaderListener);
+        classLoaderService.removeListener(TENANT, myClassLoaderListener);
         //when
         processClassLoader.destroy();
         //then
@@ -163,7 +160,7 @@ public class ClassLoaderServiceImplTest {
     public void should_stop_destroy_all_classloaders() throws Exception {
         //given
         classLoaderService.addListener(identifier(PROCESS, PROCESS_ID), myClassLoaderListener);
-        classLoaderService.addListener(identifier(TENANT, TENANT_ID), myClassLoaderListener);
+        classLoaderService.addListener(TENANT, myClassLoaderListener);
         classLoaderService.getClassLoader(identifier(PROCESS, 125));
         classLoaderService.addListener(identifier(PROCESS, 125), myClassLoaderListener);
         classLoaderService.getClassLoader(identifier(PROCESS, 126));
@@ -187,7 +184,7 @@ public class ClassLoaderServiceImplTest {
     public void should_removeLocalClassLoader_call_destroy() throws Exception {
         //given
         classLoaderService.addListener(identifier(PROCESS, PROCESS_ID), myClassLoaderListener);
-        classLoaderService.addListener(identifier(TENANT, TENANT_ID), myClassLoaderListener);
+        classLoaderService.addListener(TENANT, myClassLoaderListener);
         //when
         classLoaderService.removeLocalClassloader(identifier(PROCESS, PROCESS_ID));
 
@@ -201,7 +198,7 @@ public class ClassLoaderServiceImplTest {
         classLoaderService.getClassLoader(identifier(PROCESS, 17));//second classloader
         //when
         classLoaderService.removeLocalClassloader(identifier(PROCESS, PROCESS_ID));
-        classLoaderService.removeLocalClassloader(identifier(TENANT, TENANT_ID));
+        classLoaderService.removeLocalClassloader(TENANT);
     }
 
     @Test
@@ -209,7 +206,7 @@ public class ClassLoaderServiceImplTest {
         //given
         //when
         classLoaderService.removeLocalClassloader(identifier(PROCESS, PROCESS_ID));
-        classLoaderService.removeLocalClassloader(identifier(TENANT, TENANT_ID));
+        classLoaderService.removeLocalClassloader(TENANT);
     }
 
     @Test
@@ -222,7 +219,7 @@ public class ClassLoaderServiceImplTest {
         ClassLoader parent = localClassLoader.getParent();
         assertThat(parent).isInstanceOf(BonitaClassLoader.class);
         assertThat(((BonitaClassLoader) parent).getIdentifier())
-                .isEqualTo(identifier(TENANT, TENANT_ID));
+                .isEqualTo(TENANT);
         ClassLoader global = parent.getParent();
         assertThat(global).isInstanceOf(BonitaClassLoader.class);
         assertThat(((BonitaClassLoader) global).getIdentifier()).isEqualTo(ClassLoaderIdentifier.GLOBAL);
@@ -233,7 +230,7 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_globalListeners_be_called_on_destroy() throws Exception {
         //given
-        classLoaderService.getClassLoader(identifier(PROCESS, 17));//second classloader
+        classLoaderService.getClassLoader(identifier(PROCESS, 17)); //second classloader
         //when
         classLoaderService.removeLocalClassloader(identifier(PROCESS, PROCESS_ID));
         classLoaderService.removeLocalClassloader(identifier(PROCESS, 17));
@@ -317,20 +314,20 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_initialize_only_once_classloader() {
 
-        classLoaderService.getClassLoader(identifier(TENANT, 43L));
-        classLoaderService.getClassLoader(identifier(TENANT, 43L));
+        classLoaderService.getClassLoader(identifier(PROCESS, 42));
+        classLoaderService.getClassLoader(identifier(PROCESS, 42));
 
-        verify(classLoaderUpdater, times(1)).initializeClassLoader(classLoaderService, identifier(TENANT, 43L));
+        verify(classLoaderUpdater, times(1)).initializeClassLoader(classLoaderService, identifier(PROCESS, 42));
     }
 
     @Test
     public void should_not_initialize_classloader_when_adding_and_removing_listener() {
         SingleClassLoaderListener singleClassLoaderListener = mock(SingleClassLoaderListener.class);
 
-        assertThat(classLoaderService.addListener(identifier(TENANT, 44L), singleClassLoaderListener)).isTrue();
-        assertThat(classLoaderService.removeListener(identifier(TENANT, 44L), singleClassLoaderListener)).isTrue();
+        assertThat(classLoaderService.addListener(TENANT, singleClassLoaderListener)).isTrue();
+        assertThat(classLoaderService.removeListener(TENANT, singleClassLoaderListener)).isTrue();
 
-        verify(classLoaderUpdater, never()).initializeClassLoader(classLoaderService, identifier(TENANT, 44L));
+        verify(classLoaderUpdater, never()).initializeClassLoader(classLoaderService, TENANT);
     }
 
     @Test
@@ -340,12 +337,12 @@ public class ClassLoaderServiceImplTest {
         };
         SingleClassLoaderListener classLoaderListener2 = new SingleClassLoaderListener() {
         };
-        classLoaderService.addListener(identifier(TENANT, 12), classLoaderListener1);
-        classLoaderService.addListener(identifier(TENANT, 12), classLoaderListener2);
+        classLoaderService.addListener(TENANT, classLoaderListener1);
+        classLoaderService.addListener(TENANT, classLoaderListener2);
         //when
-        classLoaderService.removeListener(identifier(TENANT, 12), classLoaderListener1);
+        classLoaderService.removeListener(TENANT, classLoaderListener1);
         //then
-        assertThat(classLoaderService.getListeners(identifier(TENANT, 12))).containsExactly(classLoaderListener2);
+        assertThat(classLoaderService.getListeners(TENANT)).containsExactly(classLoaderListener2);
     }
 
     @Test
@@ -355,7 +352,7 @@ public class ClassLoaderServiceImplTest {
         MyClassLoaderListener process13Listener = new MyClassLoaderListener();
         classLoaderService.addListener(identifier(PROCESS, 13), process13Listener);
         MyClassLoaderListener tenantListener = new MyClassLoaderListener();
-        classLoaderService.addListener(identifier(TENANT, TENANT_ID), tenantListener);
+        classLoaderService.addListener(TENANT, tenantListener);
         MyClassLoaderListener globalListener = new MyClassLoaderListener();
         classLoaderService.addListener(GLOBAL, globalListener);
 

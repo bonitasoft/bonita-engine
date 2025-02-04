@@ -15,27 +15,20 @@ package org.bonitasoft.engine.classloader;
 
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ParentClassLoaderResolver {
-
-    private final ReadSessionAccessor sessionAccessor;
-
-    public ParentClassLoaderResolver(final ReadSessionAccessor sessionAccessor) {
-        this.sessionAccessor = sessionAccessor;
-    }
 
     /**
      * @return the key of the parent or null if it is the global
      */
     public ClassLoaderIdentifier getParentClassLoaderIdentifier(ClassLoaderIdentifier childId) {
         if (ScopeType.PROCESS.equals(childId.getType())) {
-            //We should not depend on the session to know what is the parent of a classloader
-            return ClassLoaderIdentifier.identifier(ScopeType.TENANT, 1L); // FIXME remove completely the tenantId
+            // We should not depend on the session to know what is the parent of a classloader
+            return ClassLoaderIdentifier.TENANT;
         } else if (ScopeType.TENANT.equals(childId.getType())) {
-            return ClassLoaderIdentifier.GLOBAL;//global
+            return ClassLoaderIdentifier.GLOBAL;
         } else if (ClassLoaderIdentifier.GLOBAL.equals(childId)) {
             return ClassLoaderIdentifier.APPLICATION;
         } else {

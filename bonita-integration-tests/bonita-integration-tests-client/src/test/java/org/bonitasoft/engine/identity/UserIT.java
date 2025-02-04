@@ -55,19 +55,19 @@ public class UserIT extends TestWithTechnicalUser {
      */
     @Test(expected = NodeNotStartedException.class)
     public void unableToCallPlatformMethodOnStoppedNode() throws Exception {
-        logoutOnTenant();
+        logout();
         PlatformSession session = loginOnPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.stopNode();
         logoutOnPlatform(session);
         try {
-            loginOnDefaultTenantWithDefaultTechnicalUser();
+            loginWithTechnicalUser();
         } finally {
             session = loginOnPlatform();
             platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
             platformAPI.startNode();
             logoutOnPlatform(session);
-            loginOnDefaultTenantWithDefaultTechnicalUser();
+            loginWithTechnicalUser();
         }
     }
 
@@ -1118,25 +1118,25 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void theTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         User john = createUser("john", "bpm");
         User jack = createUser("jack", "bpm");
         Date connection1 = getIdentityAPI().getUserByUserName("john").getLastConnection();
         Thread.sleep(20);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
         Date connection2 = getIdentityAPI().getUserByUserName("john").getLastConnection();
         getIdentityAPI().getUserByUserName("john").getLastConnection();
         Thread.sleep(20);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
         Date connection3 = getIdentityAPI().getUserByUserName("john").getLastConnection();
         Thread.sleep(20);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("jack", "bpm");
         Date connection4 = getIdentityAPI().getUserByUserName("john").getLastConnection();
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
 
         deleteUsers(john, jack);
 

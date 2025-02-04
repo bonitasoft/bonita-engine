@@ -48,7 +48,7 @@ public class StringIndexIT extends CommonAPIIT {
 
     @Test
     public void should_set_string_index_of_current_process_using_operation_in_called_process() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         User user = createUser("john", "bpm");
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("mainProcess", "1.0");
         builder.addCallActivity("call", stringConstant("calledProcess"), stringConstant("1.0"));
@@ -101,7 +101,7 @@ public class StringIndexIT extends CommonAPIIT {
 
     @Test
     public void should_initialize_string_index_in_call_activity() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         User user = createUser("john", "bpm");
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("mainProcess", "1.0");
         builder.addCallActivity("call", stringConstant("calledProcess"), stringConstant("1.0"));
@@ -134,7 +134,7 @@ public class StringIndexIT extends CommonAPIIT {
 
     @Test
     public void should_be_able_to_initialize_a_search_index_using_a_business_data() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final String qualifiedName = "com.company.test.Bo";
         final BusinessObjectModel bom = buildSimpleBom(qualifiedName);
         installBusinessDataModel(bom);

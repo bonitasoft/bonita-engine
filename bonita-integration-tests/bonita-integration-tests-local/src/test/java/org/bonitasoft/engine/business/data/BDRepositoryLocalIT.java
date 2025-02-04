@@ -18,7 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.CommonAPIIT;
@@ -44,7 +48,11 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.platform.setup.PlatformSetup;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class BDRepositoryLocalIT extends CommonAPIIT {
@@ -107,7 +115,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
     @Before
     public void setUp() throws Exception {
         clientFolder = temporaryFolder.newFolder();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         matti = createUser("matti", "bpm");
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
@@ -137,7 +145,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         resumeClassloader();
 
         deleteUser(matti);
-        logoutOnTenant();
+        logout();
     }
 
     private void resumeClassloader() {

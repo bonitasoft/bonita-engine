@@ -65,7 +65,7 @@ public abstract class CommonAPIIT extends APITestUtil {
     };
 
     private void clean() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         cleanCommands();
         cleanProcessInstances();
         cleanApplications();
@@ -79,7 +79,7 @@ public abstract class CommonAPIIT extends APITestUtil {
         cleanSupervisors();
         checkThereAreNoWaitingEventsLeft();
         cleanBdm();
-        logoutOnTenant();
+        logout();
     }
 
     private void cleanBdm() throws BonitaException {

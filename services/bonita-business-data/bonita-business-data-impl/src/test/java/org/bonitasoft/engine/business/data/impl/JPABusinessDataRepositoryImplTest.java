@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -37,9 +36,9 @@ import javax.persistence.criteria.Selection;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,7 +73,7 @@ public class JPABusinessDataRepositoryImplTest {
     @Before
     public void setUp() {
         realJPABusinessDataRepository = new JPABusinessDataRepositoryImpl(transactionService,
-                businessDataModelRepository, configuration, classLoaderService, 1L);
+                businessDataModelRepository, configuration, classLoaderService);
         repository = spy(
                 realJPABusinessDataRepository);
         doReturn(manager).when(repository).getEntityManager();
@@ -92,7 +91,7 @@ public class JPABusinessDataRepositoryImplTest {
     @Test
     public void should_constructor_add_listener_on_classloader() {
         //then
-        verify(classLoaderService).addListener(identifier(ScopeType.TENANT, 1L), realJPABusinessDataRepository);
+        verify(classLoaderService).addListener(ClassLoaderIdentifier.TENANT, realJPABusinessDataRepository);
     }
 
     @Test

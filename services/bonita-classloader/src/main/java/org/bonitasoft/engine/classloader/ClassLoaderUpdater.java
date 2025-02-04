@@ -23,7 +23,6 @@ import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.stereotype.Component;
 
@@ -37,20 +36,15 @@ import org.springframework.stereotype.Component;
 class ClassLoaderUpdater {
 
     private final BonitaTaskExecutor bonitaTaskExecutor;
-    private final SessionAccessor sessionAccessor;
     private final UserTransactionService userTransactionService;
 
-    public ClassLoaderUpdater(BonitaTaskExecutor bonitaTaskExecutor,
-            SessionAccessor sessionAccessor, UserTransactionService userTransactionService) {
+    public ClassLoaderUpdater(BonitaTaskExecutor bonitaTaskExecutor, UserTransactionService userTransactionService) {
         this.bonitaTaskExecutor = bonitaTaskExecutor;
-        this.sessionAccessor = sessionAccessor;
         this.userTransactionService = userTransactionService;
     }
 
-    public void refreshClassloaders(ClassLoaderServiceImpl classLoaderService, Long tenantId,
-            Set<ClassLoaderIdentifier> ids) {
-
-        execute(tenantId, () -> {
+    public void refreshClassloaders(ClassLoaderServiceImpl classLoaderService, Set<ClassLoaderIdentifier> ids) {
+        execute(() -> {
             for (ClassLoaderIdentifier id : ids) {
                 classLoaderService.refreshClassLoaderImmediately(id);
             }
@@ -61,12 +55,11 @@ class ClassLoaderUpdater {
     BonitaClassLoader initializeClassLoader(ClassLoaderServiceImpl classLoaderService,
             ClassLoaderIdentifier identifier) {
         log.debug("Request creation of classloader in an other thread: {}", identifier);
-        return execute(getTenantId(), () -> classLoaderService.createClassloader(identifier));
+        return execute(() -> classLoaderService.createClassloader(identifier));
     }
 
-    private <T> T execute(Long tenantId, Callable<T> callable) {
-        Future<T> execute = bonitaTaskExecutor.execute(
-                inSession(tenantId, inTransaction(callable)));
+    private <T> T execute(Callable<T> callable) {
+        Future<T> execute = bonitaTaskExecutor.execute(inTransaction(callable));
         try {
             return execute.get(5, TimeUnit.MINUTES); // hard coded timeout, it should never happen
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -74,25 +67,8 @@ class ClassLoaderUpdater {
         }
     }
 
-    private <T> Callable<T> inSession(Long tenantId, Callable<T> callable) {
-        if (tenantId == null) {
-            return callable;
-        }
-        return () -> {
-            sessionAccessor.setTenantId(1L); // FIXME remove completely the tenantId
-            try {
-                return callable.call();
-            } finally {
-                sessionAccessor.deleteTenantId();
-            }
-        };
-    }
-
     private <T> Callable<T> inTransaction(Callable<T> callable) {
         return () -> userTransactionService.executeInTransaction(callable);
     }
 
-    private Long getTenantId() {
-        return 1L; // FIXME remove completely the tenantId
-    }
 }

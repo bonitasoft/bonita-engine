@@ -15,14 +15,8 @@ package org.bonitasoft.engine.test.util;
 
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -84,20 +78,6 @@ public class TestUtil {
         } catch (STransactionCommitException | STransactionRollbackException e) {
             LOGGER.debug("Cannot complete the transaction. Probably already completed. Ignoring.");
         }
-    }
-
-    public static void createSessionOn(final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final long tenantId)
-            throws SBonitaException {
-        try {
-            sessionService.deleteSession(sessionAccessor.getSessionId());
-            sessionAccessor.deleteSessionId();
-        } catch (final SessionIdNotSetException | SSessionNotFoundException e) {
-            // do nothing
-        }
-        final SSession session = sessionService.createSession(tenantId, DEFAULT_USER_NAME);
-        sessionAccessor.setSessionInfo(session.getId(), tenantId);
-
     }
 
 }

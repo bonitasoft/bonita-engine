@@ -1186,7 +1186,7 @@ public class DocumentIT extends TestWithUser {
         check(processInstance, 2, 4, 1, 3, 5, DocumentCriterion.URL_DESC);
 
         final User john = createUser("john", "bpm");
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
         assignAndExecuteStep(step1Id, john.getId());
         final long step2Id = waitForUserTask(processInstance, "step2");

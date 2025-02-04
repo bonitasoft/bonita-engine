@@ -65,7 +65,7 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
 
     @Test
     public void should_delete_complete_archived_process_instances() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         User user = createUser("deleteProcessInstanceIT", "bpm");
         ProcessDefinition mainProcess = createMainProcessDefinition();
         ProcessDefinition sub1 = createSubProcessDefinition1();
@@ -153,7 +153,7 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
 
     @Test
     public void should_delete_process_instance_currently_executing() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         User user = createUser("deleteProcessInstanceIT", "bpm");
         ProcessDefinition mainProcess = createMainProcessDefinition();
         ProcessDefinition sub1 = createSubProcessDefinition1();

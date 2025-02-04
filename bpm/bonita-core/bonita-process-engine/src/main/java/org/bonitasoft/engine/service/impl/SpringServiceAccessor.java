@@ -248,15 +248,6 @@ public class SpringServiceAccessor implements ServiceAccessor {
     }
 
     @Override
-    public long getTenantId() {
-        try {
-            return ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public EventInstanceService getEventInstanceService() {
         return beanAccessor.getService(EventInstanceService.class);
     }

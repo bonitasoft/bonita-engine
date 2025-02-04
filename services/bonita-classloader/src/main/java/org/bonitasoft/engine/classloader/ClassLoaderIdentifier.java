@@ -21,7 +21,18 @@ import lombok.Data;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 
 /**
+ * <pre>
+ * -            APPLICATION
+ * -                 |
+ * -               GLOBAL
+ * -                 |
+ * -      ------- TENANT ------
+ * -     |          |         |
+ * - PROCESS1 - PROCESS2 - PROCESS3
+ * </pre>
+ *
  * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,15 +40,17 @@ public class ClassLoaderIdentifier implements Serializable {
 
     public static final ScopeType GLOBAL_TYPE = ScopeType.GLOBAL;
     public static final long GLOBAL_ID = -1;
-    /**
-     * The GLOBAL classloader is the unique one at platform level
-     */
-    public static final ClassLoaderIdentifier GLOBAL = identifier(GLOBAL_TYPE, GLOBAL_ID);
+    protected static final int FIXED_TENANT_ID = 1;
     /**
      * The APPLICATION classloader is the parent classloader of the GLOBAL classloader. It the one in which bonita is
      * bootstrapped
      */
     public static final ClassLoaderIdentifier APPLICATION = identifier(null, Long.MIN_VALUE);
+    /**
+     * The GLOBAL classloader is the unique one at platform level
+     */
+    public static final ClassLoaderIdentifier GLOBAL = identifier(GLOBAL_TYPE, GLOBAL_ID);
+    public static final ClassLoaderIdentifier TENANT = identifier(ScopeType.TENANT, FIXED_TENANT_ID);
 
     private ScopeType type;
     private long id;
@@ -50,7 +63,9 @@ public class ClassLoaderIdentifier implements Serializable {
     public String toString() {
         if (this.equals(GLOBAL)) {
             return "GLOBAL";
-        }
-        return type.name() + ':' + id;
+        } else if (this.type == ScopeType.TENANT) {
+            return "TENANT";
+        } else
+            return type.name() + ':' + id;
     }
 }

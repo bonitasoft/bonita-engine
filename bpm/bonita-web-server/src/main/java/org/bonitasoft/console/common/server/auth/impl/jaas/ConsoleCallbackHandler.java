@@ -19,10 +19,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-
-import org.bonitasoft.console.common.server.utils.TenantsManagementUtils;
 
 /**
  * Console call back handler
@@ -65,8 +62,6 @@ public class ConsoleCallbackHandler implements CallbackHandler {
                 nc.setName(this.name);
             } else if (callback instanceof PasswordCallback pc) {
                 pc.setPassword(this.password.toCharArray());
-            } else if (callback instanceof TextInputCallback tc) {
-                tc.setText(String.valueOf(TenantsManagementUtils.getDefaultTenantId()));
             }
 
         }

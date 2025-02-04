@@ -112,8 +112,6 @@ import org.springframework.core.env.Environment;
  */
 public interface ServiceAccessor {
 
-    long getTenantId();
-
     ParentContainerResolver getParentContainerResolver();
 
     SessionService getSessionService();

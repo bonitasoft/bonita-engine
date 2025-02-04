@@ -46,7 +46,7 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         cebolinha = createUser("cebolinha", "bpm");
         cascao = createUser("cascao", "bpm");
     }
@@ -54,7 +54,7 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
     @After
     public void after() throws Exception {
         deleteUsers(cebolinha, cascao);
-        logoutOnTenant();
+        logout();
     }
 
     @Test

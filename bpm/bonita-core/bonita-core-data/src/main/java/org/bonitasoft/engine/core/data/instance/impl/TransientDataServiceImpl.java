@@ -114,7 +114,7 @@ public class TransientDataServiceImpl implements TransientDataService {
 
     private void setId(final SDataInstance dataInstance)
             throws SecurityException, IllegalArgumentException, SReflectException {
-        // FIXME: probably the id will be be used, so not necessary to be set
+        // FIXME: probably the id will be used, so not necessary to be set
         final long id = Math.abs(UUID.randomUUID().getMostSignificantBits());
         ClassReflector.invokeSetter(dataInstance, "setId", long.class, id);
     }

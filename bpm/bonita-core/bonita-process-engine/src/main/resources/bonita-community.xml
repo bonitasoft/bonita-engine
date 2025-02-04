@@ -1845,7 +1845,6 @@
 
     <bean class="org.bonitasoft.engine.dependency.impl.DependencyServiceRegistrator" init-method="registerDependencyService">
         <constructor-arg name="tenantDependencyService" ref="dependencyService" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">
@@ -2016,7 +2015,6 @@
                 <entry key="hibernate.cache.use_query_cache" value="false" />
             </map>
         </constructor-arg>
-        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
 

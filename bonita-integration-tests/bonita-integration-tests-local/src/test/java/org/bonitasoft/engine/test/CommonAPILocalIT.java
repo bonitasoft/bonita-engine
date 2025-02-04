@@ -38,7 +38,7 @@ public class CommonAPILocalIT extends CommonAPIIT {
 
     protected static void setSessionInfo(final APISession session) throws Exception {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-        sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+        sessionAccessor.setSessionId(session.getId());
     }
 
     protected static void cleanSession() throws Exception {

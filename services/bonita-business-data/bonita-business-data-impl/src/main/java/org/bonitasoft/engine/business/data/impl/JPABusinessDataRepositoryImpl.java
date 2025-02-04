@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,10 +42,10 @@ import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SingleClassLoaderListener;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.hibernate.Hibernate;
@@ -74,27 +72,23 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
     private final ThreadLocal<EntityManager> managers = new ThreadLocal<>();
 
     private final BusinessDataModelRepository businessDataModelRepository;
-    private final ClassLoaderService classLoaderService;
-    private final long tenantId;
 
     private final UserTransactionService transactionService;
 
     public JPABusinessDataRepositoryImpl(final UserTransactionService transactionService,
             final BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration,
-            ClassLoaderService classLoaderService, long tenantId) {
+            ClassLoaderService classLoaderService) {
         this.transactionService = transactionService;
         this.businessDataModelRepository = businessDataModelRepository;
-        this.classLoaderService = classLoaderService;
-        this.tenantId = tenantId;
         this.configuration = new HashMap<>(configuration);
         this.configuration.put("hibernate.archive.scanner", DisabledScanner.class.getName());
-        classLoaderService.addListener(identifier(ScopeType.TENANT, tenantId), this);
+        classLoaderService.addListener(ClassLoaderIdentifier.TENANT, this);
     }
 
     @Override
     public void start() {
         if (entityManagerFactory == null && businessDataModelRepository.isBDMDeployed()) {
-            log.debug("Creating Entity Manager Factory on tenant {}", tenantId);
+            log.debug("Creating Entity Manager Factory");
             recreateEntityManagerFactoryEvenIfExisting();
         }
     }
@@ -106,7 +100,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
     @Override
     public void stop() {
         if (getEntityManagerFactory() != null) {
-            log.debug("Closing Entity Manager Factory because service is stopping on tenant {}", tenantId);
+            log.debug("Closing Entity Manager Factory because service is stopping");
             getEntityManagerFactory().close();
             entityManagerFactory = null;
             log.debug("Entity Manager Factory closed");
@@ -115,7 +109,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
 
     private synchronized void recreateEntityManagerFactoryOnClassLoaderChange(ClassLoader newClassLoader) {
         if (businessDataModelRepository.isBDMDeployed()) {
-            log.debug("Recreating Entity Manager Factory for classloader {} on tenant {}", newClassLoader, tenantId);
+            log.debug("Recreating Entity Manager Factory for classloader {}", newClassLoader);
             final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(newClassLoader);
@@ -135,7 +129,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
             entityManagerFactory.close();
         }
         entityManagerFactory = createEntityManagerFactory();
-        log.debug("Recreated Entity Manager Factory: " + entityManagerFactory);
+        log.debug("Recreated Entity Manager Factory: {}", entityManagerFactory);
     }
 
     public EntityManagerFactory getEntityManagerFactory() {
@@ -399,7 +393,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
     @Override
     public Entity unwrap(final Entity wrapped) {
         Entity entity = wrapped;
-        if (entity != null && entity instanceof HibernateProxy) {
+        if (entity instanceof HibernateProxy) {
             Hibernate.initialize(entity);
             entity = (Entity) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
         }

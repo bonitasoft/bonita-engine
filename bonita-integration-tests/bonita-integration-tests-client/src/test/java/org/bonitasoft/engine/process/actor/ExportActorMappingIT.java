@@ -100,7 +100,7 @@ public class ExportActorMappingIT extends TestWithUser {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final Group group = createGroup("group");
         final Role role = createRole("role");
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
@@ -128,7 +128,7 @@ public class ExportActorMappingIT extends TestWithUser {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final Group sales = createGroup("sales");
         final Group subSales = createGroup("sub", "/sales");
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
@@ -172,7 +172,7 @@ public class ExportActorMappingIT extends TestWithUser {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final User john = createUser("john", "bpm");
         final Group rd = createGroup("RD");
         final Role role = createRole("dev");

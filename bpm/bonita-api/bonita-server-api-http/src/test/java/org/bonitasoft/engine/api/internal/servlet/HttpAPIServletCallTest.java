@@ -67,7 +67,7 @@ public class HttpAPIServletCallTest {
         ServerAPI serverAPI = mock(ServerAPI.class);
         doReturn(serverAPI).when(httpAPIServletCall).getServerAPI();
         APISessionImpl apiSession = new APISessionImpl(-2241174137745053814L, date("2018-06-07T15:10:09.132Z"),
-                3600000, "install", -1, "default", 1L);
+                3600000, "install", -1);
         apiSession.setTechnicalUser(true);
         when(serverAPI.invokeMethod(new HashMap<>(), "com.bonitasoft.engine.api.LoginAPI", "login",
                 asList(String.class.getName(), String.class.getName()) //
@@ -88,8 +88,6 @@ public class HttpAPIServletCallTest {
                 "    <userName>install</userName>" +
                 "    <userId>-1</userId>" +
                 "    <technicalUser>true</technicalUser>" +
-                "    <tenantName>default</tenantName>" +
-                "    <tenantId>1</tenantId>" +
                 "  </org.bonitasoft.engine.session.impl.APISessionImpl>" +
                 "</object-stream>");
     }

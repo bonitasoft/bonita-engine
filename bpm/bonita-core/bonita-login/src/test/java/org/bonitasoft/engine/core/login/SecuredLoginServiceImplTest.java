@@ -23,7 +23,12 @@ import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
@@ -68,15 +73,14 @@ public class SecuredLoginServiceImplTest {
                 identityService, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS), profileService,
                 permissionsBuilder);
         //return a session with given arguments
-        when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean(), anyList(), anySet()))
+        when(sessionService.createSession(anyLong(), anyString(), anyBoolean(), anyList(), anySet()))
                 .thenAnswer(invok -> SSession.builder()
                         .id(UUID.randomUUID().getLeastSignificantBits())
                         .applicationName("myApp")
-                        .tenantId(invok.getArgument(0))
-                        .userId(invok.getArgument(1))
-                        .userName(invok.getArgument(2))
-                        .technicalUser(invok.getArgument(3))
-                        .profiles(invok.getArgument(4))
+                        .userId(invok.getArgument(0))
+                        .userName(invok.getArgument(1))
+                        .technicalUser(invok.getArgument(2))
+                        .profiles(invok.getArgument(3))
                         .build());
     }
 
@@ -165,7 +169,7 @@ public class SecuredLoginServiceImplTest {
             securedLoginServiceImpl.login(credentials);
         } catch (final SLoginException e) {
             verify(genericAuthenticationService, times(1)).checkUserCredentials(anyMap());
-            verify(sessionService, times(0)).createSession(tenantId, userId, login, true);
+            verify(sessionService, times(0)).createSession(userId, login, true);
             assertThat(e).hasRootCauseExactlyInstanceOf(AuthenticationException.class);
             return;
         }
@@ -177,13 +181,13 @@ public class SecuredLoginServiceImplTest {
     public void testSecuredLoginServiceWithPlatformCredentialsWithGenericAuthenticationService() throws Exception {
         final Map<String, Serializable> credentials = credentials(TECH_USER_NAME, TECH_USER_PASS, TENANT_ID);
         final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(TENANT_ID, -1L, TECH_USER_NAME, true, emptyList(), emptySet()))
+        when(sessionService.createSession(-1L, TECH_USER_NAME, true, emptyList(), emptySet()))
                 .thenReturn(sSession);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(0)).checkUserCredentials(anyMap());
-        verify(sessionService, times(1)).createSession(1L, -1L, TECH_USER_NAME, true, emptyList(), emptySet());
+        verify(sessionService, times(1)).createSession(-1L, TECH_USER_NAME, true, emptyList(), emptySet());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
@@ -192,13 +196,13 @@ public class SecuredLoginServiceImplTest {
         final Map<String, Serializable> credentials = credentials(TECH_USER_NAME, TECH_USER_PASS, TENANT_ID);
 
         final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true, emptyList(), emptySet()))
+        when(sessionService.createSession(USER_ID, TECH_USER_NAME, true, emptyList(), emptySet()))
                 .thenReturn(sSession);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, never()).checkUserCredentials(credentials);
-        verify(sessionService).createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true, emptyList(), emptySet());
+        verify(sessionService).createSession(USER_ID, TECH_USER_NAME, true, emptyList(), emptySet());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
@@ -212,14 +216,14 @@ public class SecuredLoginServiceImplTest {
 
         when(sUser.getId()).thenReturn(112345L);
         when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn("julien");
-        when(sessionService.createSession(TENANT_ID, 112345L, "julien", false, emptyList(), emptySet()))
+        when(sessionService.createSession(112345L, "julien", false, emptyList(), emptySet()))
                 .thenReturn(sSession);
         when(identityService.getUserByUserName("julien")).thenReturn(sUser);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(1)).checkUserCredentials(credentials);
-        verify(sessionService, times(1)).createSession(TENANT_ID, 112345L, "julien", false, emptyList(), emptySet());
+        verify(sessionService, times(1)).createSession(112345L, "julien", false, emptyList(), emptySet());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
@@ -283,7 +287,7 @@ public class SecuredLoginServiceImplTest {
     public void should_login_with_technical_user() throws Exception {
         SSession session = securedLoginServiceImpl.login(credentials(TECH_USER_NAME, TECH_USER_PASS, 1L));
 
-        assertThat(session).hasFieldOrPropertyWithValue("tenantId", 1L)
+        assertThat(session)
                 .hasFieldOrPropertyWithValue("userName", TECH_USER_NAME)
                 .hasFieldOrPropertyWithValue("userId", -1L)
                 .hasFieldOrPropertyWithValue("technicalUser", true);
@@ -295,7 +299,7 @@ public class SecuredLoginServiceImplTest {
 
         SSession session = securedLoginServiceImpl.login(credentials("john", "bpm", 42));
 
-        assertThat(session).hasFieldOrPropertyWithValue("tenantId", 42L)
+        assertThat(session)
                 .hasFieldOrPropertyWithValue("userName", "john")
                 .hasFieldOrPropertyWithValue("userId", user.getId())
                 .hasFieldOrPropertyWithValue("technicalUser", false);

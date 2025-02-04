@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
-
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
@@ -44,7 +42,6 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaContextException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
@@ -253,10 +250,9 @@ public class ServerAPIImpl implements ServerAPI {
     private ClassLoader beforeInvokeMethodForAPISession(SessionAccessor sessionAccessor,
             ServiceAccessor serviceAccessor, Session session) throws SBonitaException {
         checkTenantSession(serviceAccessor, session);
-        long tenantId = ((APISession) session).getTenantId();
         SessionService sessionService = serviceAccessor.getSessionService();
         sessionService.renewSession(session.getId());
-        sessionAccessor.setSessionInfo(session.getId(), tenantId);
+        sessionAccessor.setSessionId(session.getId());
         return getTenantClassLoader(serviceAccessor, session);
     }
 
@@ -270,7 +266,7 @@ public class ServerAPIImpl implements ServerAPI {
             throw new InvalidSessionException("Invalid session");
         }
         platformSessionService.renewSession(session.getId());
-        sessionAccessor.setSessionInfo(session.getId(), -1);
+        sessionAccessor.setSessionId(session.getId());
         return getPlatformClassLoader(serviceAccessor);
     }
 
@@ -532,9 +528,8 @@ public class ServerAPIImpl implements ServerAPI {
 
     private ClassLoader getTenantClassLoader(final ServiceAccessor serviceAccessor, final Session session)
             throws SClassLoaderException {
-        final APISession apiSession = (APISession) session;
         final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
-        return classLoaderService.getClassLoader(identifier(ScopeType.TENANT, apiSession.getTenantId()));
+        return classLoaderService.getClassLoader(ClassLoaderIdentifier.TENANT);
     }
 
     private ClassLoader getPlatformClassLoader(final ServiceAccessor serviceAccessor)

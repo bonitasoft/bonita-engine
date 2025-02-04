@@ -25,16 +25,6 @@ import java.util.List;
 public interface APISession extends Session {
 
     /**
-     * @return The name of the connected tenant
-     */
-    String getTenantName();
-
-    /**
-     * @return The identifier of the connected tenant
-     */
-    long getTenantId();
-
-    /**
      * @return The list of profiles of the user
      */
     List<String> getProfiles();

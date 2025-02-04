@@ -144,10 +144,10 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         businessUser = createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildCustomBOM());
@@ -157,7 +157,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         getTenantAdministrationAPI().updateBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         loadClientJars();
@@ -184,15 +184,15 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
         if (!getTenantAdministrationAPI().isPaused()) {
             getTenantAdministrationAPI().pause();
             getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
             getTenantAdministrationAPI().resume();
         }
         deleteUser(businessUser);
-        logoutOnTenant();
+        logout();
     }
 
     @Test

@@ -31,7 +31,7 @@ public class APICallLogIT extends CommonAPIIT {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         bill = createUser(USERNAME, "bpm");
     }
 
@@ -41,9 +41,9 @@ public class APICallLogIT extends CommonAPIIT {
     @Test
     public void apiCallAndInspectLogs() throws Exception {
         // given
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
-        logoutOnTenant();
+        logout();
         // when
         loginOnDefaultTenantWith(USERNAME, "bpm");
         systemOutRule.clearLog();

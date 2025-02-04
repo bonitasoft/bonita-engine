@@ -235,8 +235,7 @@ public class TenantStateManager {
     private void executeOnOtherNodes(ServiceAction action) {
         Map<String, TaskResult<Void>> execute;
         try {
-            execute = broadcastService.executeOnOthersAndWait(new ChangesServicesStateCallable(action),
-                    tenantId);
+            execute = broadcastService.executeOnOthersAndWait(new ChangesServicesStateCallable(action));
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new IllegalStateException("Unable to update services on other nodes", e);
         }

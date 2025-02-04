@@ -61,7 +61,7 @@ public class StarterThreadTest {
     public void before() throws Exception {
         doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService)
                 .executeInTransaction(any());
-        starterThread = new StarterThread(1L, sessionAccessor, transactionService,
+        starterThread = new StarterThread(transactionService,
                 platformService, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
         doReturn(tenant).when(platformService).getDefaultTenant();
     }

@@ -25,7 +25,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.login.SLoginException;
-import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
@@ -38,7 +37,6 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.springframework.util.CollectionUtils;
 
@@ -99,23 +97,19 @@ public class LoginAPIImpl implements LoginAPI {
 
     protected APISession loginInternal(final Map<String, Serializable> credentials)
             throws Exception {
-        final String userName = credentials.get(AuthenticationConstants.BASIC_USERNAME) != null
-                ? String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME)) : null;
         final ServiceAccessor serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
         final STenant sTenant = getTenant(serviceAccessor);
 
-        checkThatWeCanLogin(userName, sTenant, serviceAccessor.getTechnicalUser());
+        checkThatWeCanLogin(sTenant);
         final LoginService loginService = serviceAccessor.getLoginService();
         final TransactionService transactionService = serviceAccessor.getTransactionService();
-        SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
 
         final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<>(credentials);
         credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
-        sessionAccessor.setTenantId(sTenant.getId());
         try {
             final SSession sSession = transactionService
                     .executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
-            return ModelConvertor.toAPISession(sSession, sTenant.getName());
+            return ModelConvertor.toAPISession(sSession);
         } catch (Exception e) {
             //avoid brut force... (should be done differently, but it is the behavior since 6.0.0)
             Thread.sleep(3000);
@@ -151,10 +145,10 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected void checkThatWeCanLogin(final String userName, final STenant sTenant, TechnicalUser technicalUser)
+    protected void checkThatWeCanLogin(final STenant sTenant)
             throws LoginException {
         if (sTenant.isDeactivated()) {
-            throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
+            throw new LoginException("Tenant is not activated !!");
         }
     }
 

@@ -14,9 +14,14 @@
 package org.bonitasoft.engine.authorization;
 
 import static java.lang.String.format;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import groovy.lang.GroovyClassLoader;
@@ -24,11 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.permission.PermissionRule;
-import org.bonitasoft.engine.authorization.properties.*;
+import org.bonitasoft.engine.authorization.properties.CompoundPermissionsMapping;
+import org.bonitasoft.engine.authorization.properties.CustomPermissionsMapping;
+import org.bonitasoft.engine.authorization.properties.DynamicPermissionsChecks;
+import org.bonitasoft.engine.authorization.properties.PropertiesWithSet;
+import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.properties.BooleanProperty;
@@ -112,7 +121,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
         SSession session = getSession();
         try {
-            final APISession apiSession = ModelConvertor.toAPISession(session, null);
+            final APISession apiSession = ModelConvertor.toAPISession(session);
             final PermissionRule permissionRule = (PermissionRule) aClass.getDeclaredConstructor().newInstance();
             return permissionRule.isAllowed(apiSession, context, createAPIAccessorImpl(),
                     new ServerLoggerWrapper(permissionRule.getClass(), log));
@@ -155,7 +164,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void start() throws SBonitaException {
         groovyClassLoader = new GroovyClassLoader(
-                classLoaderService.getClassLoader(identifier(ScopeType.TENANT, tenantId)));
+                classLoaderService.getClassLoader(ClassLoaderIdentifier.TENANT));
         groovyClassLoader.setShouldRecompile(true);
     }
 

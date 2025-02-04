@@ -35,7 +35,7 @@ public class ServicesResolver {
         for (final Method method : methods) {
             if (method.getAnnotation(InjectedService.class) != null) {
                 String serviceName = WordUtils.uncapitalize(method.getName().substring(3));
-                final Object lookup = servicesLookup.lookupOnPlatform(serviceName);
+                final Object lookup = servicesLookup.lookupService(serviceName);
                 method.invoke(target, lookup);
             }
         }

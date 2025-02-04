@@ -96,8 +96,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
         }
 
-        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector, 1L,
-                classLoader); // FIXME remove completely the tenantId
+        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector,
+                classLoader);
         return execute(sConnector, task);
     }
 
@@ -169,19 +169,15 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         private final SConnector sConnector;
 
-        private final long tenantId;
-
         private final ClassLoader loader;
         private Thread thread;
         private boolean interrupted;
         private boolean completed;
 
         private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector,
-                final long tenantId,
                 final ClassLoader loader) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
-            this.tenantId = tenantId;
             this.loader = loader;
         }
 
@@ -194,7 +190,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             final long startTime = System.currentTimeMillis();
 
             //Fix Classloading issue with ThreadLocal implementation of SessionAccessor
-            sessionAccessor.setTenantId(tenantId);
             Thread.currentThread().setContextClassLoader(loader);
 
             sConnector.setInputParameters(inputParameters);

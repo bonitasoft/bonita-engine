@@ -52,14 +52,14 @@ public class BDMUpdateIT extends CommonAPIIT {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         tenantAdministrationAPI = getTenantAdministrationAPI();
     }
 
     @After
     public void cleanup() throws Exception {
         cleanAndUninstallBusinessDataModel();
-        logoutOnTenant();
+        logout();
     }
 
     @Test
@@ -182,7 +182,7 @@ public class BDMUpdateIT extends CommonAPIIT {
     }
 
     private void uninstallBusinessDataModel() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         pauseTenantIfNeeded();
         final String version = tenantAdministrationAPI.getBusinessDataModelVersion();
         if (version != null) {

@@ -58,12 +58,12 @@ public class ProcessExecutionLogIT extends CommonAPIIT {
 
     @After
     public void afterTest() throws Exception {
-        logoutOnTenant();
+        logout();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
     }
 
     @Test

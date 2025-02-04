@@ -50,24 +50,23 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public SSession createSession(final long tenantId, final String userName) throws SSessionException {
-        return this.createSession(tenantId, -1, userName, false);
+    public SSession createSession(final String userName) throws SSessionException {
+        return this.createSession(-1, userName, false);
     }
 
     @Override
-    public SSession createSession(final long tenantId, final long userId, final String userName,
+    public SSession createSession(final long userId, final String userName,
             final boolean isTechnicalUser) throws SSessionException {
-        return createSession(tenantId, userId, userName, isTechnicalUser, emptyList(), emptySet());
+        return createSession(userId, userName, isTechnicalUser, emptyList(), emptySet());
     }
 
     @Override
-    public SSession createSession(final long tenantId, final long userId, final String userName,
+    public SSession createSession(final long userId, final String userName,
             final boolean isTechnicalUser, List<String> profiles, Set<String> permissions) throws SSessionException {
         final long id = SessionIdGenerator.getNextId();
         Date now = new Date();
         SSession session = SSession.builder()
                 .id(id)
-                .tenantId(tenantId)
                 .duration(sessionDuration)
                 .userName(userName)
                 .applicationName(applicationName)
@@ -80,9 +79,7 @@ public class SessionServiceImpl implements SessionService {
                 .build();
         sessionProvider.addSession(session);
         if (log.isTraceEnabled()) {
-            log.trace(
-                    "CreateSession with tenantId = <" + tenantId + ">, username = <" + userName + ">, id = <"
-                            + id + ">");
+            log.trace("CreateSession with username = <{}>, id = <{}>", userName, id);
         }
         return session;
     }
@@ -145,12 +142,12 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void deleteSessionsOfTenant(final long tenantId) {
-        sessionProvider.deleteSessionsOfTenant(tenantId, false/* don't keep technical user */);
+        sessionProvider.deleteSessions(false/* don't keep technical user */);
     }
 
     @Override
     public void deleteSessionsOfTenantExceptTechnicalUser(final long tenantId) {
-        sessionProvider.deleteSessionsOfTenant(tenantId, true/* keep technical user */);
+        sessionProvider.deleteSessions(true/* keep technical user */);
     }
 
     @Override

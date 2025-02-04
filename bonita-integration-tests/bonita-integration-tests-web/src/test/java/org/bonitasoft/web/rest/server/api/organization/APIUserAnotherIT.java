@@ -42,7 +42,6 @@ import org.junit.Test;
 
 /**
  * @author Vincent Elcrin
- *         FIXME to be refactored using test-toolkit
  */
 public class APIUserAnotherIT extends AbstractConsoleTest {
 

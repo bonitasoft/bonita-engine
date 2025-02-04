@@ -95,7 +95,7 @@ public class JPABusinessDataRepositoryImplITest {
                         classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,
-                        configuration.getJpaConfiguration(), classLoaderService, 1L));
+                        configuration.getJpaConfiguration(), classLoaderService));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
         ut.begin();

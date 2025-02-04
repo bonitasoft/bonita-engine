@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 @Slf4j
 public class JobWrapper implements StatelessJob {
 
+    @Serial
     private static final long serialVersionUID = 7145451610635400449L;
 
     private final StatelessJob statelessJob;
@@ -62,7 +64,6 @@ public class JobWrapper implements StatelessJob {
             PersistenceService persistenceService, JobService jobService) {
         this.jobIdentifier = jobIdentifier;
         this.statelessJob = statelessJob;
-
         this.eventService = eventService;
         this.transactionService = transactionService;
         this.persistenceService = persistenceService;

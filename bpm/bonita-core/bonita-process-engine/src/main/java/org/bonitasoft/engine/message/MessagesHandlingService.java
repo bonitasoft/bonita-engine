@@ -43,7 +43,6 @@ import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.mdc.MDCTransmitingThreadPoolExecutor;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -62,27 +61,23 @@ public class MessagesHandlingService implements TenantLifecycleService {
     public static final String NUMBER_OF_MESSAGES_POTENTIAL_MATCHED = "bonita.bpmengine.message.potential";
     public static final String NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS = "bonita.bpmengine.message.retriggeredtasks";
     private ThreadPoolExecutor threadPoolExecutor;
-    private EventInstanceService eventInstanceService;
-    private WorkService workService;
-    private LockService lockService;
-    private Long tenantId;
-    private UserTransactionService userTransactionService;
-    private SessionAccessor sessionAccessor;
-    private BPMWorkFactory workFactory;
+    private final EventInstanceService eventInstanceService;
+    private final WorkService workService;
+    private final LockService lockService;
+    private final UserTransactionService userTransactionService;
+    private final BPMWorkFactory workFactory;
 
     private final Counter executedMessagesCounter;
     private final Counter matchedPotentialMessagesCounter;
     private final Counter retriggeredMatchingTasksCounter;
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService,
-            LockService lockService, Long tenantId, UserTransactionService userTransactionService,
-            SessionAccessor sessionAccessor, BPMWorkFactory workFactory, MeterRegistry meterRegistry) {
+            LockService lockService, UserTransactionService userTransactionService, BPMWorkFactory workFactory,
+            MeterRegistry meterRegistry) {
         this.eventInstanceService = eventInstanceService;
         this.workService = workService;
         this.lockService = lockService;
-        this.tenantId = tenantId;
         this.userTransactionService = userTransactionService;
-        this.sessionAccessor = sessionAccessor;
         this.workFactory = workFactory;
         executedMessagesCounter = Counter.builder(NUMBER_OF_MESSAGES_EXECUTED)
                 .baseUnit("messages")
@@ -274,7 +269,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
             throws SWaitingEventModificationException, SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
         if (waitingMsg == null) {
-            log.warn("Unable to reset waiting event because it is not found", waitingMessageId);
+            log.warn("Unable to reset waiting event because it is not found: {}", waitingMessageId);
             return;
         }
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -299,7 +294,6 @@ public class MessagesHandlingService implements TenantLifecycleService {
                     return null;
                 }
                 try {
-                    sessionAccessor.setTenantId(tenantId);
                     matchEventCoupleAndTriggerExecution();
                 } finally {
                     lockService.unlock(eventLock);

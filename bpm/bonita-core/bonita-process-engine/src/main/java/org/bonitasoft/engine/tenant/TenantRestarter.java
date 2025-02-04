@@ -55,7 +55,7 @@ public class TenantRestarter {
     }
 
     public void executeAfterServicesStart() {
-        new StarterThread(tenantId, sessionAccessor, transactionService, platformService,
+        new StarterThread(transactionService, platformService,
                 tenantRestartHandlers).start();
     }
 

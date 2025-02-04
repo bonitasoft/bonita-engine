@@ -104,7 +104,7 @@ public class MultiInstanceIT extends TestWithUser {
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         jenny = createUser(JENNY, "bpm");
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(JOHN, "bpm");
     }
 

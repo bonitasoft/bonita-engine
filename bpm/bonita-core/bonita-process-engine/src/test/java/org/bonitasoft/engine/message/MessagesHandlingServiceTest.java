@@ -17,9 +17,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.iterate;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.EVENT_SUB_PROCESS;
-import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.INTERMEDIATE_CATCH_EVENT;
-import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.START_EVENT;
+import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.*;
 import static org.bonitasoft.engine.message.MessagesHandlingService.*;
 import static org.mockito.Mockito.*;
 
@@ -80,7 +78,7 @@ public class MessagesHandlingServiceTest {
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
                 Clock.SYSTEM);
         messagesHandlingService = spy(new MessagesHandlingService(eventInstanceService, workService, lockService,
-                TENANT_ID, userTransactionService, sessionAccessor, workFactory, meterRegistry));
+                userTransactionService, workFactory, meterRegistry));
     }
 
     @Test

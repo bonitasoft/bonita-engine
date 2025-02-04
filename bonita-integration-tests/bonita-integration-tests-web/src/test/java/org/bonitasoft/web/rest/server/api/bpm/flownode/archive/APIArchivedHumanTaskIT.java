@@ -42,9 +42,6 @@ import org.bonitasoft.web.test.AbstractConsoleTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * FIXME to be refactored using much more test-toolkit
- */
 public class APIArchivedHumanTaskIT extends AbstractConsoleTest {
 
     private APIArchivedHumanTask apiArchivedHumanTask;

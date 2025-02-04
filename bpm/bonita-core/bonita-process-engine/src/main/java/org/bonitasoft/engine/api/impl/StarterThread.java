@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.slf4j.Logger;
@@ -34,18 +33,13 @@ public class StarterThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(StarterThread.class);
 
     private final List<TenantRestartHandler> tenantRestartHandlers;
-    private final Long tenantId;
-    private final SessionAccessor sessionAccessor;
     private final UserTransactionService transactionService;
     private final PlatformService platformService;
 
-    public StarterThread(Long tenantId, SessionAccessor sessionAccessor,
-            UserTransactionService transactionService, PlatformService platformService,
+    public StarterThread(UserTransactionService transactionService, PlatformService platformService,
             List<TenantRestartHandler> tenantRestartHandlers) {
-        super("Tenant " + tenantId + " starter Thread");
+        super("Starter Thread created");
         this.tenantRestartHandlers = tenantRestartHandlers;
-        this.tenantId = tenantId;
-        this.sessionAccessor = sessionAccessor;
         this.transactionService = transactionService;
         this.platformService = platformService;
     }
@@ -58,22 +52,17 @@ public class StarterThread extends Thread {
             logger.warn("Unable to restart elements of tenant because tenant is {}", tenant.getStatus());
             return;
         }
-        executeHandlers(sessionAccessor);
+        executeHandlers();
     }
 
-    private void executeHandlers(SessionAccessor sessionAccessor) {
-        sessionAccessor.setTenantId(tenantId);
-        try {
-            for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {
-                try {
-                    logger.info("Executing Restart Handler " + restartHandler.getClass().getName());
-                    restartHandler.afterServicesStart();
-                } catch (Exception e) {
-                    logger.error("The Restart Handler " + restartHandler.getClass().getName() + " failed", e);
-                }
+    private void executeHandlers() {
+        for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {
+            try {
+                logger.info("Executing Restart Handler {}", restartHandler.getClass().getName());
+                restartHandler.afterServicesStart();
+            } catch (Exception e) {
+                logger.error("The Restart Handler {} failed", restartHandler.getClass().getName(), e);
             }
-        } finally {
-            sessionAccessor.deleteTenantId();
         }
     }
 

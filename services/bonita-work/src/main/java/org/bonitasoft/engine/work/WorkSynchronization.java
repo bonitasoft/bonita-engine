@@ -17,8 +17,6 @@ import java.time.Instant;
 
 import javax.transaction.Status;
 
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.slf4j.Logger;
@@ -32,22 +30,13 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
 
     private final WorkExecutorService workExecutorService;
 
-    private long tenantId;
     private final UserTransactionService transactionService;
     private final int workDelayOnMultipleXAResource;
 
     WorkSynchronization(final UserTransactionService transactionService, final WorkExecutorService workExecutorService,
-            final SessionAccessor sessionAccessor,
             WorkDescriptor work, int workDelayOnMultipleXAResource) {
         this.transactionService = transactionService;
         this.workDelayOnMultipleXAResource = workDelayOnMultipleXAResource;
-        try {
-            // Instead of doing this which is not so clear using sessionAccessor, we should add the tenantId as a parameter of the class
-            tenantId = sessionAccessor.getTenantId();
-        } catch (final STenantIdNotSetException e) {
-            // We are not in a tenant
-            tenantId = -1L;
-        }
         this.work = work;
         this.workExecutorService = workExecutorService;
     }
@@ -59,7 +48,6 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
     @Override
     public void afterCompletion(final int transactionStatus) {
         if (Status.STATUS_COMMITTED == transactionStatus) {
-            work.setTenantId(tenantId);
             if (workDelayOnMultipleXAResource > 0) {
                 transactionService.hasMultipleResources().ifPresentOrElse(
                         hasMultiple -> {

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.junit.Test;
@@ -23,9 +22,9 @@ import org.junit.Test;
  */
 public class LoginAPIImplTest {
 
-    private STenant sTenant = new STenant();
+    private final STenant sTenant = new STenant();
 
-    private LoginAPIImpl loginAPI = new LoginAPIImpl();
+    private final LoginAPIImpl loginAPI = new LoginAPIImpl();
 
     @Test
     public void checkThatWeCanLogin_should_allow_technical_user() throws Exception {
@@ -33,7 +32,7 @@ public class LoginAPIImplTest {
         sTenant.setStatus(STenant.PAUSED);
 
         //expected no exception
-        loginAPI.checkThatWeCanLogin("install", sTenant, new TechnicalUser("install", "install"));
+        loginAPI.checkThatWeCanLogin(sTenant);
 
     }
 
@@ -43,7 +42,7 @@ public class LoginAPIImplTest {
         sTenant.setStatus(STenant.DEACTIVATED);
 
         //expected LoginException
-        loginAPI.checkThatWeCanLogin("joe", sTenant, new TechnicalUser("techUser", "techPass"));
+        loginAPI.checkThatWeCanLogin(sTenant);
 
     }
 

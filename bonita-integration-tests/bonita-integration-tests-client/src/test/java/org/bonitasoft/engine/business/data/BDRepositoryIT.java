@@ -131,13 +131,12 @@ public class BDRepositoryIT extends CommonAPIIT {
     public ExpectedException expectedException = ExpectedException.none();
     private User testUser;
     private File clientFolder;
-    private long tenantId;
     private BusinessObjectModel model;
 
     @Before
     public void setUp() throws Exception {
         clientFolder = temporaryFolder.newFolder();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         testUser = createUser("testUser", "bpm");
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
@@ -148,8 +147,6 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         assertThat(getTenantAdministrationAPI().isPaused())
                 .as("should have resume tenant after installing Business Object Model").isFalse();
-
-        tenantId = getSession().getTenantId();
     }
 
     @After
@@ -166,7 +163,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         getTenantAdministrationAPI().resume();
 
         deleteUser(testUser);
-        logoutOnTenant();
+        logout();
     }
 
     @Test
@@ -715,7 +712,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     @Test
     public void should_undeploy_delete_generate_client_bdm_zip() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         getTenantAdministrationAPI().resume();
@@ -789,20 +786,20 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(nbOfAddress).isEqualTo(1L);
         assertThat(nbOfEmployee).isEqualTo(1L);
 
-        logoutOnTenant();
+        logout();
 
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().resume();
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("testUser", "bpm");
 
         evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
 
         assertCount(processInstanceId);
 
@@ -2146,14 +2143,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(businessDataReference.getStorageIdAsString()).isNull();
 
         disableAndDeleteProcess(definition.getId());
-    }
-
-    private String getClientBdmJarClassPath(final String bonitaHomePath) {
-        return new StringBuilder().append(bonitaHomePath).append(File.separator).append("engine-server")
-                .append(File.separator).append("work")
-                .append(File.separator).append("tenants").append(File.separator).append(tenantId).append(File.separator)
-                .append("data-management-client")
-                .toString();
     }
 
     @Test

@@ -115,7 +115,7 @@ public class SecuredLoginServiceImpl implements LoginService {
             List<SProfile> profilesOfUser = profileService.getProfilesOfUser(id);
             List<String> profiles = profilesOfUser.stream().map(SProfile::getName).collect(Collectors.toList());
             Set<String> permissions = permissionsBuilder.getPermissions(isTechnicalUser, profiles, userName);
-            return sessionService.createSession(tenantId, id, userName, isTechnicalUser, profiles, permissions);
+            return sessionService.createSession(id, userName, isTechnicalUser, profiles, permissions);
         } catch (SSessionException | SBonitaReadException e) {
             throw new SLoginException(e);
         }

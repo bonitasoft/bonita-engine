@@ -33,6 +33,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.TestStates;
 import org.junit.Before;
@@ -43,17 +44,19 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
     private static final String TIMER_EVENT_PREFIX = "Timer_Ev_";
 
     private ServiceAccessor serviceAccessor;
-    private SessionAccessor sessionAccessor;
+
+    protected static void setSessionInfo(final APISession session) throws Exception {
+        final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+        sessionAccessor.setSessionId(session.getId());
+    }
 
     @Before
     public void setUp() throws Exception {
         serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
-        sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
     }
 
     private boolean containsTimerJob(final String jobName) throws Exception {
-        var session = getSession();
-        sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+        setSessionInfo(getSession());
         return serviceAccessor.getTransactionService().executeInTransaction(() -> serviceAccessor.getSchedulerService()
                 .getJobs().stream().anyMatch(serverJobName -> serverJobName.contains(jobName)));
     }

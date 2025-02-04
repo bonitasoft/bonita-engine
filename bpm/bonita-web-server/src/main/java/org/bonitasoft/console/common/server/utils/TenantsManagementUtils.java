@@ -55,17 +55,7 @@ public class TenantsManagementUtils {
      *         If default tenant id couldn't be retrieved
      */
     public static long getDefaultTenantId() {
-        if (defaultTenantId == -1) { // Lazy init
-            try {
-                final APISession session = TenantAPIAccessor.getLoginAPI().login(getTechnicalUserUsername(),
-                        getTechnicalUserPassword());
-                defaultTenantId = session.getTenantId();
-                TenantAPIAccessor.getLoginAPI().logout(session);
-            } catch (final Exception e) {
-                throw new DefaultTenantIdException(e);
-            }
-        }
-        return defaultTenantId;
+        return 1L; /* FIXME tenantId */
     }
 
     public static String getTechnicalUserUsername() {

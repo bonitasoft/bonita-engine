@@ -74,16 +74,16 @@ public class ContractIT extends CommonAPIIT {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         matti = createUser("matti", "bpm");
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(matti.getUserName(), "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
         deleteUser(matti);
-        logoutOnTenant();
+        logout();
     }
 
     @Test

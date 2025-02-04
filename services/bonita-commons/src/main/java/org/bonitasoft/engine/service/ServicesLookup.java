@@ -28,6 +28,6 @@ public interface ServicesLookup {
      * @return
      *         the service
      */
-    <T> T lookupOnPlatform(String serviceName);
+    <T> T lookupService(String serviceName);
 
 }

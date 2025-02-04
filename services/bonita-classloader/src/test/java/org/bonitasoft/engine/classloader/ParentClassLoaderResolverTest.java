@@ -16,13 +16,10 @@ package org.bonitasoft.engine.classloader;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
-import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
 
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -31,15 +28,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ParentClassLoaderResolverTest {
 
-    @Mock
-    private ReadSessionAccessor sessionAccessor;
     @InjectMocks
     private ParentClassLoaderResolver parentClassLoaderResolver;
 
     @Test
-    public void should_getParentClassLoaderIdentifier_return_global_on_tenant_classloader() throws Exception {
+    public void should_getParentClassLoaderIdentifier_return_global_on_tenant_classloader() {
         //given
-        final ClassLoaderIdentifier childId = identifier(TENANT, 124);
+        final ClassLoaderIdentifier childId = ClassLoaderIdentifier.TENANT;
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = parentClassLoaderResolver
                 .getParentClassLoaderIdentifier(childId);
@@ -48,18 +43,18 @@ public class ParentClassLoaderResolverTest {
     }
 
     @Test
-    public void should_getParentClassLoaderIdentifier_return_tenant() throws Exception {
+    public void should_getParentClassLoaderIdentifier_return_tenant() {
         //given
         final ClassLoaderIdentifier childId = identifier(PROCESS, 124);
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = parentClassLoaderResolver
                 .getParentClassLoaderIdentifier(childId);
         //then
-        assertThat(parentClassLoaderIdentifier).isEqualTo(identifier(TENANT, 1L));
+        assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.TENANT);
     }
 
     @Test
-    public void should_give_APPLICATION_for_parent_of_global_classloader() throws Exception {
+    public void should_give_APPLICATION_for_parent_of_global_classloader() {
         ClassLoaderIdentifier parentClassLoaderIdentifier = parentClassLoaderResolver
                 .getParentClassLoaderIdentifier(ClassLoaderIdentifier.GLOBAL);
 

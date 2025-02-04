@@ -209,7 +209,6 @@ public class RecoveryService {
     public void recoverAllElements() {
         longTaskTimer.record(() -> {
             try {
-                sessionAccessor.setTenantId(tenantId);
                 List<ElementToRecover> allElementsToRecover = userTransactionService.executeInTransaction(
                         () -> RecoveryService.this.getAllElementsToRecover(considerElementsOlderThan));
                 log.debug("Found {} that can potentially be recovered", allElementsToRecover.size());

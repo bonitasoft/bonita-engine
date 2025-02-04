@@ -16,7 +16,6 @@ package org.bonitasoft.engine.tenant;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Map;
@@ -130,7 +129,7 @@ public class TenantStateManagerTest {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(5L, TimeUnit.HOURS);
         doReturn(singletonMap("workService", taskResult)).when(broadcastService)
-                .executeOnOthersAndWait(any(), eq(TENANT_ID));
+                .executeOnOthersAndWait(any());
 
         // When a tenant moved to available mode
         tenantStateManager.resume();
@@ -149,7 +148,7 @@ public class TenantStateManagerTest {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(new SWorkException("plop"));
         doReturn(singletonMap("workService", taskResult)).when(broadcastService)
-                .executeOnOthersAndWait(any(), eq(TENANT_ID));
+                .executeOnOthersAndWait(any());
 
         // When a tenant moved to available mode
         tenantStateManager.resume();
@@ -158,7 +157,7 @@ public class TenantStateManagerTest {
     @Test
     public void pause_should_update_tenant_in_pause() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(), eq(TENANT_ID));
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any());
 
         tenantStateManager.pause();
 
@@ -205,7 +204,7 @@ public class TenantStateManagerTest {
     @Test
     public void resume_should_not_delete_sessions() throws Exception {
         whenTenantIsInState(STenant.PAUSED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(), eq(TENANT_ID));
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any());
 
         tenantStateManager.resume();
 
