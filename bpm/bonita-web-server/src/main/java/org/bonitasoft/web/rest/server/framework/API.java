@@ -216,7 +216,8 @@ public abstract class API<ITEM extends IItem> {
 
         for (final ITEM item : searchResult.getResults()) {
             fillDeploys(item, deploys != null ? deploys : new ArrayList<>());
-            fillCounters(item, counters != null ? counters : new ArrayList<>());
+            fillCountersDependingOnFilters(item, counters != null ? counters : List.of(),
+                    filters != null ? filters : Map.of());
         }
 
         return searchResult;
@@ -315,7 +316,17 @@ public abstract class API<ITEM extends IItem> {
     }
 
     protected void fillCounters(final ITEM item, final List<String> counters) {
-        // Do Nothing if not override
+        // Do Nothing if not overridden
+    }
+
+    /**
+     * When the values of the filters of a search are required to determine the counters queries,
+     * this method can be overridden instead of fillCounters
+     */
+    protected void fillCountersDependingOnFilters(final ITEM item, final List<String> counters,
+            final Map<String, String> filters) {
+        fillCounters(item, counters);
+        // Do Nothing more if not overridden
     }
 
     /**

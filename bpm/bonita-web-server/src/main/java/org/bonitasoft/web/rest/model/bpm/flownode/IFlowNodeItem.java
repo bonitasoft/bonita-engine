@@ -69,8 +69,11 @@ public interface IFlowNodeItem extends IItem, ItemHasUniqueId, ItemHasDualName, 
 
     String VALUE_STATE_SKIPPED = "skipped";
 
-    // TODO replay is the SP feature only
     String VALUE_STATE_REPLAY = "replay";
+
+    String VALUE_STATE_PENDING = "pending";
+
+    String VALUE_STATE_ONGOING = "ongoing";
 
     String VALUE_TYPE_AUTOMATIC_TASK = "AUTOMATIC_TASK";
 

@@ -54,6 +54,8 @@ public class CaseItem extends Item implements ItemHasLastUpdateDate, ItemHasUniq
 
     public static final String COUNTER_ACTIVE_FLOW_NODES = "activeFlowNodes";
 
+    public static final String COUNTER_PENDING_FLOW_NODES = "pendingFlowNodes";
+
     public static final String ATTRIBUTE_SEARCH_INDEX_1_LABEL = "searchIndex1Label";
     public static final String ATTRIBUTE_SEARCH_INDEX_1_VALUE = "searchIndex1Value";
     public static final String ATTRIBUTE_SEARCH_INDEX_2_LABEL = "searchIndex2Label";

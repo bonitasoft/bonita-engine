@@ -376,10 +376,10 @@ public class APICaseTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCounters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List)}.
+     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCountersDependingOnFilters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List, java.util.Map)}.
      */
     @Test
-    public final void fillCounters_should_fill_number_of_failed_flow_nodes_when_counter_of_failed_flow_nodes_is_active() {
+    public final void fillCountersDependingOnFilters_should_fill_number_of_failed_flownodes_for_child_case_if_failed_counter_exists() {
         // Given
         final APIID id = APIID.makeAPIID(78L);
         final CaseItem item = mock(CaseItem.class);
@@ -387,14 +387,16 @@ public class APICaseTest {
 
         final List<String> counters = Arrays.asList(CaseItem.COUNTER_FAILED_FLOW_NODES);
 
-        final Map<String, String> filters = new HashMap<>();
-        filters.put(FlowNodeItem.ATTRIBUTE_STATE, FlowNodeItem.VALUE_STATE_FAILED);
-        filters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(id.toLong()));
+        final Map<String, String> flowNodeFilters = new HashMap<>();
+        flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_STATE, FlowNodeItem.VALUE_STATE_FAILED);
+        flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(id.toLong()));
         final long numberOfFailedFlowNodes = 2L;
-        doReturn(numberOfFailedFlowNodes).when(flowNodeDatastore).count(null, null, filters);
+        doReturn(numberOfFailedFlowNodes).when(flowNodeDatastore).count(null, null, flowNodeFilters);
 
         // When
-        apiCase.fillCounters(item, counters);
+        final Map<String, String> caseFilters = new HashMap<>();
+        caseFilters.put(CaseItem.FILTER_CALLER, "any");
+        apiCase.fillCountersDependingOnFilters(item, counters, caseFilters);
 
         // Then
         verify(item).setAttribute(CaseItem.COUNTER_FAILED_FLOW_NODES, numberOfFailedFlowNodes);
@@ -402,7 +404,33 @@ public class APICaseTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCounters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List)}.
+     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCountersDependingOnFilters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List, java.util.Map)}.
+     */
+    @Test
+    public final void fillCountersDependingOnFilters_should_fill_number_of_failed_flownodes_for_root_case_if_failed_counter_exists() {
+        // Given
+        final APIID id = APIID.makeAPIID(78L);
+        final CaseItem item = mock(CaseItem.class);
+        doReturn(id).when(item).getId();
+
+        final List<String> counters = Arrays.asList(CaseItem.COUNTER_FAILED_FLOW_NODES);
+
+        final Map<String, String> flowNodeFilters = new HashMap<>();
+        flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_STATE, FlowNodeItem.VALUE_STATE_FAILED);
+        flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_ROOT_CASE_ID, String.valueOf(id.toLong()));
+        final long numberOfFailedFlowNodes = 2L;
+        doReturn(numberOfFailedFlowNodes).when(flowNodeDatastore).count(null, null, flowNodeFilters);
+
+        // When
+        apiCase.fillCountersDependingOnFilters(item, counters, Map.of());
+
+        // Then
+        verify(item).setAttribute(CaseItem.COUNTER_FAILED_FLOW_NODES, numberOfFailedFlowNodes);
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCountersDependingOnFilters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List, java.util.Map)}.
      */
     @Test
     public final void fillCounters_should_do_nothing_when_counter_of_failed_flow_nodes_is_not_active() {
@@ -419,10 +447,10 @@ public class APICaseTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCounters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List)}.
+     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCountersDependingOnFilters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List, java.util.Map)}.
      */
     @Test
-    public void fillNumberOfActiveFlowNodesIfActiveCounterExists() {
+    public void fillCountersDependingOnFilters_should_fill_number_of_active_flownodes_for_child_case_if_active_counter_exists() {
         // Given
         final APIID id = APIID.makeAPIID(78L);
         final CaseItem item = mock(CaseItem.class);
@@ -432,13 +460,94 @@ public class APICaseTest {
 
         final Map<String, String> filters = new HashMap<>();
         filters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(id.toLong()));
-        final long numberOfFailedFlowNodes = 2L;
-        doReturn(numberOfFailedFlowNodes).when(flowNodeDatastore).count(null, null, filters);
+        final long numberOfActiveFlowNodes = 3L;
+        doReturn(numberOfActiveFlowNodes).when(flowNodeDatastore).count(null, null, filters);
 
         // When
-        apiCase.fillCounters(item, counters);
+        final Map<String, String> caseFilters = new HashMap<>();
+        caseFilters.put(CaseItem.FILTER_CALLER, "any");
+        apiCase.fillCountersDependingOnFilters(item, counters, caseFilters);
 
         // Then
-        verify(item).setAttribute(CaseItem.COUNTER_ACTIVE_FLOW_NODES, numberOfFailedFlowNodes);
+        verify(item).setAttribute(CaseItem.COUNTER_ACTIVE_FLOW_NODES, numberOfActiveFlowNodes);
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCountersDependingOnFilters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List, java.util.Map)}.
+     */
+    @Test
+    public void fillCountersDependingOnFilters_should_fill_number_of_active_flownodes_for_root_case_if_active_counter_exists() {
+        // Given
+        final APIID id = APIID.makeAPIID(78L);
+        final CaseItem item = mock(CaseItem.class);
+        doReturn(id).when(item).getId();
+
+        final List<String> counters = Arrays.asList(CaseItem.COUNTER_ACTIVE_FLOW_NODES);
+
+        final Map<String, String> filters = new HashMap<>();
+        filters.put(FlowNodeItem.ATTRIBUTE_ROOT_CASE_ID, String.valueOf(id.toLong()));
+        final long numberOfActiveFlowNodes = 3L;
+        doReturn(numberOfActiveFlowNodes).when(flowNodeDatastore).count(null, null, filters);
+
+        // When
+        apiCase.fillCountersDependingOnFilters(item, counters, Map.of());
+
+        // Then
+        verify(item).setAttribute(CaseItem.COUNTER_ACTIVE_FLOW_NODES, numberOfActiveFlowNodes);
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCountersDependingOnFilters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List, java.util.Map)}.
+     */
+    @Test
+    public void fillCountersDependingOnFilters_should_fill_number_of_pending_flownodes_for_child_case_if_pending_counter_exists() {
+        // Given
+        final APIID id = APIID.makeAPIID(78L);
+        final CaseItem item = mock(CaseItem.class);
+        doReturn(id).when(item).getId();
+
+        final List<String> counters = Arrays.asList(CaseItem.COUNTER_PENDING_FLOW_NODES);
+
+        final Map<String, String> filters = new HashMap<>();
+        filters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(id.toLong()));
+        filters.put(FlowNodeItem.ATTRIBUTE_STATE, FlowNodeItem.VALUE_STATE_PENDING);
+        final long numberOfPendingFlowNodes = 4L;
+        doReturn(numberOfPendingFlowNodes).when(flowNodeDatastore).count(null, null, filters);
+
+        // When
+        final Map<String, String> caseFilters = new HashMap<>();
+        caseFilters.put(CaseItem.FILTER_CALLER, "any");
+        apiCase.fillCountersDependingOnFilters(item, counters, caseFilters);
+
+        // Then
+        verify(item).setAttribute(CaseItem.COUNTER_PENDING_FLOW_NODES, numberOfPendingFlowNodes);
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.web.rest.server.api.bpm.cases.APICase#fillCountersDependingOnFilters(org.bonitasoft.web.rest.model.bpm.cases.CaseItem, java.util.List, java.util.Map)}.
+     */
+    @Test
+    public void fillCountersDependingOnFilters_should_fill_number_of_pending_flownodes_for_root_case_if_pending_counter_exists() {
+        // Given
+        final APIID id = APIID.makeAPIID(78L);
+        final CaseItem item = mock(CaseItem.class);
+        doReturn(id).when(item).getId();
+
+        final List<String> counters = Arrays.asList(CaseItem.COUNTER_PENDING_FLOW_NODES);
+
+        final Map<String, String> filters = new HashMap<>();
+        filters.put(FlowNodeItem.ATTRIBUTE_ROOT_CASE_ID, String.valueOf(id.toLong()));
+        filters.put(FlowNodeItem.ATTRIBUTE_STATE, FlowNodeItem.VALUE_STATE_PENDING);
+        final long numberOfPendingFlowNodes = 4L;
+        doReturn(numberOfPendingFlowNodes).when(flowNodeDatastore).count(null, null, filters);
+
+        // When
+        apiCase.fillCountersDependingOnFilters(item, counters, Map.of());
+
+        // Then
+        verify(item).setAttribute(CaseItem.COUNTER_PENDING_FLOW_NODES, numberOfPendingFlowNodes);
     }
 }

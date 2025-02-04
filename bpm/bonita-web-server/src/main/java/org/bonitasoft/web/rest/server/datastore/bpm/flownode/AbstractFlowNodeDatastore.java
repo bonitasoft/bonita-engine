@@ -153,13 +153,13 @@ public class AbstractFlowNodeDatastore<CONSOLE_ITEM extends FlowNodeItem, ENGINE
         addStringFilterToSearchBuilder(filters, builder, TaskItem.ATTRIBUTE_NAME,
                 FlowNodeInstanceSearchDescriptor.NAME);
 
-        if (filters.containsKey(FlowNodeInstanceSearchDescriptor.STATE_NAME)
-                && "pending".equalsIgnoreCase(filters.get(FlowNodeInstanceSearchDescriptor.STATE_NAME))) {
+        if (filters.containsKey(FlowNodeItem.ATTRIBUTE_STATE)
+                && FlowNodeItem.VALUE_STATE_PENDING.equalsIgnoreCase(filters.get(FlowNodeItem.ATTRIBUTE_STATE))) {
             builder.leftParenthesis().filter(FlowNodeInstanceSearchDescriptor.STATE_NAME, "ready")
                     .or().filter(FlowNodeInstanceSearchDescriptor.STATE_NAME, "waiting")
                     .rightParenthesis();
-        } else if (filters.containsKey(FlowNodeInstanceSearchDescriptor.STATE_NAME)
-                && "ongoing".equalsIgnoreCase(filters.get(FlowNodeInstanceSearchDescriptor.STATE_NAME))) {
+        } else if (filters.containsKey(FlowNodeItem.ATTRIBUTE_STATE)
+                && FlowNodeItem.VALUE_STATE_ONGOING.equalsIgnoreCase(filters.get(FlowNodeItem.ATTRIBUTE_STATE))) {
             builder.leftParenthesis().filter(FlowNodeInstanceSearchDescriptor.STATE_NAME, "executing")
                     .or().filter(FlowNodeInstanceSearchDescriptor.STATE_NAME, "completing")
                     .or().filter(FlowNodeInstanceSearchDescriptor.STATE_NAME, "initializing")
