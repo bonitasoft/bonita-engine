@@ -151,7 +151,7 @@ public class TenantAdministrationAPIImplTest {
         // Given
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         when(serviceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
-        when(tenantStateManager.executeTenantManagementOperation(anyString(), any(Callable.class)))
+        when(tenantStateManager.executeManagementOperation(anyString(), any(Callable.class)))
                 .thenAnswer(invocation -> {
                     Object[] args = invocation.getArguments();
                     return ((Callable) args[1]).call();
@@ -169,7 +169,7 @@ public class TenantAdministrationAPIImplTest {
         // Given
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         when(serviceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
-        when(tenantStateManager.executeTenantManagementOperation(anyString(), any(Callable.class)))
+        when(tenantStateManager.executeManagementOperation(anyString(), any(Callable.class)))
                 .thenAnswer(invocation -> {
                     Object[] args = invocation.getArguments();
                     return ((Callable) args[1]).call();

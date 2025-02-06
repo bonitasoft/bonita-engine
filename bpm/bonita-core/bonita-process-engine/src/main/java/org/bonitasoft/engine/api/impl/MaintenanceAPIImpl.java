@@ -18,13 +18,11 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.maintenance.MaintenanceDetails;
-import org.bonitasoft.engine.maintenance.MaintenanceDetailsNotFoundException;
 import org.bonitasoft.engine.maintenance.impl.MaintenanceDetailsImpl;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.builder.SPlatformUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.impl.SPlatformUpdateBuilderImpl;
@@ -51,11 +49,10 @@ public class MaintenanceAPIImpl implements MaintenanceAPI {
     }
 
     @Override
-    public MaintenanceDetails getMaintenanceDetails()
-            throws MaintenanceDetailsNotFoundException, PlatformNotFoundException {
+    public MaintenanceDetails getMaintenanceDetails() throws PlatformNotFoundException {
         try {
             PlatformService platformService = getServiceAccessor().getPlatformService();
-            MaintenanceDetails.State state = platformService.getDefaultTenant().isPaused()
+            MaintenanceDetails.State state = platformService.getPlatform().isPaused()
                     ? MaintenanceDetails.State.ENABLED
                     : MaintenanceDetails.State.DISABLED;
             SPlatform platform = platformService.getPlatform();
@@ -64,8 +61,6 @@ public class MaintenanceAPIImpl implements MaintenanceAPI {
                     .maintenanceMessageActive(platform.isMaintenanceMessageActive())
                     .maintenanceState(state)
                     .build();
-        } catch (STenantNotFoundException e) {
-            throw new MaintenanceDetailsNotFoundException("Maintenance info not found", e);
         } catch (SPlatformNotFoundException e) {
             throw new PlatformNotFoundException(e.getMessage(), e);
         }

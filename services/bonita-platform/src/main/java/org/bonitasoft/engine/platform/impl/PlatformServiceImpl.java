@@ -14,15 +14,11 @@
 package org.bonitasoft.engine.platform.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.*;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -38,18 +34,13 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
 @Slf4j
 public class PlatformServiceImpl implements PlatformService {
 
-    private static final String QUERY_GET_DEFAULT_TENANT = "getDefaultTenant";
-
     private final PersistenceService platformPersistenceService;
     private final SPlatformProperties sPlatformProperties;
     private final Recorder recorder;
     private final PlatformRetriever platformRetriever;
 
-    private static Long defaultTenantId = null;
-
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever,
-            final Recorder recorder,
-            final SPlatformProperties sPlatformProperties) {
+            final Recorder recorder, final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
         this.sPlatformProperties = sPlatformProperties;
         this.recorder = recorder;
@@ -67,21 +58,6 @@ public class PlatformServiceImpl implements PlatformService {
         }
     }
 
-    @Override
-    @Deprecated
-    public STenant getTenant(final long id) throws STenantNotFoundException {
-        STenant tenant;
-        try {
-            tenant = platformPersistenceService.selectById(new SelectByIdDescriptor<>(STenant.class, id));
-            if (tenant == null) {
-                throw new STenantNotFoundException("No tenant found with id: " + id);
-            }
-        } catch (final Exception e) {
-            throw new STenantNotFoundException("Unable to get the tenant : " + e.getMessage(), e);
-        }
-        return tenant;
-    }
-
     // FIXME: Not necessary anymore, as platform is always created by ScriptExecutor at startup
     @Override
     public boolean isPlatformCreated() {
@@ -94,66 +70,38 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public STenant getDefaultTenant() throws STenantNotFoundException {
-        try {
-            STenant tenant = platformPersistenceService
-                    .selectOne(new SelectOneDescriptor<>(QUERY_GET_DEFAULT_TENANT, null, STenant.class));
-            if (tenant == null) {
-                throw new STenantNotFoundException("No default tenant found");
-            }
-            return tenant;
-        } catch (final SBonitaReadException e) {
-            throw new STenantNotFoundException("Unable to check if a default tenant already exists: " + e.getMessage(),
-                    e);
-        }
-    }
-
-    @Override
-    public long getDefaultTenantId() throws STenantNotFoundException {
-        if (defaultTenantId == null) {
-            try {
-                defaultTenantId = platformPersistenceService
-                        .selectOne(new SelectOneDescriptor<>("getDefaultTenantId", null, STenant.class));
-            } catch (final SBonitaReadException e) {
-                throw new STenantNotFoundException("Unable to retrieve default tenant id: " + e.getMessage(), e);
-            }
-        }
-        return defaultTenantId;
-    }
-
-    @Override
-    public void activateTenant(final long tenantId) throws STenantNotFoundException, STenantActivationException {
-        final STenant tenant = getDefaultTenant();
-        final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addField(STenant.STATUS, STenant.ACTIVATED);
+    public void activateServices() throws SPlatformNotFoundException, SPlatformUpdateException {
+        final SPlatform platform = getPlatform();
+        final UpdateDescriptor desc = new UpdateDescriptor(platform);
+        desc.addField(SPlatform.STATUS, SPlatform.ACTIVATED);
         try {
             platformPersistenceService.update(desc);
         } catch (final SPersistenceException e) {
-            throw new STenantActivationException("Problem while activating tenant: " + tenant, e);
+            throw new SPlatformUpdateException("Problem while activating services", e);
         }
     }
 
     @Override
-    public void deactivateTenant(final long tenantId) throws STenantNotFoundException, STenantDeactivationException {
-        final STenant tenant = getDefaultTenant();
-        final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addField(STenant.STATUS, STenant.DEACTIVATED);
+    public void deactivateServices() throws SPlatformNotFoundException, SPlatformUpdateException {
+        final SPlatform platform = getPlatform();
+        final UpdateDescriptor desc = new UpdateDescriptor(platform);
+        desc.addField(SPlatform.STATUS, SPlatform.DEACTIVATED);
         try {
             platformPersistenceService.update(desc);
         } catch (final SPersistenceException e) {
-            throw new STenantDeactivationException("Problem while deactivating tenant: " + tenant, e);
+            throw new SPlatformUpdateException("Problem while deactivating services", e);
         }
     }
 
     @Override
-    public void pauseTenant(long tenantId) throws STenantUpdateException, STenantNotFoundException {
-        final STenant tenant = getDefaultTenant();
-        final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addField(STenant.STATUS, STenant.PAUSED);
+    public void pauseServices() throws SPlatformNotFoundException, SPlatformUpdateException {
+        final SPlatform platform = getPlatform();
+        final UpdateDescriptor desc = new UpdateDescriptor(platform);
+        desc.addField(SPlatform.STATUS, SPlatform.PAUSED);
         try {
             platformPersistenceService.update(desc);
         } catch (final SPersistenceException e) {
-            throw new STenantUpdateException("Unable to update tenant status in database.", e);
+            throw new SPlatformUpdateException("Unable to update platform status in database.", e);
         }
     }
 

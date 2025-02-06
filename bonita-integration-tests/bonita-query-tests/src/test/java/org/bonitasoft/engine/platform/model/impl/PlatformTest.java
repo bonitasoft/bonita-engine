@@ -50,6 +50,7 @@ public class PlatformTest {
                 .created(345L)
                 .information("some infos XYZ")
                 .createdBy("The almighty")
+                .status("ACTIVATED")
                 .build());
         repository.flush();
 
@@ -67,7 +68,8 @@ public class PlatformTest {
                 entry("MAINTENANCE_MESSAGE", null),
                 entry("MAINTENANCE_MESSAGE_ACTIVE", false),
                 entry("VERSION", "1.2"),
-                entry("INFORMATION", "some infos XYZ"));
+                entry("INFORMATION", "some infos XYZ"),
+                entry("STATUS", "ACTIVATED"));
     }
 
 }

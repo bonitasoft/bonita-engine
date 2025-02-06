@@ -21,10 +21,18 @@ import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.platform.*;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
+import org.bonitasoft.engine.platform.Platform;
+import org.bonitasoft.engine.platform.PlatformManager;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.PlatformState;
+import org.bonitasoft.engine.platform.StartNodeException;
+import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -163,13 +171,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public Map<String, byte[]> getClientTenantConfigurations() {
-        try {
-            PlatformService platformService = getServiceAccessor().getPlatformService();
-            long tenantId = platformService.getDefaultTenantId();
-            return getBonitaHomeServer().getTenantPortalConfigurations(tenantId);
-        } catch (ReflectiveOperationException | BonitaException | IOException | STenantNotFoundException e) {
-            throw new RetrieveException(e);
-        }
+        return getBonitaHomeServer().getTenantPortalConfigurations(1); // FIXME: remove this when tenantid is completely removed from configuration
     }
 
     @Override

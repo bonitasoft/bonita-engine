@@ -19,7 +19,6 @@ import static org.mockito.Mockito.*;
 import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatform;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.tenant.TenantStateManager;
@@ -61,13 +60,12 @@ public class MaintenanceAPIImplTest {
     @Test
     public void get_maintenance_info_should_retrieve_from_platform_service() throws Exception {
         //given
-        STenant tenant = STenant.builder().status(STenant.PAUSED).build();
         SPlatform platform = SPlatform.builder()
                 .maintenanceMessage("maintenance msg")
                 .maintenanceMessageActive(true)
+                .status(SPlatform.PAUSED)
                 .build();
 
-        doReturn(tenant).when(platformService).getDefaultTenant();
         doReturn(platform).when(platformService).getPlatform();
         //when
         MaintenanceDetails info = maintenanceAPI.getMaintenanceDetails();

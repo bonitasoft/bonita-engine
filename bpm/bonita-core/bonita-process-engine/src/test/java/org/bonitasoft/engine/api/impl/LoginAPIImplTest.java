@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.platform.LoginException;
-import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.junit.Test;
 
 /**
@@ -22,27 +22,27 @@ import org.junit.Test;
  */
 public class LoginAPIImplTest {
 
-    private final STenant sTenant = new STenant();
+    private final SPlatform platform = new SPlatform();
 
     private final LoginAPIImpl loginAPI = new LoginAPIImpl();
 
     @Test
     public void checkThatWeCanLogin_should_allow_technical_user() throws Exception {
         //given
-        sTenant.setStatus(STenant.PAUSED);
+        platform.setStatus(SPlatform.PAUSED);
 
         //expected no exception
-        loginAPI.checkThatWeCanLogin(sTenant);
+        loginAPI.checkThatWeCanLogin(platform);
 
     }
 
     @Test(expected = LoginException.class)
-    public void checkThatWeCanLogin_should_throw_exception_when_tenant_is_not_activated() throws Exception {
+    public void checkThatWeCanLogin_should_throw_exception_when_platform_is_not_activated() throws Exception {
         //given
-        sTenant.setStatus(STenant.DEACTIVATED);
+        platform.setStatus(SPlatform.DEACTIVATED);
 
         //expected LoginException
-        loginAPI.checkThatWeCanLogin(sTenant);
+        loginAPI.checkThatWeCanLogin(platform);
 
     }
 

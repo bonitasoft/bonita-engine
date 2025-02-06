@@ -80,4 +80,9 @@ public interface Platform extends Serializable {
      */
     String getCreatedBy();
 
+    /**
+     * Return the status of the platform. The possible values are: DEACTIVATED, ACTIVATED, PAUSED.
+     */
+    String getStatus();
+
 }

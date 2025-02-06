@@ -61,7 +61,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableInMaintenanceMode
     public boolean isPaused() {
         try {
-            return getServiceAccessorNoException().getPlatformService().getDefaultTenant().isPaused();
+            return getServiceAccessorNoException().getPlatformService().getPlatform().isPaused();
         } catch (final SBonitaException e) {
             throw new RetrieveException("Unable to retrieve the tenant status", e);
         }
@@ -143,7 +143,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         try {
             final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
             TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
-            String bdm_version = tenantStateManager.executeTenantManagementOperation("BDM Installation",
+            String bdm_version = tenantStateManager.executeManagementOperation("BDM Installation",
                     () -> bdmRepository.install(zip, userId));
             log.info("Installation of the BDM completed.");
             return bdm_version;
@@ -165,7 +165,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         try {
             final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
             TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
-            tenantStateManager.executeTenantManagementOperation("BDM Uninstallation", () -> {
+            tenantStateManager.executeManagementOperation("BDM Uninstallation", () -> {
                 bdmRepository.uninstall();
                 return null;
             });
@@ -204,7 +204,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         try {
             final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
             TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
-            tenantStateManager.executeTenantManagementOperation("BDM Cleanup and uninstallation", () -> {
+            tenantStateManager.executeManagementOperation("BDM Cleanup and uninstallation", () -> {
                 bdmRepository.dropAndUninstall();
                 return null;
             });

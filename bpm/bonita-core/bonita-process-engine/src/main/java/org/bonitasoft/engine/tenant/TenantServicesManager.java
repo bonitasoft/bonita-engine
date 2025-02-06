@@ -59,7 +59,7 @@ public class TenantServicesManager {
     private final SessionService sessionService;
     private final TransactionService transactionService;
     private final ClassLoaderService classLoaderService;
-    private List<TenantLifecycleService> services;
+    private final List<TenantLifecycleService> services;
     private final Long tenantId;
     private final TenantElementsRestarter tenantElementsRestarter;
     private TenantServiceState tenantServiceState = TenantServiceState.STOPPED;
@@ -82,7 +82,7 @@ public class TenantServicesManager {
     }
 
     private void updateState(TenantServiceState tenantServiceState) {
-        LOGGER.debug("Tenant services state updated to {}", tenantServiceState);
+        LOGGER.debug("Services state updated to {}", tenantServiceState);
         this.tenantServiceState = tenantServiceState;
     }
 
@@ -95,7 +95,7 @@ public class TenantServicesManager {
     }
 
     public void stop() throws Exception {
-        // stop the tenant services:
+        // stop the services:
         doStop(STOP);
     }
 
@@ -104,9 +104,9 @@ public class TenantServicesManager {
     }
 
     public void initServices() throws Exception {
-        inTenantSessionTransaction(() -> {
+        inSessionTransaction(() -> {
             for (TenantLifecycleService tenantService : services) {
-                LOGGER.info("Initializing service {} of tenant {}", tenantService.getClass().getName(), tenantId);
+                LOGGER.info("Initializing service {}", tenantService.getClass().getName());
                 tenantService.init();
             }
             return null;
@@ -114,14 +114,14 @@ public class TenantServicesManager {
     }
 
     private void doStart(ServiceAction startAction) throws Exception {
-        LOGGER.debug("Starting services of tenant {}", tenantId);
+        LOGGER.debug("Starting services");
         if (tenantServiceState != TenantServiceState.STOPPED) {
-            LOGGER.debug("Tenant services cannot be started, they are {}", tenantServiceState);
+            LOGGER.debug("Services cannot be started, they are {}", tenantServiceState);
             return;
         }
         updateState(TenantServiceState.STARTING);
         try {
-            inTenantSession(() -> {
+            inSession(() -> {
                 tenantElementsRestarter.prepareRestartOfElements();
                 transactionService.executeInTransaction((Callable<Void>) () -> {
                     executeInClassloader(() -> startServices(startAction));
@@ -135,16 +135,15 @@ public class TenantServicesManager {
                     e);
         }
         updateState(TenantServiceState.STARTED);
-        inTenantSession(tenantElementsRestarter::restartElements);
-        LOGGER.debug("Services of tenant {} are started.", tenantId);
+        inSession(tenantElementsRestarter::restartElements);
+        LOGGER.debug("Services are started.");
     }
 
     private void startServices(ServiceAction startAction) throws SLifecycleException {
 
         for (TenantLifecycleService tenantService : services) {
             try {
-                LOGGER.info("{} tenant-level service {} on tenant with ID {}", startAction,
-                        tenantService.getClass().getName(), tenantId);
+                LOGGER.info("{} service {}", startAction, tenantService.getClass().getName());
                 if (startAction == RESUME) {
                     tenantService.resume();
                 } else {
@@ -165,20 +164,20 @@ public class TenantServicesManager {
         updateState(TenantServiceState.ABORTING_START);
         ServiceAction stopAction = startAction == START ? STOP : PAUSE;
         try {
-            LOGGER.info("Stopping tenant services after a failed {}...", startAction);
+            LOGGER.info("Stopping services after a failed {}...", startAction);
             doStop(stopAction);
         } catch (Exception exceptionOnStop) {
-            LOGGER.warn("Unable to {} tenant services to recover from exception when executing {} because {}: {}",
+            LOGGER.warn("Unable to {} services to recover from exception when executing {} because {}: {}",
                     stopAction, startAction, e.getClass().getName(), e.getMessage());
             LOGGER.debug("Caused by: ", exceptionOnStop);
         }
     }
 
     private void doStop(ServiceAction stopAction) throws Exception {
-        LOGGER.debug("Stopping services of tenant {}", tenantId);
+        LOGGER.debug("Stopping services");
         if (tenantServiceState != TenantServiceState.STARTED
                 && tenantServiceState != TenantServiceState.ABORTING_START) {
-            LOGGER.debug("Tenant services cannot be stopped, they are {}", tenantServiceState);
+            LOGGER.debug("Services cannot be stopped, they are {}", tenantServiceState);
             return;
         }
         updateState(TenantServiceState.STOPPING);
@@ -188,8 +187,7 @@ public class TenantServicesManager {
                 .executeInTransaction(
                         () -> list.stream()
                                 .map(tenantService -> {
-                                    LOGGER.info("{} tenant-level service {} on tenant with ID {}", stopAction,
-                                            tenantService.getClass().getName(), tenantId);
+                                    LOGGER.info("{} service {}", stopAction, tenantService.getClass().getName());
                                     try {
                                         if (stopAction == PAUSE) {
                                             tenantService.pause();
@@ -206,7 +204,7 @@ public class TenantServicesManager {
                                     return null;
                                 }).filter(Objects::nonNull).findFirst());
         updateState(TenantServiceState.STOPPED);
-        LOGGER.debug("Services of tenant {} are stopped.", tenantId);
+        LOGGER.debug("Services are stopped.");
         if (firstIssue.isPresent()) {
             throw new SLifecycleException("Unable to stop some services", firstIssue.get());
         }
@@ -230,7 +228,7 @@ public class TenantServicesManager {
         return sessionService.createSession(SessionService.SYSTEM).getId();
     }
 
-    private void inTenantSession(RunnableWithException runnable) throws Exception {
+    private void inSession(RunnableWithException runnable) throws Exception {
         // FIXME: check if it is ok to remove the the commented code below:
         //        if (sessionAccessor.isTenantSession()) {
         //            runnable.run();
@@ -254,7 +252,7 @@ public class TenantServicesManager {
         //        }
     }
 
-    public <T> void inTenantSessionTransaction(final Callable<T> callable) throws Exception {
-        inTenantSession(() -> transactionService.executeInTransaction(callable));
+    public <T> void inSessionTransaction(final Callable<T> callable) throws Exception {
+        inSession(() -> transactionService.executeInTransaction(callable));
     }
 }

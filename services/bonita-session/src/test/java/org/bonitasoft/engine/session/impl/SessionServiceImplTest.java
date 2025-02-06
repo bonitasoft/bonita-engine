@@ -89,14 +89,14 @@ public class SessionServiceImplTest {
     }
 
     @Test
-    public final void deleteSessionsOfTenant() {
-        sessionServiceImpl.deleteSessionsOfTenant(12L);
+    public final void deleteAllSessions() {
+        sessionServiceImpl.deleteAllSessions();
         verify(sessionProvider, times(1)).deleteSessions(false);
     }
 
     @Test
-    public final void deleteSessionsOfTenantExceptTechnicalUser() {
-        sessionServiceImpl.deleteSessionsOfTenantExceptTechnicalUser(12L);
+    public final void deleteSessionsExceptTechnicalUser() {
+        sessionServiceImpl.deleteSessionsExceptTechnicalUser();
         verify(sessionProvider, times(1)).deleteSessions(true);
     }
 

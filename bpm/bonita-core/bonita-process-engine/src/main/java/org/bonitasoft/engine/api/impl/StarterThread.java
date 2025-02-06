@@ -16,7 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.slf4j.Logger;
@@ -46,10 +46,10 @@ public class StarterThread extends Thread {
 
     @Override
     public void run() {
-        STenant tenant = getTenant();
-        logger.info("Restarting elements of tenant {} that were not finished at the last shutdown", tenant.getId());
-        if (!tenant.isActivated()) {
-            logger.warn("Unable to restart elements of tenant because tenant is {}", tenant.getStatus());
+        SPlatform platform = getPlatform();
+        logger.info("Restarting elements of platform that were not finished at the last shutdown");
+        if (!platform.isActivated()) {
+            logger.warn("Unable to restart elements of platform because platform is {}", platform.getStatus());
             return;
         }
         executeHandlers();
@@ -66,9 +66,9 @@ public class StarterThread extends Thread {
         }
     }
 
-    STenant getTenant() {
+    SPlatform getPlatform() {
         try {
-            return transactionService.executeInTransaction(platformService::getDefaultTenant);
+            return transactionService.executeInTransaction(platformService::getPlatform);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

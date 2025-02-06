@@ -29,7 +29,7 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -98,17 +98,15 @@ public class LoginAPIImpl implements LoginAPI {
     protected APISession loginInternal(final Map<String, Serializable> credentials)
             throws Exception {
         final ServiceAccessor serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
-        final STenant sTenant = getTenant(serviceAccessor);
+        final SPlatform platform = getPlatform(serviceAccessor);
 
-        checkThatWeCanLogin(sTenant);
+        checkThatWeCanLogin(platform);
         final LoginService loginService = serviceAccessor.getLoginService();
         final TransactionService transactionService = serviceAccessor.getTransactionService();
 
-        final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<>(credentials);
-        credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
         try {
             final SSession sSession = transactionService
-                    .executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
+                    .executeInTransaction(() -> loginService.login(credentials));
             return ModelConvertor.toAPISession(sSession);
         } catch (Exception e) {
             //avoid brut force... (should be done differently, but it is the behavior since 6.0.0)
@@ -117,11 +115,11 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    private STenant getTenant(final ServiceAccessor serviceAccessor)
+    private SPlatform getPlatform(final ServiceAccessor serviceAccessor)
             throws SBonitaException {
         final PlatformService platformService = serviceAccessor.getPlatformService();
         try {
-            return serviceAccessor.getTransactionService().executeInTransaction(platformService::getDefaultTenant);
+            return serviceAccessor.getTransactionService().executeInTransaction(platformService::getPlatform);
         } catch (SBonitaException | RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -145,10 +143,10 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected void checkThatWeCanLogin(final STenant sTenant)
+    protected void checkThatWeCanLogin(final SPlatform platform)
             throws LoginException {
-        if (sTenant.isDeactivated()) {
-            throw new LoginException("Tenant is not activated !!");
+        if (platform.isDeactivated()) {
+            throw new LoginException("Platform is not activated !!");
         }
     }
 

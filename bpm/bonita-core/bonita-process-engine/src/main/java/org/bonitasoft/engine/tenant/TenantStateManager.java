@@ -26,9 +26,9 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
-import org.bonitasoft.engine.platform.exception.STenantActivationException;
+import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -70,12 +70,8 @@ public class TenantStateManager {
         this.tenantServicesManager = tenantServicesManager;
     }
 
-    public long getTenantId() {
-        return tenantId;
-    }
-
     /**
-     * Stop the tenant:
+     * Stop the platform:
      * - stop services
      * - delete session if its the only node
      * **Called outside of a transaction in a platform-level session**
@@ -88,16 +84,16 @@ public class TenantStateManager {
     }
 
     /**
-     * Start the tenant:
+     * Start the platform:
      * - start services
      * - resume elements if its the only node
      * **Called outside of a transaction in a platform-level session**
      */
     public synchronized void start() throws Exception {
-        STenant tenant = getTenantInTransaction();
         tenantServicesManager.initServices();
-        if (!tenant.isActivated()) {
-            LOGGER.debug("Not starting tenant {}. It is in state {}", tenantId, tenant.getStatus());
+        final SPlatform platform = getPlatformInTransaction();
+        if (!platform.isActivated()) {
+            LOGGER.debug("Not starting platform. It is in state {}", platform.getStatus());
             return;
         }
         tenantServicesManager.start();
@@ -109,54 +105,54 @@ public class TenantStateManager {
         return ServiceAccessorFactory.getInstance().createServiceAccessor();
     }
 
-    private STenant getTenantInTransaction() throws Exception {
-        return transactionService.executeInTransaction(() -> platformService.getDefaultTenant());
+    private SPlatform getPlatformInTransaction() throws Exception {
+        return transactionService.executeInTransaction(() -> platformService.getPlatform());
     }
 
     /**
-     * Pause the tenant:
+     * Pause the platform:
      * - pause services
-     * - tenant has the status PAUSED in database
+     * - platform has the status PAUSED in database
      * - other nodes pause the services
-     * **Called outside a transaction with a tenant-level session**
+     * **Called outside a transaction with a platform-level session**
      */
     public synchronized void pause() throws Exception {
-        LOGGER.info("Pausing tenant {}", tenantId);
-        STenant tenant = getTenantInTransaction();
-        if (!tenant.isActivated()) {
-            throw new UpdateException("Can't pause a tenant in state " + tenant.getStatus());
+        LOGGER.info("Pausing platform");
+        SPlatform platform = getPlatformInTransaction();
+        if (!platform.isActivated()) {
+            throw new UpdateException("Can't pause platform in state " + platform.getStatus());
         }
-        pauseTenantInTransaction();
+        pauseServicesInTransaction();
         pauseSchedulerJobsInTransaction();
         tenantServicesManager.pause();
         pauseServicesOnOtherNodes();
-        LOGGER.info("Paused tenant {}", tenantId);
+        LOGGER.info("Paused platform");
     }
 
     /**
-     * Resume the tenant:
+     * Resume the platform:
      * - resume services
-     * - tenant has the status ACTIVATED in database
+     * - platform has the status ACTIVATED in database
      * - other nodes resume the services
-     * **Called outside a transaction with a tenant-level session**
+     * **Called outside a transaction with a platform-level session**
      */
     public synchronized void resume() throws Exception {
-        LOGGER.info("Resuming tenant {}", tenantId);
-        STenant tenant = getTenantInTransaction();
-        if (!tenant.isPaused()) {
-            throw new UpdateException("Can't resume a tenant in state " + tenant.getStatus());
+        LOGGER.info("Resuming platform");
+        SPlatform platform = getPlatformInTransaction();
+        if (!platform.isPaused()) {
+            throw new UpdateException("Can't resume platform in state " + platform.getStatus());
         }
-        activateTenantInTransaction();
+        activateServicesInTransaction();
         try {
             tenantServicesManager.resume();
         } catch (Exception e) {
-            pauseTenantInTransaction();
+            pauseServicesInTransaction();
             throw e;
         }
         resumeServicesOnOtherNodes();
         resumeSchedulerJobsInTransaction();
 
-        LOGGER.info("Resumed tenant {}", tenantId);
+        LOGGER.info("Resumed platform");
     }
 
     private void resumeSchedulerJobsInTransaction() throws Exception {
@@ -173,47 +169,47 @@ public class TenantStateManager {
         });
     }
 
-    private void pauseTenantInTransaction() throws Exception {
+    private void pauseServicesInTransaction() throws Exception {
         transactionService.executeInTransaction(() -> {
-            platformService.pauseTenant(tenantId);
+            platformService.pauseServices();
             return null;
         });
     }
 
-    private void activateTenantInTransaction() throws Exception {
+    private void activateServicesInTransaction() throws Exception {
         transactionService.executeInTransaction(() -> {
-            platformService.activateTenant(tenantId);
+            platformService.activateServices();
             return null;
         });
     }
 
-    private void deactivateTenantInTransaction() throws Exception {
+    private void deactivateServicesInTransaction() throws Exception {
         transactionService.executeInTransaction(() -> {
-            platformService.deactivateTenant(tenantId);
+            platformService.deactivateServices();
             return null;
         });
     }
 
     /**
-     * Activate the tenant:
+     * Activate the services:
      * - resume elements
      * - start services
-     * - tenant has the status ACTIVATED in database
+     * - platform has the status ACTIVATED in database
      * - services are started on other nodes
      * **Called outside a transaction in a platform-level session**
      */
     public synchronized void activate() throws Exception {
-        LOGGER.info("Activating tenant {}", tenantId);
-        STenant tenant = getTenantInTransaction();
-        if (!tenant.isDeactivated()) {
-            throw new STenantActivationException(
-                    "Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
+        LOGGER.info("Activating platform");
+        SPlatform platform = getPlatformInTransaction();
+        if (!platform.isDeactivated()) {
+            throw new SPlatformUpdateException(
+                    "Platform activation failed. Platform is not deactivated: current state " + platform.getStatus());
         }
-        activateTenantInTransaction();
+        activateServicesInTransaction();
         tenantServicesManager.start();
         startServicesOnOtherNodes();
         resumeSchedulerJobsInTransaction();
-        LOGGER.info("Activated tenant {}", tenantId);
+        LOGGER.info("Activated platform");
     }
 
     private void startServicesOnOtherNodes() {
@@ -243,44 +239,42 @@ public class TenantStateManager {
             if (resultEntry.getValue().isError()) {
                 throw new IllegalStateException(resultEntry.getValue().getThrowable());
             }
-
         }
     }
 
     /**
-     * Deactivate the tenant:
+     * Deactivate the platform:
      * - stop services
-     * - tenant has the status DEACTIVATED in database
+     * - platform has the status DEACTIVATED in database
      * - services are stopped on other nodes
      * **Called outside a transaction with a platform-level session**
      */
     public synchronized void deactivate() throws Exception {
-        LOGGER.info("Deactivating tenant {}", tenantId);
-        STenant tenant = getTenantInTransaction();
-        String previousStatus = tenant.getStatus();
-        if (previousStatus.equals(STenant.DEACTIVATED)) {
+        LOGGER.info("Deactivating platform");
+        SPlatform platform = getPlatformInTransaction();
+        String previousStatus = platform.getStatus();
+        if (previousStatus.equals(SPlatform.DEACTIVATED)) {
             throw new STenantDeactivationException("Tenant deactivated failed. Tenant is already deactivated");
         }
-        sessionService.deleteSessionsOfTenant(tenantId);
-        deactivateTenantInTransaction();
-        if (previousStatus.equals(STenant.ACTIVATED)) {
+        sessionService.deleteAllSessions();
+        deactivateServicesInTransaction();
+        if (previousStatus.equals(SPlatform.ACTIVATED)) {
             pauseSchedulerJobsInTransaction();
             tenantServicesManager.stop();
             stopServicesOnOtherNodes();
         }
-        LOGGER.info("Deactivated tenant {}", tenantId);
+        LOGGER.info("Deactivated platform");
     }
 
-    public synchronized <T> T executeTenantManagementOperation(String operationName, Callable<T> operation)
+    public synchronized <T> T executeManagementOperation(String operationName, Callable<T> operation)
             throws Exception {
-        LOGGER.info("Executing synchronized tenant maintenance operation {} for tenant {}", operationName, tenantId);
+        LOGGER.info("Executing synchronized maintenance operation {}", operationName);
         T operationReturn = operation.call();
-        LOGGER.info("Successful synchronized tenant maintenance operation {} for tenant {}", operationName, tenantId);
+        LOGGER.info("Successful synchronized maintenance operation {}", operationName);
         return operationReturn;
     }
 
     public synchronized String getStatus() throws Exception {
-        STenant tenant = getTenantInTransaction();
-        return tenant.getStatus();
+        return getPlatformInTransaction().getStatus();
     }
 }

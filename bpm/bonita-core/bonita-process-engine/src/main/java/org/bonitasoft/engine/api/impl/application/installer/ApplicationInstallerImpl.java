@@ -501,7 +501,7 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     protected void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         log.info("Uninstalling the currently deployed BDM");
         try {
-            tenantStateManager.executeTenantManagementOperation("BDM Uninstallation", () -> {
+            tenantStateManager.executeManagementOperation("BDM Uninstallation", () -> {
                 bdmRepository.uninstall();
                 return null;
             });
@@ -517,7 +517,7 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         log.info("Starting the installation of the BDM.");
         try {
-            String bdmVersion = tenantStateManager.executeTenantManagementOperation("BDM Installation",
+            String bdmVersion = tenantStateManager.executeManagementOperation("BDM Installation",
                     () -> bdmRepository.install(zip, SessionService.SYSTEM_ID));
             log.info("Installation of the BDM completed.");
             return bdmVersion;

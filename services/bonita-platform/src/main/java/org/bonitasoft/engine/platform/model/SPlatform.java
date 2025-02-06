@@ -43,6 +43,11 @@ public class SPlatform implements PersistentObject {
     public static final String APPLICATION_VERSION = "applicationVersion";
     public static final String MAINTENANCE_MESSAGE = "maintenanceMessage";
     public static final String MAINTENANCE_MESSAGE_ACTIVE = "maintenanceMessageActive";
+    public static final String STATUS = "status";
+
+    public static final String PAUSED = "PAUSED";
+    public static final String DEACTIVATED = "DEACTIVATED";
+    public static final String ACTIVATED = "ACTIVATED";
 
     @Id
     private long id;
@@ -61,10 +66,12 @@ public class SPlatform implements PersistentObject {
     private String maintenanceMessage;
     @Column(name = "maintenance_message_active")
     private boolean maintenanceMessageActive;
+    @Column(name = "status")
+    private String status;
 
     public SPlatform(final String dbSchemaVersion, final String initialBonitaVersion, final String applicationVersion,
             final String maintenanceMessage, final boolean maintenanceMessageActive,
-            final String createdBy, final long created) {
+            final String createdBy, final long created, final String status) {
         this.dbSchemaVersion = dbSchemaVersion;
         this.initialBonitaVersion = initialBonitaVersion;
         this.applicationVersion = applicationVersion;
@@ -72,6 +79,24 @@ public class SPlatform implements PersistentObject {
         this.maintenanceMessageActive = maintenanceMessageActive;
         this.createdBy = createdBy;
         this.created = created;
+        this.status = status;
+    }
+
+    /**
+     * Return true if the platform is activated else return false.
+     *
+     * @return true if the platform is activated
+     */
+    public boolean isActivated() {
+        return ACTIVATED.equals(status);
+    }
+
+    public boolean isDeactivated() {
+        return DEACTIVATED.equals(status);
+    }
+
+    public boolean isPaused() {
+        return PAUSED.equals(status);
     }
 
 }

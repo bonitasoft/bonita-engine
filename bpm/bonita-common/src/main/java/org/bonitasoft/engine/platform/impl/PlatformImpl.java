@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.platform.impl;
 
+import java.io.Serial;
+
 import lombok.ToString;
 import org.bonitasoft.engine.platform.Platform;
 
@@ -22,6 +24,7 @@ import org.bonitasoft.engine.platform.Platform;
 @ToString
 public class PlatformImpl implements Platform {
 
+    @Serial
     private static final long serialVersionUID = -8493649294374229877L;
 
     private final long created;
@@ -32,12 +35,15 @@ public class PlatformImpl implements Platform {
 
     private final String version;
 
-    public PlatformImpl(final String version, final String initialVersion,
-            final String createdBy, final long created) {
+    private final String status;
+
+    public PlatformImpl(final String version, final String initialVersion, final String createdBy, final long created,
+            final String status) {
         this.version = version;
         this.initialVersion = initialVersion;
         this.createdBy = createdBy;
         this.created = created;
+        this.status = status;
     }
 
     @Override
@@ -64,6 +70,11 @@ public class PlatformImpl implements Platform {
     @Override
     public String getVersion() {
         return this.version;
+    }
+
+    @Override
+    public String getStatus() {
+        return this.status;
     }
 
 }

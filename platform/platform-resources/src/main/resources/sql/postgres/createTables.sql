@@ -840,7 +840,8 @@ CREATE TABLE platform (
   created INT8 NOT NULL,
   created_by VARCHAR(50) NOT NULL,
   information TEXT,
-  PRIMARY KEY (id)
+  status VARCHAR(15) NOT NULL,
+  CONSTRAINT pk_platform PRIMARY KEY (id)
 );
 
 CREATE TABLE tenant (

@@ -75,7 +75,7 @@ public class SessionServiceIT extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testIsValid() throws Exception {
+    public void should_session_be_valid() throws Exception {
         final String username = "john";
         sessionService.setSessionDuration(1000);
         final SSession session = createSession(username);

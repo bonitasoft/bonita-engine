@@ -59,7 +59,7 @@ public class TenantMaintenanceIT extends TestWithUser {
             loginOnDefaultTenantWith(USERNAME, PASSWORD);
             logout();
         } catch (LoginException e) {
-            fail("Expected that user is able to log in, but he is not");
+            fail("Expected that user is able to log in, but is not");
         }
     }
 

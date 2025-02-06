@@ -844,7 +844,8 @@ CREATE TABLE platform (
   created BIGINT NOT NULL,
   created_by VARCHAR(50) NOT NULL,
   information CLOB,
-  PRIMARY KEY (id)
+  status VARCHAR(15) NOT NULL,
+  CONSTRAINT pk_platform PRIMARY KEY (id)
 );
 
 CREATE TABLE tenant (
@@ -859,6 +860,7 @@ CREATE TABLE tenant (
   status VARCHAR(15) NOT NULL,
   PRIMARY KEY (id)
 );
+
 CREATE TABLE platformCommand (
   id BIGINT PRIMARY KEY,
   name VARCHAR(50) NOT NULL UNIQUE,

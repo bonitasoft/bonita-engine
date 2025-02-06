@@ -322,8 +322,7 @@ public class ModelConvertor {
 
     public static Platform toPlatform(final SPlatform sPlatform, SPlatformProperties sPlatformProperties) {
         return new PlatformImpl(sPlatformProperties.getPlatformVersion(), sPlatform.getInitialBonitaVersion(),
-                sPlatform.getCreatedBy(),
-                sPlatform.getCreated());
+                sPlatform.getCreatedBy(), sPlatform.getCreated(), sPlatform.getStatus());
     }
 
     public static List<ActivityInstance> toActivityInstances(final List<SActivityInstance> sActivities,
