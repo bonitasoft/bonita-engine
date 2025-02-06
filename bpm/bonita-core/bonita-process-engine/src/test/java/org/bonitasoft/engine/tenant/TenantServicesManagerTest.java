@@ -66,7 +66,7 @@ public class TenantServicesManagerTest {
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         tenantServicesManager = new TenantServicesManager(sessionAccessor, sessionService, transactionService,
                 classLoaderService,
-                asList(tenantService1, tenantService2, tenantService3), TENANT_ID, tenantElementsRestarter);
+                asList(tenantService1, tenantService2, tenantService3), tenantElementsRestarter);
         doThrow(SessionIdNotSetException.class).when(sessionAccessor).getSessionId();
     }
 

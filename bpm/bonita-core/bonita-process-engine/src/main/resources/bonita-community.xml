@@ -192,12 +192,6 @@
     <bean id="sequenceMappingProvider" class="org.bonitasoft.engine.sequence.SequenceMappingProvider" autowire="byType" />
 
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.STenant" />
-        <constructor-arg name="sequenceId" value="1" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.1:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.SPlatformDependency" />
         <constructor-arg name="sequenceId" value="2" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.2:${bonita.platform.sequence.defaultRangeSize}}" />
@@ -798,7 +792,6 @@
                 <entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="saComment" />
                 <!-- platform -->
                 <entry key="org.bonitasoft.engine.platform.model.SPlatform" value="platform" />
-                <entry key="org.bonitasoft.engine.platform.model.STenant" value="tenant" />
                 <!-- platform command -->
                 <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="platformCommand" />
                 <!-- page -->
@@ -876,7 +869,6 @@
                 <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
                 <value>org.bonitasoft.engine.platform.model.SPlatform</value>
-                <value>org.bonitasoft.engine.platform.model.STenant</value>
                 <value>org.bonitasoft.engine.platform.command.model.SPlatformCommand</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>

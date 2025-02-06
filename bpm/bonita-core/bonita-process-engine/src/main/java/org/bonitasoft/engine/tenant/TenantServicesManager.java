@@ -35,7 +35,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -60,20 +59,17 @@ public class TenantServicesManager {
     private final TransactionService transactionService;
     private final ClassLoaderService classLoaderService;
     private final List<TenantLifecycleService> services;
-    private final Long tenantId;
     private final TenantElementsRestarter tenantElementsRestarter;
     private TenantServiceState tenantServiceState = TenantServiceState.STOPPED;
 
     public TenantServicesManager(SessionAccessor sessionAccessor, SessionService sessionService,
             TransactionService transactionService, ClassLoaderService classLoaderService,
-            List<TenantLifecycleService> services, @Value("${tenantId}") Long tenantId,
-            TenantElementsRestarter tenantElementsRestarter) {
+            List<TenantLifecycleService> services, TenantElementsRestarter tenantElementsRestarter) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.transactionService = transactionService;
         this.classLoaderService = classLoaderService;
         this.services = services;
-        this.tenantId = tenantId;
         this.tenantElementsRestarter = tenantElementsRestarter;
     }
 

@@ -96,7 +96,7 @@ import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
-import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.builder.SPlatformUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.impl.SPlatformUpdateBuilderImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -112,7 +112,6 @@ import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -142,19 +141,17 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     private final SessionService sessionService;
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     private final ApplicationImporter applicationImporter;
-    private final Long tenantId;
     private final ApplicationNodeContainerConverter appXmlConverter = new ApplicationNodeContainerConverter();
 
     public ApplicationInstallerImpl(InstallationService installationService,
             @Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
-            UserTransactionService transactionService, @Value("${tenantId}") Long tenantId,
-            SessionAccessor sessionAccessor, SessionService sessionService, TenantStateManager tenantStateManager,
+            UserTransactionService transactionService, SessionAccessor sessionAccessor, SessionService sessionService,
+            TenantStateManager tenantStateManager,
             @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager,
             ApplicationImporter applicationImporter) {
         this.installationService = installationService;
         this.bdmRepository = bdmRepository;
         this.transactionService = transactionService;
-        this.tenantId = tenantId;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.tenantStateManager = tenantStateManager;
@@ -245,7 +242,7 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     public void resumeTenantInSession() throws Exception {
         inSession(() -> {
             try {
-                if (Objects.equals(STenant.PAUSED, tenantStateManager.getStatus())) {
+                if (Objects.equals(SPlatform.PAUSED, tenantStateManager.getStatus())) {
                     tenantStateManager.resume();
                     transactionService.executeInTransaction(() -> {
                         businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getServiceAccessor());
@@ -264,9 +261,9 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
         inSession(() -> {
             try {
                 String status = tenantStateManager.getStatus();
-                if (STenant.ACTIVATED.equals(status)) {
+                if (SPlatform.ACTIVATED.equals(status)) {
                     tenantStateManager.pause();
-                } else if (!STenant.PAUSED.equals(status)) {
+                } else if (!SPlatform.PAUSED.equals(status)) {
                     throw new UpdateException(
                             "The default tenant is in state " + status + " and cannot be paused. Aborting.");
                 }

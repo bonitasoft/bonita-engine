@@ -24,8 +24,6 @@ public class TenantAdminDefinition extends ItemDefinition<TenantAdminItem> {
 
     public static final String TOKEN = "tenantAdmin";
 
-    public static final String UNUSED_ID = "1";
-
     protected static final String API_URL = "../API/system/tenant";
 
     public static TenantAdminDefinition get() {

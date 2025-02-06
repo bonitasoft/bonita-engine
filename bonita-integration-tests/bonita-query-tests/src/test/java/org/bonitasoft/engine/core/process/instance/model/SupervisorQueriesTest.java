@@ -37,8 +37,6 @@ public class SupervisorQueriesTest {
 
     private static final long supervisorId = 1;
 
-    private static final long tenantId = 2;
-
     private static final long processDefId = 3;
 
     private static final long userId = 4;

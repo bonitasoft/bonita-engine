@@ -101,7 +101,6 @@ public class ScriptExecutor {
             createTables();
             initializePlatformStructure();
             insertPlatform();
-            insertTenant();
         } else {
             log.info("Bonita platform already exists. Nothing to do. Stopping.");
         }
@@ -126,14 +125,6 @@ public class ScriptExecutor {
             log.debug(e.getMessage(), e);
             throw new IllegalStateException("Cannot properly setup Bonita platform");
         }
-    }
-
-    protected void insertTenant() {
-        final String sql = "INSERT INTO tenant (id, created, createdBy, description, defaultTenant, name, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        new JdbcTemplate(datasource).update(sql, 1L, System.currentTimeMillis(),
-                "defaultUser", "Default tenant", true, "default", "ACTIVATED");
     }
 
     public boolean isPlatformAlreadyCreated() {

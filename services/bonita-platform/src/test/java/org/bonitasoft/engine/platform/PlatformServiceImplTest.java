@@ -16,13 +16,13 @@ package org.bonitasoft.engine.platform;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.impl.PlatformServiceImpl;
 import org.bonitasoft.engine.platform.model.SPlatform;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.UpdateDescriptor;
@@ -87,11 +87,11 @@ public class PlatformServiceImplTest {
     }
 
     @Test
-    public void activateTenant_should_update_services_state_to_ACTIVATED() throws SBonitaException {
+    public void activateServices_should_update_services_state_to_ACTIVATED() throws SBonitaException {
         platformServiceImpl.activateServices();
 
         verify(persistenceService)
-                .update(Mockito.<UpdateDescriptor> argThat(u -> updateOnlyStatus(STenant.ACTIVATED, u)));
+                .update(Mockito.<UpdateDescriptor> argThat(u -> updateOnlyStatus(SPlatform.ACTIVATED, u)));
     }
 
     @Test
@@ -99,12 +99,12 @@ public class PlatformServiceImplTest {
         platformServiceImpl.deactivateServices();
 
         verify(persistenceService)
-                .update(Mockito.<UpdateDescriptor> argThat(u -> updateOnlyStatus(STenant.DEACTIVATED, u)));
+                .update(Mockito.<UpdateDescriptor> argThat(u -> updateOnlyStatus(SPlatform.DEACTIVATED, u)));
     }
 
     private boolean updateOnlyStatus(String status, UpdateDescriptor u) {
         return u.getFields().size() == 1
-                && u.getFields().containsKey(STenant.STATUS)
+                && u.getFields().containsKey(SPlatform.STATUS)
                 && u.getFields().containsValue(status);
     }
 

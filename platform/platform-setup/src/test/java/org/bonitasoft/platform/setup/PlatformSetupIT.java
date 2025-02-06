@@ -98,8 +98,6 @@ class PlatformSetupIT {
         final List<String> platformRows = jdbcTemplate.queryForList("SELECT information FROM platform", String.class);
         assertThat(platformRows).hasSize(1);
         assertThat(platformRows.get(0)).isNotBlank(); // In Community, should contain the initial case counter value for information
-        final int tenantRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "tenant");
-        assertThat(tenantRows).isEqualTo(1);
         final int configurationFiles = JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration");
         assertThat(configurationFiles).isGreaterThan(1);
     }
