@@ -40,7 +40,7 @@ public class TenantStorage {
 
     }
 
-    Folder getTenantTempFolder(long tenantId) throws IOException, BonitaHomeNotSetException {
+    Folder getTenantTempFolder(long tenantId) throws IOException {
         Folder tenantWorkFolder = FolderMgr.getTenantTempFolder(tenantId);
         createFolders(tenantWorkFolder);
         return tenantWorkFolder;

@@ -16,18 +16,16 @@ package org.bonitasoft.platform.setup;
 import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
 import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.platform.setup.PlatformSetup.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.database.DatabaseVendor;
 import org.bonitasoft.platform.exception.PlatformException;
@@ -210,44 +208,13 @@ public class PlatformSetupTest {
     }
 
     @Test
-    public void should_store_tenant_configurationFile_when_initializing_platform() throws PlatformException {
-        List<BonitaConfiguration> tenantTemplateEngineConfs = List
-                .of(new BonitaConfiguration("tenantTemplateEngineConf", null));
-        List<BonitaConfiguration> tenantTemplateSecurityScripts = List
-                .of(new BonitaConfiguration("tenantTemplateSecurityScript", null));
-        List<BonitaConfiguration> tenantTemplatePortalConfs = List
-                .of(new BonitaConfiguration("tenantTemplatePortalConf", null));
-
-        when(configurationService.getTenantTemplateEngineConf()).thenReturn(tenantTemplateEngineConfs);
-        when(configurationService.getTenantTemplateSecurityScripts()).thenReturn(tenantTemplateSecurityScripts);
-        when(configurationService.getTenantTemplatePortalConf()).thenReturn(tenantTemplatePortalConfs);
-
-        platformSetup.init();
-
-        verify(configurationService).storeTenantEngineConf(tenantTemplateEngineConfs, 1L);
-        verify(configurationService).storeTenantSecurityScripts(tenantTemplateSecurityScripts, 1L);
-        verify(configurationService).storeTenantPortalConf(tenantTemplatePortalConfs, 1L);
-    }
-
-    @Test
-    public void should_not_store_tenant_configurationFile_when_platform_is_initialized() throws PlatformException {
-        when(platformSetup.isPlatformAlreadyCreated()).thenReturn(true);
-
-        platformSetup.init();
-
-        verify(configurationService, never()).storeTenantEngineConf(any(), anyLong());
-        verify(configurationService, never()).storeTenantSecurityScripts(any(), anyLong());
-        verify(configurationService, never()).storeTenantPortalConf(any(), anyLong());
-    }
-
-    @Test
     public void getFolderFromConfiguration_should_work_for_platform_level_folder() throws Exception {
         // given:
         final Path setupFolder = temporaryFolder.newFolder().toPath();
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
         platformSetup.initProperties();
 
-        LightBonitaConfiguration configuration = new LightBonitaConfiguration(0L, "some_folder");
+        LightBonitaConfiguration configuration = new LightBonitaConfiguration("some_folder");
 
         // when:
         final Path folder = platformSetup.getFolderFromConfiguration(configuration);
@@ -263,13 +230,13 @@ public class PlatformSetupTest {
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
         platformSetup.initProperties();
 
-        LightBonitaConfiguration configuration = new LightBonitaConfiguration(2L, "TENANT-LEVEL-FOLDER");
+        LightBonitaConfiguration configuration = new LightBonitaConfiguration("TENANT-LEVEL-FOLDER");
 
         // when:
         final Path folder = platformSetup.getFolderFromConfiguration(configuration);
 
         // then:
         assertThat(folder)
-                .hasToString(separatorsToSystem(setupFolder + "/platform_conf/current/tenants/2/tenant-level-folder"));
+                .hasToString(separatorsToSystem(setupFolder + "/platform_conf/current/tenant-level-folder"));
     }
 }

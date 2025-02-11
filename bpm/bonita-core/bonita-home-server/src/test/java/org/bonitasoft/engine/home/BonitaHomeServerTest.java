@@ -22,7 +22,6 @@ import static org.mockito.Mockito.verify;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -52,7 +51,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BonitaHomeServerTest {
 
-    public static final long TENANT_ID = 16543L;
     @InjectMocks
     @Spy
     BonitaHomeServer bonitaHomeServer;
@@ -65,37 +63,24 @@ public class BonitaHomeServerTest {
     public void should_updateTenantPortalConfigurationFile_update_the_files() throws Exception {
         //given
         doReturn(conf("myFile.properties", "previous content".getBytes()))
-                .when(configurationService).getTenantPortalConfiguration(TENANT_ID, "myFile.properties");
+                .when(configurationService).getTenantPortalConfiguration("myFile.properties");
 
         //when
-        bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties",
+        bonitaHomeServer.updateTenantPortalConfigurationFile("myFile.properties",
                 "the updated content".getBytes());
         //then
         verify(configurationService).storeTenantPortalConf(
-                Collections.singletonList(conf("myFile.properties", "the updated content".getBytes())), TENANT_ID);
+                Collections.singletonList(conf("myFile.properties", "the updated content".getBytes())));
     }
 
     @Test(expected = UpdateException.class)
     public void should_updateTenantPortalConfigurationFile_throws_UpdateException_if_not_found() throws Exception {
         //given
-        doReturn(null).when(configurationService).getTenantPortalConfiguration(TENANT_ID, "myFile.properties");
+        doReturn(null).when(configurationService).getTenantPortalConfiguration("myFile.properties");
 
         //when
-        bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties",
+        bonitaHomeServer.updateTenantPortalConfigurationFile("myFile.properties",
                 "the updated content".getBytes());
-    }
-
-    @Test
-    public void should_delete_tenant_delete_configuration_files() throws Exception {
-        //when
-        bonitaHomeServer.deleteTenant(TENANT_ID);
-
-        //then
-        verify(configurationService).deleteTenantConfiguration(TENANT_ID);
-    }
-
-    private List<BonitaConfiguration> confs(BonitaConfiguration... bonitaConfiguration) {
-        return Arrays.asList(bonitaConfiguration);
     }
 
     private BonitaConfiguration conf(String file1, byte[] bytes) {
@@ -141,7 +126,7 @@ public class BonitaHomeServerTest {
 
         doReturn(Collections.singletonList(new BonitaConfiguration("tenant.properties",
                 getPropertiesAsByteArray("prop4=prop4TenantDB"))))
-                .when(configurationService).getTenantEngineConf(1);
+                .when(configurationService).getTenantEngineConf();
         //when
         Properties allProperties = bonitaHomeServer.getTenantProperties(1);
         //then
@@ -150,17 +135,11 @@ public class BonitaHomeServerTest {
                 entry("prop2", "prop2PlatformDB"),
                 entry("prop3", "prop3TenantCP"),
                 entry("prop4", "prop4TenantDB"),
-                entry("tenantId", "1"));
+                entry("tenantId", "1")); // FIXME: remove when tenantId is removed from SpringBeanAccessor
     }
 
     private byte[] getPropertiesAsByteArray(String... propertiesV) {
         return String.join("\n", propertiesV).getBytes(StandardCharsets.UTF_8);
-    }
-
-    private Properties getPropertiesAsProp(String... propertiesV) throws IOException {
-        Properties properties = new Properties();
-        properties.load(new StringReader(String.join("\n", propertiesV)));
-        return properties;
     }
 
     private ClassLoader getClassLoaderWithProperties(BonitaConfiguration... bonitaConfigurations) throws IOException {
@@ -204,13 +183,13 @@ public class BonitaHomeServerTest {
         //given
         final String configFile = "a portal config file";
         BonitaConfiguration tenantTemplateConf = conf(configFile, "{}".getBytes());
-        doReturn(tenantTemplateConf).when(configurationService).getTenantPortalConfiguration(TENANT_ID, configFile);
+        doReturn(tenantTemplateConf).when(configurationService).getTenantPortalConfiguration(configFile);
 
         //when
-        byte[] content = bonitaHomeServer.getTenantPortalConfiguration(TENANT_ID, configFile);
+        byte[] content = bonitaHomeServer.getTenantPortalConfiguration(configFile);
 
         //then
-        verify(configurationService).getTenantPortalConfiguration(TENANT_ID, configFile);
+        verify(configurationService).getTenantPortalConfiguration(configFile);
         assertThat(content).isEqualTo("{}".getBytes());
 
     }

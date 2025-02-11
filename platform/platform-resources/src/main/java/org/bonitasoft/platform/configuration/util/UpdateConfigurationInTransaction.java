@@ -27,19 +27,18 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 /**
  * @author Emmanuel Duchastenier
  */
-public class UpdateConfigurationInTransactionForAllTenants extends TransactionCallbackWithoutResult {
+public class UpdateConfigurationInTransaction extends TransactionCallbackWithoutResult {
 
     private final JdbcTemplate jdbcTemplate;
     private final List<BonitaConfiguration> bonitaConfigurations;
     private final ConfigurationType type;
     private final String dbVendor;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(UpdateConfigurationInTransactionForAllTenants.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(UpdateConfigurationInTransaction.class);
 
-    public UpdateConfigurationInTransactionForAllTenants(JdbcTemplate jdbcTemplate, String dbVendor,
+    public UpdateConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor,
             List<BonitaConfiguration> bonitaConfigurations,
             ConfigurationType type) {
-
         this.jdbcTemplate = jdbcTemplate;
         this.dbVendor = dbVendor;
         this.bonitaConfigurations = bonitaConfigurations;
@@ -48,9 +47,7 @@ public class UpdateConfigurationInTransactionForAllTenants extends TransactionCa
 
     @Override
     protected void doInTransactionWithoutResult(TransactionStatus status) {
-        LOGGER.debug(
-                "Updating configuration files " + bonitaConfigurations.toString() + " of type:" + type.name()
-                        + " for all tenants");
+        LOGGER.debug("Updating configuration files {} of type:{}", bonitaConfigurations.toString(), type.name());
 
         jdbcTemplate.batchUpdate(BonitaConfigurationTenantUpdater.UPDATE_ALL_TENANTS_CONFIGURATION,
                 new BonitaConfigurationTenantUpdater(bonitaConfigurations, dbVendor, type));

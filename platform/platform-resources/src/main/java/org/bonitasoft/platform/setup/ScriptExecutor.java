@@ -196,7 +196,7 @@ public class ScriptExecutor {
         populate.setIgnoreFailedDrops(true);
         populate.addScript(sqlResource);
         populate.execute(datasource);
-        log.info("Executed SQL script " + sqlResource.getURL().getFile());
+        log.info("Executed SQL script {}", sqlResource.getURL().getFile());
     }
 
     public void initializePlatformStructure() throws PlatformException {

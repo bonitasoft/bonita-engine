@@ -130,7 +130,8 @@ SELECT
             p.created / 1000
         ),
         'DD/MM/YYYY HH24:MI:SS'
-    ) as creation_date
+    ) as creation_date,
+    status
 FROM
     platform p"
 
@@ -141,46 +142,40 @@ echo "========================================"
 
 docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
 SELECT
-    c.tenant_id,
     c.content_type,
     c.resource_name
 FROM
     configuration c
 ORDER BY
-    c.tenant_id,
     c.content_type,
     c.resource_name"
 
-
-echo "========================================"
-echo "simulation of engine start"
-echo "========================================"
-docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
-INSERT
-    INTO
-        configuration(
-            tenant_id,
-            content_type,
-            resource_name,
-            resource_content
-        ) SELECT
-            1,
-            'TENANT_SECURITY_SCRIPTS',
-            c.resource_name,
-            c.resource_content
-        FROM
-            configuration c
-        WHERE
-            c.tenant_id = 0
-            AND c.content_type ='TENANT_TEMPLATE_SECURITY_SCRIPTS'"
+#
+#echo "========================================"
+#echo "simulation of engine start"
+#echo "========================================"
+#docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
+#INSERT
+#    INTO
+#        configuration(
+#            content_type,
+#            resource_name,
+#            resource_content
+#        ) SELECT
+#            'TENANT_SECURITY_SCRIPTS',
+#            c.resource_name,
+#            c.resource_content
+#        FROM
+#            configuration c
+#        WHERE c.content_type ='TENANT_SECURITY_SCRIPTS'"
 
 echo "================================================================================"
 echo "simulate a version upgrade (configuration files have changed in folder initial/)"
 echo "================================================================================"
 
-echo "dynamic-permissions-checks" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/dynamic-permissions-checks.properties
-echo "resources-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/resources-permissions-mapping.properties
-echo "compound-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/compound-permissions-mapping.properties
+echo "dynamic-permissions-checks" > ${E2E_DIR}/platform_conf/initial/tenant_portal/dynamic-permissions-checks.properties
+echo "resources-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_portal/resources-permissions-mapping.properties
+echo "compound-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_portal/compound-permissions-mapping.properties
 
 ${E2E_DIR}/setup.sh init
 testReturnCode $? "setup.sh init"
@@ -195,13 +190,13 @@ echo "==========================================================================
 echo "verify version upgrade has updated configuration file changes (in folder current/)"
 echo "=================================================================================="
 
-new_content=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/dynamic-permissions-checks.properties`
+new_content=`cat ${E2E_DIR}/platform_conf/current/tenant_portal/dynamic-permissions-checks.properties`
 testValue $new_content "dynamic-permissions-checks"
 
-res_mapp=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/resources-permissions-mapping.properties`
+res_mapp=`cat ${E2E_DIR}/platform_conf/current/tenant_portal/resources-permissions-mapping.properties`
 testValue $res_mapp "resources-permissions-mapping"
 
-compound=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/compound-permissions-mapping.properties`
+compound=`cat ${E2E_DIR}/platform_conf/current/tenant_portal/compound-permissions-mapping.properties`
 testValue $compound "compound-permissions-mapping"
 
 echo "=> Verification Ok"

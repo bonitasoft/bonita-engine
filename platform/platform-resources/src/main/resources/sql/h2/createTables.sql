@@ -1,11 +1,10 @@
 CREATE TABLE configuration (
-  tenant_id BIGINT NOT NULL,
   content_type VARCHAR(50) NOT NULL,
   resource_name VARCHAR(120) NOT NULL,
-  resource_content LONGBLOB NOT NULL
+  resource_content LONGBLOB NOT NULL,
+  CONSTRAINT pk_configuration PRIMARY KEY (content_type, resource_name)
 );
-ALTER TABLE configuration ADD CONSTRAINT pk_configuration PRIMARY KEY (tenant_id, content_type, resource_name);
-CREATE INDEX idx_configuration ON configuration (tenant_id, content_type);
+CREATE INDEX idx_configuration ON configuration (content_type);
 
 CREATE TABLE contract_data (
   id BIGINT NOT NULL,

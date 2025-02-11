@@ -171,12 +171,12 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public Map<String, byte[]> getClientTenantConfigurations() {
-        return getBonitaHomeServer().getTenantPortalConfigurations(1); // FIXME: remove this when tenantid is completely removed from configuration
+        return getBonitaHomeServer().getTenantPortalConfigurations();
     }
 
     @Override
     public byte[] getClientTenantConfiguration(long tenantId, String file) {
-        return getBonitaHomeServer().getTenantPortalConfiguration(tenantId, file);
+        return getBonitaHomeServer().getTenantPortalConfiguration(file);
     }
 
     protected BonitaHomeServer getBonitaHomeServer() {
@@ -185,6 +185,6 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
-        getBonitaHomeServer().updateTenantPortalConfigurationFile(tenantId, file, content);
+        getBonitaHomeServer().updateTenantPortalConfigurationFile(file, content);
     }
 }

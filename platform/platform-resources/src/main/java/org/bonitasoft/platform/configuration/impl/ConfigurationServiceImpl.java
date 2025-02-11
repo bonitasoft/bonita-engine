@@ -35,7 +35,6 @@ import org.bonitasoft.platform.configuration.util.CleanAndStoreAllConfigurationI
 import org.bonitasoft.platform.configuration.util.CleanAndStoreConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.ConfigurationResourceVisitor;
 import org.bonitasoft.platform.configuration.util.DeleteAllConfigurationInTransaction;
-import org.bonitasoft.platform.configuration.util.DeleteTenantConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.GetAllConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.GetConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.GetConfigurationsInTransaction;
@@ -43,7 +42,7 @@ import org.bonitasoft.platform.configuration.util.GetMandatoryStructureConfigura
 import org.bonitasoft.platform.configuration.util.LicensesResourceVisitor;
 import org.bonitasoft.platform.configuration.util.StoreConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.StoreConfigurationsIfNotExist;
-import org.bonitasoft.platform.configuration.util.UpdateConfigurationInTransactionForAllTenants;
+import org.bonitasoft.platform.configuration.util.UpdateConfigurationInTransaction;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +57,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Service
 public class ConfigurationServiceImpl implements ConfigurationService {
 
-    private static final int NON_TENANT_RESOURCE = 0;
-
     public static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
     private final JdbcTemplate jdbcTemplate;
@@ -68,8 +65,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private final String dbVendor;
 
-    public ConfigurationServiceImpl(JdbcTemplate jdbcTemplate,
-            TransactionTemplate transactionTemplate, @Value("${db.vendor}") String dbVendor) {
+    public ConfigurationServiceImpl(JdbcTemplate jdbcTemplate, TransactionTemplate transactionTemplate,
+            @Value("${db.vendor}") String dbVendor) {
         this.jdbcTemplate = jdbcTemplate;
         this.transactionTemplate = transactionTemplate;
         this.dbVendor = dbVendor;
@@ -77,57 +74,22 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public List<BonitaConfiguration> getPlatformPortalConf() {
-        return getNonTenantResource(PLATFORM_PORTAL);
+        return getBonitaConfigurations(PLATFORM_PORTAL);
     }
 
     @Override
     public List<BonitaConfiguration> getPlatformEngineConf() {
-        return getNonTenantResource(PLATFORM_ENGINE);
+        return getBonitaConfigurations(PLATFORM_ENGINE);
     }
 
     @Override
-    public List<BonitaConfiguration> getTenantTemplateEngineConf() {
-        return getNonTenantResource(TENANT_TEMPLATE_ENGINE);
-    }
-
-    @Override
-    public List<BonitaConfiguration> getTenantTemplateSecurityScripts() {
-        return getNonTenantResource(TENANT_TEMPLATE_SECURITY_SCRIPTS);
-    }
-
-    @Override
-    public void storePlatformEngineConf(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, PLATFORM_ENGINE, NON_TENANT_RESOURCE);
-    }
-
-    @Override
-    public void storeTenantTemplateEngineConf(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, TENANT_TEMPLATE_ENGINE, NON_TENANT_RESOURCE);
-    }
-
-    @Override
-    public void storeTenantTemplateSecurityScripts(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, TENANT_TEMPLATE_SECURITY_SCRIPTS, NON_TENANT_RESOURCE);
-    }
-
-    @Override
-    public void storeTenantEngineConf(List<BonitaConfiguration> bonitaConfigurations, long tenantId) {
-        storeConfiguration(bonitaConfigurations, TENANT_ENGINE, tenantId);
-    }
-
-    @Override
-    public void storeTenantSecurityScripts(List<BonitaConfiguration> bonitaConfigurations, long tenantId) {
-        storeConfiguration(bonitaConfigurations, TENANT_SECURITY_SCRIPTS, tenantId);
-    }
-
-    @Override
-    public void storeTenantConfiguration(File configurationRootFolder, long tenantId) throws PlatformException {
-        storeConfiguration(configurationRootFolder, TENANT_PORTAL, tenantId);
+    public void storeTenantSecurityScripts(List<BonitaConfiguration> bonitaConfigurations) {
+        storeConfiguration(bonitaConfigurations, TENANT_SECURITY_SCRIPTS);
     }
 
     @Override
     public void storePlatformConfiguration(File configurationRootFolder) throws PlatformException {
-        storeConfiguration(configurationRootFolder, PLATFORM_ENGINE, NON_TENANT_RESOURCE);
+        storeConfiguration(configurationRootFolder, PLATFORM_ENGINE);
     }
 
     @Override
@@ -145,7 +107,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
-    public void updateDefaultConfigurationForAllTenantsAndTemplate(Path configurationRootFolder)
+    public void updateDefaultConfiguration(Path configurationRootFolder)
             throws PlatformException {
         List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
         try {
@@ -153,49 +115,29 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         } catch (IOException e) {
             throw new PlatformException(e);
         }
-        updateTenantPortalConfForAllTenantsAndTemplate(bonitaConfigurations);
+        updateTenantPortalConf(bonitaConfigurations);
     }
 
     @Override
-    public void storeTenantTemplatePortalConf(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, TENANT_TEMPLATE_PORTAL, NON_TENANT_RESOURCE);
+    public void storeTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations) {
+        storeConfiguration(bonitaConfigurations, TENANT_PORTAL);
     }
 
     @Override
-    public void storeTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations, long tenantId) {
-        storeConfiguration(bonitaConfigurations, TENANT_PORTAL, tenantId);
-    }
-
-    @Override
-    public void updateTenantPortalConfForAllTenantsAndTemplate(List<BonitaConfiguration> bonitaConfigurations) {
-        // update default configuration at TENANT_TEMPLATE_PORTAL level:
+    public void updateTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations) {
+        // update default configuration at TENANT_PORTAL level:
         transactionTemplate.execute(
-                new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations,
-                        TENANT_TEMPLATE_PORTAL));
-        // Also update default configuration at TENANT_PORTAL level for all existing tenants:
-        transactionTemplate
-                .execute(new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations,
-                        TENANT_PORTAL));
+                new UpdateConfigurationInTransaction(jdbcTemplate, dbVendor, bonitaConfigurations, TENANT_PORTAL));
     }
 
     @Override
-    public void storePlatformPortalConf(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, PLATFORM_PORTAL, NON_TENANT_RESOURCE);
+    public List<BonitaConfiguration> getTenantPortalConf() {
+        return getBonitaConfigurations(TENANT_PORTAL);
     }
 
     @Override
-    public List<BonitaConfiguration> getTenantTemplatePortalConf() {
-        return getNonTenantResource(TENANT_TEMPLATE_PORTAL);
-    }
-
-    @Override
-    public List<BonitaConfiguration> getTenantPortalConf(long tenantId) {
-        return getBonitaConfigurations(TENANT_PORTAL, tenantId);
-    }
-
-    @Override
-    public BonitaConfiguration getTenantPortalConfiguration(long tenantId, String file) {
-        return getBonitaConfiguration(TENANT_PORTAL, tenantId, file);
+    public BonitaConfiguration getTenantPortalConfiguration(String file) {
+        return getBonitaConfiguration(TENANT_PORTAL, file);
     }
 
     @Override
@@ -222,7 +164,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return transactionTemplate.execute(new GetAllConfigurationInTransaction(jdbcTemplate));
     }
 
-    private void storeConfiguration(File configurationRootFolder, ConfigurationType type, long tenantId)
+    private void storeConfiguration(File configurationRootFolder, ConfigurationType type)
             throws PlatformException {
         final Path path = configurationRootFolder.toPath();
         List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
@@ -230,44 +172,39 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 bonitaConfigurations);
         try {
             Files.walkFileTree(path, configurationResourceVisitor);
-            storeConfiguration(bonitaConfigurations, type, tenantId);
+            storeConfiguration(bonitaConfigurations, type);
         } catch (IOException e) {
             throw new PlatformException(e);
         }
     }
 
-    private void storeConfiguration(List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type,
-            long tenantId) {
+    private void storeConfiguration(List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type) {
         transactionTemplate.execute(
-                new StoreConfigurationInTransaction(jdbcTemplate, dbVendor, bonitaConfigurations, type, tenantId));
+                new StoreConfigurationInTransaction(jdbcTemplate, dbVendor, bonitaConfigurations, type));
     }
 
     private void cleanAndStoreLicenseConfiguration(List<BonitaConfiguration> bonitaConfigurations) {
         transactionTemplate.execute(new CleanAndStoreConfigurationInTransaction(jdbcTemplate, dbVendor,
-                bonitaConfigurations, ConfigurationType.LICENSES, ConfigurationServiceImpl.NON_TENANT_RESOURCE));
-    }
-
-    List<BonitaConfiguration> getNonTenantResource(ConfigurationType configurationType) {
-        return getBonitaConfigurations(configurationType, NON_TENANT_RESOURCE);
+                bonitaConfigurations, ConfigurationType.LICENSES));
     }
 
     @Override
-    public List<BonitaConfiguration> getTenantEngineConf(long tenantId) {
-        return getBonitaConfigurations(TENANT_ENGINE, tenantId);
+    public List<BonitaConfiguration> getTenantEngineConf() {
+        return getBonitaConfigurations(TENANT_ENGINE);
     }
 
-    private List<BonitaConfiguration> getBonitaConfigurations(ConfigurationType type, long tenantId) {
-        return transactionTemplate.execute(new GetConfigurationsInTransaction(jdbcTemplate, tenantId, type));
+    List<BonitaConfiguration> getBonitaConfigurations(ConfigurationType type) {
+        return transactionTemplate.execute(new GetConfigurationsInTransaction(jdbcTemplate, type));
     }
 
     @Override
-    public List<BonitaConfiguration> getTenantSecurityScripts(long tenantId) {
-        return getBonitaConfigurations(TENANT_SECURITY_SCRIPTS, tenantId);
+    public List<BonitaConfiguration> getTenantSecurityScripts() {
+        return getBonitaConfigurations(TENANT_SECURITY_SCRIPTS);
     }
 
-    private BonitaConfiguration getBonitaConfiguration(ConfigurationType type, long tenantId, String resourceName) {
+    private BonitaConfiguration getBonitaConfiguration(ConfigurationType type, String resourceName) {
         return transactionTemplate
-                .execute(new GetConfigurationInTransaction(jdbcTemplate, tenantId, type, resourceName));
+                .execute(new GetConfigurationInTransaction(jdbcTemplate, type, resourceName));
     }
 
     @Override
@@ -284,16 +221,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
-    public List<BonitaConfiguration> getLicenses() throws PlatformException {
-        return getNonTenantResource(LICENSES);
-    }
-
-    @Override
-    public void deleteTenantConfiguration(long tenantId) {
-        if (tenantId <= 0) {
-            throw new IllegalArgumentException("tenantId value " + tenantId + " is not allowed");
-        }
-        transactionTemplate.execute(new DeleteTenantConfigurationInTransaction(jdbcTemplate, tenantId));
+    public List<BonitaConfiguration> getLicenses() {
+        return getBonitaConfigurations(LICENSES);
     }
 
     @Override
@@ -307,19 +236,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
-    public List<Long> getAllTenants() {
-        return transactionTemplate.execute(ts -> jdbcTemplate
-                .queryForList("SELECT distinct tenant_id FROM configuration WHERE tenant_id <> 0", Long.class));
-    }
-
-    @Override
     public void storeConfigurationsIfNotExist(List<FullBonitaConfiguration> configurations) {
         transactionTemplate.execute(new StoreConfigurationsIfNotExist(jdbcTemplate, dbVendor, configurations));
-    }
-
-    @Override
-    public long getDefaultTenantId() {
-        return jdbcTemplate.queryForObject("select distinct tenant_id from configuration where tenant_id <> 0",
-                Long.class);
     }
 }

@@ -24,20 +24,17 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
  */
 public class BonitaConfigurationContentTypeCleaner implements BatchPreparedStatementSetter {
 
-    public static final String DELETE_CONFIGURATION = "DELETE from configuration where tenant_id = ? and content_type = ? ";
+    public static final String DELETE_CONFIGURATION = "DELETE from configuration where content_type = ? ";
 
     private final ConfigurationType type;
-    private final long tenantId;
 
-    public BonitaConfigurationContentTypeCleaner(ConfigurationType type, long tenantId) {
+    public BonitaConfigurationContentTypeCleaner(ConfigurationType type) {
         this.type = type;
-        this.tenantId = tenantId;
     }
 
     @Override
     public void setValues(PreparedStatement ps, int i) throws SQLException {
-        ps.setLong(1, tenantId);
-        ps.setString(2, type.toString());
+        ps.setString(1, type.toString());
 
     }
 

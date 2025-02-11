@@ -18,8 +18,7 @@ package org.bonitasoft.platform.configuration.impl;
  */
 public interface ConfigurationColumns {
 
-    int COLUMN_INDEX_TENANT_ID = 1;
-    int COLUMN_INDEX_TYPE = 2;
-    int COLUMN_INDEX_RESOURCE_NAME = 3;
-    int COLUMN_INDEX_RESOURCE_CONTENT = 4;
+    int COLUMN_INDEX_TYPE = 1;
+    int COLUMN_INDEX_RESOURCE_NAME = 2;
+    int COLUMN_INDEX_RESOURCE_CONTENT = 3;
 }

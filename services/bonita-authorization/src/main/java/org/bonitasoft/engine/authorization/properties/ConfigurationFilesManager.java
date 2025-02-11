@@ -39,7 +39,7 @@ public class ConfigurationFilesManager {
             boolean setKeysToLowerCase) {
         Properties properties = new Properties();
         try {
-            final Map<String, Properties> propertiesByFilename = getTenantConfigurations(tenantId);
+            final Map<String, Properties> propertiesByFilename = getTenantConfigurations();
             if (propertiesByFilename.containsKey(propertiesFileName)) {
                 properties.putAll(propertiesKeysToLowerCaseIfNeeded(propertiesByFilename.get(propertiesFileName),
                         setKeysToLowerCase));
@@ -102,12 +102,12 @@ public class ConfigurationFilesManager {
         return properties;
     }
 
-    public void removeProperty(String propertiesFilename, long tenantId, String propertyName) throws IOException {
-        Map<String, Properties> resources = getTenantConfigurations(tenantId);
+    public void removeProperty(String propertiesFilename, String propertyName) throws IOException {
+        Map<String, Properties> resources = getTenantConfigurations();
         Properties properties = resources.get(propertiesFilename);
         if (properties != null) {
             properties.remove(propertyName);
-            update(tenantId, propertiesFilename, properties);
+            update(propertiesFilename, properties);
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("File " + propertiesFilename + " not found. Cannot remove property '" + propertyName + "'.");
@@ -125,10 +125,10 @@ public class ConfigurationFilesManager {
         return propertiesFilename.replaceAll("\\.properties$", "-custom" + ".properties");
     }
 
-    protected void update(long tenantId, String propertiesFilename, Properties properties) throws IOException {
+    protected void update(String propertiesFilename, Properties properties) throws IOException {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             properties.store(byteArrayOutputStream, "");
-            getConfigurationFilesUtils().updateTenantPortalConfigurationFile(tenantId, propertiesFilename,
+            getConfigurationFilesUtils().updateTenantPortalConfigurationFile(propertiesFilename,
                     byteArrayOutputStream.toByteArray());
         } catch (UpdateException e) {
             throw new IOException(e);
@@ -139,25 +139,25 @@ public class ConfigurationFilesManager {
         return BonitaHomeServer.getInstance();
     }
 
-    protected Properties getTenantPortalConfiguration(long tenantId, String propertiesFilename) {
+    protected Properties getTenantPortalConfiguration(String propertiesFilename) {
         return ConfigurationFilesManager
-                .getProperties(getConfigurationFilesUtils().getTenantPortalConfiguration(tenantId, propertiesFilename));
+                .getProperties(getConfigurationFilesUtils().getTenantPortalConfiguration(propertiesFilename));
     }
 
-    protected Map<String, Properties> getTenantConfigurations(long tenantId)
+    protected Map<String, Properties> getTenantConfigurations()
             throws IOException {
         Map<String, byte[]> clientTenantConfigurations = getConfigurationFilesUtils()
-                .getTenantPortalConfigurations(tenantId);
+                .getTenantPortalConfigurations();
         return clientTenantConfigurations.entrySet().stream().collect(Collectors.toMap(
                 Entry::getKey, v -> ConfigurationFilesManager.getProperties(v.getValue())));
     }
 
-    public void setProperty(String propertiesFilename, long tenantId, String propertyName, String propertyValue)
+    public void setProperty(String propertiesFilename, String propertyName, String propertyValue)
             throws IOException {
-        Properties properties = getTenantPortalConfiguration(tenantId, propertiesFilename);
+        Properties properties = getTenantPortalConfiguration(propertiesFilename);
         if (properties != null) {
             properties.setProperty(propertyName, propertyValue);
-            update(tenantId, propertiesFilename, properties); // store them back in database
+            update(propertiesFilename, properties); // store them back in database
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("File " + propertiesFilename + " not found. Cannot set property '" + propertyName + "'.");

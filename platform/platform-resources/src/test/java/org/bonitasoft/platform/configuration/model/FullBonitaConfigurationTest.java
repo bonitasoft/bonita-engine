@@ -31,20 +31,20 @@ public class FullBonitaConfigurationTest {
     public void should_have_readable_toString() {
         //given
         FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("resourceName",
-                "content".getBytes(), "type", 147L);
+                "content".getBytes(), "type");
 
         //then
         Assertions
                 .assertThat(fullBonitaConfiguration.toString())
                 .isEqualTo(
-                        "FullBonitaConfiguration{ resourceName='resourceName' , configurationType='type' , tenantId=147 }");
+                        "FullBonitaConfiguration{ resourceName='resourceName' , configurationType='type' }");
     }
 
     @Test
     public void should_be_a_licence_file() {
         //given
         FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("resourceName",
-                "content".getBytes(), LICENSES.name(), 147L);
+                "content".getBytes(), LICENSES.name());
 
         //then
         Assertions.assertThat(fullBonitaConfiguration.isLicenseFile()).isTrue();
@@ -54,39 +54,19 @@ public class FullBonitaConfigurationTest {
     public void should_not_be_a_licence_file() {
         //given
         final List<ConfigurationType> allExceptLicense = Arrays.asList(PLATFORM_PORTAL, PLATFORM_ENGINE, TENANT_PORTAL,
-                TENANT_ENGINE, TENANT_TEMPLATE_ENGINE, TENANT_SECURITY_SCRIPTS, TENANT_TEMPLATE_SECURITY_SCRIPTS,
-                TENANT_TEMPLATE_PORTAL);
+                TENANT_ENGINE, TENANT_ENGINE, TENANT_SECURITY_SCRIPTS, TENANT_SECURITY_SCRIPTS,
+                TENANT_PORTAL);
 
         for (ConfigurationType configurationType : allExceptLicense) {
 
             //when
             FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("resourceName",
-                    "content".getBytes(), configurationType.name(), 147L);
+                    "content".getBytes(), configurationType.name());
 
             //then
             Assertions.assertThat(fullBonitaConfiguration.isLicenseFile()).isFalse();
 
         }
-
     }
 
-    @Test
-    public void should_be_a_tenant_file() {
-        //given
-        FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("resourceName",
-                "content".getBytes(), "type", 147L);
-
-        //then
-        Assertions.assertThat(fullBonitaConfiguration.isTenantFile()).isTrue();
-    }
-
-    @Test
-    public void should_not_be_a_tenant_file() {
-        //given
-        FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("resourceName",
-                "content".getBytes(), "type", 0L);
-
-        //then
-        Assertions.assertThat(fullBonitaConfiguration.isTenantFile()).isFalse();
-    }
 }

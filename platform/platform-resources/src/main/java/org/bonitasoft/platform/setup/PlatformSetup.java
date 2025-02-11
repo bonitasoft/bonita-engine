@@ -63,8 +63,6 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(PlatformSetup.class)
 public class PlatformSetup {
 
-    public static final long DEFAULT_TENANT_ID = 1L;
-
     public static final String BONITA_SETUP_FOLDER = "org.bonitasoft.platform.setup.folder";
 
     public static final String PLATFORM_CONF_FOLDER_NAME = "platform_conf";
@@ -156,17 +154,6 @@ public class PlatformSetup {
         }
         pushLicenses(true);
         LOGGER.info("Initial configuration files successfully pushed to database");
-        initializeTenant();
-
-    }
-
-    private void initializeTenant() {
-        configurationService.storeTenantEngineConf(configurationService.getTenantTemplateEngineConf(),
-                DEFAULT_TENANT_ID);
-        configurationService
-                .storeTenantSecurityScripts(configurationService.getTenantTemplateSecurityScripts(), DEFAULT_TENANT_ID);
-        configurationService.storeTenantPortalConf(configurationService.getTenantTemplatePortalConf(),
-                DEFAULT_TENANT_ID);
     }
 
     boolean isPlatformAlreadyCreated() {
@@ -238,31 +225,18 @@ public class PlatformSetup {
                     LOGGER.warn("Force-pushing the deletion of folder {}", folder);
                 } else {
                     throw new PlatformException("You are trying to remove a protected folder from configuration: " +
-                            getSpecificErrorMessage(configuration, folder));
+                            getSpecificErrorMessage(folder));
                 }
             }
         }
     }
 
     protected Path getFolderFromConfiguration(LightBonitaConfiguration configuration) {
-        if (configuration.getTenantId() == 0L) {
-            return currentConfigurationFolder.resolve(configuration.getType().toLowerCase());
-        } else {
-            return currentConfigurationFolder.resolve("tenants").resolve(configuration.getTenantId().toString())
-                    .resolve(configuration.getType().toLowerCase());
-        }
+        return currentConfigurationFolder.resolve(configuration.type().toLowerCase());
     }
 
-    private String getSpecificErrorMessage(LightBonitaConfiguration configuration, Path folder) {
-        final String message;
-        if (configuration.getTenantId() == 0L) {
-            message = "You are not allowed to remove folder '" + folder.toString() + "'";
-        } else {
-            message = "You are not allowed to remove configuration folder for tenant " + configuration.getTenantId() +
-                    ". To remove a tenant, please search for 'Platform API' on https://documentation.bonitasoft.com";
-        }
-        return message
-                + lineSeparator()
+    private String getSpecificErrorMessage(Path folder) {
+        return "You are not allowed to remove folder '" + folder.toString() + "'" + lineSeparator()
                 + "To restore the deleted folders, run 'setup pull'. You will lose the locally modified configuration.";
     }
 
@@ -271,7 +245,6 @@ public class PlatformSetup {
      * each file will be located under sub folder according to its purpose. See
      * {@link org.bonitasoft.platform.configuration.type.ConfigurationType} for all
      * available values
-     * For tenant specific files, a tenants/[TENANT_ID] folder is created prior to configuration type
      */
     public void pull() throws PlatformException {
         initPlatformSetup();
@@ -402,26 +375,24 @@ public class PlatformSetup {
     }
 
     private void updateDefaultConfigurationFromFolder(Path folderToPush) throws PlatformException {
-        configurationService.updateDefaultConfigurationForAllTenantsAndTemplate(folderToPush);
+        configurationService.updateDefaultConfiguration(folderToPush);
     }
 
     private void insertNewConfigurationsFromClasspathIfExist() throws PlatformException {
         final ArrayList<FullBonitaConfiguration> configurations = new ArrayList<>();
-        final List<Long> allTenants = configurationService.getAllTenants();
         try {
-            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_ENGINE, allTenants));
-            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_PORTAL, allTenants));
-            configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_ENGINE, allTenants));
-            configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_PORTAL, allTenants));
-            configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_SECURITY_SCRIPTS, allTenants));
-
+            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_ENGINE));
+            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_PORTAL));
+            configurations.addAll(getConfigurationsMatchingPattern(TENANT_ENGINE));
+            configurations.addAll(getConfigurationsMatchingPattern(TENANT_PORTAL));
+            configurations.addAll(getConfigurationsMatchingPattern(TENANT_SECURITY_SCRIPTS));
         } catch (IOException e) {
             throw new PlatformException(e);
         }
         configurationService.storeConfigurationsIfNotExist(configurations);
     }
 
-    public List<FullBonitaConfiguration> getConfigurationsMatchingPattern(ConfigurationType type, List<Long> allTenants)
+    public List<FullBonitaConfiguration> getConfigurationsMatchingPattern(ConfigurationType type)
             throws IOException {
         final ArrayList<FullBonitaConfiguration> configurations = new ArrayList<>();
         final String typeLowercase = type.name().toLowerCase();
@@ -433,17 +404,7 @@ public class PlatformSetup {
                 LOGGER.debug("Found configuration file '{}' of type '{}' in classpath", resourceName, type);
                 try (InputStream resourceAsStream = resource.getInputStream()) {
                     final byte[] content = IOUtils.toByteArray(resourceAsStream);
-                    // insert the file both at platform level for the template...
-                    // eg. (TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml", 0L):
-                    configurations.add(new FullBonitaConfiguration(resourceName, content, type.name(), 0L));
-                    if (typeLowercase.contains("_template_")) {
-                        // also add a version of the configuration file for each existing tenant.
-                        // eg. (TENANT_ENGINE, "bonita-tenant-sp-custom.xml", tenantId):
-                        for (Long tenantId : allTenants) {
-                            configurations.add(new FullBonitaConfiguration(resourceName, content,
-                                    type.name().replace("_TEMPLATE", ""), tenantId));
-                        }
-                    }
+                    configurations.add(new FullBonitaConfiguration(resourceName, content, type.name()));
                 }
             }
         }
@@ -453,13 +414,13 @@ public class PlatformSetup {
     private void updateDefaultConfigurationFromClasspath() throws PlatformException {
         List<BonitaConfiguration> portalTenant = new ArrayList<>(3);
         try {
-            addIfExists(portalTenant, TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping.properties");
-            addIfExists(portalTenant, TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks.properties");
-            addIfExists(portalTenant, TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping.properties");
+            addIfExists(portalTenant, TENANT_PORTAL, "compound-permissions-mapping.properties");
+            addIfExists(portalTenant, TENANT_PORTAL, "dynamic-permissions-checks.properties");
+            addIfExists(portalTenant, TENANT_PORTAL, "resources-permissions-mapping.properties");
         } catch (IOException e) {
             throw new PlatformException(e);
         }
-        configurationService.updateTenantPortalConfForAllTenantsAndTemplate(portalTenant);
+        configurationService.updateTenantPortalConf(portalTenant);
     }
 
     private void addIfExists(List<BonitaConfiguration> configurations, ConfigurationType configurationType,

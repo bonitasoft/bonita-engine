@@ -133,7 +133,7 @@ public abstract class ConfigurationFile {
             final Properties tenantProperties = getProperties();
             if (tenantProperties.remove(propertyName) != null) { // if the property was present
                 storePropertiesInCache(tenantProperties);
-                configurationFilesManager.removeProperty(propertiesFilename, tenantId, propertyName);
+                configurationFilesManager.removeProperty(propertiesFilename, propertyName);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -150,7 +150,7 @@ public abstract class ConfigurationFile {
             if (tenantProperties.remove(propertyName) != null) { // if the property was present
                 storePropertiesInCache(tenantProperties);
                 configurationFilesManager.removeProperty(getCustomPropertiesFilename(propertiesFilename),
-                        tenantId, propertyName);
+                        propertyName);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -167,7 +167,7 @@ public abstract class ConfigurationFile {
             if (tenantProperties.remove(propertyName) != null) { // if the property was present
                 storePropertiesInCache(tenantProperties);
                 configurationFilesManager.removeProperty(getInternalPropertiesFilename(propertiesFilename),
-                        tenantId, propertyName);
+                        propertyName);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -183,7 +183,7 @@ public abstract class ConfigurationFile {
             final Properties tenantProperties = getProperties();
             tenantProperties.setProperty(propertyName, propertyValue);
             storePropertiesInCache(tenantProperties);
-            configurationFilesManager.setProperty(propertiesFilename, tenantId, propertyName,
+            configurationFilesManager.setProperty(propertiesFilename, propertyName,
                     propertyValue);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -199,7 +199,7 @@ public abstract class ConfigurationFile {
             tenantProperties.setProperty(propertyName, propertyValue);
             storePropertiesInCache(tenantProperties);
             configurationFilesManager.setProperty(getCustomPropertiesFilename(propertiesFilename),
-                    tenantId, propertyName, propertyValue);
+                    propertyName, propertyValue);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -214,7 +214,7 @@ public abstract class ConfigurationFile {
             tenantProperties.setProperty(propertyName, propertyValue);
             storePropertiesInCache(tenantProperties);
             configurationFilesManager.setProperty(getInternalPropertiesFilename(propertiesFilename),
-                    tenantId, propertyName, propertyValue);
+                    propertyName, propertyValue);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

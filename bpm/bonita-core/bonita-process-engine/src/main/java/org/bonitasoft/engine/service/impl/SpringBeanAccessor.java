@@ -172,7 +172,7 @@ public class SpringBeanAccessor {
         extractHazelcastConfigurationFile(platformConfiguration);
 
         bonitaConfigurations.addAll(platformConfiguration);
-        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getTenantConfiguration(BONITA_HOME_SERVER.getDefaultTenantId()));
+        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getTenantConfiguration());
         return bonitaConfigurations;
     }
 

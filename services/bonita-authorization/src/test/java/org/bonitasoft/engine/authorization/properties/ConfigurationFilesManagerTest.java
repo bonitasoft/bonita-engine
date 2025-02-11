@@ -61,11 +61,11 @@ public class ConfigurationFilesManagerTest {
         configurationFiles.put("configFile1.properties", getProperties("myProp1=authKey\nmyProp2=passHash".getBytes()));
         configurationFiles.put(MY_PROP_INTERNAL_PROPERTIES,
                 getProperties("testProperty=testValue\npropToRemove=willBeRemoved".getBytes()));
-        doReturn(configurationFiles).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
+        doReturn(configurationFiles).when(configurationFilesManager).getTenantConfigurations();
         //when
-        configurationFilesManager.removeProperty(MY_PROP_INTERNAL_PROPERTIES, TENANT_ID, "propToRemove");
+        configurationFilesManager.removeProperty(MY_PROP_INTERNAL_PROPERTIES, "propToRemove");
         //then
-        verify(bonitaHomeServer).updateTenantPortalConfigurationFile(eq(TENANT_ID), eq(MY_PROP_INTERNAL_PROPERTIES),
+        verify(bonitaHomeServer).updateTenantPortalConfigurationFile(eq(MY_PROP_INTERNAL_PROPERTIES),
                 contentCaptor.capture());
         assertThat(new String(contentCaptor.getValue())).doesNotContain("propToRemove").contains("testProperty",
                 "testValue");
@@ -75,11 +75,11 @@ public class ConfigurationFilesManagerTest {
     public void should_setProperty_call_update_with_new_content() throws Exception {
         //given
         doReturn(getProperties("testProperty=testValue\npropToRemove=willBeRemoved".getBytes()))
-                .when(configurationFilesManager).getTenantPortalConfiguration(TENANT_ID, MY_PROP_INTERNAL_PROPERTIES);
+                .when(configurationFilesManager).getTenantPortalConfiguration(MY_PROP_INTERNAL_PROPERTIES);
         //when
-        configurationFilesManager.setProperty(MY_PROP_INTERNAL_PROPERTIES, TENANT_ID, "testProperty", "new Value");
+        configurationFilesManager.setProperty(MY_PROP_INTERNAL_PROPERTIES, "testProperty", "new Value");
         //then
-        verify(bonitaHomeServer).updateTenantPortalConfigurationFile(eq(TENANT_ID), eq(MY_PROP_INTERNAL_PROPERTIES),
+        verify(bonitaHomeServer).updateTenantPortalConfigurationFile(eq(MY_PROP_INTERNAL_PROPERTIES),
                 contentCaptor.capture());
         assertThat(new String(contentCaptor.getValue())).doesNotContain("testValue").contains("testProperty",
                 "new Value");
@@ -96,7 +96,7 @@ public class ConfigurationFilesManagerTest {
         Map<String, Properties> propertiesMap = new HashMap<>();
         propertiesMap.put("toto.properties", defaultProps);
         propertiesMap.put("toto-custom.properties", customProps);
-        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
+        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations();
 
         //when
         final Properties properties = configurationFilesManager
@@ -117,7 +117,7 @@ public class ConfigurationFilesManagerTest {
         Map<String, Properties> propertiesMap = new HashMap<>();
         propertiesMap.put("toto.properties", defaultProps);
         propertiesMap.put("toto-internal.properties", internalProps);
-        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
+        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations();
 
         //when
         final Properties properties = configurationFilesManager
@@ -136,7 +136,7 @@ public class ConfigurationFilesManagerTest {
         defaultProps.put("defaultKey", "defaultValue");
         Map<String, Properties> propertiesMap = new HashMap<>();
         propertiesMap.put("toto.properties", defaultProps);
-        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
+        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations();
 
         //when
         final Properties properties = configurationFilesManager
@@ -163,7 +163,7 @@ public class ConfigurationFilesManagerTest {
         propertiesMap.put("overwrite.properties", defaultProps);
         propertiesMap.put("overwrite-internal.properties", internalProps);
         propertiesMap.put("overwrite-custom.properties", customProps);
-        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
+        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations();
 
         //when
         final Properties properties = configurationFilesManager
