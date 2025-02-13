@@ -95,6 +95,16 @@ public class ConnectorInstanceDatastore extends CommonDatastore<ConnectorInstanc
                 ConnectorInstancesSearchDescriptor.CONTAINER_ID);
         addStringFilterToSearchBuilder(filters, builder, ConnectorInstanceItem.ATTRIBUTE_STATE,
                 ConnectorInstancesSearchDescriptor.STATE);
+        addStringFilterToSearchBuilder(filters, builder, ConnectorInstanceItem.ATTRIBUTE_CONTAINER_TYPE,
+                ConnectorInstancesSearchDescriptor.CONTAINER_TYPE);
+        addStringFilterToSearchBuilder(filters, builder, ConnectorInstanceItem.ATTRIBUTE_ACTIVATION_EVENT,
+                ConnectorInstancesSearchDescriptor.ACTIVATION_EVENT);
+        addStringFilterToSearchBuilder(filters, builder, ConnectorInstanceItem.ATTRIBUTE_CONNECTOR_ID,
+                ConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_ID);
+        addStringFilterToSearchBuilder(filters, builder, ConnectorInstanceItem.ATTRIBUTE_VERSION,
+                ConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_VERSION);
+        addStringFilterToSearchBuilder(filters, builder, ConnectorInstanceItem.ATTRIBUTE_NAME,
+                ConnectorInstancesSearchDescriptor.NAME);
         return builder.done();
     }
 
