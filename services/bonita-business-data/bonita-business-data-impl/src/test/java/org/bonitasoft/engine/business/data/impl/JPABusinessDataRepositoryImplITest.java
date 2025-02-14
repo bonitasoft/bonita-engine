@@ -38,7 +38,7 @@ import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -91,8 +91,8 @@ public class JPABusinessDataRepositoryImplITest {
 
         final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration());
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(
-                new BusinessDataModelRepositoryImpl(mock(PlatformService.class), mock(DependencyService.class),
-                        classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
+                new BusinessDataModelRepositoryImpl(mock(PlatformService.class), mock(TenantDependencyService.class),
+                        classLoaderService, schemaManager, mock(TenantResourcesService.class)));
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,
                         configuration.getJpaConfiguration(), classLoaderService));

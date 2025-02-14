@@ -16,10 +16,6 @@ package org.bonitasoft.engine;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.operation.OperatorType.ASSIGNMENT;
 
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -39,7 +35,6 @@ import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 /**
  * @author Baptiste Mesta.
@@ -170,8 +165,7 @@ public class StringIndexIT extends CommonAPIIT {
         deleteUser(testUser);
     }
 
-    private BusinessObjectModel buildSimpleBom(final String boQualifiedName)
-            throws IOException, JAXBException, SAXException {
+    private BusinessObjectModel buildSimpleBom(final String boQualifiedName) {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
         final SimpleField field = new SimpleField();

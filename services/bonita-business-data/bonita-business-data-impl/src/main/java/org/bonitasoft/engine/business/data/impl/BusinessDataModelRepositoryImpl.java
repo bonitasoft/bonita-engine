@@ -54,9 +54,9 @@ import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
+import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.io.IOUtils;
@@ -67,7 +67,6 @@ import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -88,24 +87,21 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private static final String BOM_NAME = "bom.zip";
 
-    private final DependencyService dependencyService;
+    private final TenantDependencyService dependencyService;
     private final ClassLoaderService classLoaderService;
 
     private final SchemaManager schemaManager;
     private final TenantResourcesService tenantResourcesService;
-    private final long tenantId;
     private final PlatformService platformService;
 
     public BusinessDataModelRepositoryImpl(final PlatformService platformService,
-            final DependencyService dependencyService,
-            ClassLoaderService classLoaderService, final SchemaManager schemaManager,
-            TenantResourcesService tenantResourcesService, @Value("${tenantId}") long tenantId) {
+            final TenantDependencyService dependencyService, ClassLoaderService classLoaderService,
+            final SchemaManager schemaManager, TenantResourcesService tenantResourcesService) {
         this.platformService = platformService;
         this.dependencyService = dependencyService;
         this.classLoaderService = classLoaderService;
         this.schemaManager = schemaManager;
         this.tenantResourcesService = tenantResourcesService;
-        this.tenantId = tenantId;
     }
 
     @Override
@@ -125,8 +121,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
         try {
-            Optional<Long> returnedId = dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT,
-                    BDR_DEPENDENCY_FILENAME);
+            Optional<Long> returnedId = dependencyService.getIdOfDependencyOfArtifactForTenant(BDR_DEPENDENCY_FILENAME);
             if (returnedId.isPresent()) {
                 return String.valueOf(returnedId.get());
             }
@@ -161,8 +156,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public boolean isBDMDeployed() {
         try {
-            return dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME)
-                    .isPresent();
+            return dependencyService.getIdOfDependencyOfArtifactForTenant(BDR_DEPENDENCY_FILENAME).isPresent();
         } catch (SBonitaReadException e) {
             return false;
         }
@@ -174,18 +168,16 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createAndDeployClientBDMZip(model, userId);
-        final long bdmVersion = createAndDeployServerBDMJar(tenantId, model);
+        final long bdmVersion = createAndDeployServerBDMJar(model);
         return String.valueOf(bdmVersion);
     }
 
-    protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model)
+    protected long createAndDeployServerBDMJar(final BusinessObjectModel model)
             throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
             final AbstractSDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME,
-                    serverBdmJar,
-                    BDR_DEPENDENCY_FILENAME, tenantId,
-                    ScopeType.TENANT);
+                    serverBdmJar, BDR_DEPENDENCY_FILENAME, -1L, ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
             ClassLoaderIdentifier tenantClassLoader = ClassLoaderIdentifier.TENANT;
             classLoaderService.refreshClassLoaderImmediatelyWithRollback(tenantClassLoader);
@@ -363,8 +355,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     public boolean isDeployed(byte[] bdmArchive)
             throws InvalidBusinessDataModelException, SBusinessDataRepositoryDeploymentException {
         try {
-            var bdmDependencyId = dependencyService
-                    .getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME);
+            var bdmDependencyId = dependencyService.getIdOfDependencyOfArtifactForTenant(BDR_DEPENDENCY_FILENAME);
             if (bdmDependencyId.isEmpty()) {
                 log.debug("No BDM currently deployed.");
                 return false;

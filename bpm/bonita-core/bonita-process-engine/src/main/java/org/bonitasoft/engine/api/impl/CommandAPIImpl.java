@@ -86,8 +86,7 @@ public class CommandAPIImpl implements CommandAPI {
         final DependencyService dependencyService = serviceAccessor.getDependencyService();
         final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
         try {
-            dependencyService.createMappedDependency(name, jar, name + ".jar", 1L //FIXME: can we omit completely the tenantID instead of 1
-                    , ScopeType.TENANT);
+            dependencyService.createMappedDependency(name, jar, name + ".jar", -1L, ScopeType.TENANT);
             classLoaderService
                     .refreshClassLoaderAfterUpdate(ClassLoaderIdentifier.TENANT);
         } catch (final SDependencyAlreadyExistsException e) {

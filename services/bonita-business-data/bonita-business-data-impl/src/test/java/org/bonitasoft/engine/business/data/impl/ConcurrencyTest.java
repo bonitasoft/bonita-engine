@@ -30,7 +30,7 @@ import javax.transaction.UserTransaction;
 import com.company.pojo.Employee;
 import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -48,7 +48,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(locations = { "/testContext.xml" })
 public class ConcurrencyTest {
 
-    private static final long TENANT_ID = 654643L;
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
     @Autowired
@@ -67,7 +66,7 @@ public class ConcurrencyTest {
 
     private UserTransaction ut;
 
-    private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
+    private final ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
 
     @Before
     public void setUp() throws Exception {
@@ -76,9 +75,8 @@ public class ConcurrencyTest {
         }
         final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration());
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(
-                new BusinessDataModelRepositoryImpl(mock(PlatformService.class),
-                        mock(DependencyService.class),
-                        classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
+                new BusinessDataModelRepositoryImpl(mock(PlatformService.class), mock(TenantDependencyService.class),
+                        classLoaderService, schemaManager, mock(TenantResourcesService.class)));
         final UserTransactionService transactionService = mock(UserTransactionService.class);
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,

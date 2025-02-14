@@ -16,7 +16,9 @@ package org.bonitasoft.engine.dependency.impl;
 import javax.annotation.PostConstruct;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DependencyServiceRegistrator {
 
     private final TenantDependencyService tenantDependencyService;

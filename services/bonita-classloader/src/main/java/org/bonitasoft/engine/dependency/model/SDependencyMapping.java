@@ -31,8 +31,15 @@ import lombok.experimental.SuperBuilder;
 @Cacheable(false)
 public class SDependencyMapping extends SAbstractDependencyMapping {
 
+    private static final long MEANINGLESS_ID = -1L;
+
     public SDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super(artifactId, artifactType, dependencyId);
+        // Need to set it afterwards because the call to super() MUST be the first statement
+        if (ScopeType.TENANT == artifactType) {
+            // If the scope is TENANT, the artifactId is meaningless:
+            setArtifactId(MEANINGLESS_ID);
+        }
     }
 
 }
