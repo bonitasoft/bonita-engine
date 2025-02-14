@@ -134,7 +134,6 @@ public class ActivityVariableResourceTest extends RestletTest {
 
     private void fillIds(final DataInstanceImpl dataInstance) {
         dataInstance.setId(5L);
-        dataInstance.setTenantId(2L);
         dataInstance.setContainerId(7L);
     }
 

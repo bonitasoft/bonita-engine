@@ -13,8 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
+import java.io.Serial;
 import java.io.Serializable;
 
+import lombok.Setter;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 
@@ -22,11 +24,11 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
+@Setter
 public abstract class DataInstanceImpl implements DataInstance {
 
+    @Serial
     private static final long serialVersionUID = -3752347909196691889L;
-
-    private long tenantId;
 
     private long id;
 
@@ -53,46 +55,8 @@ public abstract class DataInstanceImpl implements DataInstance {
         className = dataDefinition.getClassName();
     }
 
-    @Deprecated
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public void setTransientData(final boolean transientData) {
-        this.transientData = transientData;
-    }
-
-    public void setClassName(final String className) {
-        this.className = className;
-    }
-
-    public void setContainerId(final long containerId) {
-        this.containerId = containerId;
-    }
-
-    public void setContainerType(final String containerType) {
-        this.containerType = containerType;
-    }
-
     public void setDataTypeClassName(final String className) {
         this.className = className;
-    }
-
-    @Deprecated
-    public long getTenantId() {
-        return tenantId;
     }
 
     @Override

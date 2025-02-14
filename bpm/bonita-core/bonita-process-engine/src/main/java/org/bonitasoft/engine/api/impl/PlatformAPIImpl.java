@@ -175,7 +175,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public byte[] getClientTenantConfiguration(long tenantId, String file) {
+    public byte[] getClientTenantConfiguration(String file) {
         return getBonitaHomeServer().getTenantPortalConfiguration(file);
     }
 
@@ -184,7 +184,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
+    public void updateClientTenantConfigurationFile(String file, byte[] content) throws UpdateException {
         getBonitaHomeServer().updateTenantPortalConfigurationFile(file, content);
     }
 }
