@@ -51,7 +51,7 @@ public class DefaultProfilesUpdaterTest {
     @Before
     public void before() throws IOException, BonitaHomeNotSetException, ExecutionException {
         md5File = temporaryFolder.newFile();
-        defaultProfilesUpdater = spy(new DefaultProfilesUpdater(1L, profilesImporter));
+        defaultProfilesUpdater = spy(new DefaultProfilesUpdater(profilesImporter));
         doReturn(md5File).when(defaultProfilesUpdater).getProfilesMD5File();
         doReturn("xml content").when(defaultProfilesUpdater).getDefaultProfilesXml();
         doReturn(defaultProfiles).when(defaultProfilesUpdater).getProfilesFromXML(anyString());

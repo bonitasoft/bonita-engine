@@ -16,34 +16,16 @@ package org.bonitasoft.engine.home;
 import java.io.File;
 import java.io.IOException;
 
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-
 /**
- * Handles tenant related files of the bonita home, mainly bdm and security scripts
+ * Handles storage and retrieval of profile temporary md5 file.
  *
  * @author Baptiste Mesta
  */
-public class TenantStorage {
+public class ProfileStorage {
 
-    TenantStorage() {
-    }
-
-    private void createFolders(Folder current) {
-        if (!current.exists()) {
-            current.getFile().mkdirs();
-        }
-    }
-
-    public File getProfileMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
-        Folder tenantWorkFolder = getTenantTempFolder(tenantId);
+    public File getProfileMD5() throws IOException {
+        Folder tenantWorkFolder = FolderMgr.getPlatformTempFolder();
         return tenantWorkFolder.getFile("profiles.md5");
-
-    }
-
-    Folder getTenantTempFolder(long tenantId) throws IOException {
-        Folder tenantWorkFolder = FolderMgr.getTenantTempFolder(tenantId);
-        createFolders(tenantWorkFolder);
-        return tenantWorkFolder;
     }
 
 }

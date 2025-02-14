@@ -84,12 +84,8 @@ public class PermissionServiceImpl implements PermissionService {
     protected final DynamicPermissionsChecks dynamicPermissionsChecks;
     protected final BooleanProperty dynamicPermissionCheck;
 
-    protected final long tenantId;
-
     public PermissionServiceImpl(final ClassLoaderService classLoaderService, final SessionAccessor sessionAccessor,
-            final SessionService sessionService,
-            @Value("${tenantId}") final long tenantId,
-            CompoundPermissionsMapping compoundPermissionsMapping,
+            final SessionService sessionService, CompoundPermissionsMapping compoundPermissionsMapping,
             ResourcesPermissionsMapping resourcesPermissionsMapping,
             CustomPermissionsMapping customPermissionsMapping,
             DynamicPermissionsChecks dynamicPermissionsChecks,
@@ -97,7 +93,6 @@ public class PermissionServiceImpl implements PermissionService {
         this.classLoaderService = classLoaderService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
-        this.tenantId = tenantId;
         this.compoundPermissionsMapping = compoundPermissionsMapping;
         this.resourcesPermissionsMapping = resourcesPermissionsMapping;
         this.customPermissionsMapping = customPermissionsMapping;

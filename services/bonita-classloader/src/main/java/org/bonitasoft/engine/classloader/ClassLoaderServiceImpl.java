@@ -43,7 +43,6 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -176,14 +175,20 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     URI getLocalTemporaryFolder(ClassLoaderIdentifier identifier) throws IOException {
-        return BonitaHomeServer.getInstance().getLocalTemporaryFolder(identifier.getType().name(), identifier.getId());
+        if (identifier.isGlobalClassloader() || identifier.isTenantClassloader()) {
+            // For tenant and platform (=GLOBAL), no need to have a sub-folder with the identifier:
+            return BonitaHomeServer.getInstance().getLocalTemporaryFolder(identifier.getType().name());
+        } else {
+            // For process-level classloader, store jar files in sub-folder named with the identifier:
+            return BonitaHomeServer.getInstance().getLocalTemporaryFolder(identifier.getType().name(),
+                    identifier.getId());
+        }
     }
 
     BonitaClassLoader createClassloader(ClassLoaderIdentifier id) throws IOException, SClassLoaderException {
         log.debug("Creating classloader {}", id);
         BonitaClassLoader classLoader = BonitaClassLoaderFactory.createClassLoader(getDependencies(id), id,
-                getLocalTemporaryFolder(id),
-                getParentClassLoader(id));
+                getLocalTemporaryFolder(id), getParentClassLoader(id));
         log.info("Created classloader {}: {}", id, classLoader);
         return classLoader;
     }
@@ -353,7 +358,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     public void refreshClassLoaderAfterUpdate(ClassLoaderIdentifier identifier) throws SClassLoaderException {
         try {
             registerRefreshOnAllNodes(identifier);
-        } catch (STransactionNotFoundException | STenantIdNotSetException e) {
+        } catch (STransactionNotFoundException e) {
             throw new SClassLoaderException(e);
         }
     }
@@ -385,8 +390,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    private void registerRefreshOnAllNodes(ClassLoaderIdentifier identifier)
-            throws STransactionNotFoundException, STenantIdNotSetException {
+    private void registerRefreshOnAllNodes(ClassLoaderIdentifier identifier) throws STransactionNotFoundException {
         synchronized (synchroLock) {
             RefreshClassloaderSynchronization refreshTaskSynchronization = currentRefreshTask.get();
             if (refreshTaskSynchronization == null) {

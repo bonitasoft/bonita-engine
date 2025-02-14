@@ -500,12 +500,10 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testDifferentsApplicationHaveDifferentGlobalClassLoader() throws Exception {
+    public void different_applications_should_have_same_global_classLoader() throws Exception {
         initializeClassLoaderServiceWithTwoApplications();
-        final ClassLoader process1Classloader = classLoaderService
-                .getClassLoader(identifier(PROCESS, ID1));
-        final ClassLoader tenant1Classloader = classLoaderService
-                .getClassLoader(identifier(TENANT, ID1));
+        final ClassLoader process1Classloader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader tenant1Classloader = classLoaderService.getClassLoader(ClassLoaderIdentifier.TENANT);
 
         final Class<?> sharedClassLoadedFromProcess1 = process1Classloader
                 .loadClass("org.bonitasoft.engine.classloader.SharedClass1");

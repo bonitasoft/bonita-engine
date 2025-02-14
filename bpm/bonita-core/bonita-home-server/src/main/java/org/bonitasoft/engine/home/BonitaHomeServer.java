@@ -51,11 +51,11 @@ public class BonitaHomeServer {
      * property name of the server api implementation class name
      */
     private static final String SERVER_API_IMPLEMENTATION = "serverApi";
-    private final TenantStorage tenantStorage;
+    private final ProfileStorage profileStorage;
     private ConfigurationService configurationService;
 
     private BonitaHomeServer() {
-        tenantStorage = new TenantStorage();
+        profileStorage = new ProfileStorage();
     }
 
     public static BonitaHomeServer getInstance() {
@@ -166,8 +166,8 @@ public class BonitaHomeServer {
      * =================================================
      */
 
-    public TenantStorage getTenantStorage() {
-        return tenantStorage;
+    public ProfileStorage getProfileStorage() {
+        return profileStorage;
     }
 
     /**
@@ -200,13 +200,17 @@ public class BonitaHomeServer {
         return file;
     }
 
+    public URI getLocalTemporaryFolder(final String artifactType) throws IOException {
+        return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType).toURI();
+    }
+
     public URI getLocalTemporaryFolder(final String artifactType, final long artifactId) throws IOException {
         return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType, artifactId).toURI();
     }
 
-    public File getSecurityScriptsFolder(long tenantId) throws BonitaHomeNotSetException, IOException {
-        final Folder localFolder = getFolder(getPlatformTempFolder(), "security-scripts").createIfNotExists();
-        final Folder tenantSecurityScriptsFolder = getFolder(localFolder, String.valueOf(tenantId)).createIfNotExists();
+    public File getSecurityScriptsFolder() throws BonitaHomeNotSetException, IOException {
+        final Folder tenantSecurityScriptsFolder = getFolder(getPlatformTempFolder(), "security-scripts")
+                .createIfNotExists();
         List<BonitaConfiguration> tenantSecurityScripts = getConfigurationService().getTenantSecurityScripts();
         writeBonitaConfiguration(tenantSecurityScriptsFolder.getFile(), tenantSecurityScripts);
         return tenantSecurityScriptsFolder.getFile();

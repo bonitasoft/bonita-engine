@@ -72,14 +72,6 @@ public class FolderMgr {
         return getFolder(getTempFolder(), "licenses");
     }
 
-    static Folder getTenantsWorkFolder(final File parentFolder) throws IOException {
-        return getFolder(parentFolder, "tenants");
-    }
-
-    static Folder getTenantTempFolder(long tenantId) throws IOException {
-        return getFolder(getTenantsWorkFolder(getTempFolder().getFile()), Long.toString(tenantId));
-    }
-
     private static Folder getPlatformClassLoaderFolder() throws IOException {
         return getFolder(getPlatformTempFolder(), "classloaders").createIfNotExists();
     }
@@ -100,10 +92,15 @@ public class FolderMgr {
         return localFolder;
     }
 
-    static Folder getPlatformLocalClassLoaderFolder(String artifactType, long artifactId) throws IOException {
+    static Folder getPlatformLocalClassLoaderFolder(String artifactType) throws IOException {
         final Folder localFolder = getPlatformLocalClassLoaderFolder();
         final Folder artifactTypeFolder = getFolder(localFolder, artifactType);
         artifactTypeFolder.createIfNotExists();
+        return artifactTypeFolder;
+    }
+
+    static Folder getPlatformLocalClassLoaderFolder(String artifactType, long artifactId) throws IOException {
+        final Folder artifactTypeFolder = getPlatformLocalClassLoaderFolder(artifactType);
         final Folder artifactIdFolder = getFolder(artifactTypeFolder, Long.toString(artifactId));
         artifactIdFolder.createIfNotExists();
         return artifactIdFolder;

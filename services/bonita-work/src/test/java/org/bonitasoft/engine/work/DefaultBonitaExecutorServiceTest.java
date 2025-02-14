@@ -40,7 +40,6 @@ import org.mockito.junit.MockitoRule;
  */
 public class DefaultBonitaExecutorServiceTest {
 
-    public static final long TENANT_ID = 13L;
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock

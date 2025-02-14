@@ -25,7 +25,6 @@ import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.ImportStatus.Status;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -216,8 +215,8 @@ public class ProfilesImporter {
         }
     }
 
-    static File getFileContainingMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
-        return BonitaHomeServer.getInstance().getTenantStorage().getProfileMD5(tenantId);
+    static File getFileContainingMD5() throws IOException {
+        return BonitaHomeServer.getInstance().getProfileStorage().getProfileMD5();
     }
 
 }

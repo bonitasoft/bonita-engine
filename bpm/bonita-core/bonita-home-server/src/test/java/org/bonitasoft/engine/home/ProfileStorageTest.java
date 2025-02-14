@@ -29,20 +29,21 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @author Laurent Leseigneur
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TenantStorageTest {
+public class ProfileStorageTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();;
 
     @Spy
-    TenantStorage tenantStorage = new TenantStorage();
+    ProfileStorage profileStorage = new ProfileStorage();
 
     @Test
     public void should_return_profiles_md5_file() throws Exception {
+        //given
+        Files.write(profileStorage.getProfileMD5().toPath(), "md5".getBytes());
 
         //when
-        Files.write(tenantStorage.getProfileMD5(5L).toPath(), "md5".getBytes());
-        final File profileMD5 = tenantStorage.getProfileMD5(5L);
+        final File profileMD5 = profileStorage.getProfileMD5();
 
         //then
         assertThat(profileMD5).as("should retrieve file").exists().hasBinaryContent("md5".getBytes());

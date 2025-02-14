@@ -27,7 +27,6 @@ import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.service.BroadcastService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
 import org.junit.Before;
@@ -56,8 +55,6 @@ public class ClassLoaderServiceImplTest {
     private PlatformDependencyService platformDependencyService;
     @Mock
     private TenantDependencyService tenantDependencyService;
-    @Mock
-    private SessionAccessor sessionAccessor;
     @Mock
     private UserTransactionService userTransactionService;
     @Mock
@@ -127,7 +124,6 @@ public class ClassLoaderServiceImplTest {
 
     @Test
     public void should_not_be_able_to_destroy_classloader_having_children() {
-
         assertThatThrownBy(() -> classLoaderService.removeLocalClassloader(TENANT))
                 .hasMessageContaining(
                         "Unable to delete classloader TENANT because it has children: [BonitaClassLoader[id=PROCESS:12");
@@ -142,7 +138,6 @@ public class ClassLoaderServiceImplTest {
         processClassLoader.destroy();
         //then
         assertThat(myClassLoaderListener.isOnDestroyCalled()).isFalse();
-
     }
 
     @Test

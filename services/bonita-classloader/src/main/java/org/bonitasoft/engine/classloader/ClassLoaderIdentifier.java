@@ -68,4 +68,12 @@ public class ClassLoaderIdentifier implements Serializable {
         } else
             return type.name() + ':' + id;
     }
+
+    public boolean isTenantClassloader() {
+        return ScopeType.TENANT.equals(type);
+    }
+
+    public boolean isGlobalClassloader() {
+        return ScopeType.GLOBAL.equals(type);
+    }
 }
