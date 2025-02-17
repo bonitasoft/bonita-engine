@@ -105,7 +105,6 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkExecutorService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Matthieu Chaffotte
@@ -315,6 +314,4 @@ public interface ServiceAccessor {
     InstallationService getInstallationService();
 
     ProcessStarterVerifier getProcessStarterVerifier();
-
-    Environment getSpringEnvironment();
 }
