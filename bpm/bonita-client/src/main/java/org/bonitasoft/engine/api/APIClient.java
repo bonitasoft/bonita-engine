@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
@@ -112,7 +113,7 @@ public class APIClient {
     }
 
     /**
-     * This methods serves the purpose to remove confusion between getAPI() when a session is mandatory, and this one,
+     * This method serves the purpose to remove confusion between getAPI() when a session is mandatory, and this one,
      * where no session is needed to access the
      * API class.
      *
@@ -145,6 +146,27 @@ public class APIClient {
      */
     public void login(String username, String password) throws LoginException {
         session = getLoginAPI(LoginAPI.class).login(username, password);
+    }
+
+    /**
+     * Connects a user, identified by credentials, in order to use API methods of a tenant.
+     *
+     * @param credentials the credentials to login with. Can be username / password couple, SSO ticket, ... depending on
+     *        the implementation.<br>
+     *        By default possible map keys are:
+     *        <ul>
+     *        <li>Basic Authentication: authentication.username and authentication.password</li>
+     *        <li>CAS Authentication: ticket and service</li>
+     *        <li>Please refer to specific documentation regarding the Authentication Service in use, to know what the
+     *        credentials must contain.</li>
+     *        </ul>
+     * @throws LoginException occurs when an exception is thrown during the login (userName does not exist, or couple
+     *         (userName,
+     *         password) is incorrect)
+     * @since 10.3
+     */
+    public void login(final Map<String, Serializable> credentials) throws LoginException {
+        session = getLoginAPI(LoginAPI.class).login(credentials);
     }
 
     /**
