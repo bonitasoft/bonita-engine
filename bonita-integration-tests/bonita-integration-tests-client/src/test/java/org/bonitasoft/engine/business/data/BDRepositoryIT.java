@@ -79,14 +79,7 @@ import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.*;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -1992,15 +1985,22 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, employeeExpression)
                 .setMultiple(true);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME)
-                .addExpectedDuration(new ExpressionBuilder().createConstantLongExpression(10000L));
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+
+        //setup expressions
+        processDefinitionBuilder.addContextEntry("retrieve_Employee",
+                new ExpressionBuilder().createGroovyScriptExpression("retrieve_Employee",
+                        "\"Employee [firstName=\" + myEmployees"
+                                + ".firstName + \", lastName=\" + myEmployees.lastName + \"]\";",
+                        String.class.getName(),
+                        new ExpressionBuilder().createBusinessDataExpression("myEmployees", List.class.getName())));
 
         //setup subprocess with loop
         SubProcessDefinitionBuilder subProcessDefinitionBuilder = processDefinitionBuilder
                 .addSubProcess("subProcess", true).getSubProcessBuilder();
         subProcessDefinitionBuilder.addStartEvent("subStart")
                 .addTimerEventTriggerDefinition(TimerType.DURATION,
-                        new ExpressionBuilder().createConstantLongExpression(1000L));
+                        new ExpressionBuilder().createConstantLongExpression(100L));
         subProcessDefinitionBuilder.addManualTask("subStep1", ACTOR_NAME)
                 .addBusinessData("employee", EMPLOYEE_QUALIFIED_NAME)
                 .addOperation(new OperationBuilder().createBusinessDataSetAttributeOperation("employee", "setLastName",
@@ -2013,11 +2013,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
                 ACTOR_NAME, testUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
-
-        waitForUserTask(instance, "step1");
-        String employeeToString = getEmployeesToString("myEmployees", instance.getId());
-        assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
-        assertThat(lastNames(employeeToString)).containsExactly("Doe", "Doe");
 
         // wait for the subprocess user task - first time
         long activityInstanceId1 = waitForUserTask("subStep1");
@@ -2034,7 +2029,13 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // wait for the subprocess to end
         waitForProcessToFinish(activityInstance2.getParentProcessInstanceId());
-        employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        waitForProcessToBeInState(instance.getId(), ProcessInstanceState.ABORTED);
+
+        // get ArchivedProcessInstanceExecutionContext
+        long archivedProcessInstanceId = getProcessAPI().getArchivedProcessInstances(instance.getId(), 0, 10).get(0)
+                .getId();
+        String employeeToString = (String) getProcessAPI()
+                .getArchivedProcessInstanceExecutionContext(archivedProcessInstanceId).get("retrieve_Employee");
         assertThat(lastNames(employeeToString)).containsExactly("Smith", "Smith");
 
         disableAndDeleteProcess(definition.getId());
