@@ -959,7 +959,7 @@ CREATE TABLE bpm_failure (
   errorMessage VARCHAR(1024),
   stackTrace TEXT,
   failureDate INT8 NOT NULL,
-  PRIMARY KEY (id)
+  CONSTRAINT pk_bpm_failure PRIMARY KEY (id)
 );
 CREATE INDEX idx_bpm_failure_flownodeinstanceid ON bpm_failure (flowNodeInstanceId);
 CREATE INDEX idx_bpm_failure_processinstanceid ON bpm_failure (processInstanceId);
@@ -979,7 +979,7 @@ CREATE TABLE arch_bpm_failure (
   failureDate INT8 NOT NULL,
   archiveDate INT8 NOT NULL,
   sourceObjectId INT8 NOT NULL,
-  PRIMARY KEY (id)
+  CONSTRAINT pk_arch_bpm_failure PRIMARY KEY (id)
 );
 CREATE INDEX idx_arch_bpm_failure_flownodeinstanceid ON arch_bpm_failure (flowNodeInstanceId);
 CREATE INDEX idx_arch_bpm_failure_processinstanceid ON arch_bpm_failure (processInstanceId);
