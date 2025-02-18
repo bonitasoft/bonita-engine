@@ -965,10 +965,10 @@ CREATE TABLE bpm_failure (
   failureDate BIGINT NOT NULL,
   PRIMARY KEY (id)
 );
-CREATE INDEX idx_flownode_instance_id ON bpm_failure (flowNodeInstanceId);
-CREATE INDEX idx_process_instance_id ON bpm_failure (processInstanceId);
-CREATE INDEX idx_root_process_instance_id ON bpm_failure (rootProcessInstanceId);
-CREATE INDEX idx_process_definition_id ON bpm_failure (processDefinitionId);
+CREATE INDEX idx_bpm_failure_flownodeinstanceid ON bpm_failure (flowNodeInstanceId);
+CREATE INDEX idx_bpm_failure_processinstanceid ON bpm_failure (processInstanceId);
+CREATE INDEX idx_bpm_failure_rootprocessinstanceid ON bpm_failure (rootProcessInstanceId);
+CREATE INDEX idx_bpm_failure_processdefinitionid ON bpm_failure (processDefinitionId);
 
 CREATE TABLE arch_bpm_failure (
   id BIGINT NOT NULL,
@@ -985,7 +985,7 @@ CREATE TABLE arch_bpm_failure (
   sourceObjectId BIGINT NOT NULL,
   PRIMARY KEY (id)
 );
-CREATE INDEX idx_arch_flownode_instance_id ON arch_bpm_failure (flowNodeInstanceId);
-CREATE INDEX idx_arch_process_instance_id ON arch_bpm_failure (processInstanceId);
-CREATE INDEX idx_arch_root_process_instance_id ON arch_bpm_failure (rootProcessInstanceId);
-CREATE INDEX idx_arch_process_definition_id ON arch_bpm_failure (processDefinitionId);
+CREATE INDEX idx_arch_bpm_failure_flownodeinstanceid ON arch_bpm_failure (flowNodeInstanceId);
+CREATE INDEX idx_arch_bpm_failure_processinstanceid ON arch_bpm_failure (processInstanceId);
+CREATE INDEX idx_arch_bpm_failure_rootprocessinstanceid ON arch_bpm_failure (rootProcessInstanceId);
+CREATE INDEX idx_arch_bpm_failure_processdefinitionid ON arch_bpm_failure (processDefinitionId);
