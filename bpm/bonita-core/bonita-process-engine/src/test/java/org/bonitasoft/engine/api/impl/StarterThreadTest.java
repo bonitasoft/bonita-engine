@@ -67,13 +67,13 @@ public class StarterThreadTest {
     }
 
     private SPlatform createPlatform() {
-        return new SPlatform("10.3", "10.3.0", "0.0.0", null, false, "system", 123455, "ACTIVATED");
+        return new SPlatform("10.3", "10.3.0", "0.0.0", null, false, "system", 123455, false);
     }
 
     @Test
-    public void should_call_all_restart_handlers() throws Exception {
+    public void should_call_all_restart_handlers() {
         //given
-        platform.setStatus("ACTIVATED");
+        platform.setMaintenanceEnabled(false);
         //when
         starterThread.run();
         //then
@@ -82,9 +82,9 @@ public class StarterThreadTest {
     }
 
     @Test
-    public void should_not_call_restart_handlers_on_paused_tenant() throws Exception {
+    public void should_not_call_restart_handlers_on_paused_tenant() {
         //given
-        platform.setStatus("PAUSED");
+        platform.setMaintenanceEnabled(true);
         //when
         starterThread.run();
         //then
@@ -93,20 +93,9 @@ public class StarterThreadTest {
     }
 
     @Test
-    public void should_not_call_restart_handlers_on_deactivated_tenant() throws Exception {
+    public void should_call_all_restart_handlers_even_when_one_handler_fails() {
         //given
-        platform.setStatus("DEACTIVATED");
-        //when
-        starterThread.run();
-        //then
-        verify(tenantRestartHandler1, never()).afterServicesStart();
-        verify(tenantRestartHandler2, never()).afterServicesStart();
-    }
-
-    @Test
-    public void should_call_all_restart_handlers_even_when_one_handler_fails() throws Exception {
-        //given
-        platform.setStatus("ACTIVATED");
+        platform.setMaintenanceEnabled(false);
         doThrow(new RuntimeException("test")).when(tenantRestartHandler1).afterServicesStart();
         //when
         starterThread.run();
@@ -120,10 +109,9 @@ public class StarterThreadTest {
     }
 
     @Test
-    public void should_call_all_restart_handlers_even_when_one_handler_fails_with_a_runtime_exception()
-            throws Exception {
+    public void should_call_all_restart_handlers_even_when_one_handler_fails_with_a_runtime_exception() {
         //given
-        platform.setStatus("ACTIVATED");
+        platform.setMaintenanceEnabled(false);
         doThrow(new RuntimeException("test", new Exception())).when(tenantRestartHandler1).afterServicesStart();
         //when
         starterThread.run();

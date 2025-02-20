@@ -52,7 +52,7 @@ public class MaintenanceAPIImpl implements MaintenanceAPI {
     public MaintenanceDetails getMaintenanceDetails() throws PlatformNotFoundException {
         try {
             PlatformService platformService = getServiceAccessor().getPlatformService();
-            MaintenanceDetails.State state = platformService.getPlatform().isPaused()
+            MaintenanceDetails.State state = platformService.getPlatform().isMaintenanceEnabled()
                     ? MaintenanceDetails.State.ENABLED
                     : MaintenanceDetails.State.DISABLED;
             SPlatform platform = platformService.getPlatform();

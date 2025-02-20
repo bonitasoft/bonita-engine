@@ -225,10 +225,6 @@ public class TenantServicesManager {
     }
 
     private void inSession(RunnableWithException runnable) throws Exception {
-        // FIXME: check if it is ok to remove the the commented code below:
-        //        if (sessionAccessor.isTenantSession()) {
-        //            runnable.run();
-        //        } else { // is a platform session: create a tenant session to run that
         long currentSessionId;
         try {
             currentSessionId = sessionAccessor.getSessionId();
@@ -245,7 +241,6 @@ public class TenantServicesManager {
         } finally {
             sessionAccessor.setSessionId(currentSessionId);
         }
-        //        }
     }
 
     public <T> void inSessionTransaction(final Callable<T> callable) throws Exception {

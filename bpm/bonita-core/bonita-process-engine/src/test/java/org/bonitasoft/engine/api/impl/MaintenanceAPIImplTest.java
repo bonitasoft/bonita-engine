@@ -63,7 +63,7 @@ public class MaintenanceAPIImplTest {
         SPlatform platform = SPlatform.builder()
                 .maintenanceMessage("maintenance msg")
                 .maintenanceMessageActive(true)
-                .status(SPlatform.PAUSED)
+                .maintenanceEnabled(true)
                 .build();
 
         doReturn(platform).when(platformService).getPlatform();

@@ -70,10 +70,10 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public void activateServices() throws SPlatformNotFoundException, SPlatformUpdateException {
+    public void resumeServices() throws SPlatformNotFoundException, SPlatformUpdateException {
         final SPlatform platform = getPlatform();
         final UpdateDescriptor desc = new UpdateDescriptor(platform);
-        desc.addField(SPlatform.STATUS, SPlatform.ACTIVATED);
+        desc.addField(SPlatform.MAINTENANCE_ENABLED, false);
         try {
             platformPersistenceService.update(desc);
         } catch (final SPersistenceException e) {
@@ -82,22 +82,10 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public void deactivateServices() throws SPlatformNotFoundException, SPlatformUpdateException {
-        final SPlatform platform = getPlatform();
-        final UpdateDescriptor desc = new UpdateDescriptor(platform);
-        desc.addField(SPlatform.STATUS, SPlatform.DEACTIVATED);
-        try {
-            platformPersistenceService.update(desc);
-        } catch (final SPersistenceException e) {
-            throw new SPlatformUpdateException("Problem while deactivating services", e);
-        }
-    }
-
-    @Override
     public void pauseServices() throws SPlatformNotFoundException, SPlatformUpdateException {
         final SPlatform platform = getPlatform();
         final UpdateDescriptor desc = new UpdateDescriptor(platform);
-        desc.addField(SPlatform.STATUS, SPlatform.PAUSED);
+        desc.addField(SPlatform.MAINTENANCE_ENABLED, true);
         try {
             platformPersistenceService.update(desc);
         } catch (final SPersistenceException e) {

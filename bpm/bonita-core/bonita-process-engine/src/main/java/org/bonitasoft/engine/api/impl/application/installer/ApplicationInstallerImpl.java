@@ -96,7 +96,6 @@ import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
-import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.builder.SPlatformUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.impl.SPlatformUpdateBuilderImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -242,7 +241,7 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     public void resumeTenantInSession() throws Exception {
         inSession(() -> {
             try {
-                if (Objects.equals(SPlatform.PAUSED, tenantStateManager.getStatus())) {
+                if (tenantStateManager.isPaused()) {
                     tenantStateManager.resume();
                     transactionService.executeInTransaction(() -> {
                         businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getServiceAccessor());
@@ -260,12 +259,8 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     public void pauseTenantInSession() throws Exception {
         inSession(() -> {
             try {
-                String status = tenantStateManager.getStatus();
-                if (SPlatform.ACTIVATED.equals(status)) {
+                if (!tenantStateManager.isPaused()) {
                     tenantStateManager.pause();
-                } else if (!SPlatform.PAUSED.equals(status)) {
-                    throw new UpdateException(
-                            "The default tenant is in state " + status + " and cannot be paused. Aborting.");
                 }
             } catch (Exception e) {
                 throw new UpdateException(e);

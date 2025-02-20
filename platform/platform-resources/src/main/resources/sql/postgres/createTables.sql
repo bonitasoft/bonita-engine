@@ -839,7 +839,7 @@ CREATE TABLE platform (
   created INT8 NOT NULL,
   created_by VARCHAR(50) NOT NULL,
   information TEXT,
-  status VARCHAR(15) NOT NULL,
+  maintenance_enabled BOOLEAN NOT NULL,
   CONSTRAINT pk_platform PRIMARY KEY (id)
 );
 

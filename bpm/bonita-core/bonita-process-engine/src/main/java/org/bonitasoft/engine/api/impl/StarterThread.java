@@ -48,8 +48,8 @@ public class StarterThread extends Thread {
     public void run() {
         SPlatform platform = getPlatform();
         logger.info("Restarting elements of platform that were not finished at the last shutdown");
-        if (!platform.isActivated()) {
-            logger.warn("Unable to restart elements of platform because platform is {}", platform.getStatus());
+        if (platform.isMaintenanceEnabled()) {
+            logger.warn("Unable to restart elements of platform because platform is {}", platform.getPausedStatus());
             return;
         }
         executeHandlers();

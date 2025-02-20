@@ -50,13 +50,14 @@ public class PlatformTest {
                 .created(345L)
                 .information("some infos XYZ")
                 .createdBy("The almighty")
-                .status("ACTIVATED")
+                .maintenanceEnabled(false)
                 .build());
         repository.flush();
 
         PersistentObject platformFromQuery = repository.selectOneOnPlatform("getPlatform");
         Map<String, Object> platformAsMap = jdbcTemplate.queryForObject("SELECT * FROM platform",
-                new JdbcRowMapper(List.of("ID", "CREATED"), List.of("MAINTENANCE_MESSAGE_ACTIVE")));
+                new JdbcRowMapper(List.of("ID", "CREATED"),
+                        List.of("MAINTENANCE_MESSAGE_ACTIVE", "MAINTENANCE_ENABLED")));
 
         assertThat(platformFromQuery).isEqualTo(platform);
         assertThat(platformAsMap).containsOnly(
@@ -69,7 +70,7 @@ public class PlatformTest {
                 entry("MAINTENANCE_MESSAGE_ACTIVE", false),
                 entry("VERSION", "1.2"),
                 entry("INFORMATION", "some infos XYZ"),
-                entry("STATUS", "ACTIVATED"));
+                entry("MAINTENANCE_ENABLED", false));
     }
 
 }

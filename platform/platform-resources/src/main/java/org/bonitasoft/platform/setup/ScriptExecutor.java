@@ -111,11 +111,11 @@ public class ScriptExecutor {
         String databaseSchemaVersion = versionService.getSupportedDatabaseSchemaVersion();
 
         final String sql = "INSERT INTO platform (id, version, initial_bonita_version, application_version, " +
-                "maintenance_message_active, created, created_by, information, status) "
+                "maintenance_message_active, created, created_by, information, maintenance_enabled) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         new JdbcTemplate(datasource).update(sql, 1L, databaseSchemaVersion, version, "0.0.0", false,
-                System.currentTimeMillis(), "platformAdmin", getInformationInitialValue(), "ACTIVATED");
+                System.currentTimeMillis(), "platformAdmin", getInformationInitialValue(), false);
     }
 
     protected String getInformationInitialValue() {

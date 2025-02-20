@@ -44,7 +44,6 @@ import org.mockito.junit.MockitoRule;
 
 public class TenantStateManagerTest {
 
-    public static final long TENANT_ID = 12L;
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -72,7 +71,7 @@ public class TenantStateManagerTest {
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         tenantStateManager = new TenantStateManager(userTransactionService,
                 platformService, nodeConfiguration, sessionService,
-                TENANT_ID, schedulerService, broadcastService, tenantServicesManager);
+                schedulerService, broadcastService, tenantServicesManager);
         platform = new SPlatform();
         when(platformService.getPlatform()).thenReturn(platform);
     }
@@ -83,7 +82,7 @@ public class TenantStateManagerTest {
 
     @Test
     public void pause_should_change_state_then_pause_platform_and_jobs() throws Exception {
-        platform.setStatus(SPlatform.ACTIVATED);
+        platform.setMaintenanceEnabled(false);
 
         tenantStateManager.pause();
 
@@ -94,29 +93,29 @@ public class TenantStateManagerTest {
     }
 
     @Test
-    public void resume_should_activate_platform_resume_services_and_resume_jobs() throws Exception {
-        platform.setStatus(SPlatform.PAUSED);
+    public void resume_should_resume_services_and_resume_jobs() throws Exception {
+        platform.setMaintenanceEnabled(true);
 
         tenantStateManager.resume();
 
         InOrder inOrder = inOrder(platformService, tenantServicesManager, schedulerService);
-        inOrder.verify(platformService).activateServices();
+        inOrder.verify(platformService).resumeServices();
         inOrder.verify(tenantServicesManager).resume();
         inOrder.verify(schedulerService).resumeJobs();
     }
 
     @Test
     public void should_throw_exception_when_resuming_a_platform_not_paused() {
-        platform.setStatus(SPlatform.ACTIVATED);
+        platform.setMaintenanceEnabled(false);
 
         assertThatThrownBy(() -> tenantStateManager.resume())
                 .isInstanceOf(UpdateException.class)
-                .hasMessage("Can't resume platform in state ACTIVATED");
+                .hasMessage("Can't resume platform in state RESUMED");
     }
 
     @Test
     public void should_throw_exception_when_pausing_a_platform_already_paused() {
-        platform.setStatus(SPlatform.PAUSED);
+        platform.setMaintenanceEnabled(true);
 
         assertThatThrownBy(() -> tenantStateManager.pause())
                 .isInstanceOf(UpdateException.class)
@@ -155,7 +154,7 @@ public class TenantStateManagerTest {
 
     @Test
     public void pause_should_update_platform_in_pause() throws Exception {
-        whenPlatformIsInStatus(SPlatform.ACTIVATED);
+        whenPlatformIsInPausedStatus(false);
         doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any());
 
         tenantStateManager.pause();
@@ -165,44 +164,30 @@ public class TenantStateManagerTest {
 
     @Test(expected = UpdateException.class)
     public void pause_should_throw_UpdateException_on_a_paused_platform() throws Exception {
-        whenPlatformIsInStatus(SPlatform.PAUSED);
-
-        tenantStateManager.pause();
-    }
-
-    @Test(expected = UpdateException.class)
-    public void pause_should_throw_UpdateException_on_a_deactivated_platform() throws Exception {
-        whenPlatformIsInStatus(SPlatform.DEACTIVATED);
+        whenPlatformIsInPausedStatus(true);
 
         tenantStateManager.pause();
     }
 
     @Test(expected = UpdateException.class)
     public void resume_should_throw_UpdateException_on_an_activated_platform() throws Exception {
-        whenPlatformIsInStatus(SPlatform.ACTIVATED);
+        whenPlatformIsInPausedStatus(false);
 
         tenantStateManager.resume();
     }
 
     @Test
     public void resume_should_keep_platform_paused_on_error() throws Exception {
-        whenPlatformIsInStatus(SPlatform.PAUSED);
+        whenPlatformIsInPausedStatus(true);
         doThrow(SLifecycleException.class).when(tenantServicesManager).resume();
 
         assertThatThrownBy(() -> tenantStateManager.resume()).isInstanceOf(SLifecycleException.class);
         verify(platformService).pauseServices();
     }
 
-    @Test(expected = UpdateException.class)
-    public void resume_should_throw_UpdateException_on_a_deactivated_platform() throws Exception {
-        whenPlatformIsInStatus(SPlatform.DEACTIVATED);
-
-        tenantStateManager.resume();
-    }
-
     @Test
     public void resume_should_not_delete_sessions() throws Exception {
-        whenPlatformIsInStatus(SPlatform.PAUSED);
+        whenPlatformIsInPausedStatus(true);
         doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any());
 
         tenantStateManager.resume();
@@ -210,7 +195,7 @@ public class TenantStateManagerTest {
         verify(sessionService, times(0)).deleteSessionsExceptTechnicalUser();
     }
 
-    private void whenPlatformIsInStatus(final String status) throws SPlatformNotFoundException {
+    private void whenPlatformIsInPausedStatus(final boolean status) throws SPlatformNotFoundException {
         SPlatform platform = new SPlatform("10.3", "10.3.0", "0.0.0", null, false, "platformAdmin", 999888777L, status);
         when(platformService.getPlatform()).thenReturn(platform);
     }
@@ -218,7 +203,7 @@ public class TenantStateManagerTest {
     @Test
     public void pause_should_update_platform_state_on_activated_platform() throws Exception {
         // Given
-        whenPlatformIsInStatus(SPlatform.ACTIVATED);
+        whenPlatformIsInPausedStatus(false);
 
         // When
         tenantStateManager.pause();
@@ -228,34 +213,9 @@ public class TenantStateManagerTest {
     }
 
     @Test
-    public void deactivate_should_stop_services_and_deactivate_platform_in_db_and_delete_sessions() throws Exception {
-        whenPlatformIsInStatus(SPlatform.ACTIVATED);
-
-        tenantStateManager.deactivate();
-
-        InOrder inOrder = inOrder(sessionService, platformService, tenantServicesManager, schedulerService);
-        inOrder.verify(sessionService).deleteAllSessions();
-        inOrder.verify(platformService).deactivateServices();
-        inOrder.verify(schedulerService).pauseJobs();
-        inOrder.verify(tenantServicesManager).stop();
-    }
-
-    @Test
-    public void activate_should_start_services_and_activate_platform_in_db_and_resume_jobs() throws Exception {
-        whenPlatformIsInStatus(SPlatform.DEACTIVATED);
-
-        tenantStateManager.activate();
-
-        InOrder inOrder = inOrder(platformService, tenantServicesManager, schedulerService);
-        inOrder.verify(platformService).activateServices();
-        inOrder.verify(tenantServicesManager).start();
-        inOrder.verify(schedulerService).resumeJobs();
-    }
-
-    @Test
     public void stop_should_stop_services_only() throws Exception {
         // given:
-        whenPlatformIsInStatus(SPlatform.ACTIVATED);
+        whenPlatformIsInPausedStatus(false);
         tenantStateManager.start();
         doReturn(true).when(nodeConfiguration).shouldClearSessions();
 
@@ -267,12 +227,11 @@ public class TenantStateManagerTest {
         inOrder.verify(sessionService).deleteSessions();
         inOrder.verify(tenantServicesManager).stop();
         verify(schedulerService, never()).pauseJobs();
-        verify(platformService, never()).deactivateServices();
     }
 
     @Test
     public void start_should_call_start_on_ServicesManager() throws Exception {
-        whenPlatformIsInStatus(SPlatform.ACTIVATED);
+        whenPlatformIsInPausedStatus(false);
 
         tenantStateManager.start();
 
@@ -281,7 +240,7 @@ public class TenantStateManagerTest {
 
     @Test
     public void start_should_init_services_even_if_platform_paused() throws Exception {
-        whenPlatformIsInStatus(SPlatform.PAUSED);
+        whenPlatformIsInPausedStatus(true);
 
         tenantStateManager.start();
 

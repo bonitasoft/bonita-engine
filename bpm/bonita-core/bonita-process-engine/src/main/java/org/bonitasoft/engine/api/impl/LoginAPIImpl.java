@@ -98,9 +98,7 @@ public class LoginAPIImpl implements LoginAPI {
     protected APISession loginInternal(final Map<String, Serializable> credentials)
             throws Exception {
         final ServiceAccessor serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
-        final SPlatform platform = getPlatform(serviceAccessor);
 
-        checkThatWeCanLogin(platform);
         final LoginService loginService = serviceAccessor.getLoginService();
         final TransactionService transactionService = serviceAccessor.getTransactionService();
 
@@ -140,13 +138,6 @@ public class LoginAPIImpl implements LoginAPI {
             throws LoginException {
         if (CollectionUtils.isEmpty(credentials)) {
             throw new LoginException("Credentials are null or empty !!");
-        }
-    }
-
-    protected void checkThatWeCanLogin(final SPlatform platform)
-            throws LoginException {
-        if (platform.isDeactivated()) {
-            throw new LoginException("Platform is not activated !!");
         }
     }
 

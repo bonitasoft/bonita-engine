@@ -61,7 +61,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableInMaintenanceMode
     public boolean isPaused() {
         try {
-            return getServiceAccessorNoException().getPlatformService().getPlatform().isPaused();
+            return getServiceAccessorNoException().getPlatformService().getPlatform().isMaintenanceEnabled();
         } catch (final SBonitaException e) {
             throw new RetrieveException("Unable to retrieve the tenant status", e);
         }

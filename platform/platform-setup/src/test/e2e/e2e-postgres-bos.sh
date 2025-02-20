@@ -131,7 +131,7 @@ SELECT
         ),
         'DD/MM/YYYY HH24:MI:SS'
     ) as creation_date,
-    status
+    maintenance_enabled
 FROM
     platform p"
 

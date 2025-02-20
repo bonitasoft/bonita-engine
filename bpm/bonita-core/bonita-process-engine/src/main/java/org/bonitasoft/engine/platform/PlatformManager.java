@@ -66,7 +66,7 @@ public class PlatformManager {
         if (!platformStateProvider.initializeStop()) {
             return false;
         }
-        getDefaultTenantStateManager().stop();
+        getTenantStateManager().stop();
         for (final PlatformLifecycleService platformService : platformServices) {
             logger.info("Stop service of platform: {}", platformService);
             platformService.stop();
@@ -91,14 +91,14 @@ public class PlatformManager {
         startPlatformServices();
         platformStateProvider.setStarted();
 
-        getDefaultTenantStateManager().start();
+        getTenantStateManager().start();
 
         restartHandlersOfPlatform();
         logger.info("Platform started.");
         return true;
     }
 
-    TenantStateManager getDefaultTenantStateManager() {
+    TenantStateManager getTenantStateManager() {
         return ServiceAccessorSingleton.getInstance().getTenantStateManager();
     }
 

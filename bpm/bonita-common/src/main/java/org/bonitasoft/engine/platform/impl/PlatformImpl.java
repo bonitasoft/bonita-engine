@@ -15,6 +15,7 @@ package org.bonitasoft.engine.platform.impl;
 
 import java.io.Serial;
 
+import lombok.Getter;
 import lombok.ToString;
 import org.bonitasoft.engine.platform.Platform;
 
@@ -22,6 +23,7 @@ import org.bonitasoft.engine.platform.Platform;
  * @author Elias Ricken de Medeiros
  */
 @ToString
+@Getter
 public class PlatformImpl implements Platform {
 
     @Serial
@@ -35,46 +37,15 @@ public class PlatformImpl implements Platform {
 
     private final String version;
 
-    private final String status;
+    private final boolean maintenanceEnabled;
 
     public PlatformImpl(final String version, final String initialVersion, final String createdBy, final long created,
-            final String status) {
+            final boolean maintenanceEnabled) {
         this.version = version;
         this.initialVersion = initialVersion;
         this.createdBy = createdBy;
         this.created = created;
-        this.status = status;
-    }
-
-    @Override
-    public long getCreated() {
-        return this.created;
-    }
-
-    @Override
-    public String getCreatedBy() {
-        return this.createdBy;
-    }
-
-    @Override
-    public String getInitialVersion() {
-        return this.initialVersion;
-    }
-
-    @Override
-    @Deprecated
-    public String getPreviousVersion() {
-        return "";
-    }
-
-    @Override
-    public String getVersion() {
-        return this.version;
-    }
-
-    @Override
-    public String getStatus() {
-        return this.status;
+        this.maintenanceEnabled = maintenanceEnabled;
     }
 
 }

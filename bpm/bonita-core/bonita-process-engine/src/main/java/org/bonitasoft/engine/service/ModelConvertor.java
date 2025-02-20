@@ -322,7 +322,7 @@ public class ModelConvertor {
 
     public static Platform toPlatform(final SPlatform sPlatform, SPlatformProperties sPlatformProperties) {
         return new PlatformImpl(sPlatformProperties.getPlatformVersion(), sPlatform.getInitialBonitaVersion(),
-                sPlatform.getCreatedBy(), sPlatform.getCreated(), sPlatform.getStatus());
+                sPlatform.getCreatedBy(), sPlatform.getCreated(), sPlatform.isMaintenanceEnabled());
     }
 
     public static List<ActivityInstance> toActivityInstances(final List<SActivityInstance> sActivities,
@@ -392,21 +392,17 @@ public class ModelConvertor {
 
     public static FlowNodeInstance toFlowNodeInstance(final SFlowNodeInstance sFlowNode,
             final FlowNodeStateManager flowNodeStateManager) {
-        switch (sFlowNode.getType()) {
-            case START_EVENT:
-            case INTERMEDIATE_CATCH_EVENT:
-            case BOUNDARY_EVENT:
-            case INTERMEDIATE_THROW_EVENT:
-            case END_EVENT:
-                return toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
-            case GATEWAY:
-                return toGatewayInstance((SGatewayInstance) sFlowNode, flowNodeStateManager);
-            default:
+        return switch (sFlowNode.getType()) {
+            case START_EVENT, INTERMEDIATE_CATCH_EVENT, BOUNDARY_EVENT, INTERMEDIATE_THROW_EVENT, END_EVENT ->
+                    toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
+            case GATEWAY -> toGatewayInstance((SGatewayInstance) sFlowNode, flowNodeStateManager);
+            default -> {
                 if (sFlowNode instanceof SActivityInstance) {
-                    return toActivityInstance((SActivityInstance) sFlowNode, flowNodeStateManager);
+                    yield toActivityInstance((SActivityInstance) sFlowNode, flowNodeStateManager);
                 }
                 throw new UnknownElementType(sFlowNode.getType().name());
-        }
+            }
+        };
     }
 
     public static ActivityInstance toAutomaticTask(final SAutomaticTaskInstance sActivity,

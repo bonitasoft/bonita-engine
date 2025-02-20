@@ -87,8 +87,8 @@ public class PlatformManagerTest {
                     ((RunnableWithException) invocationOnMock.getArgument(0)).run();
                     return null;
                 });
-        doReturn(tenantManager).when(platformManager).getDefaultTenantStateManager();
-        doReturn(new SPlatform("1.3", "1.1.0", "0.0.0", null, false, "someUser", 123455, "ACTIVATED"))
+        doReturn(tenantManager).when(platformManager).getTenantStateManager();
+        doReturn(new SPlatform("1.3", "1.1.0", "0.0.0", null, false, "someUser", 123455, false))
                 .when(platformService)
                 .getPlatform();
         doReturn(new SPlatformPropertiesImpl("1.3.0")).when(platformService).getSPlatformProperties();

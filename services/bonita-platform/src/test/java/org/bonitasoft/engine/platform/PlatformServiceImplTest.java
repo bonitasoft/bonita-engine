@@ -15,6 +15,7 @@ package org.bonitasoft.engine.platform;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,7 +33,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -82,34 +82,17 @@ public class PlatformServiceImplTest {
         platformServiceImpl.pauseServices();
 
         // then
-        verify(persistenceService)
-                .update(Mockito.<UpdateDescriptor> argThat(u -> updateOnlyStatus(SPlatform.PAUSED, u)));
+        verify(persistenceService).update(argThat(this::updateOnlyStatus));
     }
 
-    @Test
-    public void activateServices_should_update_services_state_to_ACTIVATED() throws SBonitaException {
-        platformServiceImpl.activateServices();
-
-        verify(persistenceService)
-                .update(Mockito.<UpdateDescriptor> argThat(u -> updateOnlyStatus(SPlatform.ACTIVATED, u)));
-    }
-
-    @Test
-    public void deactivateServices_should_update_services_state_to_DEACTIVATED() throws SBonitaException {
-        platformServiceImpl.deactivateServices();
-
-        verify(persistenceService)
-                .update(Mockito.<UpdateDescriptor> argThat(u -> updateOnlyStatus(SPlatform.DEACTIVATED, u)));
-    }
-
-    private boolean updateOnlyStatus(String status, UpdateDescriptor u) {
+    private boolean updateOnlyStatus(UpdateDescriptor u) {
         return u.getFields().size() == 1
-                && u.getFields().containsKey(SPlatform.STATUS)
-                && u.getFields().containsValue(status);
+                && u.getFields().containsKey(SPlatform.MAINTENANCE_ENABLED)
+                && u.getFields().containsValue(true);
     }
 
     private SPlatform buildPlatform() {
-        return new SPlatform("1.0", "0.5", "0.0.0", null, false, "me", 654687344687645L, "ACTIVATED");
+        return new SPlatform("1.0", "0.5", "0.0.0", null, false, "me", 654687344687645L, false);
     }
 
 }

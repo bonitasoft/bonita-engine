@@ -45,17 +45,7 @@ public interface PlatformService {
      * @throws STenantActivationException occurs when an exception is thrown during activating sTenant
      * @since 6.0
      */
-    void activateServices() throws STenantNotFoundException, STenantActivationException, SPlatformNotFoundException,
-            SPlatformUpdateException;
-
-    /**
-     * Set status of the tenant into deactivated
-     *
-     * @throws STenantNotFoundException occurs when the identifier does not refer to an existing sTenant
-     * @throws STenantDeactivationException occurs when an exception is thrown during deactivating sTenant
-     * @since 6.0
-     */
-    void deactivateServices() throws STenantNotFoundException, STenantDeactivationException, SPlatformNotFoundException,
+    void resumeServices() throws STenantNotFoundException, STenantActivationException, SPlatformNotFoundException,
             SPlatformUpdateException;
 
     /**
