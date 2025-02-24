@@ -979,8 +979,8 @@ msgstr "El nombre de la URL debe comenzar con custompage_ seguido de sólo carac
 msgid "The task has been submitted but an error occurred while adding the comment"
 msgstr "La tarea ha sido enviada pero ocurrió un error al agregar el comentario"
 
-msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">here</a>."
-msgstr "La lista completa de estos cambios está disponible <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">aquí</a>."
+msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate>here</a>."
+msgstr ""
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "Las palabras 'content', 'API' y 'theme' están reservadas para uso interno. No debe utilizarse en la URL de una página o en una aplicación."
