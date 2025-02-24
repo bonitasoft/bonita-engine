@@ -982,8 +982,8 @@ msgstr "URL の名前は、英数字のみが続く custompage_ で始まらな�
 msgid "The task has been submitted but an error occurred while adding the comment"
 msgstr "タスクが送信されましたが、コメントを追加するときにエラーが発生しました。"
 
-msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">here</a>."
-msgstr "このような変更の一覧はこちら <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\"></a>です。"
+msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate>here</a>."
+msgstr ""
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "'content'、'API' 、 'theme' の単語は、内部使用のため予約されています。アプリケーション、またはページの URL にそれらを使用してはいけません。"
