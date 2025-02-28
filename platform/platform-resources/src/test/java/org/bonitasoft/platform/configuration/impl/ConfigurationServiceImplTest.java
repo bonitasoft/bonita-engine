@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.platform.configuration.impl;
 
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,7 +30,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -52,7 +51,7 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getPlatformPortalConf_should_call_query_for_PLATFORM_PORTAL_type() {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
+        doReturn(Collections.EMPTY_LIST).when(configurationService)
                 .getBonitaConfigurations(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getPlatformPortalConf();
@@ -62,7 +61,7 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getPlatformEngineConf_should_call_query_for_PLATFORM_ENGINE_type() {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
+        doReturn(Collections.EMPTY_LIST).when(configurationService)
                 .getBonitaConfigurations(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getPlatformEngineConf();
@@ -72,7 +71,7 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getLicenses_should_call_query_for_LICENSES_type() {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
+        doReturn(Collections.EMPTY_LIST).when(configurationService)
                 .getBonitaConfigurations(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getLicenses();
@@ -89,8 +88,8 @@ public class ConfigurationServiceImplTest {
         confs.add(new FullBonitaConfiguration("conf1.properties", "content 1".getBytes(), "PLATFORM_TYPE"));
         confs.add(new FullBonitaConfiguration("conf2.properties", "content 2".getBytes(), "TENANT_TYPE"));
 
-        Mockito.doReturn(confs).when(configurationService).getAllConfiguration();
-        Mockito.doCallRealMethod().when(configurationService).writeAllConfigurationToFolder(configFolder, licFolder);
+        doReturn(confs).when(configurationService).getAllConfiguration();
+        doCallRealMethod().when(configurationService).writeAllConfigurationToFolder(configFolder, licFolder);
 
         //when
         configurationService.writeAllConfigurationToFolder(configFolder, licFolder);
@@ -100,7 +99,7 @@ public class ConfigurationServiceImplTest {
                 .as("should lowercase configuration type").exists();
         Assertions
                 .assertThat(configFolder.toPath().resolve("tenant_type").resolve("conf2.properties").toFile())
-                .as("should create sub folder with tenantId").exists();
+                .as("should create 'tenant_type' sub folder").exists();
 
     }
 

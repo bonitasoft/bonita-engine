@@ -57,9 +57,8 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
     private final long workTerminationTimeout;
     private BonitaExecutorService executor;
     private final IncidentService incidentService;
-    private final long tenantId;
     public int numberOfFramesToLogInExceptions = 3;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public RetryingWorkExecutorService(BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
             EngineClock engineClock,
@@ -70,8 +69,7 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
             ExceptionRetryabilityEvaluator exceptionRetryabilityEvaluator,
             WorkExecutionAuditor workExecutionAuditor,
             MeterRegistry meterRegistry,
-            IncidentService incidentService,
-            @Value("${tenantId}") long tenantId) {
+            IncidentService incidentService) {
         this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
         this.engineClock = engineClock;
         this.workTerminationTimeout = workTerminationTimeout;
@@ -81,9 +79,8 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
         this.exceptionRetryabilityEvaluator = exceptionRetryabilityEvaluator;
         this.workExecutionAuditor = workExecutionAuditor;
         this.incidentService = incidentService;
-        this.tenantId = tenantId;
         Gauge.builder(NUMBER_OF_WORKS_RETRIED, retriedWorks, AtomicLong::get)
-                .tag("tenant", String.valueOf(tenantId)).baseUnit("works")
+                .baseUnit("works")
                 .description("Works currently waiting for execution that have been retried at least once")
                 .register(meterRegistry);
     }
@@ -186,7 +183,7 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
                                 +
                                 "We were not able to mark it as failed because of {}",
                         bonitaWork.getDescription(), printLightWeightStacktrace(e, numberOfFramesToLogInExceptions));
-                incidentService.report(tenantId,
+                incidentService.report(
                         new Incident(bonitaWork.getDescription(), bonitaWork.getRecoveryProcedure(), thrown, e));
             }
         }

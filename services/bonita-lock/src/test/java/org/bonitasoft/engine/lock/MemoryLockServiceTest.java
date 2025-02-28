@@ -30,7 +30,6 @@ import org.junit.Test;
  */
 public class MemoryLockServiceTest {
 
-    private final Long tenantId = 1L;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private final class LockThread extends Thread {
@@ -70,10 +69,7 @@ public class MemoryLockServiceTest {
 
         private final Semaphore semaphore;
 
-        private final String name2;
-
-        public TryLockThread(final String name, final int id, final String type, final Semaphore semaphore) {
-            name2 = name;
+        public TryLockThread(final int id, final String type, final Semaphore semaphore) {
             this.id = id;
             this.type = type;
             this.semaphore = semaphore;
@@ -131,18 +127,18 @@ public class MemoryLockServiceTest {
         memoryLockService.lock(123, "abc");
 
         //Unable to lock in an other thread
-        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNull();
+        assertThat(tryLockInAnOtherThread(123, "abc")).isNull();
 
         //Unable to lock in an other thread: the lock is still hold once by the current thread
         memoryLockService.unlock(bonitaLock);
-        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNull();
+        assertThat(tryLockInAnOtherThread(123, "abc")).isNull();
 
         //Able to unlock the thread release all holds
         memoryLockService.unlock(bonitaLock);
-        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNotNull();
+        assertThat(tryLockInAnOtherThread(123, "abc")).isNotNull();
     }
 
-    private BonitaLock tryLockInAnOtherThread(int objectToLockId, String abc, Long tenantId)
+    private BonitaLock tryLockInAnOtherThread(int objectToLockId, String abc)
             throws InterruptedException, java.util.concurrent.ExecutionException {
         return executorService
                 .submit(() -> memoryLockService.tryLock(objectToLockId, abc, 10, TimeUnit.MILLISECONDS))
@@ -183,9 +179,9 @@ public class MemoryLockServiceTest {
         final Semaphore s1 = new Semaphore(1);
         final Semaphore s2 = new Semaphore(1);
         final Semaphore s3 = new Semaphore(1);
-        final TryLockThread t1 = new TryLockThread("t1", rd, "t", s1);
-        final TryLockThread t2 = new TryLockThread("t2", rd, "t", s2);
-        final TryLockThread t3 = new TryLockThread("t3", rd, "t", s3);
+        final TryLockThread t1 = new TryLockThread(rd, "t", s1);
+        final TryLockThread t2 = new TryLockThread(rd, "t", s2);
+        final TryLockThread t3 = new TryLockThread(rd, "t", s3);
         s1.acquire();
         s2.acquire();
         s3.acquire();

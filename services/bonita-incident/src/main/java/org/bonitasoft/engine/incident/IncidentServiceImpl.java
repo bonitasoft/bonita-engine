@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class IncidentServiceImpl implements IncidentService {
 
-    private Logger logger = LoggerFactory.getLogger(IncidentServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(IncidentServiceImpl.class);
     private final List<IncidentHandler> handlers;
 
     public IncidentServiceImpl(final List<IncidentHandler> handlers) {
@@ -34,12 +34,12 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public void report(final long tenantId, final Incident incident) {
+    public void report(final Incident incident) {
         for (final IncidentHandler handler : handlers) {
             try {
-                handler.handle(tenantId, incident);
+                handler.handle(incident);
             } catch (final Exception t) {
-                logger.error("Unable to report an incident using the handler " + handler + " incident was " + incident);
+                logger.error("Unable to report an incident using the handler {} incident was {}", handler, incident);
             }
         }
     }

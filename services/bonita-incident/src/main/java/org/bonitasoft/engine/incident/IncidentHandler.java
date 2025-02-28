@@ -19,6 +19,6 @@ package org.bonitasoft.engine.incident;
  */
 public interface IncidentHandler {
 
-    void handle(long tenantId, Incident incident);
+    void handle(Incident incident);
 
 }
