@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConfigurationFilesManager {
 
-    protected Properties getAlsoCustomAndInternalPropertiesFromFilename(long tenantId, String propertiesFileName,
+    protected Properties getAlsoCustomAndInternalPropertiesFromFilename(String propertiesFileName,
             boolean setKeysToLowerCase) {
         Properties properties = new Properties();
         try {
@@ -57,7 +57,7 @@ public class ConfigurationFilesManager {
                 }
             } else {
                 if (log.isTraceEnabled()) {
-                    log.trace("File " + propertiesFileName + " not found. Returning empty properties object.");
+                    log.trace("File {} not found. Returning empty properties object.", propertiesFileName);
                 }
             }
         } catch (IOException e) {
@@ -78,12 +78,12 @@ public class ConfigurationFilesManager {
         }
     }
 
-    public Properties getTenantProperties(String propertiesFileName, long tenantId) {
-        return getTenantProperties(propertiesFileName, tenantId, false);
+    public Properties getTenantProperties(String propertiesFileName) {
+        return getTenantProperties(propertiesFileName, false);
     }
 
-    public Properties getTenantProperties(String propertiesFileName, long tenantId, boolean setKeysToLowerCase) {
-        return getAlsoCustomAndInternalPropertiesFromFilename(tenantId, propertiesFileName, setKeysToLowerCase);
+    public Properties getTenantProperties(String propertiesFileName, boolean setKeysToLowerCase) {
+        return getAlsoCustomAndInternalPropertiesFromFilename(propertiesFileName, setKeysToLowerCase);
     }
 
     /**
@@ -110,7 +110,7 @@ public class ConfigurationFilesManager {
             update(propertiesFilename, properties);
         } else {
             if (log.isDebugEnabled()) {
-                log.debug("File " + propertiesFilename + " not found. Cannot remove property '" + propertyName + "'.");
+                log.debug("File {} not found. Cannot remove property '{}'.", propertiesFilename, propertyName);
             }
         }
     }
@@ -160,7 +160,7 @@ public class ConfigurationFilesManager {
             update(propertiesFilename, properties); // store them back in database
         } else {
             if (log.isDebugEnabled()) {
-                log.debug("File " + propertiesFilename + " not found. Cannot set property '" + propertyName + "'.");
+                log.debug("File {} not found. Cannot set property '{}'.", propertiesFilename, propertyName);
             }
         }
     }

@@ -17,9 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bdm.Entity;
@@ -39,8 +44,21 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
-import org.bonitasoft.engine.core.process.definition.model.*;
-import org.bonitasoft.engine.core.process.definition.model.impl.*;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SBusinessDataDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SSubProcessDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -55,7 +73,6 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessM
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -66,7 +83,6 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.work.WorkService;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
@@ -425,8 +441,7 @@ public class ProcessExecutorImplTest {
 
     @Test
     public void should_getInitialDocumentValue_return_the_document_value_from_expression()
-            throws BonitaHomeNotSetException, STenantIdNotSetException,
-            IOException, SBonitaReadException {
+            throws SBonitaReadException {
         //given
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SExpression initialValueExpression = new SExpressionImpl();
@@ -444,8 +459,7 @@ public class ProcessExecutorImplTest {
     }
 
     @Test
-    public void should_getInitialDocumentValue_return_the_document_value_from_url()
-            throws BonitaHomeNotSetException, STenantIdNotSetException, IOException, SBonitaReadException {
+    public void should_getInitialDocumentValue_return_the_document_value_from_url() throws SBonitaReadException {
         //given
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         SDocumentDefinitionImpl documentDefinition = new SDocumentDefinitionImpl("myDoc");
@@ -458,8 +472,7 @@ public class ProcessExecutorImplTest {
     }
 
     @Test
-    public void should_getInitialDocumentValue_return_the_document_value_from_file()
-            throws BonitaHomeNotSetException, STenantIdNotSetException, IOException, SBonitaReadException {
+    public void should_getInitialDocumentValue_return_the_document_value_from_file() throws SBonitaReadException {
         //given
         ProcessExecutorImpl processExecutor = spy(processExecutorImpl);
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);

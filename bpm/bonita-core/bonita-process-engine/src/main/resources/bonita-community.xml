@@ -1139,7 +1139,6 @@
     <bean id="messagesHandlingService" class="org.bonitasoft.engine.message.MessagesHandlingService">
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="workService" ref="workService" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
         <constructor-arg name="workFactory" ref="workFactory" />
         <constructor-arg name="meterRegistry" ref="meterRegistry" />

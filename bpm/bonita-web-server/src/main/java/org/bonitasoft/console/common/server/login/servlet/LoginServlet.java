@@ -33,7 +33,6 @@ import org.bonitasoft.console.common.server.utils.LocaleUtils;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.console.common.server.utils.TenantsManagementUtils;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
@@ -157,7 +156,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     protected boolean hasProfile(final APISession apiSession)
-            throws NotFoundException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantsManagementUtils.hasProfileForUser(apiSession);
     }
 

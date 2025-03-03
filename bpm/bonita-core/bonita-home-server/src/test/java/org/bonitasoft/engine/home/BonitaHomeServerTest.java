@@ -128,14 +128,13 @@ public class BonitaHomeServerTest {
                 getPropertiesAsByteArray("prop4=prop4TenantDB"))))
                 .when(configurationService).getTenantEngineConf();
         //when
-        Properties allProperties = bonitaHomeServer.getTenantProperties(1);
+        Properties allProperties = bonitaHomeServer.getTenantProperties();
         //then
         assertThat(allProperties).containsOnly(
                 entry("prop1", "prop1PlatformCP"),
                 entry("prop2", "prop2PlatformDB"),
                 entry("prop3", "prop3TenantCP"),
-                entry("prop4", "prop4TenantDB"),
-                entry("tenantId", "1")); // FIXME: remove when tenantId is removed from SpringBeanAccessor
+                entry("prop4", "prop4TenantDB"));
     }
 
     private byte[] getPropertiesAsByteArray(String... propertiesV) {

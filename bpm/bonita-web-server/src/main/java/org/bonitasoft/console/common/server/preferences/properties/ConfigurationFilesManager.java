@@ -74,7 +74,7 @@ public class ConfigurationFilesManager {
             }
         } else {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("File " + propertiesFileName + " not found. Returning empty properties object.");
+                LOGGER.debug("File {} not found. Returning empty properties object.", propertiesFileName);
             }
         }
         return properties;

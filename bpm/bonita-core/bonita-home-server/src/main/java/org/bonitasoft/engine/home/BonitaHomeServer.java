@@ -45,8 +45,6 @@ public class BonitaHomeServer {
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
 
-    private long DEFAULT_TENANT_ID = -1;
-
     /**
      * property name of the server api implementation class name
      */
@@ -73,13 +71,6 @@ public class BonitaHomeServer {
         return configurationService;
     }
 
-    public long getDefaultTenantId() {
-        if (DEFAULT_TENANT_ID == -1) {
-            DEFAULT_TENANT_ID = 1L; // FIXME remove tenantId
-        }
-        return DEFAULT_TENANT_ID;
-    }
-
     /**
      * Properties inheritance is defined like that:
      * <ol>
@@ -102,15 +93,13 @@ public class BonitaHomeServer {
      * <li>platform properties in database overrides platform properties in classpath</li>
      * </ol>
      */
-    public Properties getTenantProperties(long tenantId) throws IOException {
+    public Properties getTenantProperties() throws IOException {
         Properties allProperties = getPlatformProperties();
         Properties tenantProperties = mergeProperties(getPropertiesFromClassPath(
                 "bonita-tenant-community.properties",
                 "bonita-tenant-sp.properties",
                 "bonita-tenant-sp-cluster.properties"), getConfigurationService().getTenantEngineConf());
         allProperties.putAll(tenantProperties);
-
-        allProperties.setProperty("tenantId", String.valueOf(tenantId));
         return allProperties;
     }
 

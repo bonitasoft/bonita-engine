@@ -14,10 +14,10 @@ Here  is an example on how to retrieve the DAO to find your objects
 ```java
 
 // configure APIClient to connect via HTTP
-HashMap<String, String> params = new HashMap<String, String>();
+HashMap<String, String> params = new HashMap<>();
 params.put("server.url", "http://localhost:8080/");
 params.put("application.name", "bonita");
-APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP,params);
+APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, params);
 // connect to the engine
 APIClient apiClient = new APIClient();
 apiClient.login("walter.bates","bpm");

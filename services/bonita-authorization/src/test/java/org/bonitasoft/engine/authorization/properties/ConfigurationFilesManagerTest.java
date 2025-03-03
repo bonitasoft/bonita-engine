@@ -99,8 +99,7 @@ public class ConfigurationFilesManagerTest {
         doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations();
 
         //when
-        final Properties properties = configurationFilesManager
-                .getTenantProperties("toto.properties", TENANT_ID);
+        final Properties properties = configurationFilesManager.getTenantProperties("toto.properties");
 
         //then
         assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("customKey", "customValue");
@@ -120,8 +119,7 @@ public class ConfigurationFilesManagerTest {
         doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations();
 
         //when
-        final Properties properties = configurationFilesManager
-                .getTenantProperties("toto.properties", TENANT_ID);
+        final Properties properties = configurationFilesManager.getTenantProperties("toto.properties");
 
         //then
         assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("internalKey",
@@ -139,8 +137,7 @@ public class ConfigurationFilesManagerTest {
         doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations();
 
         //when
-        final Properties properties = configurationFilesManager
-                .getTenantProperties("non-existing.properties", TENANT_ID);
+        final Properties properties = configurationFilesManager.getTenantProperties("non-existing.properties");
 
         //then
         assertThat(properties).isEmpty();
@@ -166,8 +163,7 @@ public class ConfigurationFilesManagerTest {
         doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations();
 
         //when
-        final Properties properties = configurationFilesManager
-                .getTenantProperties("overwrite.properties", TENANT_ID);
+        final Properties properties = configurationFilesManager.getTenantProperties("overwrite.properties");
 
         //then
         assertThat(properties).containsEntry("defaultKey", "defaultValue").containsEntry("otherKey",

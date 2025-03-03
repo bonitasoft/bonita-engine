@@ -162,7 +162,7 @@ public class SpringBeanAccessor {
 
     protected Properties getProperties() throws IOException {
         Properties platformProperties = BONITA_HOME_SERVER.getPlatformProperties();
-        platformProperties.putAll(BONITA_HOME_SERVER.getTenantProperties(BONITA_HOME_SERVER.getDefaultTenantId()));
+        platformProperties.putAll(BONITA_HOME_SERVER.getTenantProperties());
         return platformProperties;
     }
 

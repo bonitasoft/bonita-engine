@@ -74,15 +74,13 @@ public class APIClient {
         try {
             final ApiAccessType apiType = APITypeManager.getAPIType();
             Map<String, String> parameters;
-            switch (apiType) {
-                case LOCAL:
-                    return LocalServerAPIFactory.getServerAPI();
-                case HTTP:
+            return switch (apiType) {
+                case LOCAL -> LocalServerAPIFactory.getServerAPI();
+                case HTTP -> {
                     parameters = APITypeManager.getAPITypeParameters();
-                    return new HTTPServerAPI(parameters);
-                default:
-                    throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
-            }
+                    yield new HTTPServerAPI(parameters);
+                }
+            };
         } catch (IOException e) {
             throw new ServerAPIException(e);
         }
