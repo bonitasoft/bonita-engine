@@ -178,6 +178,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    // Needed by Bonita Central
+    @Override
+    public void storePlatformEngineConf(List<BonitaConfiguration> bonitaConfigurations) {
+        storeConfiguration(bonitaConfigurations, PLATFORM_ENGINE);
+    }
+
     private void storeConfiguration(List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type) {
         transactionTemplate.execute(
                 new StoreConfigurationInTransaction(jdbcTemplate, dbVendor, bonitaConfigurations, type));

@@ -97,6 +97,13 @@ public interface ConfigurationService {
     BonitaConfiguration getTenantPortalConfiguration(String file);
 
     /**
+     * store platform configuration file in database
+     *
+     * @param bonitaConfigurations list of files
+     */
+    void storePlatformEngineConf(List<BonitaConfiguration> bonitaConfigurations);
+
+    /**
      * store platform configuration files for engine
      *
      * @param configurationRootFolder root folder containing configuration files
