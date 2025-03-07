@@ -157,10 +157,9 @@ class PlatformSetupIT {
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList("SELECT * FROM configuration WHERE content_type= '" + ConfigurationType.PLATFORM_PORTAL
                         + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(3);
+        assertThat(rows).hasSize(2);
         assertThat(rows.get(0)).containsEntry("RESOURCE_NAME", "cache-config.xml");
-        assertThat(rows.get(1)).containsEntry("RESOURCE_NAME", "platform-tenant-config.properties");
-        assertThat(rows.get(2)).containsEntry("RESOURCE_NAME", "security-config.properties");
+        assertThat(rows.get(1)).containsEntry("RESOURCE_NAME", "security-config.properties");
     }
 
     @Test
@@ -189,7 +188,6 @@ class PlatformSetupIT {
                 "bonita-platform-community-custom.properties",
                 "bonita-platform-custom.xml",
                 "cache-config.xml",
-                "platform-tenant-config.properties",
                 "security-config.properties",
                 "bonita-tenant-community-custom.properties",
                 "bonita-tenants-custom.xml",
