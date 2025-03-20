@@ -495,6 +495,8 @@ CREATE TABLE pending_mapping (
 GO
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (activityId, userId, actorId)
 GO
+CREATE INDEX idx_pending_mapping_deadlock ON pending_mapping(tenantid, activityId)
+GO
 
 CREATE TABLE ref_biz_data_inst (
 	tenantid NUMERIC(19, 0) NOT NULL,
