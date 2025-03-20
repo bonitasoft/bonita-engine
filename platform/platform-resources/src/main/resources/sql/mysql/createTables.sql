@@ -441,6 +441,7 @@ CREATE TABLE pending_mapping (
   	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (activityId, userId, actorId);
+CREATE INDEX idx_pending_mapping_deadlock ON pending_mapping(tenantid, activityId);
 
 CREATE TABLE ref_biz_data_inst (
 	tenantid BIGINT NOT NULL,
