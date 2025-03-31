@@ -78,7 +78,24 @@ distributions {
                 from('src/main/standalone')
                 include('*.sh')
                 include('*.bat')
-                fileMode = 0740 // the first 0 is important
+                filePermissions {
+                    user {
+                        read = true
+                        write = true
+                        execute = true
+                    }
+                    group {
+                        read = true
+                        write = false
+                        execute = false
+                    }
+                    other {
+                        read = false
+                        write = false
+                        execute = false
+
+                    }
+                }
             }
             into('/') {
                 from('src/main/standalone')
@@ -113,7 +130,24 @@ distributions {
                     }
                 }
             }
-            fileMode = 0640
+            filePermissions {
+                user {
+                    read = true
+                    write = true
+                    execute = false
+                }
+                group {
+                    read = true
+                    write = false
+                    execute = false
+                }
+                other {
+                    read = false
+                    write = false
+                    execute = false
+
+                }
+            }
         }
     }
 }

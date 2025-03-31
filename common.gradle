@@ -48,10 +48,10 @@ subprojects {
         // related to ehcache-core 2.x - must be challenged when upgrading to ehcache 3.x
         // needed to get org.terracotta.internal:statistics:1.0.5 (required by ehcache-core jar)
         maven {
-            url 'https://repo.terracotta.org/maven2/'
+            url='https://repo.terracotta.org/maven2/'
         }
         maven {
-            url "https://oss.sonatype.org/content/repositories/snapshots"
+            url="https://oss.sonatype.org/content/repositories/snapshots"
             mavenContent {
                 snapshotsOnly()
             }
@@ -101,10 +101,10 @@ subprojects {
         }
     }
     testlogger {
-        showFullStackTraces false
-        showCauses true
-        showPassed false
-        showSkipped true
-        showSummary false
+        showFullStackTraces=false
+        showCauses=true
+        showPassed=false
+        showSkipped=true
+        showSummary=false
     }
 }
