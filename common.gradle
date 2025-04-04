@@ -63,6 +63,8 @@ subprojects {
         testImplementation libs.junit5api
         testCompileOnly libs.junit4
         testRuntimeOnly libs.junitJupiterEngine
+        // in Gradle 8, this declaration is mandatory. See https://docs.gradle.org/8.3/userguide/upgrading_version_8.html#manually_declaring_dependencies :
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         // to support junit4 tests
         testRuntimeOnly libs.junitVintageEngine
     }
