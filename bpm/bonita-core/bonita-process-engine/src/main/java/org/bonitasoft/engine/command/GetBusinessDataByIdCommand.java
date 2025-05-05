@@ -50,9 +50,7 @@ public class GetBusinessDataByIdCommand extends RuntimeCommand {
             } else {
                 return businessDataService.getJsonEntity(entityClassName, identifier, businessDataURIPattern);
             }
-        } catch (final SBusinessDataNotFoundException e) {
-            throw new SCommandExecutionException(e);
-        } catch (final SBusinessDataRepositoryException e) {
+        } catch (final SBusinessDataNotFoundException | SBusinessDataRepositoryException e) {
             throw new SCommandExecutionException(e);
         }
     }

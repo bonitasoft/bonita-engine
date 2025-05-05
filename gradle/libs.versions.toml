@@ -84,6 +84,7 @@ concurrentUnitVersion = "0.4.6"
 junitQuickCheck = "1.0"
 jettyVersion = "9.4.57.v20241219"
 jbossLoggingVersion = "3.6.1.Final"
+jsonassertVersion = "1.5.3"
 commonsExecVersion = "1.4.0"
 jmockitVersion = "1.49"
 mockServerJunitVersion = "5.15.0"
@@ -250,7 +251,7 @@ jbossLogging = { group = "org.jboss.logging", name = "jboss-logging", version.re
 commonsExec = { group = "org.apache.commons", name = "commons-exec", version.ref = "commonsExecVersion" }
 jmockit = { group = "org.jmockit", name = "jmockit", version.ref = "jmockitVersion" }
 mockServerJunit = { group = "org.mock-server", name = "mockserver-junit-jupiter", version.ref = "mockServerJunitVersion" }
-
+jsonassert = { group = "org.skyscreamer", name = "jsonassert", version.ref = "jsonassertVersion" }
 
 [bundles]
 groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx", "groovyNio", "groovyGroovysh", "groovyDatetime",

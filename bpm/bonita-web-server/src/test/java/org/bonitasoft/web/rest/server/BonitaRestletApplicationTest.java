@@ -13,12 +13,8 @@
  **/
 package org.bonitasoft.web.rest.server;
 
-import static org.mockito.Mockito.times;
-
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataQueryResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataResource;
 import org.bonitasoft.web.rest.server.api.system.I18nTranslationResource;
 import org.bonitasoft.web.rest.server.utils.BonitaJacksonConverter;
 import org.junit.Test;
@@ -46,10 +42,8 @@ public class BonitaRestletApplicationTest {
         bonitaRestletApplication.buildRouter();
 
         //then
-        Mockito.verify(finderFactory).create(BusinessDataQueryResource.class);
         Mockito.verify(finderFactory).create(BusinessDataReferenceResource.class);
         Mockito.verify(finderFactory).create(BusinessDataReferencesResource.class);
-        Mockito.verify(finderFactory, times(2)).create(BusinessDataResource.class);
     }
 
     @Test

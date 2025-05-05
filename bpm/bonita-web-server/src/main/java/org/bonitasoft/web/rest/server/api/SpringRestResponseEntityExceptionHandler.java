@@ -13,16 +13,31 @@
  **/
 package org.bonitasoft.web.rest.server.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.console.common.server.utils.SessionUtil;
+import org.bonitasoft.engine.bpm.data.DataNotFoundException;
+import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+@Slf4j
 @RestControllerAdvice
 public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -33,8 +48,98 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @ExceptionHandler(value = { InvalidSessionException.class })
-    protected ResponseEntity<Object> handleInvalidSession(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> handleInvalidSession(RuntimeException ex, WebRequest request,
+            HttpSession httpSession) {
+        SessionUtil.sessionLogout(httpSession);
         return handleExceptionInternal(ex, "Invalid session",
                 new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
+
+    @ExceptionHandler(value = { Exception.class })
+    protected ResponseEntity<Object> defaultToInternalServerError(Exception ex, WebRequest request,
+            HttpSession httpSession) {
+        return handleExceptionInternal(ex, "Internal server error",
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    private static final Map<String, String> parameterErrorNames = Map.of("c", "count", "p", "page");
+
+    @ExceptionHandler(value = {
+            MethodArgumentTypeMismatchException.class,
+    })
+    public ResponseEntity<Object> handleInvalidParameters(HttpServletRequest req,
+            MethodArgumentTypeMismatchException ex) {
+        // replicate the error message produced by former API written with Restlet (see CommonResource)
+        String parameterName = ex.getName();
+        if (log.isDebugEnabled()) {
+            String error = "Invalid parameter [" + req.getPathInfo() + "] " + parameterName + ": " + ex.getMessage();
+            log.debug(error);
+        }
+        String error = "Invalid parameter [" + req.getPathInfo() + "] " + parameterName + ": " + ex.getMessage();
+
+        String mapping = parameterErrorNames.get(parameterName);
+        if (mapping != null) {
+            String message = "query parameter " + parameterName + " (" + mapping + ") should be a number";
+            return bonitaHandleException(new IllegalArgumentException(message), HttpStatus.BAD_REQUEST);
+        }
+
+        Object value = ex.getValue();
+        Class<?> requiredType = ex.getRequiredType();
+        boolean isNumber = Integer.class.equals(requiredType) || Long.class.equals(requiredType);
+        if (isNumber) {
+            String message = "[ " + value + " ] must be a number";
+            return bonitaHandleException(new IllegalArgumentException(message), HttpStatus.BAD_REQUEST);
+        }
+
+        return bonitaHandleException(new IllegalArgumentException("Bad parameter " + parameterName + "=" + value),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = { NotFoundException.class,
+    })
+    public ResponseEntity<Object> handleNotFound(NotFoundException exception) {
+        return bonitaHandleException(exception, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = { ExecutionException.class,
+    })
+    public ResponseEntity<Object> handleExecutionException(ExecutionException exception) {
+        if (exception instanceof CommandExecutionException) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof DataNotFoundException) {
+                return bonitaHandleException(cause, HttpStatus.NOT_FOUND);
+            }
+        }
+
+        return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException exception, HttpHeaders headers, HttpStatus status,
+            WebRequest request) {
+        // replicate the error message produced by former API written with Restlet (see CommonResource)
+        String parameterName = exception.getParameterName();
+
+        String mapping = parameterErrorNames.get(parameterName);
+        String message;
+        if (mapping != null) {
+            message = "query parameter " + parameterName + " (" + mapping + ") is mandatory";
+        } else {
+            message = "query parameter " + parameterName + " is mandatory";
+        }
+
+        return bonitaHandleException(new IllegalArgumentException(message), HttpStatus.BAD_REQUEST);
+    }
+
+    private static ResponseEntity<Object> bonitaHandleException(Throwable exception, HttpStatus status) {
+        // replicate the behaviour of former API written with Restlet (see CommonResource)
+        final Throwable cause = exception.getCause() != null ? exception.getCause() : exception;
+
+        Map<String, String> response = new HashMap<>();
+        response.put("exception", "class " + exception.getClass().getName());
+        response.put("message", cause.getMessage());
+        return ResponseEntity.status(status).body(response);
+    }
+
 }

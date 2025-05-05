@@ -13,16 +13,17 @@
  **/
 package org.bonitasoft.web.rest.server.api;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
+import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -39,11 +40,14 @@ public abstract class AbstractRESTController {
         return apiSession;
     }
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request")
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public void handleBadRequestError(HttpServletRequest req, MethodArgumentTypeMismatchException ex) {
-        String error = "[" + req.getPathInfo() + "] " + ex.getName() + ": " + ex.getMessage();
-        log.debug(error);
+    public CommandAPI getCommandAPI(APISession apiSession)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getCommandAPI(apiSession);
+    }
+
+    protected CommandAPI getCommandAPI(HttpSession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getCommandAPI(getApiSession(session));
     }
 
 }
