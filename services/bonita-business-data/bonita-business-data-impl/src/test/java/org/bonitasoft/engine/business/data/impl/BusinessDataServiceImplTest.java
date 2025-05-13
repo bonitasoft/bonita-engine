@@ -60,15 +60,14 @@ public class BusinessDataServiceImplTest {
     JsonBusinessDataSerializer jsonEntitySerializer;
     @Mock
     BusinessDataModelRepository businessDataModelRepository;
-    private BusinessDataServiceImpl businessDataService;
     @Mock
     private BusinessDataRepository businessDataRepository;
     @Mock
     private BusinessDataReloader businessDataReloader;
     @Mock
-    private Entity businessData;
-    @Mock
     private CountQueryProvider countQueryProvider;
+
+    private BusinessDataServiceImpl businessDataService;
 
     @Before
     public void before() {
@@ -77,6 +76,65 @@ public class BusinessDataServiceImplTest {
         businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer,
                 businessDataModelRepository, new TypeConverterUtil(datePatterns),
                 businessDataReloader, countQueryProvider));
+    }
+
+    @Test
+    public void instantiateNewEntity_should_set_fields_correctly() throws Exception {
+        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
+                Map.of("name", "The Name", "bool", true, "aFloat", 7f, "aDouble", 8d));
+        assertThat(entity.getName()).isEqualTo("The Name");
+        assertThat(entity.getBool()).isTrue();
+        assertThat(entity.getaFloat()).isEqualTo(7f);
+        assertThat(entity.getaDouble()).isEqualTo(8d);
+    }
+
+    @Test
+    public void instantiateNewEntity_should_convert_compatible_float_field_from_integer() throws Exception {
+        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
+                Map.of("aFloat", 11));
+        assertThat(entity.getaFloat()).isEqualTo(11.0f);
+    }
+
+    @Test
+    public void instantiateNewEntity_should_convert_compatible_float_field_from_double() throws Exception {
+        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
+                Map.of("aFloat", 11.7d));
+        assertThat(entity.getaFloat()).isEqualTo(11.7f);
+    }
+
+    @Test
+    public void instantiateNewEntity_should_convert_compatible_double_field_from_float() throws Exception {
+        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
+                Map.of("aDouble", 41.9f));
+        assertThat(entity.getaDouble()).isEqualTo(41.9d);
+    }
+
+    @Test
+    public void instantiateNewEntity_should_convert_compatible_long_field_from_integer() throws Exception {
+        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
+                Map.of("aLong", 111111111));
+        assertThat(entity.getaLong()).isEqualTo(111111111L);
+    }
+
+    @Test
+    public void instantiateNewEntity_should_convert_compatible_long_field_from_int() throws Exception {
+        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
+                Map.of("anInt", 1245454200L));
+        assertThat(entity.getAnInt()).isEqualTo(1245454200);
+    }
+
+    @Test
+    public void instantiateNewEntity_should_convert_compatible_short_field_from_int() throws Exception {
+        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
+                Map.of("aShort", 32767));
+        assertThat(entity.getaShort()).isEqualTo((short) 32767);
+    }
+
+    @Test
+    public void instantiateNewEntity_should_convert_compatible_byte_field_from_int() throws Exception {
+        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
+                Map.of("aByte", 125));
+        assertThat(entity.getaByte()).isEqualTo((byte) 125);
     }
 
     @Test
@@ -109,7 +167,7 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNull() throws Exception {
+    public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNull() {
         assertThatExceptionOfType(SBusinessDataNotFoundException.class)
                 .isThrownBy(() -> businessDataService.callJavaOperation(null, new EntityPojo(1L), "someMethod",
                         String.class.getName()));
@@ -143,7 +201,7 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void callJavaOperationShouldThrowExceptionWheninvokeFails() throws Exception {
+    public void callJavaOperationShouldThrowExceptionWhenInvokeFails() {
         assertThatExceptionOfType(SBusinessDataRepositoryException.class)
                 .isThrownBy(() -> businessDataService.callJavaOperation(pojo, new EntityPojo(1L), "someMethod",
                         String.class.getName()));
@@ -503,7 +561,7 @@ public class BusinessDataServiceImplTest {
 
         final List<Entity> entities = new ArrayList<>();
         entities.add(entity);
-        doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(),
+        doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(), anyMap(),
                 anyInt(), anyInt());
 
         //given

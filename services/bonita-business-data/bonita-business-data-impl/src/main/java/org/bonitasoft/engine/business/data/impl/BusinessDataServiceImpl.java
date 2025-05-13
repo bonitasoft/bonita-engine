@@ -379,6 +379,14 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     @Override
     public Long createEntity(String entityClassName, Map<String, Serializable> fields)
             throws ReflectiveOperationException, SBusinessDataRepositoryException {
+        final Entity entity = instantiateNewEntity(entityClassName, fields);
+        businessDataRepository.persist(entity);
+        return entity.getPersistenceId();
+    }
+
+    protected Entity instantiateNewEntity(String entityClassName, Map<String, Serializable> fields)
+            throws SBusinessDataRepositoryException, InstantiationException, IllegalAccessException,
+            InvocationTargetException, NoSuchMethodException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         final Entity entity = entityClass.getDeclaredConstructor().newInstance();
         // loop on fields to set the values by reflection:
@@ -391,16 +399,22 @@ public class BusinessDataServiceImpl implements BusinessDataService {
                         format("No such field '%s' on Business Object %s", entry.getKey(), entityClassName));
             }
             declaredField.setAccessible(true);
-            try {
-                declaredField.set(entity, entry.getValue());
-            } catch (IllegalArgumentException e) {
-                throw new SBusinessDataCrudOperationException(
-                        format("Cannot set value '%s' for field '%s' on Business Object %s", entry.getValue(),
-                                entry.getKey(), entityClassName));
+            final Class<?> expectedType = declaredField.getType();
+            final Serializable providedValue = entry.getValue();
+            // convert the value to the expected type, if possible:
+            if (providedValue != null) {
+                final Object convertedValue = BdmFieldTypeConverter.convert(providedValue, expectedType);
+                try {
+                    declaredField.set(entity, convertedValue);
+                } catch (IllegalArgumentException e) {
+                    throw new SBusinessDataCrudOperationException(
+                            format("Cannot set value '%s' for field '%s' (of type '%s') on Business Object %s",
+                                    providedValue,
+                                    entry.getKey(), expectedType, entityClassName));
+                }
             }
         }
-        businessDataRepository.persist(entity);
-        return entity.getPersistenceId();
+        return entity;
     }
 
     private Class<? extends Serializable> getQueryReturnType(final Query queryDefinition, final String entityClassName)
