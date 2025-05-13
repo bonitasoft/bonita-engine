@@ -13,8 +13,11 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import static java.lang.String.format;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -49,6 +52,7 @@ import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
+import org.bonitasoft.engine.business.data.SBusinessDataCrudOperationException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -185,7 +189,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         primaryKeys = new ArrayList<>();
         for (final Entity entity : entities) {
             if (entity.getPersistenceId() == null) {
-                throw new SBusinessDataNotFoundException(String.format(
+                throw new SBusinessDataNotFoundException(format(
                         "Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
                         businessDataReloader.getEntityRealClass(entity).getName()));
             }
@@ -212,7 +216,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             try {
                 return businessDataReloader.reloadEntity(entity);
             } catch (SBusinessDataNotFoundException e) {
-                throw new SBusinessDataNotFoundException(String.format(
+                throw new SBusinessDataNotFoundException(format(
                         "Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
                         businessDataReloader.getEntityRealClass(entity).getName()), e);
             }
@@ -372,6 +376,33 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return false;
     }
 
+    @Override
+    public Long createEntity(String entityClassName, Map<String, Serializable> fields)
+            throws ReflectiveOperationException, SBusinessDataRepositoryException {
+        final Class<? extends Entity> entityClass = loadClass(entityClassName);
+        final Entity entity = entityClass.getDeclaredConstructor().newInstance();
+        // loop on fields to set the values by reflection:
+        for (final Map.Entry<String, Serializable> entry : fields.entrySet()) {
+            final Field declaredField;
+            try {
+                declaredField = entityClass.getDeclaredField(entry.getKey());
+            } catch (NoSuchFieldException e) {
+                throw new SBusinessDataCrudOperationException(
+                        format("No such field '%s' on Business Object %s", entry.getKey(), entityClassName));
+            }
+            declaredField.setAccessible(true);
+            try {
+                declaredField.set(entity, entry.getValue());
+            } catch (IllegalArgumentException e) {
+                throw new SBusinessDataCrudOperationException(
+                        format("Cannot set value '%s' for field '%s' on Business Object %s", entry.getValue(),
+                                entry.getKey(), entityClassName));
+            }
+        }
+        businessDataRepository.persist(entity);
+        return entity.getPersistenceId();
+    }
+
     private Class<? extends Serializable> getQueryReturnType(final Query queryDefinition, final String entityClassName)
             throws SBusinessDataRepositoryException {
         if (queryDefinition.hasMultipleResults()) {
@@ -386,7 +417,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     private String getQualifiedQueryName(final Class<? extends Entity> businessDataClass, final String queryName) {
-        return String.format("%s.%s", businessDataClass.getSimpleName(), queryName);
+        return format("%s.%s", businessDataClass.getSimpleName(), queryName);
     }
 
     private Map<String, Serializable> getQueryParameters(final Query queryDefinition,
