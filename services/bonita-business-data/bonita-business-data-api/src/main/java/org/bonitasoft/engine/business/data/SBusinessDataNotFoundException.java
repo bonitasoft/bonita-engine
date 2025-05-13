@@ -30,4 +30,8 @@ public class SBusinessDataNotFoundException extends SBonitaException {
         super(message, cause);
     }
 
+    public BusinessDataNotFoundException convertToClientException() {
+        return new BusinessDataNotFoundException(getMessage(), getCause());
+    }
+
 }

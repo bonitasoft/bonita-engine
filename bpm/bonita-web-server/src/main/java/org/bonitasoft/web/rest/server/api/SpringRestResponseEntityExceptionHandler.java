@@ -105,13 +105,22 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     public ResponseEntity<Object> handleExecutionException(ExecutionException exception) {
         if (exception instanceof CommandExecutionException) {
             Throwable wrapped = exception.getCause();
+            // TODO remove, not used in production
+            // BusinessDataControllerTest requires it, but in reality, it is not used because the exception is wrapped in another exception (see the code right after this block)
             if (wrapped instanceof DataNotFoundException) {
                 return bonitaHandleException(wrapped, HttpStatus.NOT_FOUND);
-            } else {
-                final Throwable causedBy = getFirstCauseOfType(wrapped, BusinessDataCrudOperationException.class);
-                if (causedBy != null) {
-                    return generateErrorResponse(causedBy, HttpStatus.BAD_REQUEST, causedBy.getMessage());
-                }
+            }
+
+            final Throwable causedByIsDataNotFoundException = getFirstCauseOfType(wrapped, NotFoundException.class);
+            if (causedByIsDataNotFoundException != null) {
+                return bonitaHandleException(causedByIsDataNotFoundException, HttpStatus.NOT_FOUND);
+            }
+
+            final Throwable causedByBusinessDataCrudOperationException = getFirstCauseOfType(wrapped,
+                    BusinessDataCrudOperationException.class);
+            if (causedByBusinessDataCrudOperationException != null) {
+                return generateErrorResponse(causedByBusinessDataCrudOperationException, HttpStatus.BAD_REQUEST,
+                        causedByBusinessDataCrudOperationException.getMessage());
             }
         }
 
@@ -121,11 +130,11 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     private <T extends Throwable> Throwable getFirstCauseOfType(Throwable exception, Class<T> exceptionTypeToSearch) {
         if (exception == null) {
             return null;
-        } else if (exceptionTypeToSearch.isInstance(exception)) {
-            return exception;
-        } else {
-            return getFirstCauseOfType(exception.getCause(), exceptionTypeToSearch);
         }
+        if (exceptionTypeToSearch.isAssignableFrom(exception.getClass())) {
+            return exception;
+        }
+        return getFirstCauseOfType(exception.getCause(), exceptionTypeToSearch);
     }
 
     @Override

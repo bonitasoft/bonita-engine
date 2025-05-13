@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2025 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,29 +13,19 @@
  **/
 package org.bonitasoft.engine.business.data;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.exception.NotFoundException;
 
-/**
- * @author Matthieu Chaffotte
- */
-public class SBusinessDataRepositoryException extends SBonitaException {
+public class BusinessDataNotFoundException extends NotFoundException {
 
-    private static final long serialVersionUID = -2517115818095061435L;
-
-    public SBusinessDataRepositoryException(final String message) {
+    public BusinessDataNotFoundException(String message) {
         super(message);
     }
 
-    public SBusinessDataRepositoryException(final Throwable cause) {
+    public BusinessDataNotFoundException(Throwable cause) {
         super(cause);
     }
 
-    public SBusinessDataRepositoryException(final String message, final Throwable cause) {
+    public BusinessDataNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
-
-    public BusinessDataRepositoryException convertToClientException() {
-        return new BusinessDataRepositoryException(getMessage(), getCause());
-    }
-
 }

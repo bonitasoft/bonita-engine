@@ -44,4 +44,7 @@ public interface BusinessDataService {
 
     Long createEntity(String entityClassName, Map<String, Serializable> fields)
             throws ReflectiveOperationException, SBusinessDataRepositoryException;
+
+    void deleteEntity(String entityClassName, Long identifier)
+            throws SBusinessDataNotFoundException, SBusinessDataRepositoryException;
 }

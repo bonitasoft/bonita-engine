@@ -417,6 +417,13 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return entity;
     }
 
+    @Override
+    public void deleteEntity(final String entityClassName, final Long identifier)
+            throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
+        final Class<? extends Entity> entityClass = loadClass(entityClassName);
+        businessDataRepository.remove(businessDataRepository.findById(entityClass, identifier));
+    }
+
     private Class<? extends Serializable> getQueryReturnType(final Query queryDefinition, final String entityClassName)
             throws SBusinessDataRepositoryException {
         if (queryDefinition.hasMultipleResults()) {

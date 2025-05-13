@@ -40,6 +40,7 @@ public abstract class AbstractRESTController {
         return apiSession;
     }
 
+    // VisibleForTesting
     public CommandAPI getCommandAPI(APISession apiSession)
             throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantAPIAccessor.getCommandAPI(apiSession);
