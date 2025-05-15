@@ -41,10 +41,4 @@ public interface BusinessDataService {
 
     Serializable getJsonEntities(String entityClassName, List<Long> identifiers, String businessDataURIPattern)
             throws SBusinessDataRepositoryException;
-
-    Long createEntity(String entityClassName, Map<String, Serializable> fields)
-            throws ReflectiveOperationException, SBusinessDataRepositoryException;
-
-    void deleteEntity(String entityClassName, Long identifier)
-            throws SBusinessDataNotFoundException, SBusinessDataRepositoryException;
 }

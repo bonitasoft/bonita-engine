@@ -17,7 +17,6 @@ import static java.lang.String.format;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -52,17 +51,20 @@ import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
-import org.bonitasoft.engine.business.data.SBusinessDataCrudOperationException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.commons.TypeConverterUtil;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Service;
 
+@Service
+@ConditionalOnSingleCandidate(BusinessDataService.class)
 public class BusinessDataServiceImpl implements BusinessDataService {
 
-    private final BusinessDataRepository businessDataRepository;
+    protected final BusinessDataRepository businessDataRepository;
 
     private final JsonBusinessDataSerializer jsonBusinessDataSerializer;
 
@@ -104,7 +106,6 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return true;
         }
         return isEntity(dataList.get(0));
-
     }
 
     private boolean isEntity(final Object data) {
@@ -374,54 +375,6 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             }
         }
         return false;
-    }
-
-    @Override
-    public Long createEntity(String entityClassName, Map<String, Serializable> fields)
-            throws ReflectiveOperationException, SBusinessDataRepositoryException {
-        final Entity entity = instantiateNewEntity(entityClassName, fields);
-        businessDataRepository.persist(entity);
-        return entity.getPersistenceId();
-    }
-
-    protected Entity instantiateNewEntity(String entityClassName, Map<String, Serializable> fields)
-            throws SBusinessDataRepositoryException, InstantiationException, IllegalAccessException,
-            InvocationTargetException, NoSuchMethodException {
-        final Class<? extends Entity> entityClass = loadClass(entityClassName);
-        final Entity entity = entityClass.getDeclaredConstructor().newInstance();
-        // loop on fields to set the values by reflection:
-        for (final Map.Entry<String, Serializable> entry : fields.entrySet()) {
-            final Field declaredField;
-            try {
-                declaredField = entityClass.getDeclaredField(entry.getKey());
-            } catch (NoSuchFieldException e) {
-                throw new SBusinessDataCrudOperationException(
-                        format("No such field '%s' on Business Object %s", entry.getKey(), entityClassName));
-            }
-            declaredField.setAccessible(true);
-            final Class<?> expectedType = declaredField.getType();
-            final Serializable providedValue = entry.getValue();
-            // convert the value to the expected type, if possible:
-            if (providedValue != null) {
-                final Object convertedValue = BdmFieldTypeConverter.convert(providedValue, expectedType);
-                try {
-                    declaredField.set(entity, convertedValue);
-                } catch (IllegalArgumentException e) {
-                    throw new SBusinessDataCrudOperationException(
-                            format("Cannot set value '%s' for field '%s' (of type '%s') on Business Object %s",
-                                    providedValue,
-                                    entry.getKey(), expectedType, entityClassName));
-                }
-            }
-        }
-        return entity;
-    }
-
-    @Override
-    public void deleteEntity(final String entityClassName, final Long identifier)
-            throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
-        final Class<? extends Entity> entityClass = loadClass(entityClassName);
-        businessDataRepository.remove(businessDataRepository.findById(entityClass, identifier));
     }
 
     private Class<? extends Serializable> getQueryReturnType(final Query queryDefinition, final String entityClassName)

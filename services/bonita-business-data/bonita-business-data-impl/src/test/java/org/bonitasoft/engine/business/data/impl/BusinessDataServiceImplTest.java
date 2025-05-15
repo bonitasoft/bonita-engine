@@ -79,65 +79,6 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void instantiateNewEntity_should_set_fields_correctly() throws Exception {
-        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
-                Map.of("name", "The Name", "bool", true, "aFloat", 7f, "aDouble", 8d));
-        assertThat(entity.getName()).isEqualTo("The Name");
-        assertThat(entity.getBool()).isTrue();
-        assertThat(entity.getaFloat()).isEqualTo(7f);
-        assertThat(entity.getaDouble()).isEqualTo(8d);
-    }
-
-    @Test
-    public void instantiateNewEntity_should_convert_compatible_float_field_from_integer() throws Exception {
-        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
-                Map.of("aFloat", 11));
-        assertThat(entity.getaFloat()).isEqualTo(11.0f);
-    }
-
-    @Test
-    public void instantiateNewEntity_should_convert_compatible_float_field_from_double() throws Exception {
-        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
-                Map.of("aFloat", 11.7d));
-        assertThat(entity.getaFloat()).isEqualTo(11.7f);
-    }
-
-    @Test
-    public void instantiateNewEntity_should_convert_compatible_double_field_from_float() throws Exception {
-        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
-                Map.of("aDouble", 41.9f));
-        assertThat(entity.getaDouble()).isEqualTo(41.9d);
-    }
-
-    @Test
-    public void instantiateNewEntity_should_convert_compatible_long_field_from_integer() throws Exception {
-        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
-                Map.of("aLong", 111111111));
-        assertThat(entity.getaLong()).isEqualTo(111111111L);
-    }
-
-    @Test
-    public void instantiateNewEntity_should_convert_compatible_long_field_from_int() throws Exception {
-        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
-                Map.of("anInt", 1245454200L));
-        assertThat(entity.getAnInt()).isEqualTo(1245454200);
-    }
-
-    @Test
-    public void instantiateNewEntity_should_convert_compatible_short_field_from_int() throws Exception {
-        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
-                Map.of("aShort", 32767));
-        assertThat(entity.getaShort()).isEqualTo((short) 32767);
-    }
-
-    @Test
-    public void instantiateNewEntity_should_convert_compatible_byte_field_from_int() throws Exception {
-        final EntityPojo entity = (EntityPojo) businessDataService.instantiateNewEntity(EntityPojo.class.getName(),
-                Map.of("aByte", 125));
-        assertThat(entity.getaByte()).isEqualTo((byte) 125);
-    }
-
-    @Test
     public void isBusinessDataShouldBeTrue() {
         assertThat(businessDataService.isBusinessData(pojo)).isTrue();
     }
