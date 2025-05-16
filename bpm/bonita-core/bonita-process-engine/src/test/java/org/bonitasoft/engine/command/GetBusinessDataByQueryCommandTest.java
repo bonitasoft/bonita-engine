@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.command;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
@@ -20,6 +21,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -79,16 +81,20 @@ public class GetBusinessDataByQueryCommandTest {
                 PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
     }
 
-    @Test(expected = SCommandExecutionException.class)
+    @Test
     public void executeCommand_should_throw_exception() throws Exception {
         //given
-        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonQueryEntities(
-                PARAMETER_RETURN_TYPE, PARAMETER_QUERY_NAME,
-                queryParameters, PARAMETER_START_INDEX, PARAMETER_MAX_RESULTS,
-                PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
+        doThrow(new SBusinessDataRepositoryException("Constraint violation")).when(businessDataService)
+                .getJsonQueryEntities(
+                        PARAMETER_RETURN_TYPE, PARAMETER_QUERY_NAME,
+                        queryParameters, PARAMETER_START_INDEX, PARAMETER_MAX_RESULTS,
+                        PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
 
         //when then exception
-        command.execute(commandParameters, serviceAccessor);
+        assertThatThrownBy(() -> command.execute(commandParameters, serviceAccessor))
+                .isInstanceOf(SCommandExecutionException.class)
+                .hasRootCauseInstanceOf(BusinessDataRepositoryException.class)
+                .hasRootCauseMessage("Constraint violation");
     }
 
     @Test

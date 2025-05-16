@@ -21,10 +21,8 @@ import javax.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
-import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.business.data.BusinessDataCrudOperationException;
 import org.bonitasoft.engine.command.CommandExecutionException;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.session.InvalidSessionException;
@@ -101,27 +99,20 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         return bonitaHandleException(exception, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = { ExecutionException.class })
-    public ResponseEntity<Object> handleExecutionException(ExecutionException exception) {
-        if (exception instanceof CommandExecutionException) {
-            Throwable wrapped = exception.getCause();
-            // TODO remove, not used in production
-            // BusinessDataControllerTest requires it, but in reality, it is not used because the exception is wrapped in another exception (see the code right after this block)
-            if (wrapped instanceof DataNotFoundException) {
-                return bonitaHandleException(wrapped, HttpStatus.NOT_FOUND);
-            }
+    @ExceptionHandler(value = { CommandExecutionException.class })
+    public ResponseEntity<Object> handleExecutionException(CommandExecutionException exception) {
+        Throwable wrapped = exception.getCause();
 
-            final Throwable causedByIsDataNotFoundException = getFirstCauseOfType(wrapped, NotFoundException.class);
-            if (causedByIsDataNotFoundException != null) {
-                return bonitaHandleException(causedByIsDataNotFoundException, HttpStatus.NOT_FOUND);
-            }
+        final Throwable causedByIsDataNotFoundException = getFirstCauseOfType(wrapped, NotFoundException.class);
+        if (causedByIsDataNotFoundException != null) {
+            return bonitaHandleException(causedByIsDataNotFoundException, HttpStatus.NOT_FOUND);
+        }
 
-            final Throwable causedByBusinessDataCrudOperationException = getFirstCauseOfType(wrapped,
-                    BusinessDataCrudOperationException.class);
-            if (causedByBusinessDataCrudOperationException != null) {
-                return generateErrorResponse(causedByBusinessDataCrudOperationException, HttpStatus.BAD_REQUEST,
-                        causedByBusinessDataCrudOperationException.getMessage());
-            }
+        final Throwable causedByBusinessDataCrudOperationException = getFirstCauseOfType(wrapped,
+                BusinessDataCrudOperationException.class);
+        if (causedByBusinessDataCrudOperationException != null) {
+            return generateErrorResponse(causedByBusinessDataCrudOperationException, HttpStatus.BAD_REQUEST,
+                    causedByBusinessDataCrudOperationException.getMessage());
         }
 
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);

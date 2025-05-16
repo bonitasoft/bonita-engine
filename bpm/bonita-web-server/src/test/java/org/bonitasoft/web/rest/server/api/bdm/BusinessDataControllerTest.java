@@ -27,10 +27,12 @@ import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryMetadataImpl;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
-import org.bonitasoft.engine.bpm.data.DataNotFoundException;
+import org.bonitasoft.engine.business.data.BusinessDataNotFoundException;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
+import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.server.api.SpringRestResponseEntityExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,7 +124,7 @@ class BusinessDataControllerTest {
 
     @Test
     void should_get_return_a_not_found_status_when_command_fails_business_data_not_found() throws Exception {
-        doThrow(new CommandExecutionException(new DataNotFoundException(new RuntimeException("not found"))))
+        doThrow(newCommandExecutionException(new BusinessDataNotFoundException(new RuntimeException("not found"))))
                 .when(commandAPI).execute(anyString(),
                         anyMap());
 
@@ -133,14 +135,15 @@ class BusinessDataControllerTest {
 
     @Test
     void should_get_return_an_internal_server_error_status_when_command_fails_during_execution() throws Exception {
-        doThrow(new CommandExecutionException("server error")).when(commandAPI).execute(anyString(), anyMap());
+        doThrow(newCommandExecutionException(new BusinessDataRepositoryException("repository error"))).when(commandAPI)
+                .execute(anyString(), anyMap());
 
         mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983").sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content()
                         .json("""
-                                {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"server error"}"""));;
+                                {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"org.bonitasoft.engine.business.data.BusinessDataRepositoryException: repository error"}"""));;
     }
 
     // =================================================================================================================
@@ -394,7 +397,7 @@ class BusinessDataControllerTest {
     @Test
     public void should_call_custom_query_return_an_internal_server_error_status_when_command_fails_during_execution() throws Exception {
         // given
-        when(commandAPI.execute(anyString(), anyMap())).thenThrow(new CommandExecutionException("server error"));
+        when(commandAPI.execute(anyString(), anyMap())).thenThrow(newCommandExecutionException(new BusinessDataRepositoryException("repository error")));
 
         // when
         final var perform = mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByName&c=5&p=3")
@@ -406,7 +409,12 @@ class BusinessDataControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
-                            {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"server error"}"""));
+                            {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"org.bonitasoft.engine.business.data.BusinessDataRepositoryException: repository error"}"""));
+    }
+
+    // wrap the root cause in the same way the command api does
+    private static CommandExecutionException newCommandExecutionException(Exception cause) {
+        return new CommandExecutionException(new SCommandExecutionException((cause)));
     }
 
 }
