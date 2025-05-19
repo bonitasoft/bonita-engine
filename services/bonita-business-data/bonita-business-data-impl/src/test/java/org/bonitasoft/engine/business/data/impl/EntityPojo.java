@@ -36,12 +36,6 @@ public class EntityPojo implements Entity {
     private String name;
     private Boolean bool;
     private Date date;
-    private Float aFloat;
-    private Double aDouble;
-    private Long aLong;
-    private Integer anInt;
-    private Short aShort;
-    private Byte aByte;
     private List<Long> numbers;
 
     @OneToOne(cascade = CascadeType.MERGE)
@@ -152,29 +146,5 @@ public class EntityPojo implements Entity {
 
     public void setCompositionEntities(List<Entity> compositionEntities) {
         this.compositionEntities = compositionEntities;
-    }
-
-    public Float getaFloat() {
-        return aFloat;
-    }
-
-    public Double getaDouble() {
-        return aDouble;
-    }
-
-    public Integer getAnInt() {
-        return anInt;
-    }
-
-    public Long getaLong() {
-        return aLong;
-    }
-
-    public Short getaShort() {
-        return aShort;
-    }
-
-    public Byte getaByte() {
-        return aByte;
     }
 }

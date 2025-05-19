@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.web.rest.server.api;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,11 +54,9 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @ExceptionHandler(value = { Exception.class })
-    protected ResponseEntity<Object> defaultToInternalServerError(Exception ex, WebRequest request,
-            HttpSession httpSession) {
-        log.error("Server-side error", ex);
-        return handleExceptionInternal(ex, "Internal server error",
-                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    protected ResponseEntity<Object> defaultToInternalServerError(Exception exception) {
+        log.error("Generic server-side error", exception);
+        return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private static final Map<String, String> parameterErrorNames = Map.of("c", "count", "p", "page");
@@ -154,10 +151,11 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
 
     private static ResponseEntity<Object> generateErrorResponse(Throwable exception, HttpStatus status,
             String message) {
-        Map<String, String> response = new HashMap<>();
-        response.put("exception", "class " + exception.getClass().getName());
-        response.put("message", message);
-        return ResponseEntity.status(status).body(response);
+        return ResponseEntity.status(status)
+                .body(new ResponseError("class " + exception.getClass().getName(), message));
+    }
+
+    private record ResponseError(String exception, String message) {
     }
 
 }
