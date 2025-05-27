@@ -59,6 +59,11 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e) {
+        return generateErrorResponse(e, HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
     private static final Map<String, String> parameterErrorNames = Map.of("c", "count", "p", "page");
 
     @ExceptionHandler(value = { MethodArgumentTypeMismatchException.class })
