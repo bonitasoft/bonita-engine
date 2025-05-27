@@ -14,7 +14,6 @@
 package org.bonitasoft.web.rest.server.api;
 
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Slf4j
@@ -55,8 +55,14 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
 
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<Object> defaultToInternalServerError(Exception exception) {
+        // If no specific exception handler is found, log the error and return an internal server error:
         log.error("Generic server-side error", exception);
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+        return generateErrorResponse(ex, HttpStatus.BAD_REQUEST, getRootCause(ex).getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -72,8 +78,7 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         // replicate the error message produced by former API written with Restlet (see CommonResource)
         String parameterName = ex.getName();
         if (log.isDebugEnabled()) {
-            String error = "Invalid parameter [" + req.getPathInfo() + "] " + parameterName + ": " + ex.getMessage();
-            log.debug(error);
+            log.debug("Invalid parameter [{}] {}: {}", req.getPathInfo(), parameterName, ex.getMessage());
         }
 
         String mapping = parameterErrorNames.get(parameterName);
@@ -128,6 +133,18 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
             return exception;
         }
         return getFirstCauseOfType(exception.getCause(), exceptionTypeToSearch);
+    }
+
+    // get the root cause of the given exception:
+    private <T extends Throwable> Throwable getRootCause(Throwable exception) {
+        if (exception == null) {
+            return null;
+        }
+        Throwable cause = exception.getCause();
+        if (cause == null || cause == exception) {
+            return exception;
+        }
+        return getRootCause(cause);
     }
 
     @Override
