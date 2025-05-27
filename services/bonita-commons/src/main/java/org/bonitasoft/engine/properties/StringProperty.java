@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 Bonitasoft S.A.
+ * Copyright (C) 2025 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,29 +17,25 @@ import static java.lang.String.valueOf;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author Emmanuel Duchastenier
- */
 @Slf4j
-public class BooleanProperty extends BonitaConfigProperty {
+public class StringProperty extends BonitaConfigProperty {
 
-    private final boolean propertyValue;
+    private final String propertyValue;
 
-    public BooleanProperty(String displayName, String propertyKey, boolean defaultValue) {
+    public StringProperty(String displayName, String propertyKey, String defaultValue) {
         super(displayName, propertyKey);
-        propertyValue = initBooleanProperty(defaultValue);
+        propertyValue = initStringProperty(defaultValue);
     }
 
-    boolean initBooleanProperty(boolean defaultValue) {
-        boolean enabled = Boolean.parseBoolean(getProperty(valueOf(defaultValue)));
+    String initStringProperty(String defaultValue) {
+        String propertyValue = getProperty(defaultValue);
         log.info(
-                "{} {}, you may {} it using env property {} or System property -D{} [=true/false]",
-                displayName, enabled ? "enabled" : "disabled", enabled ? "disable" : "enable", envPropertyKey(),
-                propertyKey);
-        return enabled;
+                "{} {}, you may set it using env property {} or System property -D{}",
+                displayName, valueOf(propertyValue), envPropertyKey(), propertyKey);
+        return propertyValue;
     }
 
-    public boolean isEnabled() {
+    public String getValue() {
         return propertyValue;
     }
 
