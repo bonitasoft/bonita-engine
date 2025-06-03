@@ -14,6 +14,7 @@
 package org.bonitasoft.web.rest.server.api;
 
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
