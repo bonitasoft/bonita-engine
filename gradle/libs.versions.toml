@@ -108,6 +108,7 @@ springBootTest = { module = "org.springframework.boot:spring-boot-test", version
 springBootStarter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "springBootVersion" }
 springBootStarterJdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "springBootVersion" }
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBootVersion" }
+springBootStarterWeb = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBootVersion" }
 
 groovyBom = { module = "org.codehaus.groovy:groovy-bom", version.ref = "groovyVersion" }
 groovyCore = { module = "org.codehaus.groovy:groovy", version.ref = "groovyVersion" }

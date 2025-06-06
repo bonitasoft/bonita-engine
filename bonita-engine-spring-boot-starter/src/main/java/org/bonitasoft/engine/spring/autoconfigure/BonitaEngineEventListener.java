@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.spring.autoconfigure;
 
 import org.bonitasoft.engine.BonitaEngine;
+import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
@@ -36,6 +37,8 @@ public class BonitaEngineEventListener implements ApplicationContextAware {
     public void handleApplicationReadyEvent(final ApplicationReadyEvent applicationReadyEvent) throws Exception {
         bonitaEngine = applicationReadyEvent.getApplicationContext().getBean(BonitaEngine.class);
         bonitaEngine.start();
+        // notify any Bonita application that the runtime is ready to accept requests:
+        applicationReadyEvent.getApplicationContext().publishEvent(new PlatformStartedEvent());
     }
 
     @EventListener

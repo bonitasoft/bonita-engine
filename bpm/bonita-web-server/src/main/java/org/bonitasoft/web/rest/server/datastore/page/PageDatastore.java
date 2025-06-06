@@ -105,6 +105,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
     @Deprecated(since = "9.0.0")
     public PageItem add(final PageItem pageItem) {
         final String zipFileAttribute = pageItem.getAttributeValue(UNMAPPED_ATTRIBUTE_ZIP_FILE);
+        // Name pattern: "TokenID::originalFileName"
         final String[] filenames = zipFileAttribute.split(FileUploadServlet.RESPONSE_SEPARATOR);
         final String filename = filenames[0];
         String originalFileName = getOriginalFilename(filenames, filename, pageItem.getAttributes());
