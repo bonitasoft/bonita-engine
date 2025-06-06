@@ -63,12 +63,12 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException ex) {
-        return generateErrorResponse(ex, HttpStatus.BAD_REQUEST, getRootCause(ex).getMessage());
+        return generateErrorResponse(ex.getClass().getName(), HttpStatus.BAD_REQUEST, getRootCause(ex).getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e) {
-        return generateErrorResponse(e, HttpStatus.BAD_REQUEST, e.getMessage());
+        return generateErrorResponse(e.getClass().getName(), HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     private static final Map<String, String> parameterErrorNames = Map.of("c", "count", "p", "page");
@@ -119,7 +119,8 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         final Throwable causedByBusinessDataCrudOperationException = getFirstCauseOfType(wrapped,
                 BusinessDataCrudOperationException.class);
         if (causedByBusinessDataCrudOperationException != null) {
-            return generateErrorResponse(causedByBusinessDataCrudOperationException, HttpStatus.BAD_REQUEST,
+            return generateErrorResponse(causedByBusinessDataCrudOperationException.getClass().getName(),
+                    HttpStatus.BAD_REQUEST,
                     causedByBusinessDataCrudOperationException.getMessage());
         }
 
@@ -169,13 +170,13 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     private static ResponseEntity<Object> bonitaHandleException(Throwable exception, HttpStatus status) {
         // replicate the behaviour of former API written with Restlet (see CommonResource)
         final Throwable cause = exception.getCause() != null ? exception.getCause() : exception;
-        return generateErrorResponse(exception, status, cause.getMessage());
+        return generateErrorResponse(exception.getClass().getName(), status, cause.getMessage());
     }
 
-    private static ResponseEntity<Object> generateErrorResponse(Throwable exception, HttpStatus status,
+    private static ResponseEntity<Object> generateErrorResponse(String exceptionClassName, HttpStatus status,
             String message) {
         return ResponseEntity.status(status)
-                .body(new ResponseError("class " + exception.getClass().getName(), message));
+                .body(new ResponseError("class " + exceptionClassName, message));
     }
 
     private record ResponseError(String exception, String message) {
