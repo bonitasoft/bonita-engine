@@ -68,7 +68,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private final JsonBusinessDataSerializer jsonBusinessDataSerializer;
 
-    private final BusinessDataModelRepository businessDataModelRepository;
+    protected final BusinessDataModelRepository businessDataModelRepository;
 
     private final TypeConverterUtil typeConverterUtil;
 
