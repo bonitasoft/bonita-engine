@@ -21,9 +21,12 @@ import javax.servlet.ServletException;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
+import org.bonitasoft.console.common.server.auth.AuthenticationManagerProperties;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.credentials.Credentials;
 import org.bonitasoft.console.common.server.utils.LocaleUtils;
+import org.bonitasoft.console.common.server.utils.UrlBuilder;
+import org.bonitasoft.engine.properties.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +43,14 @@ public class StandardAuthenticationManagerImpl implements AuthenticationManager 
     @Override
     public String getLoginPageURL(final HttpServletRequestAccessor request, final String redirectURL)
             throws ServletException {
-        final StringBuilder url = new StringBuilder();
-        String context = request.asHttpServletRequest().getContextPath();
-        url.append(context).append(AuthenticationManager.LOGIN_PAGE).append("?");
+        final UrlBuilder loginURL = new UrlBuilder(getLoginPage(request));
         //adds the locale to the login URL if it is set in the requested URL
         String localeFromRequestedURL = LocaleUtils.getLocaleFromRequestURL(request.asHttpServletRequest());
         if (localeFromRequestedURL != null) {
-            url.append(LocaleUtils.PORTAL_LOCALE_PARAM).append("=").append(localeFromRequestedURL).append("&");
+            loginURL.appendParameter(LocaleUtils.PORTAL_LOCALE_PARAM, localeFromRequestedURL);
         }
-        url.append(AuthenticationManager.REDIRECT_URL).append("=").append(redirectURL);
-        return url.toString();
+        loginURL.appendParameter(AuthenticationManager.REDIRECT_URL, redirectURL);
+        return loginURL.build();
     }
 
     @Override
@@ -67,5 +68,26 @@ public class StandardAuthenticationManagerImpl implements AuthenticationManager 
     public String getLogoutPageURL(final HttpServletRequestAccessor request, final String redirectURL)
             throws ServletException {
         return null;
+    }
+
+    protected String getLoginPage(HttpServletRequestAccessor requestAccessor) {
+        StringProperty loginPage = new StringProperty("External Login URL",
+                AuthenticationManager.BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR,
+                getAuthenticationProperty(
+                        AuthenticationManager.BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR,
+                        getDefaultLoginPage(requestAccessor)));
+        return loginPage.getValue();
+    }
+
+    protected String getDefaultLoginPage(HttpServletRequestAccessor requestAccessor) {
+        final StringBuilder url = new StringBuilder();
+        String context = requestAccessor.asHttpServletRequest().getContextPath();
+        url.append(context).append(LOGIN_PAGE);
+        return url.toString();
+    }
+
+    protected String getAuthenticationProperty(String propertyName, String defaultValue) {
+        String propertyValue = AuthenticationManagerProperties.getProperties().getTenantProperty(propertyName);
+        return propertyValue != null ? propertyValue : defaultValue;
     }
 }

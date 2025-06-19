@@ -44,9 +44,14 @@ public interface AuthenticationManager {
     String REDIRECT_AFTER_LOGIN_PARAM_NAME = "redirect";
 
     /**
-     * the URL of the default login page
+     * the URL of the default login page. Only used when @BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR is not set
      */
     String LOGIN_PAGE = "/login.jsp";
+
+    /*
+     * The system variable or property name for the login page URL
+     */
+    String BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR = "bonita.runtime.authentication.login.url";
 
     /**
      * The default redirect URL.

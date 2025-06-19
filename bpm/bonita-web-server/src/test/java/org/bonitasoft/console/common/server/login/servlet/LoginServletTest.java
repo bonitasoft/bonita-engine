@@ -263,6 +263,7 @@ public class LoginServletTest {
         final LoginManager loginManager = mock(LoginManager.class);
         final ServletContext servletContext = mock(ServletContext.class);
         RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
+        doReturn("/bonita").when(req).getContextPath();
         doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
         doReturn("anyurl").when(req).getParameter(AuthenticationManager.REDIRECT_URL);
         doReturn(httpSession).when(req).getSession();

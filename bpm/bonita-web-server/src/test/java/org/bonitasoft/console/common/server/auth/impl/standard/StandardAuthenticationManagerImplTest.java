@@ -41,7 +41,7 @@ public class StandardAuthenticationManagerImplTest {
 
     @Test
     public void testGetSimpleLoginpageURL() throws Exception {
-        String redirectUrl = "%2Fapps%2FappDirectoryBonita";
+        String redirectUrl = "/apps/appDirectoryBonita";
 
         String loginURL = standardLoginManagerImpl.getLoginPageURL(requestAccessor, redirectUrl);
 
@@ -50,7 +50,7 @@ public class StandardAuthenticationManagerImplTest {
 
     @Test
     public void testGetLoginpageURLWithLocale() throws Exception {
-        String redirectUrl = "%2Fapps%2FappDirectoryBonita";
+        String redirectUrl = "/apps/appDirectoryBonita";
         request.setParameter("_l", "es");
 
         String loginURL = standardLoginManagerImpl.getLoginPageURL(requestAccessor, redirectUrl);
@@ -60,7 +60,7 @@ public class StandardAuthenticationManagerImplTest {
 
     @Test
     public void testGetLoginpageURLFromPortal() throws Exception {
-        String redirectUrl = "%2Fapps%2FappDirectoryBonita";
+        String redirectUrl = "/apps/appDirectoryBonita";
         request.setServletPath("/portal/");
 
         String loginURL = standardLoginManagerImpl.getLoginPageURL(requestAccessor, redirectUrl);

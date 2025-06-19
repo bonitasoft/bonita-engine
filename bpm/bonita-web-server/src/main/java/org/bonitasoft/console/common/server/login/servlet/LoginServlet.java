@@ -24,7 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
+import org.bonitasoft.console.common.server.auth.AuthenticationManagerFactory;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
+import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
 import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.login.utils.RedirectUrlBuilder;
@@ -60,11 +62,6 @@ public class LoginServlet extends HttpServlet {
      * login fail message
      */
     protected static final String LOGIN_FAIL_MESSAGE = "loginFailMessage";
-
-    /**
-     * the URL param for the login page
-     */
-    protected static final String LOGIN_URL_PARAM_NAME = "loginUrl";
 
     /*
      * System property to allow login with GET from the development suite
@@ -123,14 +120,25 @@ public class LoginServlet extends HttpServlet {
             doLogin(request, response);
             final APISession apiSession = (APISession) request.getSession()
                     .getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
-            // if there a redirect=true or a redirectURL parameter in the request do nothing (API login), otherwise, redirect (Portal login)
+            // if there is no redirect=true or redirectURL parameter in the request do nothing (API login), otherwise, redirect (Portal login)
             if (redirectAfterLogin) {
                 if (apiSession.isTechnicalUser() || hasProfile(apiSession)) {
                     response.sendRedirect(createRedirectUrl(redirectURL, locale));
                 } else {
-                    request.setAttribute(LOGIN_FAIL_MESSAGE, "noProfileForUser");
-                    getServletContext().getRequestDispatcher(AuthenticationManager.LOGIN_PAGE).forward(request,
-                            response);
+                    String loginURL = AuthenticationManagerFactory.getAuthenticationManager()
+                            .getLoginPageURL(new HttpServletRequestAccessor(request), redirectURL);
+                    if (loginURL.startsWith(request.getContextPath() + AuthenticationManager.LOGIN_PAGE)) {
+                        request.setAttribute(LOGIN_FAIL_MESSAGE, "noProfileForUser");
+                        getServletContext().getRequestDispatcher(AuthenticationManager.LOGIN_PAGE).forward(request,
+                                response);
+                    } else {
+                        // if the login page is not the default jsp but an external URL the forward cannot work.
+                        // just respond with a 401
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("No profiles for user");
+                        }
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED, "noProfileForUser");
+                    }
                 }
             } else {
                 LocaleUtils.addOrReplaceLocaleCookieResponse(response, locale);
@@ -161,29 +169,37 @@ public class LoginServlet extends HttpServlet {
     }
 
     private void handleException(final HttpServletRequest request, final HttpServletResponse response,
-            final boolean redirectAfterLogin,
-            final Exception e, final String locale) throws ServletException {
+            final boolean redirectAfterLogin, final Exception exception, final String locale) throws ServletException {
         // if there a redirect=false attribute in the request do nothing (API login), otherwise, redirect (Portal login)
         if (redirectAfterLogin) {
             try {
-                request.setAttribute(LOGIN_FAIL_MESSAGE, LOGIN_FAIL_MESSAGE);
-                String loginURL = request.getParameter(LOGIN_URL_PARAM_NAME);
+                String loginURL = request.getParameter(AuthenticationManager.LOGIN_URL_PARAM_NAME);
                 if (loginURL == null) {
-                    loginURL = AuthenticationManager.LOGIN_PAGE;
-                    getServletContext().getRequestDispatcher(loginURL).forward(request, response);
+                    final String redirectURL = getRedirectUrl(request, redirectAfterLogin);
+                    loginURL = AuthenticationManagerFactory.getAuthenticationManager()
+                            .getLoginPageURL(new HttpServletRequestAccessor(request), redirectURL);
                 } else {
-                    getServletContext().getRequestDispatcher(createRedirectUrl(loginURL, locale)).forward(request,
+                    loginURL = createRedirectUrl(loginURL, locale);
+                }
+                if (loginURL.startsWith(request.getContextPath() + AuthenticationManager.LOGIN_PAGE)) {
+                    request.setAttribute(LOGIN_FAIL_MESSAGE, LOGIN_FAIL_MESSAGE);
+                    getServletContext().getRequestDispatcher(AuthenticationManager.LOGIN_PAGE).forward(request,
                             response);
+                } else {
+                    // if the login page is not the default jsp but an external URL the forward cannot work.
+                    // just respond with a 401
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(exception.getMessage());
+                    }
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED, LOGIN_FAIL_MESSAGE);
                 }
-            } catch (final Exception e1) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error(e1.getMessage());
-                }
-                throw new ServletException(e1);
+            } catch (final Exception e) {
+                LOGGER.error(e.getMessage());
+                throw new ServletException(e);
             }
         } else {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(e.getMessage());
+                LOGGER.debug(exception.getMessage());
             }
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
