@@ -8,7 +8,7 @@ class Deps {
     //fileupload 1.4 does not work on web-side.
     public static String commonscodec = "1.15"
     public static String commonsFileupload = "1.6.0"
-    public static String commonsBeanutilsVersion = "1.9.4"
+    public static String commonsBeanutilsVersion = "1.11.0"
     public static String commonsCollections4Version = "4.4"
     public static String commonsLangVersion = "3.11"
     public static String commonsDbcp2Version = "2.5.0"
