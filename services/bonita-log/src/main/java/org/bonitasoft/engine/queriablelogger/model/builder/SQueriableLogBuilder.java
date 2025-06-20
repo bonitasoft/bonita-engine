@@ -118,7 +118,7 @@ public class SQueriableLogBuilder implements SLogBuilder {
     public SQueriableLog build() {
         final List<String> problems = checkMandatoryFields();
         if (problems.size() > 0) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + problems);
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + problems);
         }
         return builder.build();
     }

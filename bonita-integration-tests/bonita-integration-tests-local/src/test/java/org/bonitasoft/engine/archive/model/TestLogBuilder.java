@@ -35,7 +35,7 @@ public class TestLogBuilder extends CRUDELogBuilder implements SPersistenceLogBu
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        // TODO Auto-generated method stub
+        // nothing here
     }
 
 }

@@ -48,7 +48,7 @@ public class SQueriableLog implements PersistentObject {
     public static final String THREAD_NUMBER = "threadNumber";
     public static final String CLUSTER_NODE = "clusterNode";
     public static final String PRODUCT_VERSION = "productVersion";
-    public static final String SEVERTITY = "severity";
+    public static final String SEVERITY = "severity";
     public static final String ACTION_TYPE = "actionType";
     public static final String ACTION_SCOPE = "actionScope";
     public static final String ACTION_STATUS = "actionStatus";
@@ -113,27 +113,14 @@ public class SQueriableLog implements PersistentObject {
     }
 
     public long getNumericIndex(final int pos) {
-        long result;
-        switch (pos) {
-            case 0:
-                result = numericIndex1;
-                break;
-            case 1:
-                result = numericIndex2;
-                break;
-            case 2:
-                result = numericIndex3;
-                break;
-            case 3:
-                result = numericIndex4;
-                break;
-            case 4:
-                result = numericIndex5;
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-        return result;
+        return switch (pos) {
+            case 0 -> numericIndex1;
+            case 1 -> numericIndex2;
+            case 2 -> numericIndex3;
+            case 3 -> numericIndex4;
+            case 4 -> numericIndex5;
+            default -> throw new IllegalStateException();
+        };
     }
 
     public void setNumericIndex(final int pos, final long value) {
