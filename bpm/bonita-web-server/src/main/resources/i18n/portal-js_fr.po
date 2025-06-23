@@ -981,7 +981,7 @@ msgid "The task has been submitted but an error occurred while adding the commen
 msgstr "La tâche a été soumise, mais une erreur s'est produite à l'ajout du commentaire"
 
 msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate>here</a>."
-msgstr ""
+msgstr "La liste complète de ces changements est listée <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate>ici</a>."
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "Les mots 'content', 'API' et 'theme' sont réservés pour un usage interne. Ils ne doivent pas être utilisés dans l'URL d'une page ou d'une application."
