@@ -91,7 +91,6 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * Saves or updates an entity in the Business Data Repository.
      *
      * @param entity the entity to save / update.
-     * @return the freshly persisted entity.
      */
     void persist(Entity entity);
 

@@ -37,7 +37,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl;
+import org.bonitasoft.engine.business.data.impl.EntityManagerFactoryAware;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
@@ -520,7 +520,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
     private List execute_native_sql(String query) throws Exception {
         ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
         return serviceAccessor.getUserTransactionService().executeInTransaction(
-                () -> ((JPABusinessDataRepositoryImpl) (serviceAccessor.getBusinessDataRepository()))
+                () -> ((EntityManagerFactoryAware) serviceAccessor.getBusinessDataRepository())
                         .getEntityManagerFactory().createEntityManager().createNativeQuery(query).getResultList());
     }
 

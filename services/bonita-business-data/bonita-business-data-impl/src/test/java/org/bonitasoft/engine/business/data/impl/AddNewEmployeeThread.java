@@ -16,14 +16,15 @@ package org.bonitasoft.engine.business.data.impl;
 import javax.transaction.UserTransaction;
 
 import com.company.pojo.Employee;
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
 
 public class AddNewEmployeeThread extends Thread {
 
-    private final JPABusinessDataRepositoryImpl repository;
+    private final BusinessDataRepository repository;
 
     private final long employeeId;
 
-    public AddNewEmployeeThread(final JPABusinessDataRepositoryImpl repository, final long employeeId) {
+    public AddNewEmployeeThread(final BusinessDataRepository repository, final long employeeId) {
         this.repository = repository;
         this.employeeId = employeeId;
     }

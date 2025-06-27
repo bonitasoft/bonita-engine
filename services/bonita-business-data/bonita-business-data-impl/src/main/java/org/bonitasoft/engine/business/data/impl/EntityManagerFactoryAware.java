@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2025 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,14 +11,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.events.model;
+package org.bonitasoft.engine.business.data.impl;
+
+import javax.persistence.EntityManagerFactory;
 
 /**
- * Represent the deletion of a persisted element
+ * Interface to be implemented by classes that need access to the {@link EntityManagerFactory}.
+ * This is typically used in the context of business data repositories.
+ * This class was introduced with the use of aspects for business data repository: A proxy class is generated, such that
+ * {@link JPABusinessDataRepositoryImpl} cannot be cast directly. Introducing this interface allows
+ * JPABusinessDataRepositoryImpl to be cast to this interface (See BDRepositoryLocalIT class).
  */
-public class SDeleteEvent extends SEvent {
+public interface EntityManagerFactoryAware {
 
-    public SDeleteEvent(String type) {
-        super(type);
-    }
+    EntityManagerFactory getEntityManagerFactory();
+
 }

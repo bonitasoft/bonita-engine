@@ -16,6 +16,10 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 
+    // AspectJ and Spring AOP for event aspects
+    api libs.springAop
+    api libs.aspectjWeaver
+
     testImplementation libs.assertj
     testImplementation libs.jsonUnit
     testImplementation libs.mockitoCore

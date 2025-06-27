@@ -2,7 +2,7 @@ plugins {
     id "org.sonarqube" version "6.0.1.5171"
     alias(libs.plugins.taskInfo)
 }
-  
+
 sonarqube {
     properties {
           property "sonar.projectKey", "bonitasoft_bonita-engine"

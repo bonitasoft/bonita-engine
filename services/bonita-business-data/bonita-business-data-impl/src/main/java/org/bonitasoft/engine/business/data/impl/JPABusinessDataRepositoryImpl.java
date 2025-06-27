@@ -56,11 +56,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Some of these methods are enriched with aspects to throw events. See BusinessDataRepositoryEventAspect for details.
+ *
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
  */
-
-public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, SingleClassLoaderListener {
+public class JPABusinessDataRepositoryImpl
+        implements BusinessDataRepository, EntityManagerFactoryAware, SingleClassLoaderListener {
 
     private static final Logger log = LoggerFactory.getLogger(JPABusinessDataRepositoryImpl.class);
     private static final String BDR_PERSISTENCE_UNIT = "BDR";
