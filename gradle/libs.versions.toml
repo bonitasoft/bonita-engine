@@ -73,7 +73,7 @@ owaspHtmlSanitizerVersion = "20240325.1"
 
 # Test dependency versions
 junit4Version = "4.13.2"
-junit5Version = "5.13.1"
+junit5Version = "5.13.2"
 awaitilityVersion = "4.3.0"
 assertjVersion = "3.27.3"
 xmlunitVersion = "1.6"
@@ -87,7 +87,7 @@ jettyVersion = "9.4.57.v20241219"
 jbossLoggingVersion = "3.6.1.Final"
 jsonassertVersion = "1.5.3"
 commonsExecVersion = "1.5.0"
-jmockitVersion = "1.49"
+jmockitVersion = "1.50"
 mockServerJunitVersion = "5.15.0"
 
 
