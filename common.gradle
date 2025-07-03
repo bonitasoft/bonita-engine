@@ -51,7 +51,7 @@ subprojects {
             url='https://repo.terracotta.org/maven2/'
         }
         maven {
-            url="https://oss.sonatype.org/content/repositories/snapshots"
+            url="https://central.sonatype.com/repository/maven-snapshots/"
             mavenContent {
                 snapshotsOnly()
             }
