@@ -13,7 +13,20 @@
  **/
 package org.bonitasoft.engine.properties;
 
-public class BonitaConfigProperty {
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Represents a Bonita configuration property. It supports properties passed as Java System property (like
+ * -Dmy.custom-property.subproperty=MY_VALUE) or as environment variables (like MY_CUSTOMPROPERTY_SUBPROPERTY=MY_VALUE).
+ * If both are defined, System Property has precedence.
+ *
+ * @author Emmanuel Duchastenier
+ */
+@Slf4j
+public abstract class BonitaConfigProperty {
 
     /*
      * System property version of the property (lowercase, with dots):
@@ -25,17 +38,36 @@ public class BonitaConfigProperty {
      */
     protected final String displayName;
 
+    // A simple "cache" to avoid logging the same property multiple times
+    private static final Set<String> alreadyLoggedProperties = ConcurrentHashMap.newKeySet();
+
+    /**
+     * @param displayName the display name of the property, used in logs
+     * @param propertyKey the "system property" version of the property, typically in lowercase and with dots.
+     */
     public BonitaConfigProperty(String displayName, String propertyKey) {
         this.displayName = displayName;
         this.propertyKey = propertyKey;
     }
+
+    protected void logInitializationMessagesIfFirstTime() {
+        if (alreadyLoggedProperties.add(this.propertyKey)) {
+            log.info(getInitializationMessage());
+        }
+    }
+
+    abstract String getInitializationMessage();
 
     protected String envPropertyKey() {
         return propertyKey.toUpperCase().replace(".", "_").replaceAll("-", "");
     }
 
     protected String getProperty(String defaultValue) {
-        return System.getProperty(propertyKey,
-                System.getenv().getOrDefault(envPropertyKey(), defaultValue));
+        return System.getProperty(propertyKey, System.getenv().getOrDefault(envPropertyKey(), defaultValue));
+    }
+
+    // for test reset
+    static void clearLoggedProperties() {
+        alreadyLoggedProperties.clear();
     }
 }

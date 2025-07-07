@@ -13,30 +13,25 @@
  **/
 package org.bonitasoft.engine.properties;
 
-import static java.lang.String.valueOf;
+import static java.lang.String.format;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class StringProperty extends BonitaConfigProperty {
 
     private final String propertyValue;
 
     public StringProperty(String displayName, String propertyKey, String defaultValue) {
         super(displayName, propertyKey);
-        propertyValue = initStringProperty(defaultValue);
-    }
-
-    String initStringProperty(String defaultValue) {
-        String propertyValue = getProperty(defaultValue);
-        log.info(
-                "{} {}, you may set it using env property {} or System property -D{}",
-                displayName, valueOf(propertyValue), envPropertyKey(), propertyKey);
-        return propertyValue;
+        propertyValue = getProperty(defaultValue);
+        logInitializationMessagesIfFirstTime();
     }
 
     public String getValue() {
         return propertyValue;
     }
 
+    @Override
+    String getInitializationMessage() {
+        return format("%s %s, you may set it using env property %s or System property -D%s", displayName, propertyValue,
+                envPropertyKey(), propertyKey);
+    }
 }

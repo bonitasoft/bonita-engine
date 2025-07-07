@@ -13,34 +13,30 @@
  **/
 package org.bonitasoft.engine.properties;
 
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Emmanuel Duchastenier
  */
-@Slf4j
 public class BooleanProperty extends BonitaConfigProperty {
 
     private final boolean propertyValue;
 
     public BooleanProperty(String displayName, String propertyKey, boolean defaultValue) {
         super(displayName, propertyKey);
-        propertyValue = initBooleanProperty(defaultValue);
-    }
-
-    boolean initBooleanProperty(boolean defaultValue) {
-        boolean enabled = Boolean.parseBoolean(getProperty(valueOf(defaultValue)));
-        log.info(
-                "{} {}, you may {} it using env property {} or System property -D{} [=true/false]",
-                displayName, enabled ? "enabled" : "disabled", enabled ? "disable" : "enable", envPropertyKey(),
-                propertyKey);
-        return enabled;
+        propertyValue = Boolean.parseBoolean(getProperty(valueOf(defaultValue)));
+        logInitializationMessagesIfFirstTime();
     }
 
     public boolean isEnabled() {
         return propertyValue;
     }
 
+    @Override
+    String getInitializationMessage() {
+        return format("%s %s, you may %s it using env property %s or System property -D%s [=true/false]",
+                displayName, isEnabled() ? "enabled" : "disabled", isEnabled() ? "disable" : "enable", envPropertyKey(),
+                propertyKey);
+    }
 }
