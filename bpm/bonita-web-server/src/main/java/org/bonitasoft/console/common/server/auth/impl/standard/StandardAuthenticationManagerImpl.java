@@ -42,6 +42,8 @@ public class StandardAuthenticationManagerImpl implements AuthenticationManager 
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(StandardAuthenticationManagerImpl.class.getName());
 
+    protected String loginPageURL = null;
+
     @Override
     public String getLoginPageURL(final HttpServletRequestAccessor request, final String redirectURL)
             throws ServletException {
@@ -76,12 +78,16 @@ public class StandardAuthenticationManagerImpl implements AuthenticationManager 
     }
 
     protected String getLoginPage(HttpServletRequestAccessor requestAccessor) {
-        StringProperty loginPage = new StringProperty("External Login URL",
-                AuthenticationManager.BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR,
-                getAuthenticationProperty(
-                        AuthenticationManager.BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR,
-                        getDefaultLoginPage(requestAccessor)));
-        return loginPage.getValue();
+        //the login page cannot be different from one request to another, so only compute it once
+        if (loginPageURL == null) {
+            StringProperty loginPage = new StringProperty("External Login URL",
+                    AuthenticationManager.BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR,
+                    getAuthenticationProperty(
+                            AuthenticationManager.BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR,
+                            getDefaultLoginPage(requestAccessor)));
+            loginPageURL = loginPage.getValue();
+        }
+        return loginPageURL;
     }
 
     protected String getDefaultLoginPage(HttpServletRequestAccessor requestAccessor) {

@@ -125,7 +125,7 @@ public class LoginServlet extends HttpServlet {
                 if (apiSession.isTechnicalUser() || hasProfile(apiSession)) {
                     response.sendRedirect(createRedirectUrl(redirectURL, locale));
                 } else {
-                    String loginURL = AuthenticationManagerFactory.getAuthenticationManager()
+                    String loginURL = getAuthenticationManager()
                             .getLoginPageURL(new HttpServletRequestAccessor(request), redirectURL);
                     if (loginURL.startsWith(request.getContextPath() + AuthenticationManager.LOGIN_PAGE)) {
                         request.setAttribute(LOGIN_FAIL_MESSAGE, "noProfileForUser");
@@ -176,7 +176,7 @@ public class LoginServlet extends HttpServlet {
                 String loginURL = request.getParameter(AuthenticationManager.LOGIN_URL_PARAM_NAME);
                 if (loginURL == null) {
                     final String redirectURL = getRedirectUrl(request, redirectAfterLogin);
-                    loginURL = AuthenticationManagerFactory.getAuthenticationManager()
+                    loginURL = getAuthenticationManager()
                             .getLoginPageURL(new HttpServletRequestAccessor(request), redirectURL);
                 } else {
                     loginURL = createRedirectUrl(loginURL, locale);
@@ -231,6 +231,10 @@ public class LoginServlet extends HttpServlet {
             AuthenticationFailedException {
         final LoginManager loginManager = getLoginManager();
         loginManager.login(request, response);
+    }
+
+    protected AuthenticationManager getAuthenticationManager() throws AuthenticationManagerNotFoundException {
+        return AuthenticationManagerFactory.getAuthenticationManager();
     }
 
     protected LoginManager getLoginManager() {

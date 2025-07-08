@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
+import org.bonitasoft.console.common.server.auth.impl.standard.StandardAuthenticationManagerImpl;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
 import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
@@ -263,6 +264,7 @@ public class LoginServletTest {
         final LoginManager loginManager = mock(LoginManager.class);
         final ServletContext servletContext = mock(ServletContext.class);
         RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
+        doReturn(new StandardAuthenticationManagerImpl()).when(servlet).getAuthenticationManager();
         doReturn("/bonita").when(req).getContextPath();
         doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
         doReturn("anyurl").when(req).getParameter(AuthenticationManager.REDIRECT_URL);
