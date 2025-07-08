@@ -14,6 +14,8 @@
 package org.bonitasoft.console.common.server.auth.impl.standard;
 
 import java.io.Serializable;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
@@ -49,7 +51,10 @@ public class StandardAuthenticationManagerImpl implements AuthenticationManager 
         if (localeFromRequestedURL != null) {
             loginURL.appendParameter(LocaleUtils.PORTAL_LOCALE_PARAM, localeFromRequestedURL);
         }
-        loginURL.appendParameter(AuthenticationManager.REDIRECT_URL, redirectURL);
+        //Decodes the redirect URL if it is encoded because UrlBuilder already encodes it (avoid double encoding)
+        //since this method is part of a public interface, we cannot change the calling code to pass decoded redirectURL
+        String decodedRedirectURL = URLDecoder.decode(redirectURL, StandardCharsets.UTF_8);
+        loginURL.appendParameter(AuthenticationManager.REDIRECT_URL, decodedRedirectURL);
         return loginURL.build();
     }
 
