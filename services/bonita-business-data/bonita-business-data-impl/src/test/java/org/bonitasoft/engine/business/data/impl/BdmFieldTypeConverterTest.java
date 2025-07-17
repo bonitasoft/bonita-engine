@@ -13,7 +13,12 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import org.junit.jupiter.api.Test;
 
@@ -69,6 +74,31 @@ class BdmFieldTypeConverterTest {
     void converting_supported_type_should_return_it_directly_Float() {
         Float someFloat = 1.0f;
         assertThat(BdmFieldTypeConverter.convert(someFloat, Float.class)).isSameAs(someFloat);
+    }
+
+    @Test
+    void should_convert_string_to_localdate() {
+        assertThat(BdmFieldTypeConverter.convert("2025-07-17", LocalDate.class)).isEqualTo(LocalDate.of(2025, 7, 17));
+    }
+
+    @Test
+    void should_convert_string_to_localdatetime() {
+        assertThat(BdmFieldTypeConverter.convert("2025-01-12T10:15:30", LocalDateTime.class))
+                .isEqualTo(LocalDateTime.of(2025, 1, 12, 10, 15, 30));
+    }
+
+    @Test
+    void should_convert_string_to_offsetdatetime() {
+        OffsetDateTime result = BdmFieldTypeConverter.convert("2025-11-29T10:15:30+01:00", OffsetDateTime.class);
+        assertThat(result.toLocalDateTime()).isEqualTo(LocalDateTime.of(2025, 11, 29, 10, 15, 30));
+        assertThat(result.getOffset()).isEqualTo(ZoneOffset.of("+01:00"));
+    }
+
+    @Test
+    void should_throw_exception_for_incompatible_conversion() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> BdmFieldTypeConverter.convert("invalid", Integer.class))
+                .withMessageContaining("Cannot convert");
     }
 
 }

@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.temporal.Temporal;
+
 /**
  * Utility class to convert a value to a specific type if compatible.
  * Notably, number types are converted to the requested type.
@@ -49,6 +54,14 @@ public class BdmFieldTypeConverter {
                 return (T) Short.valueOf((short) doubleValue);
             } else if (targetType == Byte.class) {
                 return (T) Byte.valueOf((byte) doubleValue);
+            }
+        } else if (Temporal.class.isAssignableFrom(targetType) && value instanceof String) {
+            if (targetType == LocalDate.class) {
+                return (T) LocalDate.parse((String) value);
+            } else if (targetType == LocalDateTime.class) {
+                return (T) LocalDateTime.parse((String) value);
+            } else if (targetType == OffsetDateTime.class) {
+                return (T) OffsetDateTime.parse((String) value);
             }
         }
         throw new IllegalArgumentException("Cannot convert " + value.getClass() + " to " + targetType);
