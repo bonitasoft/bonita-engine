@@ -24,6 +24,7 @@ import org.bonitasoft.engine.business.data.BusinessDataCrudOperationException;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.TenantStatusException;
+import org.bonitasoft.engine.exception.UnavailableLockException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -125,6 +126,12 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         }
 
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = { UnavailableLockException.class })
+    protected ResponseEntity<Object> handleUnavailableLockException(UnavailableLockException exception) {
+        return generateErrorResponse(exception.getClass().getName(), HttpStatus.NOT_ACCEPTABLE,
+                exception.getMessage());
     }
 
     private <T extends Throwable> Throwable getFirstCauseOfType(Throwable exception, Class<T> exceptionTypeToSearch) {
