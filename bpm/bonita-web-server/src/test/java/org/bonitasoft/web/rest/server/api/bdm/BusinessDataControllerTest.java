@@ -14,7 +14,9 @@
 package org.bonitasoft.web.rest.server.api.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.mockito.Mockito.*;
+import static org.mockito.quality.Strictness.LENIENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -23,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryMetadataImpl;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
@@ -34,44 +35,32 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.web.rest.server.api.SpringRestResponseEntityExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = BusinessDataController.class)
+@MockitoSettings(strictness = LENIENT)
 class BusinessDataControllerTest {
+
+    private final Map<String, Object> sessionAttributes = new HashMap<>();
+    private MockMvc mockMvc;
 
     @Mock
     private APISession apiSession;
 
-    private Map<String, Object> sessionAttributes;
-
     @Mock
     CommandAPI commandAPI;
 
-    private MockMvc mockMvc;
-
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
         commandAPI = mock(CommandAPI.class);
         BusinessDataController businessDataController = spy(new BusinessDataController());
-        doReturn(apiSession).when(businessDataController).getApiSession(any());
+        mockMvc = initMockMvcWithSessionAttributes(businessDataController, sessionAttributes, apiSession);
         doReturn(commandAPI).when(businessDataController).getCommandAPI(apiSession);
-        sessionAttributes = Map.ofEntries(Map.entry(SessionUtil.API_SESSION_PARAM_KEY, apiSession));
-        mockMvc = MockMvcBuilders.standaloneSetup(businessDataController)
-                .setControllerAdvice(new SpringRestResponseEntityExceptionHandler()) // so that generic exceptions are also handled
-                .build();
     }
 
     @Test
