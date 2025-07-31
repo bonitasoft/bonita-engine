@@ -24,7 +24,6 @@ dependencies {
     api 'org.bonitasoft.engine:bonita-connector-model'
 
     testImplementation libs.assertj
-    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.systemRules
 
     testRuntimeOnly libs.logback

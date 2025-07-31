@@ -61,6 +61,7 @@ subprojects {
 
     dependencies {
         testImplementation libs.junit5api
+        testImplementation libs.mockitoJunitJupiter
         testCompileOnly libs.junit4
         testRuntimeOnly libs.junitJupiterEngine
         // in Gradle 8, this declaration is mandatory. See https://docs.gradle.org/8.3/userguide/upgrading_version_8.html#manually_declaring_dependencies :

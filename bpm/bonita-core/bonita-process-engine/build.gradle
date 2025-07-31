@@ -75,7 +75,6 @@ dependencies {
     testAnnotationProcessor libs.lombok
 
     testImplementation libs.assertj
-    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.systemRules      // works with Junit4
     testImplementation libs.systemLambda    // works with Junit5
     testImplementation libs.springTest

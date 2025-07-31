@@ -54,7 +54,6 @@ dependencies {
     testImplementation libs.systemRules
     testImplementation libs.mockitoCore
     testImplementation libs.hamcrest
-    testImplementation libs.mockitoJunitJupiter
     testRuntimeOnly libs.jsonassert
 }
 
