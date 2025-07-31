@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -128,10 +129,16 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(value = { UnavailableLockException.class })
-    protected ResponseEntity<Object> handleUnavailableLockException(UnavailableLockException exception) {
-        return generateErrorResponse(exception.getClass().getName(), HttpStatus.NOT_ACCEPTABLE,
-                exception.getMessage());
+    @ExceptionHandler(value = { UndeclaredThrowableException.class })
+    protected ResponseEntity<Object> handleUnavailableLockException(UndeclaredThrowableException exception) {
+        final UnavailableLockException unavailableLockException = (UnavailableLockException) getFirstCauseOfType(
+                exception, UnavailableLockException.class);
+        if (unavailableLockException != null) {
+            // UnavailableLockExceptions are not declared in the API, as they are thrown by the engine interceptor (ServerAPIImpl), so it is automatically wrapped in an UndeclaredThrowableException by the HttpClient proxy:
+            return generateErrorResponse(unavailableLockException.getClass().getName(), HttpStatus.NOT_ACCEPTABLE,
+                    unavailableLockException.getMessage());
+        }
+        return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private <T extends Throwable> Throwable getFirstCauseOfType(Throwable exception, Class<T> exceptionTypeToSearch) {
