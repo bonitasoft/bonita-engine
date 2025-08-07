@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerProperties;
@@ -53,10 +54,12 @@ public class StandardAuthenticationManagerImpl implements AuthenticationManager 
         if (localeFromRequestedURL != null) {
             loginURL.appendParameter(LocaleUtils.PORTAL_LOCALE_PARAM, localeFromRequestedURL);
         }
-        //Decodes the redirect URL if it is encoded because UrlBuilder already encodes it (avoid double encoding)
-        //since this method is part of a public interface, we cannot change the calling code to pass decoded redirectURL
-        String decodedRedirectURL = URLDecoder.decode(redirectURL, StandardCharsets.UTF_8);
-        loginURL.appendParameter(AuthenticationManager.REDIRECT_URL, decodedRedirectURL);
+        if (StringUtils.isNotBlank(redirectURL)) {
+            //Decodes the redirect URL if it is encoded because LoginUrl already encodes it (avoid double encoding)
+            //since this method is part of a public interface, we cannot change the calling code to pass decoded redirectURL
+            String decodedRedirectURL = URLDecoder.decode(redirectURL, StandardCharsets.UTF_8);
+            loginURL.appendParameter(AuthenticationManager.REDIRECT_URL, decodedRedirectURL);
+        }
         return loginURL.build();
     }
 
