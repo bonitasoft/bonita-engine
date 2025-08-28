@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataModelResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataModelResourceFinder;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResourceFinder;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
@@ -106,7 +104,6 @@ public class FinderFactory {
         finders.put(ProcessContractResource.class, new ProcessContractResourceFinder());
         finders.put(ProcessDefinitionDesignResource.class, new ProcessDefinitionDesignResourceFinder());
         finders.put(ProcessInstantiationResource.class, new ProcessInstantiationResourceFinder());
-        finders.put(BusinessDataModelResource.class, new BusinessDataModelResourceFinder());
         finders.put(I18nTranslationResource.class, new I18nTanslationResourceFinder());
         finders.put(ArchivedCaseVariableResource.class, new ArchivedCaseVariableResourceFinder());
         finders.put(ArchivedCaseVariablesResource.class, new ArchivedCaseVariablesResourceFinder());

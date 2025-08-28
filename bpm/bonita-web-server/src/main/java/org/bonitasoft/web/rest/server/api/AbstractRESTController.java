@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -49,6 +50,11 @@ public abstract class AbstractRESTController {
     protected CommandAPI getCommandAPI(HttpSession session)
             throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getCommandAPI(getApiSession(session));
+    }
+
+    public TenantAdministrationAPI getTenantAdministrationAPI(HttpSession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getTenantAdministrationAPI(getApiSession(session));
     }
 
 }

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.web.rest.server.api;
 
+import static org.bonitasoft.web.rest.server.api.SpringResponseEntityUtils.generateErrorResponse;
+
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
 
@@ -22,6 +24,7 @@ import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.business.data.BusinessDataCrudOperationException;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.TenantStatusException;
@@ -129,6 +132,11 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(value = { InvalidBusinessDataModelException.class })
+    public ResponseEntity<Object> handleInvalidBDM(InvalidBusinessDataModelException exception) {
+        return bonitaHandleException(exception, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(value = { UndeclaredThrowableException.class })
     protected ResponseEntity<Object> handleUnavailableLockException(UndeclaredThrowableException exception) {
         final UnavailableLockException unavailableLockException = (UnavailableLockException) getFirstCauseOfType(
@@ -185,15 +193,6 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         // replicate the behaviour of former API written with Restlet (see CommonResource)
         final Throwable cause = exception.getCause() != null ? exception.getCause() : exception;
         return generateErrorResponse(exception.getClass().getName(), status, cause.getMessage());
-    }
-
-    private static ResponseEntity<Object> generateErrorResponse(String exceptionClassName, HttpStatus status,
-            String message) {
-        return ResponseEntity.status(status)
-                .body(new ResponseError("class " + exceptionClassName, message));
-    }
-
-    private record ResponseError(String exception, String message) {
     }
 
 }
