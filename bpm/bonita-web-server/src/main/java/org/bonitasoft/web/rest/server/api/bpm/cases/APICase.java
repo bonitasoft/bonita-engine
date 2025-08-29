@@ -26,10 +26,7 @@ import org.bonitasoft.web.rest.server.datastore.bpm.cases.CaseDatastore;
 import org.bonitasoft.web.rest.server.datastore.bpm.flownode.FlowNodeDatastore;
 import org.bonitasoft.web.rest.server.datastore.bpm.process.ProcessDatastore;
 import org.bonitasoft.web.rest.server.datastore.organization.UserDatastore;
-import org.bonitasoft.web.rest.server.framework.api.APIHasAdd;
-import org.bonitasoft.web.rest.server.framework.api.APIHasDelete;
-import org.bonitasoft.web.rest.server.framework.api.APIHasGet;
-import org.bonitasoft.web.rest.server.framework.api.APIHasSearch;
+import org.bonitasoft.web.rest.server.framework.api.*;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
@@ -41,7 +38,8 @@ import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
  * @author Celine Souchet
  */
 public class APICase extends ConsoleAPI<CaseItem>
-        implements APIHasGet<CaseItem>, APIHasAdd<CaseItem>, APIHasSearch<CaseItem>, APIHasDelete {
+        implements APIHasUpdate<CaseItem>, APIHasGet<CaseItem>, APIHasAdd<CaseItem>, APIHasSearch<CaseItem>,
+        APIHasDelete {
 
     @Override
     protected ItemDefinition defineItemDefinition() {
@@ -190,4 +188,8 @@ public class APICase extends ConsoleAPI<CaseItem>
         return new CaseDatastore(getEngineSession());
     }
 
+    @Override
+    public CaseItem update(final APIID id, final Map<String, String> attributes) {
+        return getCaseDatastore().update(id, attributes);
+    }
 }
