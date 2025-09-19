@@ -17,10 +17,10 @@ msgid "1 case has been deleted"
 msgstr "1 案件が削除されました"
 
 msgid "A Link to your application made outside the portal, e.g. with Bonita UI Builder."
-msgstr ""
+msgstr "Bonita UI Builderなどのポータル外で作成されたアプリケーションへのリンク."
 
 msgid "A classic Bonita Living Application."
-msgstr ""
+msgstr "クラシックなBonitaリビングアプリケーション."
 
 msgid "A page with this name already exists."
 msgstr "この名前のページは既に存在します。"
@@ -114,7 +114,7 @@ msgid "An error occurred with the requested operation."
 msgstr "要求された操作でエラーが発生しました。"
 
 msgid "Application Link"
-msgstr ""
+msgstr "アプリケーションリンク"
 
 msgid "Application XML file"
 msgstr "アプリケーションのXMLファイル"
@@ -536,7 +536,7 @@ msgid "Layout"
 msgstr "レイアウト"
 
 msgid "Legacy Application"
-msgstr ""
+msgstr "従来のアプリケーション"
 
 msgid "Loading..."
 msgstr "ロード中..."
@@ -872,7 +872,7 @@ msgid "Sort by name"
 msgstr "名前で並べ替え"
 
 msgid "Sort by type"
-msgstr ""
+msgstr "種類で並び替え"
 
 msgid "Sort by updated on"
 msgstr "更新日で並べ替え"
@@ -983,7 +983,7 @@ msgid "The task has been submitted but an error occurred while adding the commen
 msgstr "タスクが送信されましたが、コメントを追加するときにエラーが発生しました。"
 
 msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate>here</a>."
-msgstr ""
+msgstr "このような変更の一覧は <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate>こちら</a>です。"
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "'content'、'API' 、 'theme' の単語は、内部使用のため予約されています。アプリケーション、またはページの URL にそれらを使用してはいけません。"
@@ -1016,10 +1016,10 @@ msgid "This name is already in use"
 msgstr "この名前は既に使用中"
 
 msgid "This only changes the application link. The application itself is still deployed at the same location."
-msgstr ""
+msgstr "これはアプリケーションのリンクを変更するだけです。アプリケーション自体は同じ場所にデプロイされます。"
 
 msgid "This only deletes the application link. The application itself is not deleted and is still deployed."
-msgstr ""
+msgstr "アプリケーションのリンクのみが削除されます。アプリケーション自体は削除されず、デプロイされたままです。"
 
 msgid "This process is no longer available."
 msgstr "このプロセスは既に使用できません。"
