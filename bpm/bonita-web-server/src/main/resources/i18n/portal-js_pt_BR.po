@@ -17,10 +17,10 @@ msgid "1 case has been deleted"
 msgstr "1 caso foi excluído"
 
 msgid "A Link to your application made outside the portal, e.g. with Bonita UI Builder."
-msgstr ""
+msgstr "Um link para sua aplicação feita fora do portal, por exemplo, com o Bonita UI Builder."
 
 msgid "A classic Bonita Living Application."
-msgstr ""
+msgstr "Um clássico aplicativo Bonita Live."
 
 msgid "A page with this name already exists."
 msgstr "Já existe uma página com esse nome."
@@ -113,7 +113,7 @@ msgid "An error occurred with the requested operation."
 msgstr "Ocorreu um erro com a operação solicitada"
 
 msgid "Application Link"
-msgstr ""
+msgstr "Link do aplicativo"
 
 msgid "Application XML file"
 msgstr "Arquivo XML do aplicativo"
@@ -533,7 +533,7 @@ msgid "Layout"
 msgstr "Layout"
 
 msgid "Legacy Application"
-msgstr ""
+msgstr "Aplicação Legacy"
 
 msgid "Loading..."
 msgstr "Carregando..."
@@ -869,7 +869,7 @@ msgid "Sort by name"
 msgstr "Ordenar por nome"
 
 msgid "Sort by type"
-msgstr ""
+msgstr "Ordenar por Tipo"
 
 msgid "Sort by updated on"
 msgstr "Ordenar pela data de atualização"
@@ -980,7 +980,7 @@ msgid "The task has been submitted but an error occurred while adding the commen
 msgstr "A tarefa foi apresentada, mas ocorreu um erro ao adicionar o comentário"
 
 msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate>here</a>."
-msgstr ""
+msgstr "A lista inteira de tais alterações é listada <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate>aqui</a>."
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "As palavras 'conteúdo', 'API' e 'tema' são reservados para uso interno. Eles não devem ser usados em um aplicativo ou a URL da página."
@@ -1013,10 +1013,10 @@ msgid "This name is already in use"
 msgstr "Este nome já está em uso"
 
 msgid "This only changes the application link. The application itself is still deployed at the same location."
-msgstr ""
+msgstr "Isso apenas muda o link do aplicativo. O próprio aplicativo ainda é implantado no mesmo local."
 
 msgid "This only deletes the application link. The application itself is not deleted and is still deployed."
-msgstr ""
+msgstr "Isso só exclui o link do aplicativo. O aplicativo em si não é excluído e ainda está implantado."
 
 msgid "This process is no longer available."
 msgstr "Este processo não está mais disponível."
