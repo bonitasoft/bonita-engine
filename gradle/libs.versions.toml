@@ -33,7 +33,7 @@ ehCacheVersion = "2.10.10.24.8"
 eclipseCompilerVersion = "3.43.0"
 jakartaActivationVersion = "1.2.2"
 quartzVersion = "2.3.2"
-micrometerVersion = "1.15.3"
+micrometerVersion = "1.15.4"
 # DB drivers:
 mysqlVersion = "8.4.0"
 msSqlServerVersion = "9.4.1.jre11"
@@ -46,7 +46,7 @@ jaxbVersion = "2.3.9"
 javaxAnnotationsVersion = "1.3.2"
 hazelcastVersion = "5.4.0" # Also update http://www.hazelcast.com/schema/config/hazelcast-config-<VERSION>.xsd if needed
 jcacheVersion = "1.1.1"
-guavaVersion = "33.4.8-jre"
+guavaVersion = "33.5.0-jre"
 antlr4RuntimeVersion = "4.7.2"
 casClientCoreVersion = "4.0.4"
 jtidyVersion = "r938"
@@ -67,7 +67,7 @@ woodstoxCoreVersion = "7.1.1"
 # subscription/bpm/bonita-web-server-sp package org.bonitasoft.console.common.server.auth.impl
 keycloakVersion = "21.1.2"
 xmlsecVersion = "2.3.5"
-bouncyCastleVersion = "1.81"
+bouncyCastleVersion = "1.82"
 spnegoVersion = "1.1.1"
 owaspHtmlSanitizerVersion = "20240325.1"
 
@@ -196,7 +196,7 @@ msSqlServer = { group = "com.microsoft.sqlserver", name = "mssql-jdbc", version.
 oracle = { group = "com.oracle.database.jdbc", name = "ojdbc8", version.ref = "oracleVersion" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
 
-lombok = "org.projectlombok:lombok:1.18.40"
+lombok = "org.projectlombok:lombok:1.18.42"
 
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 
