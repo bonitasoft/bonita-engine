@@ -4,7 +4,7 @@ groovyVersion = "3.0.25"
 springVersion = "5.3.39"
 springSessionVersion = "2.7.4"
 springBootVersion = "2.7.18"
-commonsLangVersion = "3.18.0"
+commonsLangVersion = "3.19.0"
 bonitaArtifactsModelVersion = "1.2.2"
 bonitaSecurityVersion = "1.28.0"
 commonsIOVersion = "2.20.0"
@@ -264,5 +264,5 @@ groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx",
 
 [plugins]
 bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "0.1.64" }
-dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.52.0" } # used by "List out-of-date dependencies" script
+dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.53.0" } # used by "List out-of-date dependencies" script
 taskInfo = { id = "org.barfuin.gradle.taskinfo", version = "2.2.0" } # Adds a 'tiTree' task to display Gradle task-graph
