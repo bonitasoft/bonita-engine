@@ -27,7 +27,7 @@ msgid "%attribute% is mandatory"
 msgstr "%attribute% es obligatorio"
 
 msgid "%attribute% is not a valid Color value"
-msgstr "%attribute%  no es un Color válido"
+msgstr "%attribute% no es un Color válido"
 
 msgid "%attribute% is not a valid URL"
 msgstr "%attribute% no es una URL valida"
