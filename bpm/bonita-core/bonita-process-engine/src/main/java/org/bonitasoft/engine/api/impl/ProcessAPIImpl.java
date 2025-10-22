@@ -3916,13 +3916,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final HashMap<String, Map<String, Long>> countersForProcessInstance = new HashMap<>();
         try {
             //make sure a process instance with this Id exists
-            // -- BEWARE: when a process instance is started by a Start Timer Event,
-            // -- there is NO 'stateid=0' archived in the ARCH_PROCESS_INSTANCE table
-            // -- Therefore, if such a process instance is still running, there won't be any record
-            // -- in the ARCH_PROCESS_INSTANCE table.
-            // -- Hence the need to also check in the PROCESS_INSTANCE table.
-            if (serviceAccessor.getProcessInstanceService().getLastArchivedProcessInstance(processInstanceId) == null
-                    && serviceAccessor.getProcessInstanceService().getProcessInstance(processInstanceId) == null) {
+            if (serviceAccessor.getProcessInstanceService().getLastArchivedProcessInstance(processInstanceId) == null) {
                 throw new SProcessInstanceNotFoundException(processInstanceId);
             }
             // Active flownodes:
@@ -3951,9 +3945,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                     countersForProcessInstance.put(flownodeName, flownodeCounters);
                 }
             }
-        } catch (final SProcessInstanceNotFoundException | SProcessInstanceReadException e) {
+        } catch (final SProcessInstanceNotFoundException e) {
             //cannot throw directly a ProcessInstanceNotFoundException to avoid API break
-            throw new RetrieveException(new ProcessInstanceNotFoundException(e, processInstanceId));
+            throw new RetrieveException(new ProcessInstanceNotFoundException(processInstanceId));
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
