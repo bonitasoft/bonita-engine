@@ -59,19 +59,4 @@ public class ProcessInstanceNotFoundException extends NotFoundException {
         setProcessInstanceIdOnContext(processInstanceId);
     }
 
-    /**
-     * Constructs a new exception and the message with the identifier of the process instance.
-     *
-     * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
-     *        is permitted, and indicates that the
-     *        cause is nonexistent or unknown.)
-     * @param processInstanceId
-     *        The identifier of the process instance
-     */
-    public ProcessInstanceNotFoundException(final Throwable cause, final long processInstanceId) {
-        super(cause);
-        setProcessInstanceIdOnContext(processInstanceId);
-    }
-
 }
