@@ -262,6 +262,7 @@ public class ProcessAPIImplTest {
     private ArgumentCaptor<SPendingActivityMapping> pendingMappingArgumentCaptor;
     @Captor
     private ArgumentCaptor<QueryOptions> deleteOldMessageArgumentCaptor;
+
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
@@ -404,9 +405,21 @@ public class ProcessAPIImplTest {
     }
 
     @Test(expected = RetrieveException.class)
-    public void getFlownodeStateCounters_should_throw_exception_when_process_instance_is_not_found() throws Exception {
+    public void getFlownodeStateCounters_should_throw_exception_when_process_instance_is_not_found_anywhere()
+            throws Exception {
         final long processInstanceId = 11L;
         when(processInstanceService.getLastArchivedProcessInstance(processInstanceId)).thenReturn(null);
+        when(processInstanceService.getProcessInstance(processInstanceId)).thenReturn(null);
+
+        processAPI.getFlownodeStateCounters(processInstanceId);
+    }
+
+    @Test
+    public void getFlownodeStateCounters_should_not_throw_exception_when_process_instance_is_found_in_active_instances()
+            throws Exception {
+        final long processInstanceId = 11L;
+        when(processInstanceService.getLastArchivedProcessInstance(processInstanceId)).thenReturn(null);
+        when(processInstanceService.getProcessInstance(processInstanceId)).thenReturn(mock(SProcessInstance.class));
 
         processAPI.getFlownodeStateCounters(processInstanceId);
     }
