@@ -20,12 +20,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.annotation.PostConstruct;
+
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,9 +40,14 @@ import org.springframework.stereotype.Component;
 @Component
 class ClassLoaderUpdater {
 
+    final static long DEFAULT_CLASSLOADER_INITIALIZATION_TIMEOUT_MINUTES = 5L;
+
     private final BonitaTaskExecutor bonitaTaskExecutor;
     private final SessionAccessor sessionAccessor;
     private final UserTransactionService userTransactionService;
+
+    @Value("${bonita.runtime.classloader.initialization.timeout-minutes:-1}")
+    private long classLoaderInitializationTimeoutMinutes;
 
     public ClassLoaderUpdater(BonitaTaskExecutor bonitaTaskExecutor,
             SessionAccessor sessionAccessor, UserTransactionService userTransactionService) {
@@ -61,7 +69,8 @@ class ClassLoaderUpdater {
 
     BonitaClassLoader initializeClassLoader(ClassLoaderServiceImpl classLoaderService,
             ClassLoaderIdentifier identifier) {
-        log.debug("Request creation of classloader in an other thread: {}", identifier);
+        log.debug("Request creation of classloader in an other thread: {}. A {} minutes timeout will be used.",
+                identifier, classLoaderInitializationTimeoutMinutes);
         return execute(getTenantId(), () -> classLoaderService.createClassloader(identifier));
     }
 
@@ -69,9 +78,17 @@ class ClassLoaderUpdater {
         Future<T> execute = bonitaTaskExecutor.execute(
                 inSession(tenantId, inTransaction(callable)));
         try {
-            return execute.get(5, TimeUnit.MINUTES);//hard coded timeout, it should never happen
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            return execute.get(classLoaderInitializationTimeoutMinutes, TimeUnit.MINUTES);
+        } catch (InterruptedException | ExecutionException e) {
             throw new SBonitaRuntimeException("Unable to refresh the classloaders", e);
+        } catch (TimeoutException toe) {
+            throw new SBonitaRuntimeException("Unable to refresh the classloaders within "
+                    + classLoaderInitializationTimeoutMinutes
+                    + " minutes. You may want to adjust the timeout using either the "
+                    + "bonita.runtime.classloader.initialization.timeout-minutes property or the "
+                    + "BONITA_RUNTIME_CLASSLOADER_INITIALIZATION_TIMEOUT_MINUTES environment variable."
+                    + "Make sure the value is within [1..XA_TRANSACTION_TIMEOUT].",
+                    toe);
         }
     }
 
@@ -101,4 +118,18 @@ class ClassLoaderUpdater {
         }
         return null;
     }
+
+    @PostConstruct
+    void validateClassLoaderInitializationTimeoutMinutes() {
+        if (classLoaderInitializationTimeoutMinutes <= 0) {
+            classLoaderInitializationTimeoutMinutes = DEFAULT_CLASSLOADER_INITIALIZATION_TIMEOUT_MINUTES;
+        }
+        log.debug(
+                "Using a timeout of {} minutes for class loader initialization or refresh. This can be configured "
+                        + "via the bonita.runtime.classloader.initialization.timeout-minutes property or the "
+                        + "BONITA_RUNTIME_CLASSLOADER_INITIALIZATION_TIMEOUT_MINUTES environment variable. "
+                        + "Make sure the value is within [1..XA_TRANSACTION_TIMEOUT].",
+                classLoaderInitializationTimeoutMinutes);
+    }
+
 }
