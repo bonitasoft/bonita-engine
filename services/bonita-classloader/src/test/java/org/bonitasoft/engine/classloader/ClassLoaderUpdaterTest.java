@@ -15,15 +15,20 @@ package org.bonitasoft.engine.classloader;
 
 import static java.util.Collections.singleton;
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 import java.util.HashSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -95,6 +100,89 @@ public class ClassLoaderUpdaterTest {
         callableGivenToTheTaskExecutor.getValue().call();
 
         verify(sessionAccessor).setTenantId(54L);
+    }
+
+    @Test
+    public void should_throw_SBonitaRuntimeException_on_timeout_in_execute() throws Exception {
+        // Make executor return a Future whose timed get throws TimeoutException
+        Future future = mock(Future.class);
+        doReturn(future).when(bonitaTaskExecutor).execute((Callable<Object>) any());
+        doThrow(new TimeoutException("simulated timeout"))
+                .when(future).get(anyLong(), any(TimeUnit.class));
+
+        assertThatExceptionOfType(SBonitaRuntimeException.class)
+                .isThrownBy(
+                        () -> classLoaderUpdater.initializeClassLoader(classLoaderService, identifier(PROCESS, 45L)))
+                .withCauseExactlyInstanceOf(TimeoutException.class)
+                .withMessageStartingWith("Unable to refresh the classloaders");
+    }
+
+    @Test
+    public void should_keep_positive_timeout_value_when_validating() throws Exception {
+        // given
+        setTimeoutValue(classLoaderUpdater, 10L);
+
+        // when
+        classLoaderUpdater.validateClassLoaderInitializationTimeoutMinutes();
+
+        // then
+        assertThat(getTimeoutValue(classLoaderUpdater)).isEqualTo(10L);
+    }
+
+    @Test
+    public void should_reset_to_default_when_timeout_is_zero() throws Exception {
+        // given
+        setTimeoutValue(classLoaderUpdater, 0L);
+
+        // when
+        classLoaderUpdater.validateClassLoaderInitializationTimeoutMinutes();
+
+        // then
+        assertThat(getTimeoutValue(classLoaderUpdater)).isEqualTo(5L);
+    }
+
+    @Test
+    public void should_reset_to_default_when_timeout_is_negative() throws Exception {
+        // given
+        setTimeoutValue(classLoaderUpdater, -5L);
+
+        // when
+        classLoaderUpdater.validateClassLoaderInitializationTimeoutMinutes();
+
+        // then
+        assertThat(getTimeoutValue(classLoaderUpdater)).isEqualTo(5L);
+    }
+
+    @Test
+    public void should_keep_minimum_positive_value_when_validating() throws Exception {
+        // given
+        setTimeoutValue(classLoaderUpdater, 1L);
+
+        // when
+        classLoaderUpdater.validateClassLoaderInitializationTimeoutMinutes();
+
+        // then
+        assertThat(getTimeoutValue(classLoaderUpdater)).isEqualTo(1L);
+    }
+
+    @Test
+    public void should_keep_large_timeout_value_when_validating() throws Exception {
+        // given
+        setTimeoutValue(classLoaderUpdater, 120L);
+
+        // when
+        classLoaderUpdater.validateClassLoaderInitializationTimeoutMinutes();
+
+        // then
+        assertThat(getTimeoutValue(classLoaderUpdater)).isEqualTo(120L);
+    }
+
+    private void setTimeoutValue(ClassLoaderUpdater updater, long value) throws Exception {
+        FieldUtils.writeField(updater, "classLoaderInitializationTimeoutMinutes", value, true);
+    }
+
+    private long getTimeoutValue(ClassLoaderUpdater updater) throws Exception {
+        return (long) FieldUtils.readField(updater, "classLoaderInitializationTimeoutMinutes", true);
     }
 
 }
