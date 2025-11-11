@@ -37,7 +37,7 @@ micrometerVersion = "1.13.1"
 # DB drivers:
 mysqlVersion = "8.2.0"
 msSqlServerVersion = "8.4.1.jre8"
-oracleVersion = "19.3.0.0"
+oracleVersion = "23.26.0.0.0"
 postgresqlVersion = "42.4.4"
 
 narayanaVersion = "5.10.6.Final"
@@ -191,7 +191,7 @@ jaxbCodeModel = { group = "org.glassfish.jaxb", name = "codemodel", version.ref 
 h2 = "com.h2database:h2:1.4.200"
 mysql = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysqlVersion" }
 msSqlServer = { group = "com.microsoft.sqlserver", name = "mssql-jdbc", version.ref = "msSqlServerVersion" }
-oracle = { group = "com.oracle.database.jdbc", name = "ojdbc8", version.ref = "oracleVersion" }
+oracle = { group = "com.oracle.database.jdbc", name = "ojdbc11", version.ref = "oracleVersion" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
 
 lombok = "org.projectlombok:lombok:1.18.32"
