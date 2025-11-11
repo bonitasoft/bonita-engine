@@ -27,14 +27,7 @@ dependencies {
     }
     api libs.msSqlServer
     api libs.h2
-    api(libs.oracle) {
-        exclude(module: "ons")
-        exclude(module: "oraclepki")
-        exclude(module: "osdt_cert")
-        exclude(module: "osdt_core")
-        exclude(module: "ucp")
-        exclude(module: "simplefan")
-    }
+    api(libs.oracle)
     api libs.commonsCLI
     annotationProcessor libs.lombok
     compileOnly libs.lombok
