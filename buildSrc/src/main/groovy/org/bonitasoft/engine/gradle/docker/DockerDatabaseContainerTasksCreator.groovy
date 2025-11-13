@@ -100,7 +100,8 @@ class DockerDatabaseContainerTasksCreator {
                 group null // do not show task when running `gradle tasks`
 
                 targetContainerId startContainer.get().getContainerId()
-                awaitStatusTimeout = 360
+                // Oracle requires more time due to initialization, other databases are faster
+                awaitStatusTimeout = ('oracle' == vendor.name) ? 480 : 360
             }
 
             def inspectContainer = project.tasks.register("inspect${uniqueName}ContainerUrl", DockerInspectContainer) {
