@@ -28,6 +28,7 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'com.adarshr.test-logger'
+    apply plugin: 'org.gradle.test-retry'
 
     repositories {
         mavenCentral()
@@ -101,6 +102,39 @@ subprojects {
         if (!project.hasProperty("createTestReports")) {
             reports.html.required = false
             reports.junitXml.required = false
+        }
+
+        retry {
+            // Test Retry Plugin Configuration
+            // Can be overridden from command line:
+            //   -PtestRetryMaxRetries=5       (Gradle property - recommended)
+            //   -Dtest.retry.maxRetries=5     (System property)
+            //   -PtestRetryMaxFailures=20     (Max failures before stopping)
+            //   -Dtest.retry.maxFailures=20   (System property)
+            //   -PtestRetryFailOnFlaky=false  (Don't fail on flaky tests)
+            //
+            // Examples:
+            //   ./gradlew integrationTest -PtestRetryMaxRetries=5
+            //   ./gradlew iT -PtestRetryMaxRetries=0  # Disable retry
+            //   ./gradlew mysqlDatabaseTest -PtestRetryMaxRetries=10
+
+            maxRetries = project.hasProperty('testRetryMaxRetries') ?
+                project.property('testRetryMaxRetries').toInteger() :
+                System.getProperty('test.retry.maxRetries', '2').toInteger()
+
+            maxFailures = project.hasProperty('testRetryMaxFailures') ?
+                project.property('testRetryMaxFailures').toInteger() :
+                System.getProperty('test.retry.maxFailures', '6').toInteger()
+
+            if (!System.getenv().containsKey("GITHUB_ACTIONS")) {
+                // locally, we want to fail the build on flaky tests passing after retry. On CI, no:
+                failOnPassedAfterRetry = project.hasProperty('testRetryFailOnFlaky') ?
+                    project.property('testRetryFailOnFlaky').toBoolean() : true
+            }
+            filter {
+                // filter by qualified class name (* matches zero or more of any character)
+                includeClasses.add("*IT")
+            }
         }
     }
     testlogger {
