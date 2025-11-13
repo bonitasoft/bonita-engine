@@ -73,9 +73,42 @@ The same can be done for publishing repository (single repo) using property `alt
 
 To run all **unit + integration tests** (on the default embedded H2
 database), run the following command:
-```
+```bash
 ./gradlew test integrationTest
 ```
+
+### Test Retry Configuration
+
+The project uses the [Gradle Test Retry Plugin](https://plugins.gradle.org/plugin/org.gradle.test-retry) to automatically retry failed tests and detect flaky tests.
+
+#### Default Retry Behavior
+
+By default:
+- Failed tests are retried up to **2 more times**
+- Build fails if more than **6 tests** fail in one round
+- Flaky tests (pass on retry) fail the build locally but not in CI
+- Only applies to '*IT' test classes (tasks `integrationTest` and database's: `postgresDatabaseTest`, etc.)
+
+#### Overriding Retry Settings
+
+```bash
+# Retry up to 5 times instead of 2
+./gradlew integrationTest -PtestRetryMaxRetries=5
+
+# Retry and allow up to 20 failures before stopping
+./gradlew integrationTest -PtestRetryMaxRetries=5 -PtestRetryMaxFailures=20
+
+# Disable retry (set to 0)
+./gradlew integrationTest -PtestRetryMaxRetries=0
+
+# Don't fail on flaky tests (tests that pass on retry). Example for database tests:
+./gradlew postgresDatabaseTest -PtestRetryFailOnFlaky=false
+```
+
+#### Important Note
+
+The test-retry plugin is designed to **detect** flaky tests, not to mask them. Always investigate and fix the root cause of flaky tests rather than just relying on retries.
+
 
 ## Project Structure
 The project is composed of several modules. Unit tests are contained in the modules, integration tests are regrouped in bonita-integration-tests.
