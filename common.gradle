@@ -88,8 +88,8 @@ subprojects {
         options.encoding = 'UTF-8'
     }
     tasks.withType(DependencyReportTask).configureEach {
-        group "Documentation"
-        description "List runtime dependencies for a specified configuration"
+        group = "Documentation"
+        description = "List runtime dependencies for a specified configuration"
         configurations = [project.configurations.runtimeClasspath]
     }
 
