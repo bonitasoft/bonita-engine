@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
+import java.io.Serial;
+
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
@@ -22,6 +24,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
  */
 public class ActivityInstanceNotFoundException extends NotFoundException {
 
+    @Serial
     private static final long serialVersionUID = -5980531959067888526L;
 
     /**

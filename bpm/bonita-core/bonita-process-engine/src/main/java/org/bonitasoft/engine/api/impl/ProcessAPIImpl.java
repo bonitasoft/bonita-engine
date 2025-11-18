@@ -2747,7 +2747,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ActivityInstanceNotFoundException(activityInstanceId);
         } catch (final SBonitaException e) {
             logError(e);
-            throw new ActivityInstanceNotFoundException(e);
+            throw new ActivityInstanceNotFoundException(activityInstanceId, e);
         }
     }
 
@@ -2779,7 +2779,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SUnreleasableTaskException e) {
             throw new UpdateException(e);
         } catch (final SActivityInstanceNotFoundException e) {
-            throw new ActivityInstanceNotFoundException(e);
+            throw new ActivityInstanceNotFoundException(userTaskId, e);
         } catch (final SBonitaException e) {
             logError(e);
             throw new UpdateException(e);

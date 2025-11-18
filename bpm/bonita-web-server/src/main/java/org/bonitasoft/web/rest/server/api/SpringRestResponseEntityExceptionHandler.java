@@ -23,6 +23,7 @@ import javax.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.business.data.BusinessDataCrudOperationException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.command.CommandExecutionException;
@@ -105,6 +106,12 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
 
         return bonitaHandleException(new IllegalArgumentException("Bad parameter " + parameterName + "=" + value),
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = { ActivityInstanceNotFoundException.class })
+    public ResponseEntity<Object> handleActivityInstanceNotFound(ActivityInstanceNotFoundException exception) {
+        // The message contains the ID:
+        return generateErrorResponse(exception.getClass().getName(), HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
     @ExceptionHandler(value = { NotFoundException.class })

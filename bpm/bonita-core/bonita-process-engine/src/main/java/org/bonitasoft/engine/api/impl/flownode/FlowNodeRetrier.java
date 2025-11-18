@@ -60,7 +60,7 @@ public class FlowNodeRetrier {
                 containerRegistry.executeFlowNode(flowNodeInstance);
             }
         } catch (final SFlowNodeNotFoundException e) {
-            throw new ActivityInstanceNotFoundException(e);
+            throw new ActivityInstanceNotFoundException(flowNodeInstanceId, e);
         } catch (final SBonitaException e) {
             throw new ActivityExecutionException(e);
         }
