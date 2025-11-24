@@ -56,6 +56,10 @@ public class HttpServletRequestAccessor {
         return httpServletRequest.getSession();
     }
 
+    public HttpSession getHttpSession(boolean create) {
+        return httpServletRequest.getSession(create);
+    }
+
     public String getRedirectUrl() {
         return httpServletRequest.getParameter(REDIRECT_URL);
     }
