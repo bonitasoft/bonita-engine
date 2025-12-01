@@ -53,7 +53,7 @@ public class AllConfigurationResourceVisitorTest {
                         "TENANT_SECURITY_SCRIPTS");
         assertThat(bonitaConfigurations).as("should add all configuration files and skip licenses")
                 .extracting("resourceName")
-                .containsOnly("cache-config.xml",
+                .containsOnly("security-config.properties",
                         "compound-permissions-mapping.properties",
                         "SamplePermissionRule.groovy.sample",
                         "bonita-tenant-community.properties",

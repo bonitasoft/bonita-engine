@@ -138,44 +138,6 @@
         <constructor-arg name="platformPersistenceService" ref="persistenceService" />
     </bean>
 
-    <bean id="defaultCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="DEFAULT_PLATFORM" />
-        <property name="maxElementsInMemory" value="${bonita.platform.cache.default.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.platform.cache.default.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.platform.cache.default.eternal}" />
-        <property name="evictionPolicy" value="${bonita.platform.cache.default.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.platform.cache.default.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.platform.cache.default.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.platform.cache.default.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.platform.cache.default.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.platform.cache.default.readIntensive}" />
-    </bean>
-
-    <bean id="synchroServiceCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="SYNCHRO_SERVICE_CACHE" />
-        <property name="maxElementsInMemory" value="${bonita.platform.cache.synchro.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.platform.cache.synchro.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.platform.cache.synchro.eternal}" />
-        <property name="evictionPolicy" value="${bonita.platform.cache.synchro.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.platform.cache.synchro.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.platform.cache.synchro.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.platform.cache.synchro.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.platform.cache.synchro.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.platform.cache.synchro.readIntensive}" />
-    </bean>
-
-    <bean id="configFilesCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="CONFIGURATION_FILES_CACHE" />
-        <property name="maxElementsInMemory" value="${bonita.platform.cache.configfiles.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.platform.cache.configfiles.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.platform.cache.configfiles.eternal}" />
-        <property name="evictionPolicy" value="${bonita.platform.cache.configfiles.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.platform.cache.configfiles.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.platform.cache.configfiles.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.platform.cache.configfiles.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.platform.cache.configfiles.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.platform.cache.configfiles.readIntensive}" />
-    </bean>
 
     <bean id="bonitaTaskExecutor" class="org.bonitasoft.engine.service.BonitaTaskExecutor" />
 
@@ -1886,84 +1848,6 @@
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
-    <bean id="connectorCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="CONNECTOR" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.connector.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.connector.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.connector.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.connector.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.connector.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.connector.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.connector.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.connector.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.connector.readIntensive}" />
-    </bean>
-
-    <bean id="processDefinitionCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="_PROCESSDEF" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.processdef.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.processdef.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.processdef.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.processdef.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.processdef.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.processdef.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.processdef.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.processdef.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.processdef.readIntensive}" />
-    </bean>
-
-
-    <bean id="parameterCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="parameters" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.parameter.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.parameter.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.parameter.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.parameter.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.parameter.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.parameter.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.parameter.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.parameter.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.parameter.readIntensive}" />
-    </bean>
-
-    <bean id="userFilterCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="USER_FILTER" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.userfilter.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.userfilter.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.userfilter.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.userfilter.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.userfilter.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.userfilter.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.userfilter.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.userfilter.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.userfilter.readIntensive}" />
-    </bean>
-
-    <bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="GROOVY_SCRIPT_CACHE_NAME" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.groovy.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.groovy.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.groovy.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.groovy.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.groovy.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.groovy.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.groovy.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.groovy.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.groovy.readIntensive}" />
-    </bean>
-
-    <bean id="transientDataCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="transient_data" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.transientdata.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.transientdata.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.transientdata.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.transientdata.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.transientdata.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.transientdata.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.transientdata.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.transientdata.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.transientdata.readIntensive}" />
-    </bean>
 
     <bean id="bdmDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">
         <property name="jndiName" value="${bdm.datasource.jndi.path}" />

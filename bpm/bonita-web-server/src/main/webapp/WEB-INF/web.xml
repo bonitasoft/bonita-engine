@@ -346,10 +346,6 @@
     </filter-mapping>
     <!-- End Filter for restlet URLs -->
 
-    <!-- Shutdown properly ehcache on tomcat shutdown -->
-    <listener>
-        <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
-    </listener>
     <!-- Platform and tenant listeners -->
     <!-- For Apps containing the engine server -->
     <listener>

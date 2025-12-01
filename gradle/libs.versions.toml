@@ -29,7 +29,7 @@ jakartaServletVersion = "4.0.4"
 javaxServletVersion = "4.0.1"
 httpComponentsVersion = "4.5.14"
 xstreamVersion = "1.4.21"
-ehCacheVersion = "2.10.10.24.8"
+ehCacheVersion = "3.11.1"
 eclipseCompilerVersion = "3.43.0"
 jakartaActivationVersion = "1.2.2"
 quartzVersion = "2.3.2"
@@ -174,7 +174,7 @@ httpComponentsClient = { group = "org.apache.httpcomponents", name = "httpclient
 httpComponentsMime = { group = "org.apache.httpcomponents", name = "httpmime", version.ref = "httpComponentsVersion" }
 
 xstream = { group = "com.thoughtworks.xstream", name = "xstream", version.ref = "xstreamVersion" }
-ehCache = { group = "net.sf.ehcache", name = "ehcache", version.ref = "ehCacheVersion" }
+ehCache = { group = "org.ehcache", name = "ehcache", version.ref = "ehCacheVersion" }
 eclipseCompiler = { group = "org.eclipse.jdt", name = "ecj", version.ref = "eclipseCompilerVersion" }
 jakartaActivation = { group = "com.sun.activation", name = "jakarta.activation", version.ref = "jakartaActivationVersion" }
 javaxAnnotations = { group = "javax.annotation", name = "javax.annotation-api", version.ref = "javaxAnnotationsVersion" }

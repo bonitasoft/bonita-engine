@@ -34,14 +34,10 @@ public interface CacheService {
     /**
      * Remove the element according to the cache name and the key
      *
-     * @param cacheName
-     * @param key
-     *        The name of the cache where the object must be stored
-     *        The key that will allow to retrieve the object
-     * @return
-     *         true if an element was removed
-     * @throws SCacheException
-     *         Error thrown if has exceptions during the cache remove.
+     * @param cacheName the name of the cache to remove from
+     * @param key the key to remove from the cache
+     * @return true if an element was removed
+     * @throws SCacheException Error thrown if has exceptions during the cache removal.
      */
     boolean remove(String cacheName, Object key) throws SCacheException;
 
@@ -64,7 +60,7 @@ public interface CacheService {
      * @param cacheName
      *        The name of the cache on which to get the key list
      * @return the list of keys on the cache, or null if no keys exist
-     * @throws SCacheException
+     * @throws SCacheException if the cache cannot be read
      */
     List<Object> getKeys(String cacheName) throws SCacheException;
 
@@ -73,7 +69,7 @@ public interface CacheService {
      *
      * @param cacheName
      *        The name of the cache to clear
-     * @return
+     * @return true if no cache was found with the given name
      * @throws SCacheException
      *         Error thrown if has exceptions during the cache clear.
      */
