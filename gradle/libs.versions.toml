@@ -36,7 +36,7 @@ quartzVersion = "2.3.2"
 micrometerVersion = "1.15.3"
 # DB drivers:
 mysqlVersion = "8.4.0"
-msSqlServerVersion = "9.4.1.jre11"
+msSqlServerVersion = "12.6.5.jre11"
 oracleVersion = "23.26.0.0.0"
 postgresqlVersion = "42.7.4"
 
