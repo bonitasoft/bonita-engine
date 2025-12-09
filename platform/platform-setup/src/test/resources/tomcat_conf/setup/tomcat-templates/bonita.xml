@@ -30,7 +30,8 @@
               user="@@ds1.database_connection_user@@"
               password="@@ds1.database_connection_password@@"
               explicitUrl="true"
-              url="@@ds1.database_connection_url@@" />
+              url="@@ds1.database_connection_url@@"
+              dataSourceURL="@@ds1.database_connection_url@@" />
 
     <Resource name="bonitaDS"
               uniqueName="jdbc/bonitaDSXA"
@@ -87,7 +88,8 @@
               user="@@ds2.database_connection_user@@"
               password="@@ds2.database_connection_password@@"
               explicitUrl="true"
-              url="@@ds2.database_connection_url@@" />
+              url="@@ds2.database_connection_url@@"
+              dataSourceURL="@@ds2.database_connection_url@@" />
 
     <Resource
             name="BusinessDataDS"

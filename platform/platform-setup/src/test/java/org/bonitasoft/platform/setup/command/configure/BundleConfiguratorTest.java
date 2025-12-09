@@ -35,7 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BundleConfiguratorTest {
 
-    private BundleConfigurator configurator = Mockito.spy(_BundleConfigurator.class);
+    private final BundleConfigurator configurator = Mockito.spy(_BundleConfigurator.class);
 
     private abstract static class _BundleConfigurator extends BundleConfigurator {
 

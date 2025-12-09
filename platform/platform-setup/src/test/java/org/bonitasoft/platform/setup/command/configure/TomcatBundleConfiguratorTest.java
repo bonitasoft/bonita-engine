@@ -17,8 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -249,12 +254,14 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonitaXml,
                 "validationQuery=\"SELECT 1\"", "username=\"bonita\"", "password=\"bpm\"",
                 "serverName=\"db.localhost\"", "portNumber=\"5432\"", "port=\"5432\"", "databaseName=\"bonita\"",
-                "url=\"jdbc:postgresql://db.localhost:5432/bonita\"");
+                "url=\"jdbc:postgresql://db.localhost:5432/bonita\"",
+                "dataSourceURL=\"jdbc:postgresql://db.localhost:5432/bonita\"");
         checkFileContains(bonitaXml,
                 "validationQuery=\"SELECT 1\"", "username=\"bizUser\"", "password=\"bizPwd\"",
                 "serverName=\"biz.localhost\"", "portNumber=\"5433\"", "port=\"5433\"",
                 "databaseName=\"business_data\"",
-                "url=\"jdbc:postgresql://biz.localhost:5433/business_data\"");
+                "url=\"jdbc:postgresql://biz.localhost:5433/business_data\"",
+                "dataSourceURL=\"jdbc:postgresql://biz.localhost:5433/business_data\"");
         checkFileContains(bonitaXml, "driverClassName=\"org.postgresql.Driver\"",
                 "type=\"org.postgresql.xa.PGXADataSource\"", "class=\"org.postgresql.xa.PGXADataSource\"",
                 "factory=\"org.postgresql.xa.PGXADataSourceFactory\"");
@@ -291,10 +298,14 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonitaXml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"",
                 "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/internal_database.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"",
+                "dataSourceURL=\"jdbc:h2:file:" + databaseAbsolutePath
                         + "/internal_database.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
         checkFileContains(bonitaXml, "validationQuery=\"SELECT 1\"", "username=\"bizUser\"", "password=\"bizPwd\"",
                 "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/internal_business_data.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"",
+                "dataSourceURL=\"jdbc:h2:file:" + databaseAbsolutePath
                         + "/internal_business_data.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
     }
 
@@ -321,6 +332,8 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonitaXml, "validationQuery=\"SELECT 1\"", "username=\"_bonita_with$dollar\\andBackSlash\"",
                 "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/bonita_bdm_with$dollarXXX.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"",
+                "dataSourceURL=\"jdbc:h2:file:" + databaseAbsolutePath
                         + "/bonita_bdm_with$dollarXXX.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
     }
 
@@ -353,7 +366,9 @@ public class TomcatBundleConfiguratorTest {
                 "username=\"_bonita_with$dollar\\andBackSlash\"", "password=\"bpm_With$dollar\\andBackSlash\"",
                 "driverClassName=\"org.postgresql.Driver\"",
                 "url=\"jdbc:postgresql://localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good\"",
-                "url=\"jdbc:postgresql://localhost:5432/bonita_bdm_with$dollarXXX\\myInstance.of.bdm&amp;perf=good?host.net.disableOob=true\"");
+                "dataSourceURL=\"jdbc:postgresql://localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good\"",
+                "url=\"jdbc:postgresql://localhost:5432/bonita_bdm_with$dollarXXX\\myInstance.of.bdm&amp;perf=good?host.net.disableOob=true\"",
+                "dataSourceURL=\"jdbc:postgresql://localhost:5432/bonita_bdm_with$dollarXXX\\myInstance.of.bdm&amp;perf=good?host.net.disableOob=true\"");
     }
 
     @Test
