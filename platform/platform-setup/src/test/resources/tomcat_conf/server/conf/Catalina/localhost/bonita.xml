@@ -135,7 +135,7 @@
               username="bonita"
               password="bpm"
               driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
-              url="jdbc:sqlserver://localhost:1433;database=journal;encrypt=false"/>
+              dataSourceURL="jdbc:sqlserver://localhost:1433;database=journal"/>
     -->
 
     <!-- MySQL Example -->
@@ -288,7 +288,7 @@
               username="bonita"
               password="bpm"
               driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
-              url="jdbc:sqlserver://localhost:1433;database=business_data;encrypt=false"/>
+              dataSourceURL="jdbc:sqlserver://localhost:1433;database=business_data"/>
     -->
 
     <!-- MySQL Example -->
