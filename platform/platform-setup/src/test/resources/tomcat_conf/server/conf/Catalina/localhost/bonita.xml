@@ -111,6 +111,8 @@
     -->
 
     <!-- SQL Server Example -->
+    <!-- NOTE: encrypt=false in url attribute is used for development/test environments. -->
+    <!-- For production environments, you should configure proper SSL certificates and use encrypt=true or encrypt=true;trustServerCertificate=false -->
     <!--
     <Resource name="bonitaSequenceManagerDS"
               auth="Container"
@@ -133,7 +135,7 @@
               username="bonita"
               password="bpm"
               driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
-              url="jdbc:sqlserver://localhost:1433;database=journal"/>
+              dataSourceURL="jdbc:sqlserver://localhost:1433;database=journal"/>
     -->
 
     <!-- MySQL Example -->
@@ -286,7 +288,7 @@
               username="bonita"
               password="bpm"
               driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
-              url="jdbc:sqlserver://localhost:1433;database=business_data"/>
+              dataSourceURL="jdbc:sqlserver://localhost:1433;database=business_data"/>
     -->
 
     <!-- MySQL Example -->
