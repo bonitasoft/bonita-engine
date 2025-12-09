@@ -14,7 +14,7 @@
                 <prop key="db.database.name">bonita_engine</prop>
                 <prop key="db.user">sa</prop>
                 <prop key="db.password">Bonita12</prop>
-                <prop key="db.url">jdbc:sqlserver://${db.server.name}:${db.server.port};database=${db.database.name}</prop>
+                <prop key="db.url">jdbc:sqlserver://${db.server.name}:${db.server.port};database=${db.database.name};encrypt=false</prop>
             </props>
         </property>
     </bean>
