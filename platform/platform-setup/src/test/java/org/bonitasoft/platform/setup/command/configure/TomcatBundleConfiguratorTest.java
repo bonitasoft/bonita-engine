@@ -17,13 +17,8 @@ import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -241,11 +236,13 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml,
                 "validationQuery=\"SELECT 1\"", "username=\"bonita\"", "password=\"bpm\"",
                 "driverClassName=\"org.postgresql.Driver\"",
-                "url=\"jdbc:postgresql://localhost:5432/bonita\"");
+                "url=\"jdbc:postgresql://localhost:5432/bonita\"",
+                "dataSourceURL=\"jdbc:postgresql://localhost:5432/bonita\"");
         checkFileContains(bonita_xml,
                 "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"",
                 "driverClassName=\"oracle.jdbc.OracleDriver\"",
-                "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash?oracle.net.disableOob=true\"");
+                "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash?oracle.net.disableOob=true\"",
+                "dataSourceURL=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash?oracle.net.disableOob=true\"");
         checkFileContains(bonita_xml, "type=\"org.postgresql.xa.PGXADataSource\"",
                 "class=\"org.postgresql.xa.PGXADataSource\"", "factory=\"org.postgresql.xa.PGXADataSourceFactory\"",
                 "serverName=\"localhost\"", "portNumber=\"5432\"", "port=\"5432\"", "databaseName=\"bonita\"");
@@ -276,6 +273,8 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"",
                 "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/internal_database.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"",
+                "dataSourceURL=\"jdbc:h2:file:" + databaseAbsolutePath
                         + "/internal_database.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"",
                 "password=\"bizPwd\"",
@@ -301,6 +300,8 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"sa\"", "password=\"\"",
                 "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/business_data.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"",
+                "dataSourceURL=\"jdbc:h2:file:" + databaseAbsolutePath
                         + "/business_data.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
     }
 
@@ -327,6 +328,8 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"_bonita_with$dollar\\andBackSlash\"",
                 "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/bonita_bdm_with$dollarXXX.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"",
+                "dataSourceURL=\"jdbc:h2:file:" + databaseAbsolutePath
                         + "/bonita_bdm_with$dollarXXX.db;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
     }
 
@@ -354,7 +357,8 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"",
                 "username=\"_bonita_with$dollar\\andBackSlash\"", "password=\"bpm_With$dollar\\andBackSlash\"",
                 "driverClassName=\"oracle.jdbc.OracleDriver\"",
-                "url=\"jdbc:oracle:thin:@//localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good?oracle.net.disableOob=true\"");
+                "url=\"jdbc:oracle:thin:@//localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good?oracle.net.disableOob=true\"",
+                "dataSourceURL=\"jdbc:oracle:thin:@//localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good?oracle.net.disableOob=true\"");
     }
 
     @Test
