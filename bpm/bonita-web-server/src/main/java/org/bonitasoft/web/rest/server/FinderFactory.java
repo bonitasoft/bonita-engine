@@ -57,8 +57,6 @@ import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResourceFinder;
 import org.bonitasoft.web.rest.server.api.form.FormMappingResource;
 import org.bonitasoft.web.rest.server.api.form.FormMappingResourceFinder;
-import org.bonitasoft.web.rest.server.api.system.I18nTanslationResourceFinder;
-import org.bonitasoft.web.rest.server.api.system.I18nTranslationResource;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
 
@@ -104,7 +102,6 @@ public class FinderFactory {
         finders.put(ProcessContractResource.class, new ProcessContractResourceFinder());
         finders.put(ProcessDefinitionDesignResource.class, new ProcessDefinitionDesignResourceFinder());
         finders.put(ProcessInstantiationResource.class, new ProcessInstantiationResourceFinder());
-        finders.put(I18nTranslationResource.class, new I18nTanslationResourceFinder());
         finders.put(ArchivedCaseVariableResource.class, new ArchivedCaseVariableResourceFinder());
         finders.put(ArchivedCaseVariablesResource.class, new ArchivedCaseVariablesResourceFinder());
         finders.put(ArchivedActivityVariableResource.class, new ArchivedActivityVariableResourceFinder());

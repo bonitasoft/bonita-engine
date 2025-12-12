@@ -35,7 +35,6 @@ import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignRes
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessInstantiationResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
 import org.bonitasoft.web.rest.server.api.form.FormMappingResource;
-import org.bonitasoft.web.rest.server.api.system.I18nTranslationResource;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -174,9 +173,6 @@ public class BonitaRestletApplication extends Application {
 
         // api extension
         router.attach(ROUTER_EXTENSION_PREFIX, factory.createExtensionResource(), Template.MODE_STARTS_WITH);
-
-        // GET all translations
-        router.attach("/system/i18ntranslation", factory.create(I18nTranslationResource.class));
 
         router.attach(BPM_ARCHIVED_CASE_VARIABLE_URL + "/{caseId}/{variableName}",
                 factory.create(ArchivedCaseVariableResource.class));

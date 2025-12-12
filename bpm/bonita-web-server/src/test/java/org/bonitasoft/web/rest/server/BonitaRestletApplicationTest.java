@@ -15,7 +15,6 @@ package org.bonitasoft.web.rest.server;
 
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
-import org.bonitasoft.web.rest.server.api.system.I18nTranslationResource;
 import org.bonitasoft.web.rest.server.utils.BonitaJacksonConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +32,7 @@ public class BonitaRestletApplicationTest {
     BonitaJacksonConverter bonitaJacksonConverter;
 
     @Test
-    public void should_application_register_bdm_resources() throws Exception {
+    public void should_application_register_bdm_resources() {
         //given
         final BonitaRestletApplication bonitaRestletApplication = new BonitaRestletApplication(finderFactory,
                 bonitaJacksonConverter);
@@ -47,7 +46,7 @@ public class BonitaRestletApplicationTest {
     }
 
     @Test
-    public void should_application_register_extension_resources() throws Exception {
+    public void should_application_register_extension_resources() {
         //given
         final BonitaRestletApplication bonitaRestletApplication = new BonitaRestletApplication(finderFactory,
                 bonitaJacksonConverter);
@@ -57,19 +56,6 @@ public class BonitaRestletApplicationTest {
 
         //then
         Mockito.verify(finderFactory).createExtensionResource();
-    }
-
-    @Test
-    public void application_should_register_i18n_resources() throws Exception {
-        //given
-        final BonitaRestletApplication bonitaRestletApplication = new BonitaRestletApplication(finderFactory,
-                bonitaJacksonConverter);
-
-        //when
-        bonitaRestletApplication.buildRouter();
-
-        //then
-        Mockito.verify(finderFactory).create(I18nTranslationResource.class);
     }
 
 }
