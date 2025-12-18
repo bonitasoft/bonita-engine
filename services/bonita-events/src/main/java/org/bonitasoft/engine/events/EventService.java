@@ -61,6 +61,18 @@ public interface EventService {
     void addHandler(final String eventType, final SHandler<SEvent> userHandler) throws HandlerRegistrationException;
 
     /**
+     * Registers a handler for the given event type only if a handler with the same identifier
+     * is not already registered. This ensures idempotent registration in clustered environments
+     * where multiple nodes may attempt to register the same handler.
+     *
+     * @param eventType the event type to register the handler for
+     * @param handler the handler to register
+     * @throws HandlerRegistrationException if registration fails
+     * @since 10.0.9
+     */
+    void registerHandlerIfNotExists(String eventType, SHandler<SEvent> handler) throws HandlerRegistrationException;
+
+    /**
      * Remove the given handler from the Event Service's handlers lists.
      *
      * @param handler
