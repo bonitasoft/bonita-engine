@@ -71,6 +71,7 @@ public class TestHandler implements SHandler<SEvent> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
         result = prime * result + (isCalled ? 1231 : 1237);
         result = prime * result + ((receivedEvent == null) ? 0 : receivedEvent.hashCode());
         return result;
@@ -88,6 +89,13 @@ public class TestHandler implements SHandler<SEvent> {
             return false;
         }
         TestHandler other = (TestHandler) obj;
+        if (identifier == null) {
+            if (other.identifier != null) {
+                return false;
+            }
+        } else if (!identifier.equals(other.identifier)) {
+            return false;
+        }
         if (isCalled != other.isCalled) {
             return false;
         }
