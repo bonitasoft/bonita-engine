@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.events;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.events.impl.EventServiceImpl;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
@@ -59,7 +57,7 @@ public class EventServiceImplTest {
     public void addTwiceTheSameHandler() throws Exception {
         final TestHandler h = new TestHandler();
         eventSvc.addHandler(EVT_INTERESTING, h);
-        assertEquals(1, eventSvc.getHandlers(EVT_INTERESTING).size());
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).hasSize(1);
         eventSvc.addHandler(EVT_INTERESTING, h);
     }
 
@@ -67,17 +65,17 @@ public class EventServiceImplTest {
     public void addHandlerInEventFilters() throws Exception {
         final TestHandler h = new TestHandler();
         eventSvc.addHandler(EVT_INTERESTING, h);
-        assertTrue(eventSvc.getHandlers(EVT_INTERESTING).contains(h));
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).contains(h);
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
 
     @Test
     public void addNewTypeInRegisteredHandlers() throws Exception {
-        assertTrue(eventSvc.getHandlers(EVT_INTERESTING).isEmpty());
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).isEmpty();
 
         final TestHandler h = new TestHandler();
         eventSvc.addHandler(EVT_INTERESTING, h);
-        assertFalse(eventSvc.getHandlers(EVT_INTERESTING).isEmpty());
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).isNotEmpty();
 
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
@@ -92,10 +90,10 @@ public class EventServiceImplTest {
     public void removeHandler() throws Exception {
         final TestHandler h = new TestHandler();
         eventSvc.addHandler(EVT_INTERESTING, h);
-        assertEquals(1, eventSvc.getHandlers(EVT_INTERESTING).size());
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).hasSize(1);
 
         eventSvc.removeHandler(EVT_INTERESTING, h);
-        assertEquals(0, eventSvc.getHandlers(EVT_INTERESTING).size());
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).isEmpty();
     }
 
     @Test
@@ -112,8 +110,8 @@ public class EventServiceImplTest {
         eventSvc.fireEvent(irrelevant);
 
         // Check that only "interesting" events have been received by the registered handler
-        assertFalse(irrelevant.isFlagged());
-        assertTrue(interesting.isFlagged());
+        assertThat(irrelevant.isFlagged()).isFalse();
+        assertThat(interesting.isFlagged()).isTrue();
 
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
@@ -127,13 +125,13 @@ public class EventServiceImplTest {
         eventSvc.addHandler(EVT_INTERESTING, h);
         eventSvc.fireEvent(interesting);
 
-        assertTrue(interesting.isFlagged());
+        assertThat(interesting.isFlagged()).isTrue();
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
 
     @Test
     public void getAllHandlersByEvent() throws HandlerRegistrationException, HandlerUnregistrationException {
-        assertTrue(eventSvc.getHandlers(EVT_INTERESTING).isEmpty());
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).isEmpty();
 
         // add 2 different handlers for 1 event type
         final TestHandler h1 = new TestHandler();
@@ -143,10 +141,64 @@ public class EventServiceImplTest {
         eventSvc.addHandler(EVT_INTERESTING, h2);
 
         // now i check if the evtList contains my both handlers
-        assertFalse(eventSvc.getHandlers(EVT_INTERESTING).isEmpty());
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).isNotEmpty();
 
         eventSvc.removeHandler(EVT_INTERESTING, h1);
         eventSvc.removeHandler(EVT_INTERESTING, h2);
+    }
+
+    @Test
+    public void registerHandlerIfNotExists_shouldRegisterWhenNoHandlerExists() throws HandlerRegistrationException {
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).isEmpty();
+
+        final TestHandler handler = new TestHandler();
+        eventSvc.registerHandlerIfNotExists(EVT_INTERESTING, handler);
+
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).hasSize(1);
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).contains(handler);
+    }
+
+    @Test
+    public void registerHandlerIfNotExists_shouldNotRegisterWhenHandlerAlreadyExists()
+            throws HandlerRegistrationException {
+        final TestHandler handler = new TestHandler();
+
+        // Register handler first time
+        eventSvc.registerHandlerIfNotExists(EVT_INTERESTING, handler);
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).hasSize(1);
+
+        // Try to register same handler again (same identifier)
+        eventSvc.registerHandlerIfNotExists(EVT_INTERESTING, handler);
+
+        // Should still have only 1 handler
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).hasSize(1);
+    }
+
+    @Test
+    public void registerHandlerIfNotExists_shouldRegisterDifferentHandlers() throws HandlerRegistrationException {
+        // Create handlers with explicit different identifiers
+        final TestHandler handler1 = new TestHandler("handler-1");
+        final TestHandler handler2 = new TestHandler("handler-2");
+
+        eventSvc.registerHandlerIfNotExists(EVT_INTERESTING, handler1);
+        eventSvc.registerHandlerIfNotExists(EVT_INTERESTING, handler2);
+
+        // Should have 2 handlers with different identifiers
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).hasSize(2);
+    }
+
+    @Test
+    public void registerHandlerIfNotExists_shouldBeIdempotentAcrossMultipleCalls()
+            throws HandlerRegistrationException {
+        final TestHandler handler = new TestHandler();
+
+        // Register multiple times
+        eventSvc.registerHandlerIfNotExists(EVT_INTERESTING, handler);
+        eventSvc.registerHandlerIfNotExists(EVT_INTERESTING, handler);
+        eventSvc.registerHandlerIfNotExists(EVT_INTERESTING, handler);
+
+        // Should still have only 1 handler
+        assertThat(eventSvc.getHandlers(EVT_INTERESTING)).hasSize(1);
     }
 
 }

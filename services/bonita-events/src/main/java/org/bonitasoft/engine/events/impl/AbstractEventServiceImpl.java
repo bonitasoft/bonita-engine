@@ -37,8 +37,6 @@ public abstract class AbstractEventServiceImpl implements EventService {
 
     /**
      * Fire the given Event only to interested handlers
-     *
-     * @throws SFireEventException
      */
     @Override
     public void fireEvent(final SEvent event) throws SFireEventException {
@@ -50,11 +48,10 @@ public abstract class AbstractEventServiceImpl implements EventService {
             // retrieve the handler list concerned by the given event
             final Collection<SHandler<SEvent>> handlers = getHandlersFor(event.getType());
 
-            if (handlers.size() > 0) {
+            if (!handlers.isEmpty()) {
                 if (getLogger().isTraceEnabled()) {
-                    getLogger().trace(
-                            "Found " + handlers.size() + " for event " + event.getType()
-                                    + ". All handlers: " + handlers);
+                    getLogger().trace("Found {} for event {}. All handlers: {}", handlers.size(), event.getType(),
+                            handlers);
                 }
                 SFireEventException sFireEventException = null;
                 for (final SHandler<SEvent> handler : handlers) {
@@ -98,6 +95,22 @@ public abstract class AbstractEventServiceImpl implements EventService {
         }
     }
 
+    @Override
+    public void registerHandlerIfNotExists(String eventType, SHandler<SEvent> handler)
+            throws HandlerRegistrationException {
+        // Check if a handler with the same identifier already exists
+        boolean alreadyRegistered = getHandlers(eventType).stream()
+                .anyMatch(h -> h.getIdentifier().equals(handler.getIdentifier()));
+
+        if (!alreadyRegistered) {
+            addHandler(eventType, handler);
+            getLogger().debug("Registered handler {} for event type {}", handler.getIdentifier(), eventType);
+        } else {
+            getLogger().debug("Handler {} already registered for event type {}. Ignoring registration.",
+                    handler.getIdentifier(), eventType);
+        }
+    }
+
     protected abstract void addHandlerFor(String eventType, SHandler<SEvent> handler)
             throws HandlerRegistrationException;
 
@@ -120,11 +133,6 @@ public abstract class AbstractEventServiceImpl implements EventService {
         removeHandlerFor(eventType, h);
     }
 
-    /**
-     * @param eventType
-     * @param h
-     * @throws HandlerUnregistrationException
-     */
     protected abstract void removeHandlerFor(final String eventType, final SHandler<SEvent> h)
             throws HandlerUnregistrationException;
 
