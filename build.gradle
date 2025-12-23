@@ -1,5 +1,5 @@
 plugins {
-    id "org.sonarqube" version "7.1.0.6387"
+    id "org.sonarqube" version "7.2.2.6593"
     alias(libs.plugins.taskInfo)
     alias(libs.plugins.testRetry)
 }
