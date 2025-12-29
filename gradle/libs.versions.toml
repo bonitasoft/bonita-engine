@@ -38,7 +38,7 @@ micrometerVersion = "1.13.1"
 mysqlVersion = "8.2.0"
 msSqlServerVersion = "12.6.5.jre11"
 oracleVersion = "23.26.0.0.0"
-postgresqlVersion = "42.4.4"
+postgresqlVersion = "42.7.8"
 
 narayanaVersion = "5.10.6.Final"
 logbackVersion = "1.2.13"
