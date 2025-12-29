@@ -121,7 +121,8 @@ public class LoginManager {
     protected void storeCredentials(final HttpServletRequestAccessor request, final APISession session,
             boolean recreateHTTPSession) throws LoginFailedException {
         String local = LocaleUtils.getUserLocaleAsString(request.asHttpServletRequest());
-        final User user = new User(request.getUsername(), local);
+        // Use APISession username instead of request parameter for SSO compatibility (OIDC, SAML, etc.)
+        final User user = new User(session.getUserName(), local);
         initSession(request, session, user, recreateHTTPSession);
     }
 
