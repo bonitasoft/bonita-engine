@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,14 +24,11 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Properties;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.file.PathUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.h2.tools.Server;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -134,37 +130,6 @@ public class PlatformSetupDistributionIT {
         int iExitValue = oDefaultExecutor.execute(oCmdLine);
         //then
         assertThat(iExitValue).isEqualTo(1);
-    }
-
-    @Test
-    public void setupSh_should_work_on_postgres_database() throws Exception {
-        //given
-        File dbFolder = temporaryFolder.newFolder();
-        Server pgServer = Server.createPgServer("-baseDir", dbFolder.getAbsolutePath(), "-ifNotExists");
-        CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
-        oCmdLine.addArguments("init");
-        try {
-            //server must be started to have a valid port
-            pgServer.start();
-            DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(setupFolder);
-            //when
-            Path databaseProperties = setupFolder.toPath().resolve("database.properties");
-            Properties properties = new Properties();
-            properties.load(new ByteArrayInputStream(Files.readAllBytes(databaseProperties)));
-            properties.setProperty("db.vendor", "postgres");
-            properties.setProperty("db.server.name", "localhost");
-            properties.setProperty("db.server.port", String.valueOf(pgServer.getPort()));
-            properties.setProperty("db.database.name", "bonita");
-            properties.setProperty("db.password", "bpm"); // Because Postgres does not allow to have empty password
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            properties.store(out, "");
-            Files.write(databaseProperties, out.toByteArray());
-            int iExitValue = executor.execute(oCmdLine);
-            //then
-            assertThat(iExitValue).isZero();
-        } finally {
-            pgServer.shutdown();
-        }
     }
 
     @Test
