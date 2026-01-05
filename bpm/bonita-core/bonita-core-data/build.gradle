@@ -6,6 +6,7 @@ dependencies {
     api project(':services:bonita-expression')
     api project(':services:bonita-commons')
     api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "org.apache.commons:commons-text:${Deps.commonsTextVersion}"
     api project(':services:bonita-cache')
     api project(':services:bonita-persistence')
     testImplementation "junit:junit:${Deps.junit4Version}"

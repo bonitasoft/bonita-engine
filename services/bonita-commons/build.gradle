@@ -7,6 +7,7 @@ dependencies {
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
     api "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
     api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "org.apache.commons:commons-text:${Deps.commonsTextVersion}"
     api(group: 'com.thoughtworks.xstream', name: 'xstream', version: Deps.xstreamVersion)
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     api "org.springframework:spring-context:${Deps.springVersion}"
