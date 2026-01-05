@@ -7,6 +7,7 @@ dependencies {
     api libs.commonsIO
     api libs.jakartaActivation
     api libs.commonsLang
+    api libs.commonsText
     api(libs.xstream)
     api libs.micrometerCore
     api libs.springContext
