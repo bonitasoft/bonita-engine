@@ -13,6 +13,7 @@ dependencies {
     api libs.javassist
     api project(':bpm:bonita-common')
     api libs.commonsLang
+    api libs.commonsText
     api libs.jaxbCodeModel
     testImplementation libs.assertj
     testImplementation libs.mockitoCore

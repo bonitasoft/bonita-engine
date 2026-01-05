@@ -9,6 +9,7 @@ dependencies {
     compileOnly libs.lombok
     api libs.bundles.groovy
     api libs.commonsLang
+    api libs.commonsText
     testImplementation libs.logback
     testImplementation libs.mockitoCore
     testImplementation libs.assertj

@@ -4,6 +4,7 @@ dependencies {
     api project(':services:bonita-expression')
     api project(':services:bonita-commons')
     api libs.commonsLang
+    api libs.commonsText
     api project(':services:bonita-cache')
     api project(':services:bonita-persistence')
     testImplementation libs.assertj
