@@ -60,8 +60,6 @@ configurations {
     all {
         // Specify woodstox version to override the version pulled by jackson-dataformat-xml (transitive dep of restlet)
         resolutionStrategy.force libs.woodstoxCore
-        // Specify Guava version to override the version pulled by owasp-java-html-sanitizer
-        resolutionStrategy.force libs.guava //forcing managed version (transitive dependency of owasp-java-html-sanitizer)
     }
     tests
 }

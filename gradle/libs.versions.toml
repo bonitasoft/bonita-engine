@@ -71,7 +71,7 @@ keycloakVersion = "21.1.2"
 xmlsecVersion = "2.2.6"
 bouncyCastleVersion = "1.78.1"
 spnegoVersion = "1.1.1"
-owaspHtmlSanitizerVersion = "20220608.1"
+owaspHtmlSanitizerVersion = "20260102.1"
 
 # Test dependency versions
 junit4Version = "4.13.2"

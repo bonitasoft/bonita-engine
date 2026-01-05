@@ -227,8 +227,15 @@ class SanitizerFilterTest {
 
         ServletRequest r = requestCaptor.getValue();
         var updatedBody = new String(r.getInputStream().readAllBytes());
-        assertThat(updatedBody).isEqualTo(
-                "{\"key\":\"<p><a href=\\\"https://documentation.bonitasoft.com/bonita/latest/\\\" rel=\\\"noopener noreferrer nofollow\\\">link text</a></p>\"}");
+        // Note: rel attribute order is non-deterministic after OWASP HTML Sanitizer removed Guava (v20240325.1+)
+        // Check structure and all required rel values are present
+        assertThat(updatedBody)
+                .startsWith(
+                        "{\"key\":\"<p><a href=\\\"https://documentation.bonitasoft.com/bonita/latest/\\\" rel=\\\"")
+                .endsWith("\\\">link text</a></p>\"}")
+                .contains("noopener")
+                .contains("noreferrer")
+                .contains("nofollow");
     }
 
     @Test

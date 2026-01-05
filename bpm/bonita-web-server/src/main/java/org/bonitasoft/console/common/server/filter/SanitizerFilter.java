@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
 import javax.servlet.FilterChain;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletException;
@@ -86,15 +85,14 @@ public class SanitizerFilter extends ExcludingPatternFilter {
     private final HtmlChangeListener<Object> changeListener = new HtmlChangeListener<>() {
 
         @Override
-        public void discardedTag(@Nullable Object context, String elementName) {
+        public void discardedTag(Object context, String elementName) {
             if (log.isDebugEnabled()) {
                 log.debug(format("Tag '%s' has been discarded", elementName));
             }
         }
 
         @Override
-        public void discardedAttributes(
-                @Nullable Object context, String elementName, String... attributeNames) {
+        public void discardedAttributes(Object context, String elementName, String... attributeNames) {
             if (log.isDebugEnabled()) {
                 log.debug(format("Tag '%s' has been cleaned from the following attributes: %s", elementName,
                         String.join(", ", attributeNames)));
