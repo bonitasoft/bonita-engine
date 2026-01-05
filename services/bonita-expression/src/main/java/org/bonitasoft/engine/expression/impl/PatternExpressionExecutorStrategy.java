@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -48,8 +48,8 @@ public class PatternExpressionExecutorStrategy extends NonEmptyContentExpression
             }
             values.put(name, value);
         }
-        final StrSubstitutor strSubstitutor = new StrSubstitutor(values);
-        return strSubstitutor.replace(expression.getContent());
+        final StringSubstitutor stringSubstitutor = new StringSubstitutor(values);
+        return stringSubstitutor.replace(expression.getContent());
     }
 
     @Override

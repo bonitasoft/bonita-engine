@@ -2,6 +2,7 @@
 
 dependencies {
     api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "org.apache.commons:commons-text:${Deps.commonsTextVersion}"
     api "org.apache.commons:commons-exec:${Deps.commonsExecVersion}"
 }
 

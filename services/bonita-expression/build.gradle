@@ -22,6 +22,7 @@ dependencies {
     api "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
     api "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
     api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "org.apache.commons:commons-text:${Deps.commonsTextVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
