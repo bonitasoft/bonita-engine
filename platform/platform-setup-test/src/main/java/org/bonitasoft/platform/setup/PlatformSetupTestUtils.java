@@ -35,7 +35,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.OS;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 
 /**
  * @author Baptiste Mesta
@@ -129,8 +129,8 @@ public class PlatformSetupTestUtils {
         Properties properties = getDatabaseProperties(distFolder);
         properties.put("h2.database.dir",
                 distFolder.toPath().resolve(properties.getProperty("h2.database.dir")).toString());
-        StrSubstitutor strSubstitutor = new StrSubstitutor(new HashMap(properties));
-        return DriverManager.getConnection(strSubstitutor.replace(properties.getProperty("h2.url")),
+        StringSubstitutor stringSubstitutor = new StringSubstitutor(new HashMap(properties));
+        return DriverManager.getConnection(stringSubstitutor.replace(properties.getProperty("h2.url")),
                 dbUser != null ? dbUser : properties.getProperty("db.user"), properties.getProperty("db.password"));
     }
 

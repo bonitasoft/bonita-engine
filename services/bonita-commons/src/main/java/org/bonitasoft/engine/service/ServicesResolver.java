@@ -16,7 +16,7 @@ package org.bonitasoft.engine.service;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 /**
  * @author Baptiste Mesta
