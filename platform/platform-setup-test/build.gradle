@@ -2,6 +2,7 @@
 
 dependencies {
     api libs.commonsLang
+    api libs.commonsText
     api libs.commonsExec
 }
 
