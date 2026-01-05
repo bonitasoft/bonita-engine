@@ -27,7 +27,60 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Handle the lifecycle of the platform: start, stop.
+ * Manages the lifecycle of the Bonita Platform node, coordinating the start and stop of all platform services.
+ * <p>
+ * The PlatformManager is responsible for orchestrating the startup and shutdown sequences of the Bonita Engine.
+ * It manages the state transitions of the platform node (the current JVM instance) and coordinates all
+ * {@link PlatformLifecycleService} implementations to ensure proper initialization and cleanup.
+ * <p>
+ * <b>Key Responsibilities:</b>
+ * <ul>
+ * <li><b>Platform State Management</b>: Tracks and manages platform state (STARTED, STOPPED, STARTING, STOPPING)
+ * via {@link PlatformStateProvider}</li>
+ * <li><b>Service Lifecycle Coordination</b>: Starts and stops all {@link PlatformLifecycleService} instances
+ * in the correct order (SchedulerService, WorkService, ConnectorExecutor, ClassLoaderService, etc.)</li>
+ * <li><b>Tenant Management</b>: Coordinates with {@link TenantStateManager} to start/stop tenant services</li>
+ * <li><b>Version Validation</b>: Verifies platform binaries version matches database schema via
+ * {@link PlatformVersionChecker}</li>
+ * <li><b>Restart Handlers</b>: Executes {@link PlatformRestartHandler} instances after successful startup
+ * (e.g., resume interrupted work, reschedule jobs)</li>
+ * </ul>
+ * <p>
+ * <b>Startup Sequence:</b>
+ * <ol>
+ * <li>Validates platform state allows starting (via {@link PlatformStateProvider#initializeStart()})</li>
+ * <li>Checks platform version compatibility via {@link PlatformVersionChecker}</li>
+ * <li>Starts all {@link PlatformLifecycleService} instances in order</li>
+ * <li>Updates state to STARTED</li>
+ * <li>Starts tenant services via {@link TenantStateManager}</li>
+ * <li>Executes platform restart handlers asynchronously</li>
+ * </ol>
+ * <p>
+ * <b>Shutdown Sequence:</b>
+ * <ol>
+ * <li>Validates platform state allows stopping (via {@link PlatformStateProvider#initializeStop()})</li>
+ * <li>Stops tenant services via {@link TenantStateManager}</li>
+ * <li>Stops all {@link PlatformLifecycleService} instances in order</li>
+ * <li>Updates state to STOPPED</li>
+ * </ol>
+ * <p>
+ * <b>Thread Safety:</b> All start/stop methods are synchronized to prevent concurrent state modifications.
+ * <p>
+ * <b>Typical Platform Services Managed:</b>
+ * <ul>
+ * <li>SchedulerService - Quartz-based job scheduling</li>
+ * <li>WorkService - Asynchronous work execution via thread pools</li>
+ * <li>ConnectorExecutorService - Connector execution management</li>
+ * <li>ClassLoaderService - Process-specific classloader management</li>
+ * <li>EventService - Event publishing and subscription</li>
+ * <li>CacheService - Data caching infrastructure</li>
+ * </ul>
+ *
+ * @see PlatformLifecycleService
+ * @see PlatformStateProvider
+ * @see TenantStateManager
+ * @see PlatformVersionChecker
+ * @see PlatformRestartHandler
  */
 @Component
 public class PlatformManager {
