@@ -33,6 +33,7 @@ xstreamVersion = "1.4.21"
 ehCacheVersion = "3.11.1"
 eclipseCompilerVersion = "3.44.0"
 jakartaActivationVersion = "1.2.2"
+jakartaValidationApiVersion = "3.1.1"
 quartzVersion = "2.3.2"
 micrometerVersion = "1.16.1"
 # DB drivers:
@@ -179,6 +180,7 @@ xstream = { group = "com.thoughtworks.xstream", name = "xstream", version.ref = 
 ehCache = { group = "org.ehcache", name = "ehcache", version.ref = "ehCacheVersion" }
 eclipseCompiler = { group = "org.eclipse.jdt", name = "ecj", version.ref = "eclipseCompilerVersion" }
 jakartaActivation = { group = "com.sun.activation", name = "jakarta.activation", version.ref = "jakartaActivationVersion" }
+jakartaValidationApi = { group = "jakarta.validation", name = "jakarta.validation-api", version.ref = "jakartaValidationApiVersion" }
 javaxAnnotations = { group = "javax.annotation", name = "javax.annotation-api", version.ref = "javaxAnnotationsVersion" }
 
 hazelcast = { group = "com.hazelcast", name = "hazelcast", version.ref = "hazelcastVersion" }

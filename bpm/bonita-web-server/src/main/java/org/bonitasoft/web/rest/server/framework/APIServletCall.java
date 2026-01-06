@@ -39,6 +39,7 @@ import org.bonitasoft.web.toolkit.client.data.item.IItem;
 import org.bonitasoft.web.toolkit.client.data.item.Item;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.ValidatorEngine;
 import org.bonitasoft.web.toolkit.server.ServletCall;
+import org.springframework.http.HttpHeaders;
 
 /**
  * @author Séverin Moussel
@@ -184,7 +185,7 @@ public class APIServletCall extends ServletCall {
                         Integer.parseInt(getParameter(PARAMETER_LIMIT, "10")), getParameter(PARAMETER_SEARCH),
                         getParameter(PARAMETER_ORDER), parseFilters(getParameterAsList(PARAMETER_FILTER)),
                         getParameterAsList(PARAMETER_DEPLOY), getParameterAsList(PARAMETER_COUNTER));
-                head("Content-Range", result.getPage() + "-" + result.getLength() + "/" + result.getTotal());
+                head(HttpHeaders.CONTENT_RANGE, result.getPage() + "-" + result.getLength() + "/" + result.getTotal());
 
                 output(result.getResults());
             }

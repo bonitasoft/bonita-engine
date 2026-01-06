@@ -33,7 +33,6 @@ import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
-import org.bonitasoft.web.rest.server.api.form.FormMappingResource;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -57,8 +56,6 @@ public class BonitaRestletApplication extends Application {
     public static final String BDM_BUSINESS_DATA_URL = "/bdm/businessData";
 
     public static final String BDM_BUSINESS_DATA_REFERENCE_URL = "/bdm/businessDataReference";
-
-    public static final String FORM_MAPPING_URL = "/form/mapping";
 
     public static final String BPM_PROCESS_URL = "/bpm/process";
 
@@ -157,9 +154,6 @@ public class BonitaRestletApplication extends Application {
         // GET a process contract:
         router.attach(BPM_PROCESS_URL + "/{processDefinitionId}/contract",
                 factory.create(ProcessContractResource.class));
-
-        // GET to search form mappings:
-        router.attach(FORM_MAPPING_URL, factory.create(FormMappingResource.class));
 
         // GET a Multiple BusinessDataReference
         router.attach(BDM_BUSINESS_DATA_REFERENCE_URL, factory.create(BusinessDataReferencesResource.class));

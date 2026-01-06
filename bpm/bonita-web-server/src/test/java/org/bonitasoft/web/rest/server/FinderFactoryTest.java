@@ -43,8 +43,6 @@ import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResourceFinder;
-import org.bonitasoft.web.rest.server.api.form.FormMappingResource;
-import org.bonitasoft.web.rest.server.api.form.FormMappingResourceFinder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -182,14 +180,6 @@ public class FinderFactoryTest {
         doReturn(processAPI).when(processContractResourceFinder).getProcessAPI(any(Request.class));
         final ServerResource serverResource = processContractResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(ProcessContractResource.class);
-    }
-
-    @Test
-    public void should_return_FormMappingResource_for_FormMappingResourceFinder() {
-        final FormMappingResourceFinder formMappingResourceFinder = spy(new FormMappingResourceFinder());
-        doReturn(processAPI).when(formMappingResourceFinder).getProcessAPI(any(Request.class));
-        final ServerResource serverResource = formMappingResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(FormMappingResource.class);
     }
 
     @Test

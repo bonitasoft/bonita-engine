@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.entry;
 
 import javax.servlet.http.Cookie;
 
+import org.apache.http.HttpHeaders;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -115,7 +116,7 @@ public class RestApiResponseTest {
                 .build();
 
         //then
-        assertThat(response.getAdditionalHeaders()).doesNotContainKey("Content-Range");
+        assertThat(response.getAdditionalHeaders()).doesNotContainKey(HttpHeaders.CONTENT_RANGE);
     }
 
     @Test
@@ -125,7 +126,7 @@ public class RestApiResponseTest {
                 .build();
 
         //then
-        assertThat(response.getAdditionalHeaders()).doesNotContainKey("Content-Range");
+        assertThat(response.getAdditionalHeaders()).doesNotContainKey(HttpHeaders.CONTENT_RANGE);
     }
 
     @Test
@@ -136,7 +137,7 @@ public class RestApiResponseTest {
                 .build();
 
         //then
-        assertThat(response.getAdditionalHeaders()).contains(entry("Content-Range", "0-10/*"));
+        assertThat(response.getAdditionalHeaders()).contains(entry(HttpHeaders.CONTENT_RANGE, "0-10/*"));
     }
 
     @Test
@@ -147,7 +148,7 @@ public class RestApiResponseTest {
                 .build();
 
         //then
-        assertThat(response.getAdditionalHeaders()).contains(entry("Content-Range", "0-10/100"));
+        assertThat(response.getAdditionalHeaders()).contains(entry(HttpHeaders.CONTENT_RANGE, "0-10/100"));
     }
 
 }

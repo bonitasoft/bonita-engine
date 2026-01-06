@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.stubbing.Answer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -297,7 +298,7 @@ class BusinessDataControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(jsonResponse))
-                .andExpect(header().string("Content-Range", "3-5/4"));
+                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "3-5/4"));
     }
 
     @Test
