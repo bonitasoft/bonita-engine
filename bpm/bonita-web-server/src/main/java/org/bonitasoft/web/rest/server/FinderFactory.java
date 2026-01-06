@@ -51,8 +51,6 @@ import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessInstantiationResource;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessInstantiationResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResourceFinder;
 import org.bonitasoft.web.rest.server.api.form.FormMappingResource;
@@ -101,7 +99,6 @@ public class FinderFactory {
         finders.put(ArchivedUserTaskContextResource.class, new ArchivedUserTaskContextResourceFinder());
         finders.put(ProcessContractResource.class, new ProcessContractResourceFinder());
         finders.put(ProcessDefinitionDesignResource.class, new ProcessDefinitionDesignResourceFinder());
-        finders.put(ProcessInstantiationResource.class, new ProcessInstantiationResourceFinder());
         finders.put(ArchivedCaseVariableResource.class, new ArchivedCaseVariableResourceFinder());
         finders.put(ArchivedCaseVariablesResource.class, new ArchivedCaseVariablesResourceFinder());
         finders.put(ArchivedActivityVariableResource.class, new ArchivedActivityVariableResourceFinder());

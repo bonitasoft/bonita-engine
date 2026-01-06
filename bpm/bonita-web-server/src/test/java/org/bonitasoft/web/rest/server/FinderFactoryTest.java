@@ -43,8 +43,6 @@ import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessInstantiationResource;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessInstantiationResourceFinder;
 import org.bonitasoft.web.rest.server.api.form.FormMappingResource;
 import org.bonitasoft.web.rest.server.api.form.FormMappingResourceFinder;
 import org.junit.Before;
@@ -106,16 +104,6 @@ public class FinderFactoryTest {
 
     private class NotSupportedResource extends ServerResource {
 
-    }
-
-    @Test
-    public void should_return_ProcessInstanciationResource_for_ProcessInstanciationResourceFinder() {
-        final ProcessInstantiationResourceFinder processInstanciationResourceFinder = spy(
-                new ProcessInstantiationResourceFinder());
-        doReturn(processAPI).when(processInstanciationResourceFinder).getProcessAPI(any(Request.class));
-        doReturn(apiSession).when(processInstanciationResourceFinder).getAPISession(any(Request.class));
-        final ServerResource serverResource = processInstanciationResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(ProcessInstantiationResource.class);
     }
 
     @Test

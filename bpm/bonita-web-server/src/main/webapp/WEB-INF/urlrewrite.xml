@@ -118,6 +118,11 @@
        <to>/APIToolkit/bpm/process/$2</to>
    </rule>
     <rule>
+        <note>Rewrite process instantiation URLs to Spring MVC internal endpoint</note>
+        <from>^(/portal.*)?/API/bpm/process/([^/]+)/instantiation$</from>
+        <to>/APISpringInternal/bpm/process/$2/instantiation</to>
+    </rule>
+    <rule>
         <from>^(/portal/custom-page)?/API/bpm/processCategory([\?/]|$)</from>
         <to>/APIToolkit/bpm/processCategory$2</to>
     </rule>

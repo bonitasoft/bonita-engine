@@ -32,7 +32,6 @@ import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedUserTaskC
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResource;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessInstantiationResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
 import org.bonitasoft.web.rest.server.api.form.FormMappingResource;
 import org.restlet.Application;
@@ -158,9 +157,6 @@ public class BonitaRestletApplication extends Application {
         // GET a process contract:
         router.attach(BPM_PROCESS_URL + "/{processDefinitionId}/contract",
                 factory.create(ProcessContractResource.class));
-        // POST to instantiate a process with contract:
-        router.attach(BPM_PROCESS_URL + "/{processDefinitionId}/instantiation",
-                factory.create(ProcessInstantiationResource.class));
 
         // GET to search form mappings:
         router.attach(FORM_MAPPING_URL, factory.create(FormMappingResource.class));

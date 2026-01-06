@@ -755,6 +755,7 @@
         <url-pattern>/API/bpm/processInfo/*</url-pattern>
         <url-pattern>/API/system/information</url-pattern>
         <url-pattern>/API/bdm/businessData/*</url-pattern>
+        <url-pattern>/APISpringInternal/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>
