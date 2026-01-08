@@ -31,7 +31,6 @@ import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityV
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedUserTaskContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -148,9 +147,6 @@ public class BonitaRestletApplication extends Application {
         router.attach(BPM_ARCHIVED_USER_TASK_URL + "/{archivedTaskId}/context",
                 factory.create(ArchivedUserTaskContextResource.class));
 
-        // GET a process defintion design :
-        router.attach(BPM_PROCESS_URL + "/{processDefinitionId}/design",
-                factory.create(ProcessDefinitionDesignResource.class));
         // GET a process contract:
         router.attach(BPM_PROCESS_URL + "/{processDefinitionId}/contract",
                 factory.create(ProcessContractResource.class));

@@ -41,8 +41,6 @@ import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
 import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResource;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessDefinitionDesignResourceFinder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -163,15 +161,6 @@ public class FinderFactoryTest {
         doReturn(apiSession).when(userTaskExecutionResourceFinder).getAPISession(any(Request.class));
         final ServerResource serverResource = userTaskExecutionResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(UserTaskExecutionResource.class);
-    }
-
-    @Test
-    public void should_return_ProcessDefinitionDesignResource_for_ProcessDefinitionDesignResourceFinder() {
-        final ProcessDefinitionDesignResourceFinder processDefinitionDesignResourceFinder = spy(
-                new ProcessDefinitionDesignResourceFinder());
-        doReturn(processAPI).when(processDefinitionDesignResourceFinder).getProcessAPI(any(Request.class));
-        final ServerResource serverResource = processDefinitionDesignResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(ProcessDefinitionDesignResource.class);
     }
 
     @Test
