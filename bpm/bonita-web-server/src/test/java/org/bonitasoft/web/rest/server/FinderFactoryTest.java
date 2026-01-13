@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.Collections;
 
 import org.bonitasoft.engine.api.BusinessDataAPI;
-import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
@@ -39,8 +38,6 @@ import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResourceFinder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,9 +58,6 @@ public class FinderFactoryTest {
 
     @Mock
     private BusinessDataAPI bdmAPI;
-
-    @Mock
-    private CommandAPI commandAPI;
 
     @Mock
     private APISession apiSession;
@@ -161,14 +155,6 @@ public class FinderFactoryTest {
         doReturn(apiSession).when(userTaskExecutionResourceFinder).getAPISession(any(Request.class));
         final ServerResource serverResource = userTaskExecutionResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(UserTaskExecutionResource.class);
-    }
-
-    @Test
-    public void should_return_ProcessContractResource_for_ProcessContractResourceFinder() {
-        final ProcessContractResourceFinder processContractResourceFinder = spy(new ProcessContractResourceFinder());
-        doReturn(processAPI).when(processContractResourceFinder).getProcessAPI(any(Request.class));
-        final ServerResource serverResource = processContractResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(ProcessContractResource.class);
     }
 
     @Test

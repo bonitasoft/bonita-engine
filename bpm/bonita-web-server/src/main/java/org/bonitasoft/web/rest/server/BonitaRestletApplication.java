@@ -30,7 +30,6 @@ import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedUserTaskContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
-import org.bonitasoft.web.rest.server.api.bpm.process.ProcessContractResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -55,8 +54,6 @@ public class BonitaRestletApplication extends Application {
     public static final String BDM_BUSINESS_DATA_URL = "/bdm/businessData";
 
     public static final String BDM_BUSINESS_DATA_REFERENCE_URL = "/bdm/businessDataReference";
-
-    public static final String BPM_PROCESS_URL = "/bpm/process";
 
     public static final String BPM_USER_TASK_URL = "/bpm/userTask";
 
@@ -146,10 +143,6 @@ public class BonitaRestletApplication extends Application {
         // GET an archived task context:
         router.attach(BPM_ARCHIVED_USER_TASK_URL + "/{archivedTaskId}/context",
                 factory.create(ArchivedUserTaskContextResource.class));
-
-        // GET a process contract:
-        router.attach(BPM_PROCESS_URL + "/{processDefinitionId}/contract",
-                factory.create(ProcessContractResource.class));
 
         // GET a Multiple BusinessDataReference
         router.attach(BDM_BUSINESS_DATA_REFERENCE_URL, factory.create(BusinessDataReferencesResource.class));

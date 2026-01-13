@@ -128,6 +128,11 @@
         <to>/APISpringInternal/bpm/process/$2/design</to>
     </rule>
     <rule>
+        <note>Rewrite process contract URLs to Spring MVC internal endpoint</note>
+        <from>^(/portal.*)?/API/bpm/process/([^/]+)/contract$</from>
+        <to>/APISpringInternal/bpm/process/$2/contract</to>
+    </rule>
+    <rule>
         <from>^(/portal/custom-page)?/API/bpm/processCategory([\?/]|$)</from>
         <to>/APIToolkit/bpm/processCategory$2</to>
     </rule>

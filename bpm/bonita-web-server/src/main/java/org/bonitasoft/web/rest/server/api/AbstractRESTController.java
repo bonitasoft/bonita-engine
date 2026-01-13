@@ -34,14 +34,14 @@ import org.springframework.web.server.ResponseStatusException;
 @Slf4j
 public abstract class AbstractRESTController {
 
+    public static final String API_SPRING_INTERNAL = "APISpringInternal";
+
     public AbstractRESTController() {
         // For testing purposes, to make sure that the new implementation is deployed and that
         // we do not fallback on the Restlet implementation.
         // Will be removed once the entire Restlet refactoring is done:
         log.info("Creating REST Controller {}", this.getClass().getName());
     }
-
-    public static final String API_SPRING_INTERNAL = "APISpringInternal";
 
     public APISession getApiSession(HttpSession session) {
         APISession apiSession = (APISession) session.getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
