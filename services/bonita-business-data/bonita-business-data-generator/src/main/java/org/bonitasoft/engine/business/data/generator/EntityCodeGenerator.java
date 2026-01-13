@@ -87,7 +87,7 @@ public class EntityCodeGenerator {
         addPersistenceVersionFieldAndAccessors(entityClass);
 
         for (final Field field : bo.getFields()) {
-            final JFieldVar fieldVar = addField(entityClass, field);
+            final JFieldVar fieldVar = addField(entityClass, field, dbVendor);
             addAccessors(entityClass, fieldVar, field);
             addModifiers(entityClass, field);
         }
@@ -215,20 +215,21 @@ public class EntityCodeGenerator {
         addAccessors(entityClass, versionField);
     }
 
-    public JFieldVar addField(final JDefinedClass entityClass, final Field field) {
+    public JFieldVar addField(final JDefinedClass entityClass, final Field field, String dbVendor) {
         JFieldVar fieldVar;
         if (field.isCollection()) {
             fieldVar = codeGenerator.addListField(entityClass, field);
         } else {
             fieldVar = codeGenerator.addField(entityClass, field.getName(), codeGenerator.toJavaClass(field));
         }
-        annotateField(entityClass, field, fieldVar);
+        annotateField(entityClass, field, fieldVar, dbVendor);
         return fieldVar;
     }
 
-    private void annotateField(final JDefinedClass entityClass, final Field field, final JFieldVar fieldVar) {
+    private void annotateField(final JDefinedClass entityClass, final Field field, final JFieldVar fieldVar,
+            String dbVendor) {
         if (field instanceof SimpleField) {
-            annotateSimpleField((SimpleField) field, fieldVar);
+            annotateSimpleField((SimpleField) field, fieldVar, dbVendor);
         } else if (field instanceof RelationField) {
             annotateRelationField(entityClass, (RelationField) field, fieldVar);
         }
@@ -239,7 +240,7 @@ public class EntityCodeGenerator {
         relationFieldAnnotator.annotateRelationField(entityClass, rfield, fieldVar);
     }
 
-    private void annotateSimpleField(final SimpleField sfield, final JFieldVar fieldVar) {
+    private void annotateSimpleField(final SimpleField sfield, final JFieldVar fieldVar, String dbVendor) {
         if (sfield.isCollection()) {
             final JAnnotationUse collectionAnnotation = codeGenerator.addAnnotation(fieldVar, ElementCollection.class);
             collectionAnnotation.param("fetch", FetchType.EAGER);
@@ -253,7 +254,16 @@ public class EntityCodeGenerator {
             final JAnnotationUse temporalAnnotation = codeGenerator.addAnnotation(fieldVar, Temporal.class);
             temporalAnnotation.param("value", TemporalType.TIMESTAMP);
         } else if (FieldType.TEXT == sfield.getType()) {
-            codeGenerator.addAnnotation(fieldVar, Lob.class);
+            if (isPostgreSQLDialect(dbVendor)) {
+                // Use custom type that forces TEXT instead of OID for PostgreSQL
+                final JAnnotationUse typeAnnotation = codeGenerator.addAnnotation(fieldVar,
+                        org.hibernate.annotations.Type.class);
+                // Use fully qualified class name (SPI doesn't apply to EntityManagerFactory)
+                typeAnnotation.param("type", "org.bonitasoft.engine.persistence.PostgresMaterializedClobType");
+            } else {
+                // Other databases: standard @Lob annotation
+                codeGenerator.addAnnotation(fieldVar, Lob.class);
+            }
         } else if (FieldType.STRING == sfield.getType() && sfield.getLength() != null && sfield.getLength() > 0) {
             columnAnnotation.param("length", sfield.getLength());
         } else if (FieldType.LOCALDATE == sfield.getType()) {
@@ -314,6 +324,10 @@ public class EntityCodeGenerator {
                     "sysprop.bonita.bdm.db.vendor is not set. This should not happen at runtime. Defaulting to h2.");
             return "h2";
         }
+    }
+
+    private boolean isPostgreSQLDialect(String dbVendor) {
+        return dbVendor != null && dbVendor.toLowerCase().equals("postgres");
     }
 
 }

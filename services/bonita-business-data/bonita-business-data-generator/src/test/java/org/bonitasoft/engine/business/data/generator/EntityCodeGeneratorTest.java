@@ -219,7 +219,7 @@ public class EntityCodeGeneratorTest {
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        final JFieldVar basicField = entityCodeGenerator.addField(definedClass, nameField);
+        final JFieldVar basicField = entityCodeGenerator.addField(definedClass, nameField, "h2");
 
         entityCodeGenerator.addAccessors(definedClass, basicField);
 
@@ -240,7 +240,7 @@ public class EntityCodeGeneratorTest {
         nameField.setType(FieldType.DATE);
         nameField.setNullable(Boolean.FALSE);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addField(definedClass, nameField);
+        entityCodeGenerator.addField(definedClass, nameField, "h2");
 
         final JFieldVar nameFieldVar = definedClass.fields().get("name");
         assertThat(nameFieldVar).isNotNull();
@@ -278,7 +278,7 @@ public class EntityCodeGeneratorTest {
         foundField.setName("found");
         foundField.setType(FieldType.BOOLEAN);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        final JFieldVar basicField = entityCodeGenerator.addField(definedClass, foundField);
+        final JFieldVar basicField = entityCodeGenerator.addField(definedClass, foundField, "h2");
 
         entityCodeGenerator.addAccessors(definedClass, basicField);
 
@@ -299,7 +299,7 @@ public class EntityCodeGeneratorTest {
         nameField.setType(FieldType.STRING);
         nameField.setLength(Integer.valueOf(45));
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addField(definedClass, nameField);
+        entityCodeGenerator.addField(definedClass, nameField, "h2");
 
         final JFieldVar nameFieldVar = definedClass.fields().get("name");
         assertThat(nameFieldVar).isNotNull();
@@ -325,7 +325,7 @@ public class EntityCodeGeneratorTest {
         nameField.setType(FieldType.TEXT);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
 
-        entityCodeGenerator.addField(definedClass, nameField);
+        entityCodeGenerator.addField(definedClass, nameField, "h2");
 
         final JFieldVar nameFieldVar = definedClass.fields().get("description");
         assertTextField(nameFieldVar);
@@ -339,6 +339,53 @@ public class EntityCodeGeneratorTest {
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
         annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Lob.class.getName());
+    }
+
+    @Test
+    public void shouldAddColumnField_WithCustomTypeForPostgreSQL() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField descriptionField = new SimpleField();
+        descriptionField.setName("description");
+        descriptionField.setType(FieldType.TEXT);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+
+        entityCodeGenerator.addField(definedClass, descriptionField, "postgres");
+
+        final JFieldVar descriptionFieldVar = definedClass.fields().get("description");
+        assertTextFieldForPostgreSQL(descriptionFieldVar);
+    }
+
+    @Test
+    public void shouldAddColumnField_WithLobForMySQL() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField descriptionField = new SimpleField();
+        descriptionField.setName("description");
+        descriptionField.setType(FieldType.TEXT);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+
+        entityCodeGenerator.addField(definedClass, descriptionField, "mysql");
+
+        final JFieldVar descriptionFieldVar = definedClass.fields().get("description");
+        // For non-PostgreSQL databases, should still use @Lob
+        assertTextField(descriptionFieldVar);
+    }
+
+    private void assertTextFieldForPostgreSQL(final JFieldVar fieldVar) {
+        final Collection<JAnnotationUse> annotations = fieldVar.annotations();
+        assertThat(annotations).hasSize(2);
+        final Iterator<JAnnotationUse> iterator = annotations.iterator();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
+        annotationUse = iterator.next();
+        // For PostgreSQL, should use @Type annotation instead of @Lob
+        assertThat(annotationUse.getAnnotationClass().fullName())
+                .isEqualTo(org.hibernate.annotations.Type.class.getName());
+        // Verify the type parameter value
+        assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
+        final String typeValue = getAnnotationParamValue(annotationUse, "type");
+        assertThat(typeValue).isEqualTo("org.bonitasoft.engine.persistence.PostgresMaterializedClobType");
     }
 
     @Test
@@ -412,7 +459,7 @@ public class EntityCodeGeneratorTest {
         nameField.setType(FieldType.LOCALDATE);
         nameField.setNullable(Boolean.FALSE);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addField(definedClass, nameField);
+        entityCodeGenerator.addField(definedClass, nameField, "h2");
         final JFieldVar nameFieldVar = definedClass.fields().get("name");
 
         assertThat(nameFieldVar).isNotNull();
@@ -446,7 +493,7 @@ public class EntityCodeGeneratorTest {
         nameField.setType(FieldType.LOCALDATETIME);
         nameField.setNullable(Boolean.FALSE);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addField(definedClass, nameField);
+        entityCodeGenerator.addField(definedClass, nameField, "h2");
         final JFieldVar nameFieldVar = definedClass.fields().get("name");
 
         assertThat(nameFieldVar).isNotNull();
@@ -481,7 +528,7 @@ public class EntityCodeGeneratorTest {
         nameField.setType(FieldType.OFFSETDATETIME);
         nameField.setNullable(Boolean.FALSE);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addField(definedClass, nameField);
+        entityCodeGenerator.addField(definedClass, nameField, "h2");
         final JFieldVar nameFieldVar = definedClass.fields().get("reunion");
 
         assertThat(nameFieldVar).isNotNull();
