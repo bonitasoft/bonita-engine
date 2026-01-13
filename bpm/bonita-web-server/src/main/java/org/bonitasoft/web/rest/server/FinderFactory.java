@@ -37,8 +37,6 @@ import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource
 import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContextResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContractResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContractResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
@@ -86,7 +84,6 @@ public class FinderFactory {
         finders.put(ArchivedCaseContextResource.class, new ArchivedCaseContextResourceFinder());
         finders.put(BusinessDataReferenceResource.class, new BusinessDataReferenceResourceFinder());
         finders.put(BusinessDataReferencesResource.class, new BusinessDataReferencesResourceFinder());
-        finders.put(UserTaskContractResource.class, new UserTaskContractResourceFinder());
         finders.put(UserTaskExecutionResource.class, new UserTaskExecutionResourceFinder());
         finders.put(UserTaskContextResource.class, new UserTaskContextResourceFinder());
         finders.put(ArchivedUserTaskContextResource.class, new ArchivedUserTaskContextResourceFinder());

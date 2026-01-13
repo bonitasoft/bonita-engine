@@ -25,7 +25,6 @@ import org.bonitasoft.web.rest.server.api.bpm.cases.CaseContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContextResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContractResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedUserTaskContextResource;
@@ -133,8 +132,6 @@ public class BonitaRestletApplication extends Application {
         router.attach(BPM_ARCHIVED_CASE_CONTEXT_URL + "/{archivedCaseId}/context",
                 factory.create(ArchivedCaseContextResource.class));
 
-        // GET a task contract:
-        router.attach(BPM_USER_TASK_URL + "/{taskId}/contract", factory.create(UserTaskContractResource.class));
         // POST to execute a task with contract:
         router.attach(BPM_USER_TASK_URL + "/{taskId}/execution", factory.create(UserTaskExecutionResource.class));
         // GET to retrieve a task context:

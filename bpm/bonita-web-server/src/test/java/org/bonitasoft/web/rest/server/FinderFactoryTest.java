@@ -32,8 +32,6 @@ import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContractResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContractResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
@@ -137,14 +135,6 @@ public class FinderFactoryTest {
         doReturn(bdmAPI).when(businessDataReferencesResourceFinder).getBdmAPI(any(Request.class));
         final ServerResource serverResource = businessDataReferencesResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(BusinessDataReferencesResource.class);
-    }
-
-    @Test
-    public void should_return_TaskContractResource_for_TaskContractResourceFinder() {
-        final UserTaskContractResourceFinder userTaskContractResourceFinder = spy(new UserTaskContractResourceFinder());
-        doReturn(processAPI).when(userTaskContractResourceFinder).getProcessAPI(any(Request.class));
-        final ServerResource serverResource = userTaskContractResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(UserTaskContractResource.class);
     }
 
     @Test
