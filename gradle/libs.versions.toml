@@ -20,7 +20,7 @@ slf4jVersion = "1.7.36"
 # Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
 hibernateVersion = "5.6.15.Final"
 # version used by hibernate 5.6.15 (also used by BDM proxy generation):
-javassistVersion = "3.29.0-GA"
+javassistVersion = "3.29.2-GA"
 # javax.persistence-api is used by hibernate:
 javaxPersistenceApiVersion = "2.2"
 jacksonBomVersion = "2.20.1"
@@ -35,7 +35,7 @@ eclipseCompilerVersion = "3.44.0"
 jakartaActivationVersion = "1.2.2"
 jakartaValidationApiVersion = "3.1.1"
 quartzVersion = "2.3.2"
-micrometerVersion = "1.16.1"
+micrometerVersion = "1.16.2"
 # DB drivers:
 mysqlVersion = "8.4.0"
 msSqlServerVersion = "12.6.5.jre11"
