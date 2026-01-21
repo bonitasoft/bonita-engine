@@ -24,10 +24,8 @@ import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResourc
 import org.bonitasoft.web.rest.server.api.bpm.cases.CaseContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedUserTaskContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
 import org.restlet.Application;
@@ -134,12 +132,6 @@ public class BonitaRestletApplication extends Application {
 
         // POST to execute a task with contract:
         router.attach(BPM_USER_TASK_URL + "/{taskId}/execution", factory.create(UserTaskExecutionResource.class));
-        // GET to retrieve a task context:
-        router.attach(BPM_USER_TASK_URL + "/{taskId}/context", factory.create(UserTaskContextResource.class));
-
-        // GET an archived task context:
-        router.attach(BPM_ARCHIVED_USER_TASK_URL + "/{archivedTaskId}/context",
-                factory.create(ArchivedUserTaskContextResource.class));
 
         // GET a Multiple BusinessDataReference
         router.attach(BDM_BUSINESS_DATA_REFERENCE_URL, factory.create(BusinessDataReferencesResource.class));
