@@ -14,7 +14,6 @@
 package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
 import static org.bonitasoft.web.rest.server.api.AbstractRESTController.API_SPRING_INTERNAL;
-import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -28,38 +27,26 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
-import org.bonitasoft.engine.session.APISession;
-import org.junit.jupiter.api.BeforeEach;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-class UserTaskContextControllerTest {
+class UserTaskContextControllerTest extends AbstractControllerTest<UserTaskContextController> {
 
     private static final long TASK_ID = 2L;
     private static final String TEST_API_URL = "/" + API_SPRING_INTERNAL + "/bpm/userTask/" + TASK_ID + "/context";
 
-    private MockMvc mockMvc;
-
     @Mock
-    private ProcessAPI processAPI;
+    protected ProcessAPI processAPI;
 
-    @Mock
-    private APISession apiSession;
+    @Override
+    protected UserTaskContextController createController() {
+        return spy(new UserTaskContextController());
+    }
 
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-
-    @BeforeEach
-    void setUp() throws Exception {
-        UserTaskContextController controller = spy(new UserTaskContextController());
-        mockMvc = initMockMvcWithSessionAttributes(controller, sessionAttributes, apiSession);
+    @Override
+    protected void configureMocks(UserTaskContextController controller) throws Exception {
         doReturn(processAPI).when(controller).getProcessAPI(apiSession);
     }
 
