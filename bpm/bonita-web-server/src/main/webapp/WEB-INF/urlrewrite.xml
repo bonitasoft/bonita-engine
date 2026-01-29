@@ -148,6 +148,16 @@
         <to>/APISpringInternal/bpm/archivedUserTask/$2/context</to>
     </rule>
     <rule>
+        <note>Rewrite case context URLs to Spring MVC internal endpoint</note>
+        <from>^(/portal.*)?/API/bpm/case/([^/]+)/context$</from>
+        <to>/APISpringInternal/bpm/case/$2/context</to>
+    </rule>
+    <rule>
+        <note>Rewrite archived case context URLs to Spring MVC internal endpoint</note>
+        <from>^(/portal.*)?/API/bpm/archivedCase/([^/]+)/context$</from>
+        <to>/APISpringInternal/bpm/archivedCase/$2/context</to>
+    </rule>
+    <rule>
         <from>^(/portal/custom-page)?/API/bpm/processCategory([\?/]|$)</from>
         <to>/APIToolkit/bpm/processCategory$2</to>
     </rule>

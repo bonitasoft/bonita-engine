@@ -23,14 +23,10 @@ import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResourceFinder;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseContextResource;
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseContextResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.cases.CaseContextResource;
-import org.bonitasoft.web.rest.server.api.bpm.cases.CaseContextResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
@@ -46,6 +42,14 @@ import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResourceFinder;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
 
+/**
+ * This class serves:
+ * <ul>
+ *     <li>for Restlet resources to provide access to Engine session and APIS</li>
+ *     <li>for server to client object conversion (currently used only for APIS that can return Business Data)</li>
+ * </ul>
+ * See {@link BusinessDataReferenceResourceFinder#toClientObject(Serializable)} for more details.
+ */
 public class FinderFactory {
 
     protected final Map<Class<? extends ServerResource>, ResourceFinder> finders;
@@ -76,8 +80,6 @@ public class FinderFactory {
         finders.put(TimerEventTriggerResource.class, new TimerEventTriggerResourceFinder());
         finders.put(BPMMessageResource.class, new BPMMessageResourceFinder());
         finders.put(BPMSignalResource.class, new BPMSignalResourceFinder());
-        finders.put(CaseContextResource.class, new CaseContextResourceFinder());
-        finders.put(ArchivedCaseContextResource.class, new ArchivedCaseContextResourceFinder());
         finders.put(BusinessDataReferenceResource.class, new BusinessDataReferenceResourceFinder());
         finders.put(BusinessDataReferencesResource.class, new BusinessDataReferencesResourceFinder());
         finders.put(UserTaskExecutionResource.class, new UserTaskExecutionResourceFinder());

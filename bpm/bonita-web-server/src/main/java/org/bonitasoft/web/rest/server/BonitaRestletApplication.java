@@ -18,10 +18,8 @@ import java.util.logging.Level;
 
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
-import org.bonitasoft.web.rest.server.api.bpm.cases.CaseContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
@@ -54,8 +52,6 @@ public class BonitaRestletApplication extends Application {
 
     public static final String BPM_USER_TASK_URL = "/bpm/userTask";
 
-    public static final String BPM_ARCHIVED_USER_TASK_URL = "/bpm/archivedUserTask";
-
     public static final String BPM_TIMER_EVENT_TRIGGER_URL = "/bpm/timerEventTrigger";
 
     public static final String BPM_MESSAGE_URL = "/bpm/message";
@@ -63,10 +59,6 @@ public class BonitaRestletApplication extends Application {
     public static final String BPM_SIGNAL_URL = "/bpm/signal";
 
     public static final String BPM_ACTIVITY_VARIABLE_URL = "/bpm/activityVariable";
-
-    public static final String BPM_CASE_CONTEXT_URL = "/bpm/case";
-
-    private static final String BPM_ARCHIVED_CASE_CONTEXT_URL = "/bpm/archivedCase";
 
     public static final String BPM_ARCHIVED_CASE_VARIABLE_URL = "/bpm/archivedCaseVariable";
 
@@ -122,13 +114,6 @@ public class BonitaRestletApplication extends Application {
 
         // POST to send a BPM signal to the engine:
         router.attach(BPM_SIGNAL_URL, factory.create(BPMSignalResource.class));
-
-        // GET to retrieve a case context:
-        router.attach(BPM_CASE_CONTEXT_URL + "/{caseId}/context", factory.create(CaseContextResource.class));
-
-        // GET to retrieve an archived case context
-        router.attach(BPM_ARCHIVED_CASE_CONTEXT_URL + "/{archivedCaseId}/context",
-                factory.create(ArchivedCaseContextResource.class));
 
         // POST to execute a task with contract:
         router.attach(BPM_USER_TASK_URL + "/{taskId}/execution", factory.create(UserTaskExecutionResource.class));
