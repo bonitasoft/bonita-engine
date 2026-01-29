@@ -45,8 +45,8 @@ import org.restlet.resource.ServerResource;
 /**
  * This class serves:
  * <ul>
- *     <li>for Restlet resources to provide access to Engine session and APIS</li>
- *     <li>for server to client object conversion (currently used only for APIS that can return Business Data)</li>
+ * <li>for Restlet resources to provide access to Engine session and APIS</li>
+ * <li>for server to client object conversion (currently used only for APIS that can return Business Data)</li>
  * </ul>
  * See {@link BusinessDataReferenceResourceFinder#toClientObject(Serializable)} for more details.
  */
