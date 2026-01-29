@@ -13,11 +13,9 @@
  **/
 package org.bonitasoft.web.rest.server.api.system;
 
-import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.LENIENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,34 +24,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.console.common.server.i18n.I18n;
-import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.bonitasoft.web.toolkit.client.common.i18n.AbstractI18n;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * @author Julien Mege
  */
-@MockitoSettings(strictness = LENIENT)
-class I18nTranslationControllerTest {
-
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-    private MockMvc mockMvc;
-
-    @Mock
-    private APISession apiSession;
+class I18nTranslationControllerTest extends AbstractControllerTest<I18nTranslationController> {
 
     @Mock
     private I18n i18n;
 
-    @BeforeEach
-    void setUp() {
-        I18nTranslationController controller = spy(new I18nTranslationController());
-        mockMvc = initMockMvcWithSessionAttributes(controller, sessionAttributes, apiSession);
+    @Override
+    protected I18nTranslationController createController() {
+        return spy(new I18nTranslationController());
+    }
+
+    @Override
+    protected void configureMocks(I18nTranslationController controller) throws Exception {
         doReturn(i18n).when(controller).getI18n();
     }
 

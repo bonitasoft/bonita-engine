@@ -13,10 +13,8 @@
  **/
 package org.bonitasoft.web.rest.server.api.bdm;
 
-import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.quality.Strictness.LENIENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -29,48 +27,38 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.io.FileContent;
-import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.tenant.TenantResourceState;
 import org.bonitasoft.engine.tenant.TenantResourceType;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@MockitoSettings(strictness = LENIENT)
-class BusinessDataModelControllerTest {
-
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-    private MockMvc mockMvc;
-
-    @Mock
-    private APISession apiSession;
-
-    @Spy
-    protected BusinessDataModelController controller;
+class BusinessDataModelControllerTest extends AbstractControllerTest<BusinessDataModelController> {
 
     @Mock
     protected TenantAdministrationAPI tenantAdministrationAPI;
 
-    @BeforeEach
-    void init() throws BonitaException {
+    private BusinessDataModelController controller;
+
+    @Override
+    protected BusinessDataModelController createController() {
+        controller = spy(new BusinessDataModelController());
+        return controller;
+    }
+
+    @Override
+    protected void configureMocks(BusinessDataModelController controller) throws Exception {
         doReturn(tenantAdministrationAPI).when(controller).getTenantAdministrationAPI(any());
         doReturn(true).when(tenantAdministrationAPI).isPaused();
-        mockMvc = initMockMvcWithSessionAttributes(controller, sessionAttributes, apiSession);
     }
 
     @Test

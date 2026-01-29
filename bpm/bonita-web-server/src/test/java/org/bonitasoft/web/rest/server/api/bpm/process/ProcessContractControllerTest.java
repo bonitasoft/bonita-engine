@@ -20,51 +20,34 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.web.rest.server.api.RestControllerUtils;
-import org.junit.jupiter.api.BeforeEach;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-class ProcessContractControllerTest {
+class ProcessContractControllerTest extends AbstractControllerTest<ProcessContractController> {
 
     private static final long PROCESS_DEFINITION_ID = 4L;
     private static final String TEST_CONTRACT_API_URL = "/APISpringInternal/bpm/process/" + PROCESS_DEFINITION_ID
             + "/contract";
 
-    private MockMvc mockMvc;
-
     @Mock
     private ProcessAPI processAPI;
 
-    @Mock
-    private APISession apiSession;
+    @Override
+    protected ProcessContractController createController() {
+        return spy(new ProcessContractController());
+    }
 
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        ProcessContractController processContractController = spy(new ProcessContractController());
-        mockMvc = RestControllerUtils.initMockMvcWithSessionAttributes(processContractController, sessionAttributes,
-                apiSession);
-        doReturn(processAPI).when(processContractController).getProcessAPI(apiSession);
+    @Override
+    protected void configureMocks(ProcessContractController controller) throws Exception {
+        doReturn(processAPI).when(controller).getProcessAPI(apiSession);
     }
 
     @Test

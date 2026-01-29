@@ -14,48 +14,33 @@
 package org.bonitasoft.web.rest.server.api.bpm.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.session.APISession;
-import org.junit.jupiter.api.BeforeEach;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-class ProcessDefinitionDesignControllerTest {
+class ProcessDefinitionDesignControllerTest extends AbstractControllerTest<ProcessDefinitionDesignController> {
 
     private static final long PROCESS_DEFINITION_ID = 4L;
-
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-    private MockMvc mockMvc;
-
-    @Mock
-    private APISession apiSession;
 
     @Mock
     protected ProcessAPI processAPI;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        ProcessDefinitionDesignController controller = spy(new ProcessDefinitionDesignController());
-        mockMvc = initMockMvcWithSessionAttributes(controller, sessionAttributes, apiSession);
+    @Override
+    protected ProcessDefinitionDesignController createController() {
+        return spy(new ProcessDefinitionDesignController());
+    }
+
+    @Override
+    protected void configureMocks(ProcessDefinitionDesignController controller) throws Exception {
         doReturn(processAPI).when(controller).getProcessAPI(apiSession);
     }
 

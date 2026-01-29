@@ -14,9 +14,7 @@
 package org.bonitasoft.web.rest.server.api.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.mockito.Mockito.*;
-import static org.mockito.quality.Strictness.LENIENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -34,34 +32,26 @@ import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.session.APISession;
-import org.junit.jupiter.api.BeforeEach;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@MockitoSettings(strictness = LENIENT)
-class BusinessDataControllerTest {
-
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-    private MockMvc mockMvc;
+class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataController> {
 
     @Mock
-    private APISession apiSession;
+    protected CommandAPI commandAPI;
 
-    @Mock
-    CommandAPI commandAPI;
+    @Override
+    protected BusinessDataController createController() {
+        return spy(new BusinessDataController());
+    }
 
-    @BeforeEach
-    void setUp() throws Exception {
-        commandAPI = mock(CommandAPI.class);
-        BusinessDataController businessDataController = spy(new BusinessDataController());
-        mockMvc = initMockMvcWithSessionAttributes(businessDataController, sessionAttributes, apiSession);
-        doReturn(commandAPI).when(businessDataController).getCommandAPI(apiSession);
+    @Override
+    protected void configureMocks(BusinessDataController controller) throws Exception {
+        doReturn(commandAPI).when(controller).getCommandAPI(apiSession);
     }
 
     @Test

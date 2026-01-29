@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.process;
 
-import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -22,7 +21,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.LENIENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,28 +36,18 @@ import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
-import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@MockitoSettings(strictness = LENIENT)
-public class ProcessInstantiationControllerTest {
+public class ProcessInstantiationControllerTest extends AbstractControllerTest<ProcessInstantiationController> {
 
     private static final long PROCESS_DEFINITION_ID = 2L;
 
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-    private MockMvc mockMvc;
-
     @Mock
     private ProcessAPI processAPI;
-
-    @Mock
-    private APISession apiSession;
 
     @Mock
     private ContractDefinition contractDefinition;
@@ -69,11 +57,15 @@ public class ProcessInstantiationControllerTest {
         I18n.getInstance();
     }
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        final ProcessInstantiationController controller = spy(new ProcessInstantiationController());
+    @Override
+    protected ProcessInstantiationController createController() {
+        ProcessInstantiationController controller = spy(new ProcessInstantiationController());
         doReturn(3L).when(controller).getMaxFileSize();
-        mockMvc = initMockMvcWithSessionAttributes(controller, sessionAttributes, apiSession);
+        return controller;
+    }
+
+    @Override
+    protected void configureMocks(ProcessInstantiationController controller) throws Exception {
         doReturn(processAPI).when(controller).getProcessAPI(apiSession);
         when(contractDefinition.getInputs()).thenReturn(Collections.emptyList());
     }
