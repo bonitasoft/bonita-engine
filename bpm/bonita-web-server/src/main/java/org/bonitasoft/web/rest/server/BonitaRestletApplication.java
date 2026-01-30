@@ -21,7 +21,6 @@ import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
@@ -51,8 +50,6 @@ public class BonitaRestletApplication extends Application {
     public static final String BDM_BUSINESS_DATA_REFERENCE_URL = "/bdm/businessDataReference";
 
     public static final String BPM_USER_TASK_URL = "/bpm/userTask";
-
-    public static final String BPM_TIMER_EVENT_TRIGGER_URL = "/bpm/timerEventTrigger";
 
     public static final String BPM_MESSAGE_URL = "/bpm/message";
 
@@ -102,12 +99,6 @@ public class BonitaRestletApplication extends Application {
         router.attach(BPM_ACTIVITY_VARIABLE_URL + "/{" + ActivityVariableResource.ACTIVITYDATA_ACTIVITY_ID + "}/{"
                 + ActivityVariableResource.ACTIVITYDATA_DATA_NAME
                 + "}", factory.create(ActivityVariableResource.class));
-
-        // GET to search timer event triggers:
-        router.attach(BPM_TIMER_EVENT_TRIGGER_URL, factory.create(TimerEventTriggerResource.class));
-        // PUT to update timer event trigger date:
-        router.attach(BPM_TIMER_EVENT_TRIGGER_URL + "/{" + TimerEventTriggerResource.ID_PARAM_NAME + "}",
-                factory.create(TimerEventTriggerResource.class));
 
         // POST to send a BPM message to the engine:
         router.attach(BPM_MESSAGE_URL, factory.create(BPMMessageResource.class));

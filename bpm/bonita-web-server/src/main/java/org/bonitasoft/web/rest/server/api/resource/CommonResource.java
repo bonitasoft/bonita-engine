@@ -30,7 +30,6 @@ import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.rest.server.QueryParameterUtils;
@@ -266,10 +265,6 @@ public class CommonResource extends ServerResource {
         } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("query parameter c (count) is mandatory");
         }
-    }
-
-    protected void setContentRange(final SearchResult<?> searchResult) {
-        setContentRange(getSearchPageNumber(), getSearchPageSize(), searchResult.getCount());
     }
 
     protected void setContentRange(final int pageNumber, final int pageSize, final long count) {

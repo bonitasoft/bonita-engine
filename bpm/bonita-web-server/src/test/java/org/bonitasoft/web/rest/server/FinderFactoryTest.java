@@ -30,8 +30,6 @@ import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
@@ -103,15 +101,6 @@ public class FinderFactoryTest {
     }
 
     @Test
-    public void should_return_TimerEventTriggerResource_for_TimerEventTriggerResourceFinder() {
-        final TimerEventTriggerResourceFinder timerEventTriggerResourceFinder = spy(
-                new TimerEventTriggerResourceFinder());
-        doReturn(processAPI).when(timerEventTriggerResourceFinder).getProcessAPI(any(Request.class));
-        final ServerResource serverResource = timerEventTriggerResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(TimerEventTriggerResource.class);
-    }
-
-    @Test
     public void should_return_SendMessageResource_for_SendMessageResourceFinder() {
         final BPMMessageResourceFinder sendMessageResourceFinder = spy(new BPMMessageResourceFinder());
         doReturn(processAPI).when(sendMessageResourceFinder).getProcessAPI(any(Request.class));
@@ -150,7 +139,7 @@ public class FinderFactoryTest {
     @Test
     public void should_getResourceFinderFor_return_result_of_first_handler() {
         final FinderFactory finderFactory = new FinderFactory(
-                Collections.<Class<? extends ServerResource>, ResourceFinder> singletonMap(null, new ResourceFinder() {
+                Collections.singletonMap(null, new ResourceFinder() {
 
                     @Override
                     public Serializable toClientObject(final Serializable object) {
@@ -171,7 +160,7 @@ public class FinderFactoryTest {
     @Test
     public void should_getResourceFinderFor_return_the_object_if_no_handler() {
         final FinderFactory finderFactory = new FinderFactory(
-                Collections.<Class<? extends ServerResource>, ResourceFinder> singletonMap(null, new ResourceFinder() {
+                Collections.singletonMap(null, new ResourceFinder() {
 
                     @Override
                     public Serializable toClientObject(final Serializable object) {

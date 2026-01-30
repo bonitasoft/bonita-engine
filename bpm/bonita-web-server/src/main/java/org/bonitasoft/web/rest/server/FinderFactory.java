@@ -29,8 +29,6 @@ import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResourc
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
@@ -77,7 +75,6 @@ public class FinderFactory {
     protected Map<Class<? extends ServerResource>, ResourceFinder> getDefaultFinders() {
         final Map<Class<? extends ServerResource>, ResourceFinder> finders = new HashMap<>();
         finders.put(ActivityVariableResource.class, new ActivityVariableResourceFinder());
-        finders.put(TimerEventTriggerResource.class, new TimerEventTriggerResourceFinder());
         finders.put(BPMMessageResource.class, new BPMMessageResourceFinder());
         finders.put(BPMSignalResource.class, new BPMSignalResourceFinder());
         finders.put(BusinessDataReferenceResource.class, new BusinessDataReferenceResourceFinder());

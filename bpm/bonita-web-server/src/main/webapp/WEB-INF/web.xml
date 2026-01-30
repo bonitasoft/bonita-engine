@@ -758,6 +758,7 @@
         <url-pattern>/API/tenant/bdm</url-pattern>
         <url-pattern>/APISpringInternal/*</url-pattern>
         <url-pattern>/API/form/mapping</url-pattern>
+        <url-pattern>/API/bpm/timerEventTrigger/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>
