@@ -65,10 +65,19 @@ public class TimerEventTriggerController extends AbstractRESTController {
         final SearchResult<TimerEventTriggerInstance> searchResult = getProcessAPI(httpSession)
                 .searchTimerEventTriggerInstances(caseId, new SearchOptionsBuilder(page * count, count).done());
 
+        final List<TimerEventTriggerInstance> results = searchResult.getResult();
+
+        // Return 204 No Content for empty results
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent()
+                    .header(HttpHeaders.CONTENT_RANGE, buildContentRange(0, 0, 0))
+                    .build();
+        }
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_RANGE,
-                        buildContentRange(page, searchResult.getResult().size(), searchResult.getCount()))
-                .body(searchResult.getResult());
+                        buildContentRange(page, results.size(), searchResult.getCount()))
+                .body(results);
     }
 
     /**
@@ -83,7 +92,7 @@ public class TimerEventTriggerController extends AbstractRESTController {
     @PutMapping("/{id}")
     public TimerEventTrigger updateTimerEventTrigger(@PathVariable Long id, @RequestBody TimerEventTrigger trigger,
             HttpSession httpSession) throws BonitaException {
-        final Date executionDate = new Date(trigger.getExecutionDate());
+        final Date executionDate = new Date(trigger.executionDate());
         final Date updatedDate = getProcessAPI(httpSession).updateExecutionDateOfTimerEventTriggerInstance(id,
                 executionDate);
         return new TimerEventTrigger(updatedDate.getTime());

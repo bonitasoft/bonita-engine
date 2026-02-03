@@ -53,11 +53,12 @@ class TimerEventTriggerControllerTest extends AbstractControllerTest<TimerEventT
     void should_search_timer_event_triggers_for_given_case() throws Exception {
         // Given
         final long caseId = 123L;
+        final long triggerId = 42L;
+        final long eventInstanceId = 100L;
 
         when(processAPI.searchTimerEventTriggerInstances(anyLong(), any(SearchOptions.class)))
-                .thenReturn(new SearchResultImpl<>(2,
-                        List.of(new TimerEventTriggerInstanceImpl(1L, 1L, "timer1", new Date()),
-                                new TimerEventTriggerInstanceImpl(2L, 1L, "timer2", new Date()))));
+                .thenReturn(new SearchResultImpl<>(1,
+                        List.of(new TimerEventTriggerInstanceImpl(triggerId, eventInstanceId, "timer1", new Date()))));
 
         // When & Then
         mockMvc.perform(get("/API/bpm/timerEventTrigger")
@@ -67,11 +68,43 @@ class TimerEventTriggerControllerTest extends AbstractControllerTest<TimerEventT
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "0-2/2"))
+                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "0-1/1"))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.length()").value(1))
+                // Verify _string fields are present (backward compatibility with Restlet)
+                .andExpect(jsonPath("$[0].id").value(triggerId))
+                .andExpect(jsonPath("$[0].id_string").value(String.valueOf(triggerId)))
+                .andExpect(jsonPath("$[0].eventInstanceId").value(eventInstanceId))
+                .andExpect(jsonPath("$[0].eventInstanceId_string").value(String.valueOf(eventInstanceId)))
+                .andExpect(jsonPath("$[0].eventInstanceName").value("timer1"));
 
         verify(processAPI).searchTimerEventTriggerInstances(eq(caseId), any(SearchOptions.class));
+    }
+
+    @Test
+    void should_return_string_fields_for_numeric_ids() throws Exception {
+        // Given - test with large IDs that could lose precision in JavaScript
+        final long caseId = 123L;
+        final long triggerId = 9007199254740993L; // > Number.MAX_SAFE_INTEGER
+        final long eventInstanceId = 9007199254740994L;
+
+        when(processAPI.searchTimerEventTriggerInstances(anyLong(), any(SearchOptions.class)))
+                .thenReturn(new SearchResultImpl<>(1,
+                        List.of(new TimerEventTriggerInstanceImpl(triggerId, eventInstanceId, "bigTimer",
+                                new Date()))));
+
+        // When & Then - _string fields preserve precision for JavaScript clients
+        mockMvc.perform(get("/API/bpm/timerEventTrigger")
+                .param("caseId", String.valueOf(caseId))
+                .param("p", "0")
+                .param("c", "10")
+                .sessionAttrs(sessionAttributes)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(triggerId))
+                .andExpect(jsonPath("$[0].id_string").value("9007199254740993"))
+                .andExpect(jsonPath("$[0].eventInstanceId").value(eventInstanceId))
+                .andExpect(jsonPath("$[0].eventInstanceId_string").value("9007199254740994"));
     }
 
     @Test
@@ -153,46 +186,41 @@ class TimerEventTriggerControllerTest extends AbstractControllerTest<TimerEventT
     }
 
     @Test
-    void should_return_empty_list_when_no_timer_triggers_found() throws Exception {
+    void should_return_no_content_when_no_timer_triggers_found() throws Exception {
         // Given
         final long caseId = 123L;
 
         when(processAPI.searchTimerEventTriggerInstances(anyLong(), any(SearchOptions.class)))
                 .thenReturn(new SearchResultImpl<>(0, List.of()));
 
-        // When & Then
+        // When & Then - 204 No Content has no body
         mockMvc.perform(get("/API/bpm/timerEventTrigger")
                 .param("caseId", String.valueOf(caseId))
                 .param("p", "0")
                 .param("c", "10")
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "0-0/0"))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(status().isNoContent())
+                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "0-0/0"));
     }
 
     @Test
-    void should_return_empty_list_when_page_out_of_bounds() throws Exception {
+    void should_return_no_content_when_page_out_of_bounds() throws Exception {
         // Given
         final long caseId = 123L;
 
         when(processAPI.searchTimerEventTriggerInstances(anyLong(), any(SearchOptions.class)))
                 .thenReturn(new SearchResultImpl<>(2, List.of())); // Total 2, but empty results for this page
 
-        // When & Then
-        // Content-Range format: page-countOnCurrentPage/total
+        // When & Then - 204 No Content has no body
         mockMvc.perform(get("/API/bpm/timerEventTrigger")
                 .param("caseId", String.valueOf(caseId))
                 .param("p", "10") // Page 10 when only 2 results exist
                 .param("c", "10")
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "10-0/2"))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(status().isNoContent())
+                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "0-0/0"));
     }
 
     @Test
