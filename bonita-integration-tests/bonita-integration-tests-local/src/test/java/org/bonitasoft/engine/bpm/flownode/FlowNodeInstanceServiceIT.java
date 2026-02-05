@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -177,6 +178,94 @@ public class FlowNodeInstanceServiceIT extends CommonBPMServicesTest {
         getTransactionService().begin();
         activityInstanceService.deleteAllPendingMappings();
         activityInstanceService.deleteFlowNodeInstance(step1);
+        getTransactionService().complete();
+    }
+
+    @Test
+    public void lastUpdateDate_should_be_persisted_when_modifying_flowNode() throws Exception {
+        // given: create a user task
+        long flowNodeDefinitionId = 12355467L;
+        long processDefinitionId = 123445566L;
+        long rootProcessInstanceID = 7754L;
+        long actorId = 5589L;
+        SUserTaskInstance task = createSUserTaskInstance("taskWithLastUpdateDate", flowNodeDefinitionId, -1,
+                processDefinitionId, rootProcessInstanceID, actorId);
+
+        // Verify initial lastUpdateDate is set during creation
+        getTransactionService().begin();
+        SFlowNodeInstance initialTask = activityInstanceService.getFlowNodeInstance(task.getId());
+        long initialLastUpdateDate = initialTask.getLastUpdateDate();
+        getTransactionService().complete();
+
+        assertThat(initialLastUpdateDate).as("Initial lastUpdateDate should be > 0").isGreaterThan(0);
+
+        // Wait a bit to ensure timestamp difference
+        Thread.sleep(10);
+
+        // when: modify the flow node using setExecuting
+        getTransactionService().begin();
+        SFlowNodeInstance taskToModify = activityInstanceService.getFlowNodeInstance(task.getId());
+        activityInstanceService.setExecuting(taskToModify);
+        getTransactionService().complete();
+
+        // then: re-fetch from database and verify lastUpdateDate was updated
+        getTransactionService().begin();
+        SFlowNodeInstance updatedTask = activityInstanceService.getFlowNodeInstance(task.getId());
+        long updatedLastUpdateDate = updatedTask.getLastUpdateDate();
+        getTransactionService().complete();
+
+        assertThat(updatedLastUpdateDate).as("Updated lastUpdateDate should be > 0").isGreaterThan(0);
+        assertThat(updatedLastUpdateDate).as("lastUpdateDate should be updated after modification")
+                .isGreaterThanOrEqualTo(initialLastUpdateDate);
+
+        // clean-up:
+        getTransactionService().begin();
+        activityInstanceService.deleteFlowNodeInstance(updatedTask);
+        getTransactionService().complete();
+    }
+
+    @Test
+    public void lastUpdateDate_should_be_persisted_when_assigning_humanTask_with_strict_query() throws Exception {
+        // given: create a user task
+        long flowNodeDefinitionId = 12355467L;
+        long processDefinitionId = 123445566L;
+        long rootProcessInstanceID = 7754L;
+        long actorId = 5589L;
+        SUserTaskInstance task = createSUserTaskInstance("taskForAssignment", flowNodeDefinitionId, -1,
+                processDefinitionId, rootProcessInstanceID, actorId);
+
+        // Verify initial lastUpdateDate is set during creation
+        getTransactionService().begin();
+        SFlowNodeInstance initialTask = activityInstanceService.getFlowNodeInstance(task.getId());
+        long initialLastUpdateDate = initialTask.getLastUpdateDate();
+        getTransactionService().complete();
+
+        assertThat(initialLastUpdateDate).as("Initial lastUpdateDate should be > 0").isGreaterThan(0);
+
+        // Wait a bit to ensure timestamp difference
+        Thread.sleep(10);
+
+        // when: assign the task using assignHumanTaskIfNotAssigned (uses updateStrictHuman query)
+        long userId = 12345L;
+        getTransactionService().begin();
+        activityInstanceService.assignHumanTaskIfNotAssigned(task.getId(), userId);
+        getTransactionService().complete();
+
+        // then: re-fetch from database and verify lastUpdateDate was updated
+        getTransactionService().begin();
+        SFlowNodeInstance assignedTask = activityInstanceService.getFlowNodeInstance(task.getId());
+        long assignedLastUpdateDate = assignedTask.getLastUpdateDate();
+        long assigneeId = ((SUserTaskInstance) assignedTask).getAssigneeId();
+        getTransactionService().complete();
+
+        assertThat(assigneeId).as("Assignee should be set").isEqualTo(userId);
+        assertThat(assignedLastUpdateDate).as("Assigned lastUpdateDate should be > 0").isGreaterThan(0);
+        assertThat(assignedLastUpdateDate).as("lastUpdateDate should be updated after assignment")
+                .isGreaterThanOrEqualTo(initialLastUpdateDate);
+
+        // clean-up:
+        getTransactionService().begin();
+        activityInstanceService.deleteFlowNodeInstance(assignedTask);
         getTransactionService().complete();
     }
 

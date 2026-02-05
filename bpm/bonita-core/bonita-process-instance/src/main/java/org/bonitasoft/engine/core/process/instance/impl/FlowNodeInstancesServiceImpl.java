@@ -111,10 +111,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     @Override
     public void setExecuting(final SFlowNodeInstance flowNodeInstance) throws SFlowNodeModificationException {
-        final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getStateExecutingKey(), true);
-        descriptor.addField(activityInstanceKeyProvider.getLastUpdateDateKey(), now);
         log.debug(MessageFormat.format("[{0} with id {1}] have executing flag set to true",
                 flowNodeInstance.getClass().getSimpleName(),
                 flowNodeInstance.getId()));
@@ -188,6 +186,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     private void updateOneField(SFlowNodeInstance flowNodeInstance, String event, EntityUpdateDescriptor descriptor)
             throws SFlowNodeModificationException {
+        setLastUpdateDate(descriptor);
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor), event);
         } catch (final SRecorderException e) {
@@ -333,13 +332,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getStateCategoryKey(), stateCategory);
-
-        try {
-            getRecorder().recordUpdate(UpdateRecord.buildSetFields(flowElementInstance, descriptor), STATE_CATEGORY);
-        } catch (final SRecorderException sre) {
-            throw new SFlowNodeModificationException(sre);
-        }
-
+        updateFlowNode(flowElementInstance, STATE_CATEGORY, descriptor);
     }
 
     @Override
@@ -369,11 +362,48 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     protected void updateFlowNode(final SFlowNodeInstance flowNodeInstance, final String eventName,
             final EntityUpdateDescriptor descriptor)
             throws SFlowNodeModificationException {
+        setLastUpdateDate(descriptor);
         try {
             getRecorder().recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor), eventName);
         } catch (final SRecorderException sre) {
             throw new SFlowNodeModificationException(sre);
         }
+    }
+
+    /**
+     * Adds the lastUpdateDate field to the descriptor if not already present.
+     * This ensures that any update to a flow node instance also updates the lastUpdateDate.
+     * If another date field (reachStateDate, claimedDate) is already in the descriptor with a
+     * timestamp value, that value is reused to ensure consistency across date fields in the same update.
+     */
+    protected void setLastUpdateDate(final EntityUpdateDescriptor descriptor) {
+        if (!descriptor.getFields().containsKey(activityInstanceKeyProvider.getLastUpdateDateKey())) {
+            Long timestamp = findExistingTimestamp(descriptor);
+            if (timestamp == null) {
+                timestamp = System.currentTimeMillis();
+            }
+            descriptor.addField(activityInstanceKeyProvider.getLastUpdateDateKey(), timestamp);
+        }
+    }
+
+    /**
+     * Looks for an existing timestamp value from known date fields in the descriptor.
+     * Returns the timestamp if found, or null if no date field is present.
+     */
+    private Long findExistingTimestamp(final EntityUpdateDescriptor descriptor) {
+        // Check reachStateDate (used in setState)
+        Object reachStateDate = descriptor.getFields().get(activityInstanceKeyProvider.getReachStateDateKey());
+        if (reachStateDate instanceof Long && (Long) reachStateDate > 0) {
+            return (Long) reachStateDate;
+        }
+        // Check claimedDate (used in assignHumanTask).
+        // Only reuse if > 0: when a task is released (unassigned), claimedDate is set to 0,
+        // which is not a valid timestamp. In that case, we return null to get a fresh timestamp.
+        Object claimedDate = descriptor.getFields().get(activityInstanceKeyProvider.getClaimedDateKey());
+        if (claimedDate instanceof Long && (Long) claimedDate > 0) {
+            return (Long) claimedDate;
+        }
+        return null;
     }
 
     protected <T> List<T> getUnmodifiableList(List<T> selectList) {

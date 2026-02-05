@@ -380,6 +380,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
                 // if this action is a Release action:
                 descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0);
             }
+            setLastUpdateDate(descriptor);
             try {
                 getRecorder().recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
                         HUMAN_TASK_INSTANCE_ASSIGNEE);
@@ -414,6 +415,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
                 // if this action is a Release action:
                 descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0L);
             }
+            setLastUpdateDate(descriptor);
             try {
                 int updatedRows = getRecorder().recordUpdateWithQuery(
                         UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
@@ -620,7 +622,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public void incrementLoopCounter(final SLoopActivityInstance loopInstance) throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("loopCounter", loopInstance.getLoopCounter() + 1);
-
+        setLastUpdateDate(descriptor);
         try {
             getRecorder().recordUpdate(UpdateRecord.buildSetFields(loopInstance, descriptor), ACTIVITYINSTANCE_STATE);
         } catch (final SRecorderException sre) {
@@ -784,6 +786,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sUserTaskInstanceBuilder.getTokenCountKey(), tokenCount);
+        setLastUpdateDate(descriptor);
         try {
             getRecorder().recordUpdate(UpdateRecord.buildSetFields(activityInstance, descriptor),
                     ACTIVITY_INSTANCE_TOKEN_COUNT);
@@ -864,7 +867,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sUserTaskInstanceBuilder.getAbortedByBoundaryEventIdKey(), boundaryEventId);
-
+        setLastUpdateDate(descriptor);
         try {
             getRecorder().recordUpdate(UpdateRecord.buildSetFields(activityInstance, descriptor), STATE_CATEGORY);
         } catch (final SRecorderException sre) {
