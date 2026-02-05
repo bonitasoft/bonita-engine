@@ -28,9 +28,12 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SUserTaskInstanceBuilderFactoryImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -379,9 +382,12 @@ public class ActivityInstanceServiceImplTest {
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity")
                 .isEqualTo(sFlowNodeInstance);
         assertThat(updateRecordArgumentCaptor.getValue().getFields())
-                .as("should only update expectedEndDate field with new value")
-                .containsExactly(entry("expectedEndDate", 123L));
-
+                .as("should update expectedEndDate and lastUpdateDate fields")
+                .containsKey("expectedEndDate")
+                .containsKey("lastUpdateDate");
+        assertThat(updateRecordArgumentCaptor.getValue().getFields().get("expectedEndDate"))
+                .as("expectedEndDate should have the new value")
+                .isEqualTo(123L);
     }
 
     @Test
@@ -465,6 +471,150 @@ public class ActivityInstanceServiceImplTest {
         assertThat(thrown)
                 .isInstanceOf(SBonitaReadException.class)
                 .hasMessageContaining("Fake for test");
+    }
+
+    // === Tests for lastUpdateDate on ActivityInstanceServiceImpl methods ===
+
+    @Test
+    public void should_assignHumanTask_update_lastUpdateDate() throws Exception {
+        // Given
+        SHumanTaskInstance humanTask = mock(SHumanTaskInstance.class);
+        when(persistenceService.selectById(any())).thenReturn(humanTask);
+
+        // When
+        activityInstanceServiceImpl.assignHumanTask(123L, 456L);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("assigneeId", "claimedDate", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_incrementLoopCounter_update_lastUpdateDate() throws Exception {
+        // Given
+        SLoopActivityInstance loopInstance = mock(SLoopActivityInstance.class);
+        when(loopInstance.getLoopCounter()).thenReturn(5);
+
+        // When
+        activityInstanceServiceImpl.incrementLoopCounter(loopInstance);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("loopCounter", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_setLoopMax_update_lastUpdateDate() throws Exception {
+        // Given
+        SLoopActivityInstance loopActivity = mock(SLoopActivityInstance.class);
+
+        // When
+        activityInstanceServiceImpl.setLoopMax(loopActivity, 10);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("loopMax", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_setLoopCardinality_update_lastUpdateDate() throws Exception {
+        // Given
+        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+
+        // When
+        activityInstanceServiceImpl.setLoopCardinality(flowNode, 5);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("loopCardinality", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_addMultiInstanceNumberOfActiveActivities_update_lastUpdateDate() throws Exception {
+        // Given
+        SMultiInstanceActivityInstance multiInstance = mock(SMultiInstanceActivityInstance.class);
+        when(multiInstance.getNumberOfActiveInstances()).thenReturn(3);
+
+        // When
+        activityInstanceServiceImpl.addMultiInstanceNumberOfActiveActivities(multiInstance, 2);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("numberOfActiveInstances", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_addMultiInstanceNumberOfTerminatedActivities_update_lastUpdateDate() throws Exception {
+        // Given
+        SMultiInstanceActivityInstance multiInstance = mock(SMultiInstanceActivityInstance.class);
+        when(multiInstance.getNumberOfActiveInstances()).thenReturn(3);
+        when(multiInstance.getNumberOfTerminatedInstances()).thenReturn(1);
+
+        // When
+        activityInstanceServiceImpl.addMultiInstanceNumberOfTerminatedActivities(multiInstance, 1);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("numberOfActiveInstances", "numberOfTerminatedInstances", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_addMultiInstanceNumberOfCompletedActivities_update_lastUpdateDate() throws Exception {
+        // Given
+        SMultiInstanceActivityInstance multiInstance = mock(SMultiInstanceActivityInstance.class);
+        when(multiInstance.getNumberOfActiveInstances()).thenReturn(3);
+        when(multiInstance.getNumberOfCompletedInstances()).thenReturn(1);
+
+        // When
+        activityInstanceServiceImpl.addMultiInstanceNumberOfCompletedActivities(multiInstance, 1);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("numberOfActiveInstances", "numberOfCompletedInstances", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_setTokenCount_update_lastUpdateDate() throws Exception {
+        // Given
+        SActivityInstance activityInstance = mock(SActivityInstance.class);
+
+        // When
+        activityInstanceServiceImpl.setTokenCount(activityInstance, 5);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("tokenCount", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_setAbortedByBoundaryEvent_update_lastUpdateDate() throws Exception {
+        // Given
+        SActivityInstance activityInstance = mock(SActivityInstance.class);
+
+        // When
+        activityInstanceServiceImpl.setAbortedByBoundaryEvent(activityInstance, 789L);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(captor.capture(), anyString());
+        assertThat(captor.getValue().getFields().keySet())
+                .contains("abortedByBoundary", "lastUpdateDate");
     }
 
 }

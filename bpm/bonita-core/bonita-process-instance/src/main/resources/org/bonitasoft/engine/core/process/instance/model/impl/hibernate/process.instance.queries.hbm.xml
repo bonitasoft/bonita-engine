@@ -158,7 +158,8 @@
 		UPDATE
 		org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance
 		SET assigneeId = :assigneeId,
-		claimedDate = :claimedDate
+		claimedDate = :claimedDate,
+		lastUpdateDate = :lastUpdateDate
 		WHERE id = :id
 		AND (
 			:assigneeId = 0
