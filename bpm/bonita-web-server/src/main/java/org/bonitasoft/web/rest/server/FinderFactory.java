@@ -19,10 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResourceFinder;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
@@ -44,7 +40,6 @@ import org.restlet.resource.ServerResource;
  * <li>for Restlet resources to provide access to Engine session and APIS</li>
  * <li>for server to client object conversion (currently used only for APIS that can return Business Data)</li>
  * </ul>
- * See {@link BusinessDataReferenceResourceFinder#toClientObject(Serializable)} for more details.
  */
 public class FinderFactory {
 
@@ -75,8 +70,6 @@ public class FinderFactory {
         finders.put(ActivityVariableResource.class, new ActivityVariableResourceFinder());
         finders.put(BPMMessageResource.class, new BPMMessageResourceFinder());
         finders.put(BPMSignalResource.class, new BPMSignalResourceFinder());
-        finders.put(BusinessDataReferenceResource.class, new BusinessDataReferenceResourceFinder());
-        finders.put(BusinessDataReferencesResource.class, new BusinessDataReferencesResourceFinder());
 
         finders.put(ArchivedCaseVariableResource.class, new ArchivedCaseVariableResourceFinder());
         finders.put(ArchivedCaseVariablesResource.class, new ArchivedCaseVariablesResourceFinder());

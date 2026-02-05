@@ -16,8 +16,6 @@ package org.bonitasoft.web.rest.server;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
@@ -45,8 +43,6 @@ public class BonitaRestletApplication extends Application {
     public static final String ROUTER_EXTENSION_PREFIX = "/extension/";
 
     public static final String BDM_BUSINESS_DATA_URL = "/bdm/businessData";
-
-    public static final String BDM_BUSINESS_DATA_REFERENCE_URL = "/bdm/businessDataReference";
 
     public static final String BPM_MESSAGE_URL = "/bpm/message";
 
@@ -102,12 +98,6 @@ public class BonitaRestletApplication extends Application {
 
         // POST to send a BPM signal to the engine:
         router.attach(BPM_SIGNAL_URL, factory.create(BPMSignalResource.class));
-
-        // GET a Multiple BusinessDataReference
-        router.attach(BDM_BUSINESS_DATA_REFERENCE_URL, factory.create(BusinessDataReferencesResource.class));
-        // GET a Simple BusinessDataReference
-        router.attach(BDM_BUSINESS_DATA_REFERENCE_URL + "/{caseId}/{dataName}",
-                factory.create(BusinessDataReferenceResource.class));
 
         // api extension
         router.attach(ROUTER_EXTENSION_PREFIX, factory.createExtensionResource(), Template.MODE_STARTS_WITH);

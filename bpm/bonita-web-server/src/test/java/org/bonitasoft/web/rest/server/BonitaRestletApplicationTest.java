@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.web.rest.server;
 
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.utils.BonitaJacksonConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,20 +28,6 @@ public class BonitaRestletApplicationTest {
 
     @Mock
     BonitaJacksonConverter bonitaJacksonConverter;
-
-    @Test
-    public void should_application_register_bdm_resources() {
-        //given
-        final BonitaRestletApplication bonitaRestletApplication = new BonitaRestletApplication(finderFactory,
-                bonitaJacksonConverter);
-
-        //when
-        bonitaRestletApplication.buildRouter();
-
-        //then
-        Mockito.verify(finderFactory).create(BusinessDataReferenceResource.class);
-        Mockito.verify(finderFactory).create(BusinessDataReferencesResource.class);
-    }
 
     @Test
     public void should_application_register_extension_resources() {

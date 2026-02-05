@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
@@ -39,7 +40,7 @@ public abstract class AbstractRESTController {
     public AbstractRESTController() {
         // For testing purposes, to make sure that the new implementation is deployed and that
         // we do not fallback on the Restlet implementation.
-        // Will be removed once the entire Restlet refactoring is done:
+        // FIXME: Will be removed once the entire Restlet refactoring is done:
         log.info("Creating REST Controller {}", this.getClass().getName());
     }
 
@@ -76,6 +77,17 @@ public abstract class AbstractRESTController {
     public TenantAdministrationAPI getTenantAdministrationAPI(HttpSession session)
             throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantAPIAccessor.getTenantAdministrationAPI(getApiSession(session));
+    }
+
+    // VisibleForTesting
+    public BusinessDataAPI getBusinessDataAPI(APISession apiSession)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getBusinessDataAPI(apiSession);
+    }
+
+    protected BusinessDataAPI getBusinessDataAPI(HttpSession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getBusinessDataAPI(getApiSession(session));
     }
 
 }

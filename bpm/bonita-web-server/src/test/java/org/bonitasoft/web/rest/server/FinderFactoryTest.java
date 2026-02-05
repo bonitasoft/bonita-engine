@@ -21,13 +21,8 @@ import static org.mockito.Mockito.spy;
 import java.io.Serializable;
 import java.util.Collections;
 
-import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResourceFinder;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
@@ -39,7 +34,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -51,9 +45,6 @@ public class FinderFactoryTest {
     private ProcessAPI processAPI;
 
     @Mock
-    private BusinessDataAPI bdmAPI;
-
-    @Mock
     private APISession apiSession;
 
     private final Request request = new Request();
@@ -62,22 +53,6 @@ public class FinderFactoryTest {
     @Before
     public void setUp() {
         factory = new FinderFactory();
-    }
-
-    @Test
-    public void should_return_BusinessDataReferenceResourceFinder_for_BusinessDataReferenceResource() {
-
-        final Finder finder = factory.create(BusinessDataReferenceResource.class);
-
-        assertThat(finder).isInstanceOf(BusinessDataReferenceResourceFinder.class);
-    }
-
-    @Test
-    public void should_return_BusinessDataReferencesResourceFinder_for_BusinessDataReferencesResource() {
-
-        final Finder finder = factory.create(BusinessDataReferencesResource.class);
-
-        assertThat(finder).isInstanceOf(BusinessDataReferencesResourceFinder.class);
     }
 
     @Test(expected = RuntimeException.class)
@@ -104,24 +79,6 @@ public class FinderFactoryTest {
         doReturn(processAPI).when(sendMessageResourceFinder).getProcessAPI(any(Request.class));
         final ServerResource serverResource = sendMessageResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(BPMMessageResource.class);
-    }
-
-    @Test
-    public void should_return_BusinessDataReferenceResource_for_BusinessDataReferenceResourceFinder() {
-        final BusinessDataReferenceResourceFinder businessDataReferenceResourceFinder = spy(
-                new BusinessDataReferenceResourceFinder());
-        doReturn(bdmAPI).when(businessDataReferenceResourceFinder).getBdmAPI(any(Request.class));
-        final ServerResource serverResource = businessDataReferenceResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(BusinessDataReferenceResource.class);
-    }
-
-    @Test
-    public void should_return_BusinessDataReferencesResource_for_BusinessDataReferencesResourceFinder() {
-        final BusinessDataReferencesResourceFinder businessDataReferencesResourceFinder = spy(
-                new BusinessDataReferencesResourceFinder());
-        doReturn(bdmAPI).when(businessDataReferencesResourceFinder).getBdmAPI(any(Request.class));
-        final ServerResource serverResource = businessDataReferencesResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(BusinessDataReferencesResource.class);
     }
 
     @Test
