@@ -143,6 +143,11 @@
         <to>/APISpringInternal/bpm/userTask/$2/context</to>
     </rule>
     <rule>
+        <note>Rewrite user task execution URLs to Spring MVC internal endpoint</note>
+        <from>^(/portal.*)?/API/bpm/userTask/([^/]+)/execution$</from>
+        <to>/APISpringInternal/bpm/userTask/$2/execution</to>
+    </rule>
+    <rule>
         <note>Rewrite archived user task context URLs to Spring MVC internal endpoint</note>
         <from>^(/portal.*)?/API/bpm/archivedUserTask/([^/]+)/context$</from>
         <to>/APISpringInternal/bpm/archivedUserTask/$2/context</to>

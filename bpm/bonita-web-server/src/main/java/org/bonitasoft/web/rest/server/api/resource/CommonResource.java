@@ -16,7 +16,6 @@ package org.bonitasoft.web.rest.server.api.resource;
 import java.io.FileNotFoundException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -228,21 +226,6 @@ public class CommonResource extends ServerResource {
         }
     }
 
-    public List<Long> getParameterAsLongList(final String parameterName) {
-        final String values = getQuery().getValues(parameterName);
-        if (values != null) {
-            final String[] parameterValues = values.split(",");
-            if (parameterValues != null && parameterValues.length > 0) {
-                final List<Long> longValues = new ArrayList<>();
-                for (final String parameterValue : parameterValues) {
-                    longValues.add(convertToLong(parameterValue));
-                }
-                return longValues;
-            }
-        }
-        return null;
-    }
-
     public String getPathParam(final String name) {
         return getAttribute(name);
     }
@@ -270,22 +253,6 @@ public class CommonResource extends ServerResource {
     protected void setContentRange(final int pageNumber, final int pageSize, final long count) {
         //This is mandatory as our API is not conform to the Content-range header specs
         getResponse().getEntity().setRange(new Range(pageNumber, pageSize - pageNumber + 1, count, ""));
-    }
-
-    protected void manageContractViolationException(final ContractViolationException e,
-            final String statusErrorMessage) {
-        if (LOGGER.isInfoEnabled()) {
-            final StringBuilder explanations = new StringBuilder();
-            for (final String explanation : e.getExplanations()) {
-                explanations.append(explanation);
-            }
-            LOGGER.info(e.getSimpleMessage() + "\nExplanations:\n" + explanations);
-        }
-        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, statusErrorMessage);
-        final ErrorMessageWithExplanations errorMessage = new ErrorMessageWithExplanations(e);
-        errorMessage.setMessage(e.getSimpleMessage());
-        errorMessage.setExplanations(e.getExplanations());
-        getResponse().setEntity(errorMessage.toEntity());
     }
 
 }

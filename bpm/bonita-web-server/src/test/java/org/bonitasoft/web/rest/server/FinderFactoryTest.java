@@ -30,8 +30,6 @@ import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResourceFinder;
 import org.junit.Before;
@@ -124,16 +122,6 @@ public class FinderFactoryTest {
         doReturn(bdmAPI).when(businessDataReferencesResourceFinder).getBdmAPI(any(Request.class));
         final ServerResource serverResource = businessDataReferencesResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(BusinessDataReferencesResource.class);
-    }
-
-    @Test
-    public void should_return_TaskExecutionResource_for_TaskExecutionResourceFinder() {
-        final UserTaskExecutionResourceFinder userTaskExecutionResourceFinder = spy(
-                new UserTaskExecutionResourceFinder());
-        doReturn(processAPI).when(userTaskExecutionResourceFinder).getProcessAPI(any(Request.class));
-        doReturn(apiSession).when(userTaskExecutionResourceFinder).getAPISession(any(Request.class));
-        final ServerResource serverResource = userTaskExecutionResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(UserTaskExecutionResource.class);
     }
 
     @Test

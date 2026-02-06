@@ -60,7 +60,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         parameters.put("entityClassName", "org.bonitasoft.pojo.Employee");
         parameters.put("businessDataId", 1983L);
         parameters.put("businessDataURIPattern", "/API/bdm/businessData/{className}/{id}/{field}");
-        when(commandAPI.execute("getBusinessDataById", parameters)).thenReturn("{\"name\":\"Matti\"}");
+        when(commandAPI.execute("getBusinessDataById", parameters)).thenReturn("{\"name\":\"たこ焼き\"}");
 
         mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983").sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
@@ -68,7 +68,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
 
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content()
-                        .json("{\"name\":\"Matti\"}"));
+                        .json("{\"name\":\"たこ焼き\"}"));
     }
 
     @Test

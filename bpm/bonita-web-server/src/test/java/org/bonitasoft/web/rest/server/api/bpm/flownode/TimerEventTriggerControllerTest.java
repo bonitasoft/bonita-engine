@@ -58,7 +58,7 @@ class TimerEventTriggerControllerTest extends AbstractControllerTest<TimerEventT
 
         when(processAPI.searchTimerEventTriggerInstances(anyLong(), any(SearchOptions.class)))
                 .thenReturn(new SearchResultImpl<>(1,
-                        List.of(new TimerEventTriggerInstanceImpl(triggerId, eventInstanceId, "timer1", new Date()))));
+                        List.of(new TimerEventTriggerInstanceImpl(triggerId, eventInstanceId, "カキクケコ", new Date()))));
 
         // When & Then
         mockMvc.perform(get("/API/bpm/timerEventTrigger")
@@ -76,7 +76,7 @@ class TimerEventTriggerControllerTest extends AbstractControllerTest<TimerEventT
                 .andExpect(jsonPath("$[0].id_string").value(String.valueOf(triggerId)))
                 .andExpect(jsonPath("$[0].eventInstanceId").value(eventInstanceId))
                 .andExpect(jsonPath("$[0].eventInstanceId_string").value(String.valueOf(eventInstanceId)))
-                .andExpect(jsonPath("$[0].eventInstanceName").value("timer1"));
+                .andExpect(jsonPath("$[0].eventInstanceName").value("カキクケコ"));
 
         verify(processAPI).searchTimerEventTriggerInstances(eq(caseId), any(SearchOptions.class));
     }

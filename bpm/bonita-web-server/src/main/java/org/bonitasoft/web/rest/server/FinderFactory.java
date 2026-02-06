@@ -29,8 +29,6 @@ import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResourc
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
@@ -79,7 +77,6 @@ public class FinderFactory {
         finders.put(BPMSignalResource.class, new BPMSignalResourceFinder());
         finders.put(BusinessDataReferenceResource.class, new BusinessDataReferenceResourceFinder());
         finders.put(BusinessDataReferencesResource.class, new BusinessDataReferencesResourceFinder());
-        finders.put(UserTaskExecutionResource.class, new UserTaskExecutionResourceFinder());
 
         finders.put(ArchivedCaseVariableResource.class, new ArchivedCaseVariableResourceFinder());
         finders.put(ArchivedCaseVariablesResource.class, new ArchivedCaseVariablesResourceFinder());

@@ -21,7 +21,6 @@ import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.UserTaskExecutionResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
 import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
@@ -48,8 +47,6 @@ public class BonitaRestletApplication extends Application {
     public static final String BDM_BUSINESS_DATA_URL = "/bdm/businessData";
 
     public static final String BDM_BUSINESS_DATA_REFERENCE_URL = "/bdm/businessDataReference";
-
-    public static final String BPM_USER_TASK_URL = "/bpm/userTask";
 
     public static final String BPM_MESSAGE_URL = "/bpm/message";
 
@@ -105,9 +102,6 @@ public class BonitaRestletApplication extends Application {
 
         // POST to send a BPM signal to the engine:
         router.attach(BPM_SIGNAL_URL, factory.create(BPMSignalResource.class));
-
-        // POST to execute a task with contract:
-        router.attach(BPM_USER_TASK_URL + "/{taskId}/execution", factory.create(UserTaskExecutionResource.class));
 
         // GET a Multiple BusinessDataReference
         router.attach(BDM_BUSINESS_DATA_REFERENCE_URL, factory.create(BusinessDataReferencesResource.class));

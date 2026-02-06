@@ -42,21 +42,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class BusinessDataController extends AbstractRESTController {
 
     @GetMapping("/{id}")
-    public String getBusinessData(
-            @PathVariable("className") String className,
-            @PathVariable("id") Long id,
-            HttpSession session)
+    public String getBusinessData(@PathVariable String className, @PathVariable Long id, HttpSession session)
             throws BonitaException {
         return getBusinessData(className, id, null, session);
     }
 
     @GetMapping("/{id}/{fieldName}")
-    public String getBusinessData(
-            @PathVariable("className") String className,
-            @PathVariable("id") Long id,
-            @PathVariable("fieldName") String fieldName,
-            HttpSession session)
-            throws BonitaException {
+    public String getBusinessData(@PathVariable String className, @PathVariable Long id, @PathVariable String fieldName,
+            HttpSession session) throws BonitaException {
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("entityClassName", className);
         parameters.put("businessDataId", id);
@@ -68,11 +61,8 @@ public class BusinessDataController extends AbstractRESTController {
     }
 
     @GetMapping("/findByIds")
-    public String getBusinessData(
-            @PathVariable("className") String className,
-            @RequestParam("ids") List<Long> ids,
-            HttpSession session)
-            throws BonitaException {
+    public String getBusinessData(@PathVariable String className, @RequestParam("ids") List<Long> ids,
+            HttpSession session) throws BonitaException {
 
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("entityClassName", className);
@@ -82,7 +72,7 @@ public class BusinessDataController extends AbstractRESTController {
     }
 
     @GetMapping("")
-    public ResponseEntity<String> getBusinessDataByQuery(@PathVariable("className") String className,
+    public ResponseEntity<String> getBusinessDataByQuery(@PathVariable String className,
             @RequestParam("c") Integer searchPageSize,
             @RequestParam(value = "f", required = false) List<String> filters,
             @RequestParam("p") Integer searchPageNumber,
