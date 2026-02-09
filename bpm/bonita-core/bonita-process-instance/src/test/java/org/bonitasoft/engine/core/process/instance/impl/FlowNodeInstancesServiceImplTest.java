@@ -89,7 +89,7 @@ public class FlowNodeInstancesServiceImplTest {
         service.setExecuting(flowNodeInstance);
 
         // Then
-        verify(recorder).recordUpdateWithQuery(updateRecordCaptor.capture(), anyString(), anyString());
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), anyString());
         assertThat(updateRecordCaptor.getValue().getFields().keySet())
                 .contains("stateExecuting", "lastUpdateDate");
     }
@@ -128,7 +128,7 @@ public class FlowNodeInstancesServiceImplTest {
         service.setTaskPriority(flowNodeInstance, STaskPriority.HIGHEST);
 
         // Then
-        verify(recorder).recordUpdateWithQuery(updateRecordCaptor.capture(), anyString(), anyString());
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), anyString());
         assertThat(updateRecordCaptor.getValue().getFields().keySet())
                 .contains("priority", "lastUpdateDate");
     }
@@ -150,7 +150,7 @@ public class FlowNodeInstancesServiceImplTest {
         service.setExecutedBy(flowNodeInstance, 123L);
 
         // Then
-        verify(recorder).recordUpdateWithQuery(updateRecordCaptor.capture(), anyString(), anyString());
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), anyString());
         assertThat(updateRecordCaptor.getValue().getFields().keySet())
                 .contains("executedBy", "lastUpdateDate");
     }
@@ -161,7 +161,7 @@ public class FlowNodeInstancesServiceImplTest {
         service.setExecutedBySubstitute(flowNodeInstance, 456L);
 
         // Then
-        verify(recorder).recordUpdateWithQuery(updateRecordCaptor.capture(), anyString(), anyString());
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), anyString());
         assertThat(updateRecordCaptor.getValue().getFields().keySet())
                 .contains("executedBySubstitute", "lastUpdateDate");
     }
@@ -172,7 +172,7 @@ public class FlowNodeInstancesServiceImplTest {
         service.setExpectedEndDate(flowNodeInstance, 123456789L);
 
         // Then
-        verify(recorder).recordUpdateWithQuery(updateRecordCaptor.capture(), anyString(), anyString());
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), anyString());
         assertThat(updateRecordCaptor.getValue().getFields().keySet())
                 .contains("expectedEndDate", "lastUpdateDate");
     }
