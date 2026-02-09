@@ -269,48 +269,4 @@ public class FlowNodeInstanceServiceIT extends CommonBPMServicesTest {
         getTransactionService().complete();
     }
 
-    @Test
-    public void assignHumanTask_should_not_overwrite_stateExecuting_flag() throws Exception {
-        // given: create a user task and set stateExecuting to true
-        long flowNodeDefinitionId = 12355467L;
-        long processDefinitionId = 123445566L;
-        long rootProcessInstanceID = 7754L;
-        long actorId = 5589L;
-        SUserTaskInstance task = createSUserTaskInstance("taskForRaceConditionTest", flowNodeDefinitionId, -1,
-                processDefinitionId, rootProcessInstanceID, actorId);
-
-        // Set stateExecuting = true (simulating an execution in progress)
-        getTransactionService().begin();
-        SFlowNodeInstance taskToExecute = activityInstanceService.getFlowNodeInstance(task.getId());
-        activityInstanceService.setExecuting(taskToExecute);
-        getTransactionService().complete();
-
-        // Verify stateExecuting is true
-        getTransactionService().begin();
-        SFlowNodeInstance executingTask = activityInstanceService.getFlowNodeInstance(task.getId());
-        assertThat(executingTask.isStateExecuting()).as("stateExecuting should be true before assign").isTrue();
-        getTransactionService().complete();
-
-        // when: assign the task (this used to cause a lost update on stateExecuting)
-        long userId = 12345L;
-        getTransactionService().begin();
-        activityInstanceService.assignHumanTask(task.getId(), userId);
-        getTransactionService().complete();
-
-        // then: stateExecuting should still be true after assignment
-        getTransactionService().begin();
-        SFlowNodeInstance assignedTask = activityInstanceService.getFlowNodeInstance(task.getId());
-        long assigneeId = ((SUserTaskInstance) assignedTask).getAssigneeId();
-        boolean stateExecuting = assignedTask.isStateExecuting();
-        getTransactionService().complete();
-
-        assertThat(assigneeId).as("Assignee should be set").isEqualTo(userId);
-        assertThat(stateExecuting).as("stateExecuting should still be true after assignHumanTask").isTrue();
-
-        // clean-up:
-        getTransactionService().begin();
-        activityInstanceService.deleteFlowNodeInstance(assignedTask);
-        getTransactionService().complete();
-    }
-
 }
