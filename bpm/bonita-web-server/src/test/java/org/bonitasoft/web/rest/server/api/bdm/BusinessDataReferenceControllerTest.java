@@ -117,7 +117,7 @@ class BusinessDataReferenceControllerTest extends AbstractControllerTest<Busines
     }
 
     @Test
-    void should_return_a_not_found_status() throws Exception {
+    void should_return_a_not_found_status_when_business_data_is_not_found() throws Exception {
         // given
         when(businessDataAPI.getProcessBusinessDataReference("myEmployee", 486L))
                 .thenThrow(new DataNotFoundException(new Exception("message")));
@@ -177,6 +177,18 @@ class BusinessDataReferenceControllerTest extends AbstractControllerTest<Busines
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_be_valid_when_extra_unwanted_filter_is_provided() throws Exception {
+        // when/then
+        mockMvc.perform(get("/API/bdm/businessDataReference")
+                .param("f", "unknownfilter=123,caseId=456")
+                .param("p", "0")
+                .param("c", "10")
+                .sessionAttrs(sessionAttributes)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test

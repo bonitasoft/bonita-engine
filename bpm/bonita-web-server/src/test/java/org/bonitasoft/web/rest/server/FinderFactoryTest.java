@@ -18,9 +18,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
-import java.io.Serializable;
-import java.util.Collections;
-
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
@@ -79,48 +76,6 @@ public class FinderFactoryTest {
         doReturn(processAPI).when(sendMessageResourceFinder).getProcessAPI(any(Request.class));
         final ServerResource serverResource = sendMessageResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(BPMMessageResource.class);
-    }
-
-    @Test
-    public void should_getResourceFinderFor_return_result_of_first_handler() {
-        final FinderFactory finderFactory = new FinderFactory(
-                Collections.singletonMap(null, new ResourceFinder() {
-
-                    @Override
-                    public Serializable toClientObject(final Serializable object) {
-                        return "resultA";
-                    }
-
-                    @Override
-                    public boolean handlesResource(final Serializable object) {
-                        return object.equals("objectA");
-                    }
-                }));
-
-        final Serializable objectA = finderFactory.getContextResultElement("objectA");
-
-        assertThat(objectA).isEqualTo("resultA");
-    }
-
-    @Test
-    public void should_getResourceFinderFor_return_the_object_if_no_handler() {
-        final FinderFactory finderFactory = new FinderFactory(
-                Collections.singletonMap(null, new ResourceFinder() {
-
-                    @Override
-                    public Serializable toClientObject(final Serializable object) {
-                        return "resultA";
-                    }
-
-                    @Override
-                    public boolean handlesResource(final Serializable object) {
-                        return object.equals("objectB");
-                    }
-                }));
-
-        final Serializable objectA = finderFactory.getContextResultElement("objectA");
-
-        assertThat(objectA).isEqualTo("objectA");
     }
 
 }

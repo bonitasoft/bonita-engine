@@ -19,10 +19,8 @@ import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.business.data.BusinessDataReference;
-import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
-import org.bonitasoft.engine.business.data.SimpleBusinessDataReference;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.web.rest.server.BonitaRestletApplication;
+import org.bonitasoft.web.rest.server.QueryParameterUtils;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,13 +59,27 @@ public class BusinessDataReferenceController extends AbstractRESTController {
             HttpSession httpSession) throws DataNotFoundException, BonitaException {
         BusinessDataReference reference = getBusinessDataAPI(httpSession)
                 .getProcessBusinessDataReference(dataName, caseId);
-        return toClient(reference);
+        return BusinessDataReferenceConverter.toClient(reference);
     }
 
     /**
      * Gets all business data references for a process instance with pagination.
+     * <p>
+     * Example:
      *
-     * @param caseId the process instance ID (required filter)
+     * <pre>
+     * f=caseId=123&p=0&c=10
+     * </pre>
+     *
+     * </p>
+     *
+     * @param filters standard filter set that MUST contain a filter named caseId and containing the process instance
+     *        ID:
+     *
+     *        <pre>
+     *        f = caseId = 123
+     *        </pre>
+     *
      * @param page the page number (0-based)
      * @param count the number of results per page
      * @param httpSession the HTTP session
@@ -81,75 +93,12 @@ public class BusinessDataReferenceController extends AbstractRESTController {
             @RequestParam("c") Integer count,
             HttpSession httpSession) throws BonitaException {
 
-        Long caseId = extractCaseIdFromFilters(filters);
+        Long caseId = QueryParameterUtils.extractLongFilterFromFilterList(filters, "caseId");
         List<BusinessDataReference> references = getBusinessDataAPI(httpSession)
                 .getProcessBusinessDataReferences(caseId, page * count, count);
         return references.stream()
-                .map(BusinessDataReferenceController::toClient)
+                .map(BusinessDataReferenceConverter::toClient)
                 .toList();
-    }
-
-    /**
-     * Extracts the caseId from the filter list.
-     *
-     * @param filters the list of filter strings in format "key=value"
-     * @return the caseId value
-     * @throws IllegalArgumentException if caseId filter is missing or not a number
-     */
-    private Long extractCaseIdFromFilters(List<String> filters) {
-        if (filters == null) {
-            throw new IllegalArgumentException("filter caseId is mandatory");
-        }
-        for (String filter : filters) {
-            if (filter.startsWith("caseId=")) {
-                String value = filter.substring("caseId=".length());
-                try {
-                    return Long.parseLong(value);
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("filter caseId should be a number");
-                }
-            }
-        }
-        throw new IllegalArgumentException("filter caseId is mandatory");
-    }
-
-    /**
-     * Converts a BusinessDataReference to its client representation.
-     *
-     * @param reference the business data reference
-     * @return the client representation with appropriate URL and storage ID fields
-     */
-    public static BusinessDataReferenceClient toClient(BusinessDataReference reference) {
-        if (reference instanceof SimpleBusinessDataReference simpleReference) {
-            return new SimpleBusinessDataReferenceClient(
-                    reference.getName(),
-                    reference.getType(),
-                    getUrl(reference.getType(), getStorageIdString(simpleReference)),
-                    simpleReference.getStorageId());
-        } else {
-            MultipleBusinessDataReference multipleReference = (MultipleBusinessDataReference) reference;
-            return new MultipleBusinessDataReferenceClient(
-                    reference.getName(),
-                    reference.getType(),
-                    getUrl(multipleReference.getType(), getStorageIdsValue(multipleReference)),
-                    multipleReference.getStorageIds());
-        }
-    }
-
-    private static String getStorageIdString(SimpleBusinessDataReference reference) {
-        Long storageId = reference.getStorageId();
-        if (storageId != null) {
-            return storageId.toString();
-        }
-        return "";
-    }
-
-    private static String getStorageIdsValue(MultipleBusinessDataReference reference) {
-        return "findByIds?ids=" + reference.getStorageIds().toString().replaceAll("[\\[\\] ]", "");
-    }
-
-    private static String getUrl(String type, String value) {
-        return "API" + BonitaRestletApplication.BDM_BUSINESS_DATA_URL + "/" + type + "/" + value;
     }
 
 }

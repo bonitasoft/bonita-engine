@@ -13,10 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
@@ -35,34 +32,18 @@ import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
 
 /**
- * This class serves:
- * <ul>
- * <li>for Restlet resources to provide access to Engine session and APIS</li>
- * <li>for server to client object conversion (currently used only for APIS that can return Business Data)</li>
- * </ul>
+ * Provides Restlet resource finders for remaining Restlet-based REST API endpoints.
  */
 public class FinderFactory {
 
     protected final Map<Class<? extends ServerResource>, ResourceFinder> finders;
-    final List<ResourceFinder> resourceFinders = new ArrayList<>();
 
     public FinderFactory() {
         finders = getDefaultFinders();
-        createResourceFinderList(finders);
     }
 
     public FinderFactory(final Map<Class<? extends ServerResource>, ResourceFinder> finders) {
         this.finders = finders;
-        createResourceFinderList(finders);
-
-    }
-
-    private void createResourceFinderList(final Map<Class<? extends ServerResource>, ResourceFinder> finders) {
-        for (final Map.Entry<Class<? extends ServerResource>, ResourceFinder> classFinderEntry : finders.entrySet()) {
-            final ResourceFinder resourceFinder = classFinderEntry.getValue();
-            resourceFinders.add(resourceFinder);
-            resourceFinder.setFinderFactory(this);
-        }
     }
 
     protected Map<Class<? extends ServerResource>, ResourceFinder> getDefaultFinders() {
@@ -88,24 +69,6 @@ public class FinderFactory {
 
     public Finder createExtensionResource() {
         return new ApiExtensionResourceFinder();
-    }
-
-    public ResourceFinder getResourceFinderFor(final Serializable object) {
-        for (final ResourceFinder resourceFinder : resourceFinders) {
-            if (resourceFinder.handlesResource(object)) {
-                return resourceFinder;
-            }
-
-        }
-        return null;
-    }
-
-    public Serializable getContextResultElement(final Serializable object) {
-        final ResourceFinder resourceFinderFor = getResourceFinderFor(object);
-        if (resourceFinderFor != null) {
-            return resourceFinderFor.toClientObject(object);
-        }
-        return object;
     }
 
 }

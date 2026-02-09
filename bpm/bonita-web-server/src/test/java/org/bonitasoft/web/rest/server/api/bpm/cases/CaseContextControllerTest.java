@@ -19,11 +19,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl;
+import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
@@ -90,5 +94,63 @@ class CaseContextControllerTest extends AbstractControllerTest<CaseContextContro
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void should_convert_simple_business_data_reference_to_client_representation() throws Exception {
+        // given
+        Map<String, Serializable> context = new HashMap<>();
+        context.put("myEmployee_ref",
+                new SimpleBusinessDataReferenceImpl("myEmployee", "com.bonitasoft.pojo.Employee", 487467354L));
+
+        doReturn(context).when(processAPI).getProcessInstanceExecutionContext(CASE_ID);
+
+        // when/then
+        mockMvc.perform(get(TEST_API_URL)
+                .sessionAttrs(sessionAttributes)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                        {
+                            "myEmployee_ref": {
+                                "name": "myEmployee",
+                                "type": "com.bonitasoft.pojo.Employee",
+                                "storageId": 487467354,
+                                "storageId_string": "487467354",
+                                "link": "API/bdm/businessData/com.bonitasoft.pojo.Employee/487467354"
+                            }
+                        }
+                        """));
+    }
+
+    @Test
+    void should_convert_multiple_business_data_reference_to_client_representation() throws Exception {
+        // given
+        Map<String, Serializable> context = new HashMap<>();
+        List<Long> ids = new ArrayList<>();
+        ids.add(687646784L);
+        ids.add(2313213874354L);
+        context.put("myTeam_ref",
+                new MultipleBusinessDataReferenceImpl("myTeam", "com.bonitasoft.pojo.Employee", ids));
+
+        doReturn(context).when(processAPI).getProcessInstanceExecutionContext(CASE_ID);
+
+        // when/then
+        mockMvc.perform(get(TEST_API_URL)
+                .sessionAttrs(sessionAttributes)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .json("""
+                                {
+                                    "myTeam_ref": {
+                                        "name": "myTeam",
+                                        "type": "com.bonitasoft.pojo.Employee",
+                                        "storageIds": [687646784, 2313213874354],
+                                        "storageIds_string": ["687646784", "2313213874354"],
+                                        "link": "API/bdm/businessData/com.bonitasoft.pojo.Employee/findByIds?ids=687646784,2313213874354"
+                                    }
+                                }
+                                """));
     }
 }

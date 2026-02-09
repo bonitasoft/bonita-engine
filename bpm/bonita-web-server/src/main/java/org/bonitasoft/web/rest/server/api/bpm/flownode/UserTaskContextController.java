@@ -21,8 +21,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.bonitasoft.web.rest.server.FinderFactory;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
+import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceConverter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,8 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/" + API_SPRING_INTERNAL + "/bpm/userTask/{taskId}/context")
 public class UserTaskContextController extends AbstractRESTController {
 
-    private final FinderFactory finderFactory = new FinderFactory();
-
     @GetMapping
     public Map<String, Serializable> getUserTaskContext(@PathVariable Long taskId, HttpSession session)
             throws Exception {
@@ -42,7 +40,7 @@ public class UserTaskContextController extends AbstractRESTController {
         Map<String, Serializable> userTaskExecutionContext = getProcessAPI(session).getUserTaskExecutionContext(taskId);
 
         for (Map.Entry<String, Serializable> entry : userTaskExecutionContext.entrySet()) {
-            resultMap.put(entry.getKey(), finderFactory.getContextResultElement(entry.getValue()));
+            resultMap.put(entry.getKey(), BusinessDataReferenceConverter.convertIfApplicable(entry.getValue()));
         }
         return resultMap;
     }

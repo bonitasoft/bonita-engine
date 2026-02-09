@@ -49,4 +49,28 @@ public class QueryParameterUtils {
         return results;
     }
 
+    /**
+     * Extracts a numeric Long filter from the filter list passed as parameter.
+     *
+     * @param filters the list of filter strings in format "key=value"
+     * @param filterName the name of the numeric Long filter to extract
+     * @return the field value, as a Long
+     * @throws IllegalArgumentException if filter is missing under the given name or not a number
+     */
+    public static Long extractLongFilterFromFilterList(List<String> filters, String filterName) {
+        if (filters == null) {
+            throw new IllegalArgumentException("filter " + filterName + " is mandatory");
+        }
+        for (String filter : filters) {
+            if (filter.startsWith(filterName + "=")) {
+                String value = filter.substring((filterName + "=").length());
+                try {
+                    return Long.parseLong(value);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("filter " + filterName + " should be a number");
+                }
+            }
+        }
+        throw new IllegalArgumentException("filter " + filterName + " is mandatory");
+    }
 }

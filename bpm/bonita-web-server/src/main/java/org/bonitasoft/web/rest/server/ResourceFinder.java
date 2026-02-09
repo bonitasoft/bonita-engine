@@ -13,12 +13,8 @@
  **/
 package org.bonitasoft.web.rest.server;
 
-import java.io.Serializable;
-
 import javax.servlet.http.HttpSession;
 
-import org.bonitasoft.engine.api.BusinessDataAPI;
-import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
@@ -31,34 +27,10 @@ import org.restlet.resource.Finder;
 
 public abstract class ResourceFinder extends Finder {
 
-    private FinderFactory finderFactory;
-
-    public boolean handlesResource(Serializable object) {
-        return false;
-    }
-
-    protected CommandAPI getCommandAPI(final Request request) {
-        final APISession apiSession = getAPISession(request);
-        try {
-            return TenantAPIAccessor.getCommandAPI(apiSession);
-        } catch (final BonitaException e) {
-            throw new APIException(e);
-        }
-    }
-
     protected ProcessAPI getProcessAPI(final Request request) {
         final APISession apiSession = getAPISession(request);
         try {
             return TenantAPIAccessor.getProcessAPI(apiSession);
-        } catch (final BonitaException e) {
-            throw new APIException(e);
-        }
-    }
-
-    protected BusinessDataAPI getBdmAPI(final Request request) {
-        final APISession apiSession = getAPISession(request);
-        try {
-            return TenantAPIAccessor.getBusinessDataAPI(apiSession);
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
@@ -78,15 +50,4 @@ public abstract class ResourceFinder extends Finder {
         return (APISession) httpSession.getAttribute("apiSession");
     }
 
-    public void setFinderFactory(FinderFactory finderFactory) {
-        this.finderFactory = finderFactory;
-    }
-
-    public FinderFactory getFinderFactory() {
-        return finderFactory;
-    }
-
-    public Serializable toClientObject(Serializable object) {
-        return object;
-    }
 }

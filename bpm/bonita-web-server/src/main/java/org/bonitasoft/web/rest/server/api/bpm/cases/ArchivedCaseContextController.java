@@ -21,8 +21,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.bonitasoft.web.rest.server.FinderFactory;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
+import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceConverter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,19 +36,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/" + API_SPRING_INTERNAL + "/bpm/archivedCase/{archivedCaseId}/context")
 public class ArchivedCaseContextController extends AbstractRESTController {
 
-    private final FinderFactory finderFactory = new FinderFactory();
-
     @GetMapping
     public Map<String, Serializable> getArchivedCaseContext(@PathVariable Long archivedCaseId, HttpSession httpSession)
             throws Exception {
 
-        Map<String, Serializable> resultMap = new HashMap<>();
         Map<String, Serializable> caseExecutionContext = getProcessAPI(httpSession)
                 .getArchivedProcessInstanceExecutionContext(archivedCaseId);
 
-        for (Map.Entry<String, Serializable> entry : caseExecutionContext.entrySet()) {
-            resultMap.put(entry.getKey(), finderFactory.getContextResultElement(entry.getValue()));
-        }
+        Map<String, Serializable> resultMap = new HashMap<>();
+        caseExecutionContext
+                .forEach((key, value) -> resultMap.put(key, BusinessDataReferenceConverter.convertIfApplicable(value)));
         return resultMap;
     }
 }

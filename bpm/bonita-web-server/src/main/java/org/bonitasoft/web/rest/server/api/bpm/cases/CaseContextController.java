@@ -21,8 +21,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.bonitasoft.web.rest.server.FinderFactory;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
+import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceConverter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,8 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/" + API_SPRING_INTERNAL + "/bpm/case/{caseId}/context")
 public class CaseContextController extends AbstractRESTController {
 
-    private final FinderFactory finderFactory = new FinderFactory();
-
     @GetMapping
     public Map<String, Serializable> getCaseContext(@PathVariable Long caseId, HttpSession httpSession)
             throws Exception {
@@ -46,7 +44,7 @@ public class CaseContextController extends AbstractRESTController {
                 .getProcessInstanceExecutionContext(caseId);
 
         for (Map.Entry<String, Serializable> entry : caseExecutionContext.entrySet()) {
-            resultMap.put(entry.getKey(), finderFactory.getContextResultElement(entry.getValue()));
+            resultMap.put(entry.getKey(), BusinessDataReferenceConverter.convertIfApplicable(entry.getValue()));
         }
 
         return resultMap;
