@@ -102,8 +102,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     private static final String QUERY_HUMAN_TASK_INSTANCE_ASSIGNEE = "updateStrictHuman";
 
-    private static final String QUERY_ASSIGN_HUMAN_TASK = "updateAssignHumanTask";
-
     private static final String WHOCANSTART_PENDING_TASK_SUFFIX = "WhoCanStartPendingTask";
 
     private static final int BATCH_SIZE = 100;
@@ -374,19 +372,18 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance(userTaskId);
         if (flowNodeInstance instanceof SHumanTaskInstance) {
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-            descriptor.addField(sUserTaskInstanceBuilder.getIdKey(), userTaskId);
             descriptor.addField(sUserTaskInstanceBuilder.getAssigneeIdKey(), userId);
             if (userId > 0) {
                 // if this action is a Assign action:
                 descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), System.currentTimeMillis());
             } else {
                 // if this action is a Release action:
-                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0L);
+                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0);
             }
             setLastUpdateDate(descriptor);
             try {
-                getRecorder().recordUpdateWithQuery(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
-                        HUMAN_TASK_INSTANCE_ASSIGNEE, QUERY_ASSIGN_HUMAN_TASK);
+                getRecorder().recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
+                        HUMAN_TASK_INSTANCE_ASSIGNEE);
             } catch (final SRecorderException e) {
                 throw new SActivityModificationException(e);
             }
