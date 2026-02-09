@@ -168,6 +168,55 @@
 		)
 	</query>
 
+	<query name="updateAssignHumanTask">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance
+		SET assigneeId = :assigneeId,
+		claimedDate = :claimedDate,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+	</query>
+
+	<query name="updateFlowNodePriority">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance
+		SET priority = :priority,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+	</query>
+
+	<query name="updateFlowNodeSetExecuting">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance
+		SET stateExecuting = :stateExecuting,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+	</query>
+
+	<query name="updateFlowNodeExecutedBy">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance
+		SET executedBy = :executedBy,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+	</query>
+
+	<query name="updateFlowNodeExecutedBySubstitute">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance
+		SET executedBySubstitute = :executedBySubstitute,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+	</query>
+
+	<query name="updateFlowNodeExpectedEndDate">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance
+		SET expectedEndDate = :expectedEndDate,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+	</query>
+
 	<query name="getAssignedUserTasks">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a

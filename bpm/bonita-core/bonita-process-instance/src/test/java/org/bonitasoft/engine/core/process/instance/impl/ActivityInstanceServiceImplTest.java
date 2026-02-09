@@ -377,8 +377,8 @@ public class ActivityInstanceServiceImplTest {
         ArgumentCaptor<UpdateRecord> updateRecordArgumentCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
 
         //then
-        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(),
-                eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED));
+        verify(recorder).recordUpdateWithQuery(updateRecordArgumentCaptor.capture(),
+                eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED), anyString());
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity")
                 .isEqualTo(sFlowNodeInstance);
         assertThat(updateRecordArgumentCaptor.getValue().getFields())
@@ -394,7 +394,8 @@ public class ActivityInstanceServiceImplTest {
     public void should_updateExpectedEndDate_throw_SFlowNodeModificationException_when_recorder_fails()
             throws Exception {
         //given
-        doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), anyString());
+        doThrow(SRecorderException.class).when(recorder).recordUpdateWithQuery(any(UpdateRecord.class), anyString(),
+                anyString());
 
         //expect
         expectedException.expect(SFlowNodeModificationException.class);
@@ -486,7 +487,7 @@ public class ActivityInstanceServiceImplTest {
 
         // Then
         ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder).recordUpdate(captor.capture(), anyString());
+        verify(recorder).recordUpdateWithQuery(captor.capture(), anyString(), anyString());
         assertThat(captor.getValue().getFields().keySet())
                 .contains("assigneeId", "claimedDate", "lastUpdateDate");
     }
