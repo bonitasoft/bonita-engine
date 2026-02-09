@@ -68,16 +68,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     private static final String SUPERVISED_BY = "SupervisedBy";
 
-    private static final String QUERY_FLOW_NODE_PRIORITY = "updateFlowNodePriority";
-
-    private static final String QUERY_SET_EXECUTING = "updateFlowNodeSetExecuting";
-
-    private static final String QUERY_SET_EXECUTED_BY = "updateFlowNodeExecutedBy";
-
-    private static final String QUERY_SET_EXECUTED_BY_SUBSTITUTE = "updateFlowNodeExecutedBySubstitute";
-
-    private static final String QUERY_SET_EXPECTED_END_DATE = "updateFlowNodeExpectedEndDate";
-
     private final SUserTaskInstanceBuilderFactory activityInstanceKeyProvider;
 
     private final Recorder recorder;
@@ -122,18 +112,11 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     @Override
     public void setExecuting(final SFlowNodeInstance flowNodeInstance) throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
         descriptor.addField(activityInstanceKeyProvider.getStateExecutingKey(), true);
-        setLastUpdateDate(descriptor);
         log.debug(MessageFormat.format("[{0} with id {1}] have executing flag set to true",
                 flowNodeInstance.getClass().getSimpleName(),
                 flowNodeInstance.getId()));
-        try {
-            recorder.recordUpdateWithQuery(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
-                    ACTIVITYINSTANCE_STATE, QUERY_SET_EXECUTING);
-        } catch (final SRecorderException e) {
-            throw new SFlowNodeModificationException(e);
-        }
+        updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
     }
 
     @Override
@@ -225,15 +208,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public void setTaskPriority(final SFlowNodeInstance flowNodeInstance, final STaskPriority priority)
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
         descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
-        setLastUpdateDate(descriptor);
-        try {
-            recorder.recordUpdateWithQuery(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
-                    ACTIVITYINSTANCE_STATE, QUERY_FLOW_NODE_PRIORITY);
-        } catch (final SRecorderException e) {
-            throw new SFlowNodeModificationException(e);
-        }
+        updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
     }
 
     @Override
@@ -363,45 +339,24 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public void setExecutedBy(final SFlowNodeInstance flowNodeInstance, final long userId)
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
         descriptor.addField(activityInstanceKeyProvider.getExecutedBy(), userId);
-        setLastUpdateDate(descriptor);
-        try {
-            recorder.recordUpdateWithQuery(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
-                    EXECUTED_BY_MODIFIED, QUERY_SET_EXECUTED_BY);
-        } catch (final SRecorderException e) {
-            throw new SFlowNodeModificationException(e);
-        }
+        updateFlowNode(flowNodeInstance, EXECUTED_BY_MODIFIED, descriptor);
     }
 
     @Override
     public void setExecutedBySubstitute(final SFlowNodeInstance flowNodeInstance, final long executerSubstituteId)
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
         descriptor.addField(activityInstanceKeyProvider.getExecutedBySubstitute(), executerSubstituteId);
-        setLastUpdateDate(descriptor);
-        try {
-            recorder.recordUpdateWithQuery(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
-                    EXECUTED_BY_SUBSTITUTE_MODIFIED, QUERY_SET_EXECUTED_BY_SUBSTITUTE);
-        } catch (final SRecorderException e) {
-            throw new SFlowNodeModificationException(e);
-        }
+        updateFlowNode(flowNodeInstance, EXECUTED_BY_SUBSTITUTE_MODIFIED, descriptor);
     }
 
     @Override
     public void setExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final Long dueDate)
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
         descriptor.addField(activityInstanceKeyProvider.getExpectedEndDateKey(), dueDate);
-        setLastUpdateDate(descriptor);
-        try {
-            recorder.recordUpdateWithQuery(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
-                    EXPECTED_END_DATE_MODIFIED, QUERY_SET_EXPECTED_END_DATE);
-        } catch (final SRecorderException e) {
-            throw new SFlowNodeModificationException(e);
-        }
+        updateFlowNode(flowNodeInstance, EXPECTED_END_DATE_MODIFIED, descriptor);
     }
 
     protected void updateFlowNode(final SFlowNodeInstance flowNodeInstance, final String eventName,
