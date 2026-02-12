@@ -21,13 +21,11 @@ import java.util.Map;
 
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.web.rest.server.utils.BonitaJacksonModuleProvider;
+import org.bonitasoft.web.rest.server.SpringWebConfiguration;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 /**
  * Test-purpose utility class to initialize MockMvc for REST controllers with session attributes.
@@ -35,9 +33,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 public class RestControllerUtils {
 
     /**
-     * Cached default HTTP message converters configured with Bonita custom serializers.
+     * Cached message converters, reusing the production SpringWebConfiguration
+     * to ensure tests use the exact same converter setup as production.
      */
-    private static final List<HttpMessageConverter<?>> MESSAGE_CONVERTERS = createConfiguredConverters();
+    private static final List<HttpMessageConverter<?>> MESSAGE_CONVERTERS = SpringWebConfiguration
+            .createBonitaMessageConverters();
 
     public static MockMvc initMockMvcWithSessionAttributes(AbstractRESTController controller,
             Map<String, Object> sessionAttributes, APISession apiSession) {
@@ -48,40 +48,9 @@ public class RestControllerUtils {
                 .standaloneSetup(controller)
                 .setControllerAdvice(new SpringRestResponseEntityExceptionHandler());
 
-        // Configure Jackson converter with Bonita custom serializers while keeping other default converters
-        configureJacksonConverter(builder);
+        builder.setMessageConverters(MESSAGE_CONVERTERS.toArray(new HttpMessageConverter<?>[0]));
 
         return builder.build();
-    }
-
-    /**
-     * Configures the Jackson message converter with Bonita custom serializers.
-     * Uses setMessageConverters to add our configured converter while keeping defaults.
-     */
-    private static void configureJacksonConverter(StandaloneMockMvcBuilder builder) {
-        builder.setMessageConverters(MESSAGE_CONVERTERS.toArray(new HttpMessageConverter<?>[0]));
-    }
-
-    /**
-     * Creates HTTP message converters configured with Bonita custom serializers.
-     */
-    private static List<HttpMessageConverter<?>> createConfiguredConverters() {
-        List<HttpMessageConverter<?>> converters = new WebMvcConfigurationSupport() {
-
-            public List<HttpMessageConverter<?>> getDefaultConverters() {
-                return getMessageConverters();
-            }
-        }.getDefaultConverters();
-
-        // Configure the Jackson converter with Bonita custom serializers
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter jacksonConverter) {
-                BonitaJacksonModuleProvider.configureObjectMapper(jacksonConverter.getObjectMapper());
-                break;
-            }
-        }
-
-        return converters;
     }
 
 }

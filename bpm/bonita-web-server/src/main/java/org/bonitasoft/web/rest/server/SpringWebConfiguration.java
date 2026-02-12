@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,22 +48,35 @@ public class SpringWebConfiguration extends WebMvcConfigurationSupport {
     }
 
     /**
-     * Configures HTTP message converters with custom Bonita Jackson serializer.
-     * This method is called by Spring during context initialization to set up
-     * the message converters for REST API serialization/deserialization.
+     * Creates the list of HTTP message converters configured for the Bonita REST API.
+     * <p>
+     * Uses Spring's default converter ordering (where StringHttpMessageConverter comes
+     * before MappingJackson2HttpMessageConverter), then replaces the default Jackson
+     * converter with one configured with Bonita custom serializers (_string suffix fields
+     * for numeric IDs, custom date/time formats).
+     * <p>
+     * This ordering is important: controllers returning pre-serialized JSON strings
+     * (e.g. BusinessDataController, ProcessDefinitionDesignController) must be handled
+     * by StringHttpMessageConverter to avoid double-serialization by Jackson.
+     *
+     * @return the configured message converters
      */
-    @Override
-    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        // First, create a custom Jackson converter with Bonita serializers
-        // for backward compatibility with Restlet JSON format (_string suffix fields)
+    public static List<HttpMessageConverter<?>> createBonitaMessageConverters() {
+        var converters = new ArrayList<HttpMessageConverter<?>>();
+        // Use a temporary instance to access the protected addDefaultHttpMessageConverters
+        new SpringWebConfiguration().addDefaultHttpMessageConverters(converters);
+
+        // Replace the default Jackson converter with one configured with Bonita
+        // custom serializers for backward compatibility with Restlet JSON format
+        converters.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);
         ObjectMapper objectMapper = new ObjectMapper();
         BonitaJacksonModuleProvider.configureObjectMapper(objectMapper);
-        MappingJackson2HttpMessageConverter bonitaConverter = new MappingJackson2HttpMessageConverter(objectMapper);
+        converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
+        return converters;
+    }
 
-        // Add our custom converter first (highest priority)
-        converters.add(bonitaConverter);
-
-        // Then add all default converters
-        addDefaultHttpMessageConverters(converters);
+    @Override
+    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.addAll(createBonitaMessageConverters());
     }
 }
