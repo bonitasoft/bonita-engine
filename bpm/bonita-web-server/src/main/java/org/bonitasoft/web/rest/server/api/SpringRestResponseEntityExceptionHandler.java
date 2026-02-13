@@ -34,6 +34,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -176,6 +177,13 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
             return exception;
         }
         return getRootCause(cause);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException exception,
+            HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return generateErrorResponse(exception.getClass().getName(), HttpStatus.BAD_REQUEST,
+                "Unable to parse the JSON body");
     }
 
     @Override

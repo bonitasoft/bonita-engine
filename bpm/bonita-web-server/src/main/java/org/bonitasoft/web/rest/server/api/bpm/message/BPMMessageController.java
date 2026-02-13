@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Bonitasoft S.A.
+ * Copyright (C) 2026 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,22 +24,27 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.bonitasoft.engine.api.ProcessAPI;
+import javax.servlet.http.HttpSession;
+
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.web.rest.server.api.resource.CommonResource;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.restlet.resource.Post;
+import org.bonitasoft.web.rest.server.api.AbstractRESTController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST resource to send BPM message to a defined process.
- *
- * @author Emmanuel Duchastenier
- */
-public class BPMMessageResource extends CommonResource {
+@RestController
+@RequestMapping("/API/bpm/message")
+public class BPMMessageController extends AbstractRESTController {
 
     private static final Set<String> SUPPORTED_TYPES = new HashSet<>();
     static {
@@ -55,52 +60,47 @@ public class BPMMessageResource extends CommonResource {
         SUPPORTED_TYPES.add(OffsetDateTime.class.getName());
     }
 
-    private final ProcessAPI processAPI;
-
-    public BPMMessageResource(final ProcessAPI processAPI) {
-        this.processAPI = processAPI;
-    }
-
-    @Post("json")
-    public void sendMessage(BPMMessage message) {
+    @PostMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void sendMessage(@RequestBody BPMMessage message, HttpSession httpSession)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException,
+            SendEventException, InvalidExpressionException {
         validateMandatoryAttributes(message);
-        try {
-            Map<Expression, Expression> msgContent = new HashMap<>();
-            if (message.getMessageContent() != null) {
-                for (Map.Entry<String, BPMMessageValue> entry : message.getMessageContent().entrySet()) {
-                    msgContent.put(new ExpressionBuilder().createConstantStringExpression(entry.getKey()),
-                            getExpressionFromObject(entry));
-                }
-            }
-            Map<Expression, Expression> correlations = new HashMap<>();
-            if (message.getCorrelations() != null) {
-                int nbCorrelations = message.getCorrelations().size();
-                if (nbCorrelations > 5) {
-                    throw new IllegalArgumentException(
-                            String.format("A maximum of 5 correlations is supported. %s found.", nbCorrelations));
-                }
-                for (Map.Entry<String, BPMMessageValue> entry : message.getCorrelations().entrySet()) {
-                    correlations.put(new ExpressionBuilder().createConstantStringExpression(entry.getKey()),
-                            getExpressionFromObject(entry));
-                }
-            }
 
-            Expression targetFlowNodeExpression = null;
-            if (message.getTargetFlowNode() != null) {
-                targetFlowNodeExpression = new ExpressionBuilder()
-                        .createConstantStringExpression(message.getTargetFlowNode());
+        Map<Expression, Expression> msgContent = new HashMap<>();
+        if (message.messageContent() != null) {
+            for (Map.Entry<String, BPMMessageValue> entry : message.messageContent().entrySet()) {
+                msgContent.put(new ExpressionBuilder().createConstantStringExpression(entry.getKey()),
+                        getExpressionFromObject(entry));
             }
-            processAPI.sendMessage(message.getMessageName(),
-                    new ExpressionBuilder().createConstantStringExpression(message.getTargetProcess()),
-                    targetFlowNodeExpression,
-                    msgContent,
-                    correlations);
-        } catch (final SendEventException | InvalidExpressionException e) {
-            throw new APIException(e);
         }
+        Map<Expression, Expression> correlations = new HashMap<>();
+        if (message.correlations() != null) {
+            int nbCorrelations = message.correlations().size();
+            if (nbCorrelations > 5) {
+                throw new IllegalArgumentException(
+                        String.format("A maximum of 5 correlations is supported. %s found.", nbCorrelations));
+            }
+            for (Map.Entry<String, BPMMessageValue> entry : message.correlations().entrySet()) {
+                correlations.put(new ExpressionBuilder().createConstantStringExpression(entry.getKey()),
+                        getExpressionFromObject(entry));
+            }
+        }
+
+        Expression targetFlowNodeExpression = null;
+        if (message.targetFlowNode() != null) {
+            targetFlowNodeExpression = new ExpressionBuilder()
+                    .createConstantStringExpression(message.targetFlowNode());
+        }
+        getProcessAPI(httpSession).sendMessage(message.messageName(),
+                new ExpressionBuilder().createConstantStringExpression(message.targetProcess()),
+                targetFlowNodeExpression,
+                msgContent,
+                correlations);
     }
 
-    private Expression getExpressionFromObject(Entry<String, BPMMessageValue> entry) throws InvalidExpressionException {
+    private Expression getExpressionFromObject(Entry<String, BPMMessageValue> entry)
+            throws InvalidExpressionException {
         BPMMessageValue messageValue = entry.getValue();
         if (messageValue == null) {
             throw new IllegalArgumentException(String.format("%s value cannot be null.", entry.getKey()));
@@ -140,6 +140,7 @@ public class BPMMessageResource extends CommonResource {
             }
             try {
                 LocalDateTime.parse((String) value);
+                return LocalDateTime.class.getName();
             } catch (DateTimeParseException e) {
                 //Ignore
             }
@@ -169,15 +170,11 @@ public class BPMMessageResource extends CommonResource {
     }
 
     private void validateMandatoryAttributes(BPMMessage message) {
-        if (message == null) {
-            throw new IllegalArgumentException("message body is missing");
+        if (message.messageName() == null) {
+            throw new IllegalArgumentException("'messageName' attribute is mandatory");
         }
-        if (message.getMessageName() == null) {
-            throw new IllegalArgumentException("messageName is mandatory");
-        }
-        if (message.getTargetProcess() == null) {
-            throw new IllegalArgumentException("targetProcess is mandatory");
+        if (message.targetProcess() == null) {
+            throw new IllegalArgumentException("'targetProcess' attribute is mandatory");
         }
     }
-
 }

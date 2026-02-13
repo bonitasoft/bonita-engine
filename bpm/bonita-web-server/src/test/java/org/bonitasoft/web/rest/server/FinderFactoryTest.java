@@ -22,8 +22,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
-import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResourceFinder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,14 +66,6 @@ public class FinderFactoryTest {
         doReturn(processAPI).when(activityVariableResourceFinder).getProcessAPI(any(Request.class));
         final ServerResource serverResource = activityVariableResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(ActivityVariableResource.class);
-    }
-
-    @Test
-    public void should_return_SendMessageResource_for_SendMessageResourceFinder() {
-        final BPMMessageResourceFinder sendMessageResourceFinder = spy(new BPMMessageResourceFinder());
-        doReturn(processAPI).when(sendMessageResourceFinder).getProcessAPI(any(Request.class));
-        final ServerResource serverResource = sendMessageResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(BPMMessageResource.class);
     }
 
 }

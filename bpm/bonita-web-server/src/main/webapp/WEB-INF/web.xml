@@ -760,6 +760,8 @@
         <url-pattern>/APISpringInternal/*</url-pattern>
         <url-pattern>/API/form/mapping</url-pattern>
         <url-pattern>/API/bpm/timerEventTrigger/*</url-pattern>
+        <url-pattern>/API/bpm/signal</url-pattern>
+        <url-pattern>/API/bpm/message</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>

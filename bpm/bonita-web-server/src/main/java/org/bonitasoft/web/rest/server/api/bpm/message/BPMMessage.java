@@ -15,55 +15,14 @@ package org.bonitasoft.web.rest.server.api.bpm.message;
 
 import java.util.Map;
 
-/**
- * @author Emmanuel Duchastenier
- */
-public class BPMMessage {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-    private String messageName;
-    private String targetProcess;
-    private String targetFlowNode;
-    private Map<String, BPMMessageValue> messageContent;
-    private Map<String, BPMMessageValue> correlations;
-
-    public String getMessageName() {
-        return messageName;
-    }
-
-    public void setMessageName(String messageName) {
-        this.messageName = messageName;
-    }
-
-    public String getTargetProcess() {
-        return targetProcess;
-    }
-
-    public void setTargetProcess(String targetProcess) {
-        this.targetProcess = targetProcess;
-    }
-
-    public String getTargetFlowNode() {
-        return targetFlowNode;
-    }
-
-    public void setTargetFlowNode(String targetFlowNode) {
-        this.targetFlowNode = targetFlowNode;
-    }
-
-    public Map<String, BPMMessageValue> getMessageContent() {
-        return messageContent;
-    }
-
-    public void setMessageContent(Map<String, BPMMessageValue> messageContent) {
-        this.messageContent = messageContent;
-    }
-
-    public Map<String, BPMMessageValue> getCorrelations() {
-        return correlations;
-    }
-
-    public void setCorrelations(Map<String, BPMMessageValue> correlations) {
-        this.correlations = correlations;
-    }
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record BPMMessage(
+        String messageName,
+        String targetProcess,
+        String targetFlowNode,
+        Map<String, BPMMessageValue> messageContent,
+        Map<String, BPMMessageValue> correlations) {
 
 }

@@ -20,8 +20,6 @@ import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
-import org.bonitasoft.web.rest.server.api.bpm.message.BPMMessageResource;
-import org.bonitasoft.web.rest.server.api.bpm.signal.BPMSignalResource;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -41,12 +39,6 @@ import org.restlet.routing.Template;
 public class BonitaRestletApplication extends Application {
 
     public static final String ROUTER_EXTENSION_PREFIX = "/extension/";
-
-    public static final String BDM_BUSINESS_DATA_URL = "/bdm/businessData";
-
-    public static final String BPM_MESSAGE_URL = "/bpm/message";
-
-    public static final String BPM_SIGNAL_URL = "/bpm/signal";
 
     public static final String BPM_ACTIVITY_VARIABLE_URL = "/bpm/activityVariable";
 
@@ -92,12 +84,6 @@ public class BonitaRestletApplication extends Application {
         router.attach(BPM_ACTIVITY_VARIABLE_URL + "/{" + ActivityVariableResource.ACTIVITYDATA_ACTIVITY_ID + "}/{"
                 + ActivityVariableResource.ACTIVITYDATA_DATA_NAME
                 + "}", factory.create(ActivityVariableResource.class));
-
-        // POST to send a BPM message to the engine:
-        router.attach(BPM_MESSAGE_URL, factory.create(BPMMessageResource.class));
-
-        // POST to send a BPM signal to the engine:
-        router.attach(BPM_SIGNAL_URL, factory.create(BPMSignalResource.class));
 
         // api extension
         router.attach(ROUTER_EXTENSION_PREFIX, factory.createExtensionResource(), Template.MODE_STARTS_WITH);

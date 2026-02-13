@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Bonitasoft S.A.
+ * Copyright (C) 2022-2026 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,22 +13,8 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.signal;
 
-public class BPMSignal {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-    private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public static BPMSignal create(String signalName) {
-        var bpmSignal = new BPMSignal();
-        bpmSignal.setName(signalName);
-        return bpmSignal;
-    }
-
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record BPMSignal(String name) {
 }
