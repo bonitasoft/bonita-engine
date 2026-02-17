@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -49,6 +50,22 @@ import org.apache.commons.io.IOUtils;
 public abstract class ServletCall {
 
     private static final String BINARY_PARAMETER = "binaryParameter";
+
+    /**
+     * JEP 290 deserialization filter.
+     * The binary parameter path (==ByteArray== multipart attachments) deserializes objects with
+     * ObjectInputStream. Without a filter, an attacker can send crafted payloads containing
+     * gadget-chain classes (URLDNS, commons-collections4, JNDI, etc.) to achieve SSRF or RCE.
+     * This allowlist restricts deserialization to the only types legitimately sent through this path:
+     * - org.bonitasoft.** / com.bonitasoft.** : BusinessArchive and its full object graph
+     * - java.lang.* : String, Long, Integer, etc. (not subpackages like java.lang.reflect)
+     * - java.util.** : HashMap, ArrayList, Collections inner classes
+     * - java.math.* : BigDecimal, BigInteger (process variables)
+     * - !* : reject everything else
+     */
+    private static final ObjectInputFilter DESERIALIZATION_FILTER = ObjectInputFilter.Config
+            .createFilter(
+                    "org.bonitasoft.**;com.bonitasoft.**;java.lang.*;java.util.**;java.math.*;!*");
 
     private String inputStream = null;
 
@@ -124,15 +141,18 @@ public abstract class ServletCall {
 
     public byte[] serialize(final Object obj) throws IOException {
         final ByteArrayOutputStream b = new ByteArrayOutputStream();
-        final ObjectOutputStream o = new ObjectOutputStream(b);
-        o.writeObject(obj);
+        try (final ObjectOutputStream o = new ObjectOutputStream(b)) {
+            o.writeObject(obj);
+        }
         return b.toByteArray();
     }
 
     public Object deserialize(final byte[] bytes) throws IOException, ClassNotFoundException {
         final ByteArrayInputStream b = new ByteArrayInputStream(bytes);
-        final ObjectInputStream o = new ObjectInputStream(b);
-        return o.readObject();
+        try (final ObjectInputStream o = new ObjectInputStream(b)) {
+            o.setObjectInputFilter(DESERIALIZATION_FILTER);
+            return o.readObject();
+        }
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
