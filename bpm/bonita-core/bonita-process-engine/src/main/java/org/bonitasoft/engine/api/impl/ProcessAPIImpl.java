@@ -5822,8 +5822,13 @@ public class ProcessAPIImpl implements ProcessAPI {
                 .getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long parentProcessInstanceId = activityInstanceService
-                    .getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, sourceActivityInstanceId)
+            final SAFlowNodeInstance lastArchivedFlowNodeInstance = activityInstanceService
+                    .getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, sourceActivityInstanceId);
+            if (lastArchivedFlowNodeInstance == null) {
+                throw new ArchivedDataNotFoundException(
+                        new ArchivedActivityInstanceNotFoundException(sourceActivityInstanceId));
+            }
+            final long parentProcessInstanceId = lastArchivedFlowNodeInstance
                     .getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getClassLoader(
                     identifier(ScopeType.PROCESS, parentProcessInstanceId));

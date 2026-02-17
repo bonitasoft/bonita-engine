@@ -13,37 +13,16 @@
  **/
 package org.bonitasoft.web.rest.server;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.restlet.Request;
-import org.restlet.Response;
 import org.restlet.resource.ServerResource;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FinderFactoryTest {
 
     private FinderFactory factory;
-
-    @Mock
-    private ProcessAPI processAPI;
-
-    @Mock
-    private APISession apiSession;
-
-    private final Request request = new Request();
-    private final Response response = new Response(request);
 
     @Before
     public void setUp() {
@@ -58,14 +37,6 @@ public class FinderFactoryTest {
 
     private class NotSupportedResource extends ServerResource {
 
-    }
-
-    @Test
-    public void should_return_ActivityVariableResource_for_ActivityVariableResourceFinder() {
-        final ActivityVariableResourceFinder activityVariableResourceFinder = spy(new ActivityVariableResourceFinder());
-        doReturn(processAPI).when(activityVariableResourceFinder).getProcessAPI(any(Request.class));
-        final ServerResource serverResource = activityVariableResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(ActivityVariableResource.class);
     }
 
 }

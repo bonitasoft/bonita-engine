@@ -18,8 +18,6 @@ import java.util.logging.Level;
 
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
-import org.bonitasoft.web.rest.server.api.bpm.flownode.archive.ArchivedActivityVariableResource;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -40,11 +38,7 @@ public class BonitaRestletApplication extends Application {
 
     public static final String ROUTER_EXTENSION_PREFIX = "/extension/";
 
-    public static final String BPM_ACTIVITY_VARIABLE_URL = "/bpm/activityVariable";
-
     public static final String BPM_ARCHIVED_CASE_VARIABLE_URL = "/bpm/archivedCaseVariable";
-
-    public static final String BPM_ARCHIVED_ACTIVITY_VARIABLE_URL = "/bpm/archivedActivityVariable";
 
     private final FinderFactory factory;
 
@@ -80,20 +74,12 @@ public class BonitaRestletApplication extends Application {
         final Router router = new Router(context);
         // WARNING: if you add a route you need to declare it in org.bonitasoft.web.rest.server.FinderFactory
 
-        // GET an activityData:
-        router.attach(BPM_ACTIVITY_VARIABLE_URL + "/{" + ActivityVariableResource.ACTIVITYDATA_ACTIVITY_ID + "}/{"
-                + ActivityVariableResource.ACTIVITYDATA_DATA_NAME
-                + "}", factory.create(ActivityVariableResource.class));
-
         // api extension
         router.attach(ROUTER_EXTENSION_PREFIX, factory.createExtensionResource(), Template.MODE_STARTS_WITH);
 
         router.attach(BPM_ARCHIVED_CASE_VARIABLE_URL + "/{caseId}/{variableName}",
                 factory.create(ArchivedCaseVariableResource.class));
         router.attach(BPM_ARCHIVED_CASE_VARIABLE_URL, factory.create(ArchivedCaseVariablesResource.class));
-
-        router.attach(BPM_ARCHIVED_ACTIVITY_VARIABLE_URL + "/{activityId}/{variableName}",
-                factory.create(ArchivedActivityVariableResource.class));
 
         return router;
     }

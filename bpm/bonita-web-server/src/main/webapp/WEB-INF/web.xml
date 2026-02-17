@@ -762,6 +762,8 @@
         <url-pattern>/API/bpm/timerEventTrigger/*</url-pattern>
         <url-pattern>/API/bpm/signal</url-pattern>
         <url-pattern>/API/bpm/message</url-pattern>
+        <url-pattern>/API/bpm/activityVariable/*</url-pattern>
+        <url-pattern>/API/bpm/archivedActivityVariable/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>
