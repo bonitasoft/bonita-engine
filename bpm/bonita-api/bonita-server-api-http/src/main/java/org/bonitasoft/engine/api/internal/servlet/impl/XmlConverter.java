@@ -22,23 +22,45 @@ import java.io.StringWriter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.xml.XStreamDenyList;
 
 // TODO duplicated with the implementation in org.bonitasoft.engine.api.impl
 // The only difference is the settings of Xstream
 // TODO xstream instance should also ignored unknowns elements as the client to avoid issue in the future (fill a task)
 public class XmlConverter {
 
-    private static final XStream XSTREAM;
-    static {
-        XSTREAM = new XStream();
-        XSTREAM.addPermission(AnyTypePermission.ANY);
+    private static volatile XStream xstream;
+
+    private static XStream getXStream() {
+        if (xstream == null) {
+            synchronized (XmlConverter.class) {
+                if (xstream == null) {
+                    xstream = createXStream();
+                }
+            }
+        }
+        return xstream;
+    }
+
+    private static XStream createXStream() {
+        var xs = new XStream();
+        xs.addPermission(AnyTypePermission.ANY);
+        // Block known deserialization gadget chain libraries to prevent RCE.
+        // A strict allowlist is not possible here because API parameters can contain BDM types with arbitrary packages.
+        xs.denyTypesByWildcard(XStreamDenyList.getDenyPatterns());
         // ignore fields suppressedExceptions causing exceptions in some cases
-        XSTREAM.omitField(Throwable.class, "suppressedExceptions");
+        xs.omitField(Throwable.class, "suppressedExceptions");
+        return xs;
+    }
+
+    // Package-private for testing
+    static void reset() {
+        xstream = null;
     }
 
     public String toXML(final Object object) {
         final StringWriter stringWriter = new StringWriter();
-        try (final ObjectOutputStream out = XSTREAM.createObjectOutputStream(stringWriter)) {
+        try (final ObjectOutputStream out = getXStream().createObjectOutputStream(stringWriter)) {
             out.writeObject(object);
         } catch (IOException e) {
             throw new BonitaRuntimeException("Unable to serialize object " + object, e);
@@ -49,7 +71,7 @@ public class XmlConverter {
     @SuppressWarnings("unchecked")
     public <T> T fromXML(final String object) {
         try (final StringReader xmlReader = new StringReader(object);
-                final ObjectInputStream in = XSTREAM.createObjectInputStream(xmlReader)) {
+                final ObjectInputStream in = getXStream().createObjectInputStream(xmlReader)) {
             return (T) in.readObject();
         } catch (final ClassNotFoundException | IOException | RuntimeException e) {
             throw new BonitaRuntimeException("Unable to deserialize object " + object, e);
