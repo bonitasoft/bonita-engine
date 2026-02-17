@@ -18,6 +18,7 @@ import java.util.WeakHashMap;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
+import org.bonitasoft.engine.xml.XStreamDenyList;
 
 public class XStreamFactory {
 
@@ -30,6 +31,9 @@ public class XStreamFactory {
             // Make the deserialization loose to avoid issues like in RUNTIME-1884
             xStream.ignoreUnknownElements();
             xStream.addPermission(AnyTypePermission.ANY);
+            // Block known deserialization gadget chain libraries to prevent RCE.
+            // A strict allowlist is not possible here because process variables can contain any Serializable type.
+            xStream.denyTypesByWildcard(XStreamDenyList.getDenyPatterns());
             // Even though xStream now supports Java 8 date types, Bonita needs to convert offset date-time to UTC, by contract:
             xStream.registerConverter(new OffsetDateTimeXStreamConverter());
             return xStream;
