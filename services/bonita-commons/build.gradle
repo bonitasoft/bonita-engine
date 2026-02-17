@@ -1,6 +1,7 @@
 import org.bonitasoft.engine.gradle.PomUtils
 
 dependencies {
+    api project(':bpm:bonita-common')
     api(libs.commonsBeanUtils) {
         exclude(module: 'commons-collections')
     }

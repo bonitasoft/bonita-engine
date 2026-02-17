@@ -14,7 +14,6 @@
 package org.bonitasoft.console.common.server.filter;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.regex.Pattern;
 
 import javax.servlet.FilterConfig;
@@ -64,31 +63,32 @@ public class URLExcludePattern {
      * @return true if the url match the pattern
      */
     public boolean matchExcludePatterns(final String url) {
+        if (getExcludePattern() == null) {
+            return false;
+        }
         try {
-            boolean isExcluded;
-            if (getExcludePattern() == null) {
-                isExcluded = false;
-            } else {
-                String path = new URL(url).getPath();
-                // interprete ../
-                String normalizedPath = new URI(url).normalize().getPath();
-                isExcluded = getExcludePattern().matcher(path).find()
-                        && getExcludePattern().matcher(normalizedPath).find();
+            // URL-decode then strip path parameters (semicolons) to handle both
+            // literal ';' and percent-encoded '%3b' before normalization, preventing
+            // ..;-based traversal from fooling the exclude pattern check.
+            // URI handles both absolute (http://host/path) and relative (/path) references.
+            URI uri = new URI(url);
+            String rawPath = uri.getRawPath();
+            if (rawPath == null) {
+                rawPath = url;
             }
+            String decodedPath = java.net.URLDecoder.decode(rawPath, "UTF-8");
+            String sanitizedPath = PathSanitizer.stripPathParameters(decodedPath);
+            String normalizedPath = new URI(sanitizedPath).normalize().getPath();
+            boolean isExcluded = getExcludePattern().matcher(sanitizedPath).find()
+                    && getExcludePattern().matcher(normalizedPath).find();
             if (LOGGER.isDebugEnabled()) {
-                if (isExcluded) {
-                    LOGGER.debug(" Exclude pattern match with this url: {}", url);
-                } else {
-                    LOGGER.debug(" Exclude pattern does not match with this url: {}", url);
-                }
+                LOGGER.debug("Exclude pattern {} with this url: {}",
+                        isExcluded ? "match" : "does not match", url);
             }
             return isExcluded;
         } catch (final Exception e) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("impossible to get URL from given input [" + url + "]:" + e);
-            }
-            return getExcludePattern().matcher(url).find();
-
+            LOGGER.warn("impossible to get URL from given input [{}]: {}", url, e);
+            return false;
         }
     }
 
