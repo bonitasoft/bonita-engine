@@ -364,6 +364,26 @@ public class AuthenticationFilterTest {
     }
 
     @Test
+    public void testSemicolonTraversalUrlsMustNotBeExcluded() {
+        // Semicolon traversal patterns must NOT bypass the authentication filter
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/system/session/..;/..;/..;/serverAPI/something", false);
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/..;/..;/serverAPI/something", false);
+        matchExcludePattern(
+                "http://host/bonita/portal/resource/page/API/system/session/..;/..;/..;/serverAPI/something", false);
+    }
+
+    @Test
+    public void testPercentEncodedSemicolonTraversalUrlsMustNotBeExcluded() {
+        // Percent-encoded semicolons (%3b / %3B) must also NOT bypass the authentication filter
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/system/session/..%3b/..%3b/..%3b/serverAPI/something",
+                false);
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/..%3b/..%3b/serverAPI/something", false);
+        matchExcludePattern(
+                "http://host/bonita/portal/resource/page/API/system/session/..%3B/..%3B/..%3B/serverAPI/something",
+                false);
+    }
+
+    @Test
     public void testMakeRedirectUrl() {
         when(httpRequest.getRequestURI()).thenReturn("/apps/appDirectoryBonita");
         final RedirectUrl redirectUrl = authenticationFilter.makeRedirectUrl(request);
@@ -395,7 +415,7 @@ public class AuthenticationFilterTest {
 
     @Test
     public void testCompileExcludePattern() {
-        final String patternToCompile = "^/(bonita/)?(login.jsp$)|(images/)|(redirectCasToCatchHash.jsp)|(loginservice)|(serverAPI)|(maintenance.jsp$)|(API/platform/)|(platformloginservice$)|(/bonita/?$)|(logoutservice)";
+        final String patternToCompile = "^/(bonita/)?(?:(login\\.jsp$)|(images/)|(redirectCasToCatchHash\\.jsp)|(loginservice)|(serverAPI)|(maintenance\\.jsp$)|(API/platform/)|(platformloginservice$)|(/bonita/?$)|(logoutservice))";
         assertThat(authenticationFilter.compilePattern(patternToCompile)).isNotNull().has(new Condition<>() {
 
             @Override

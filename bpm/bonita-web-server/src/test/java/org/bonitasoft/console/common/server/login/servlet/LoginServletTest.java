@@ -347,4 +347,49 @@ public class LoginServletTest {
 
         servlet.doPost(req, resp);
     }
+
+    @Test
+    public void should_sanitize_semicolon_traversal_in_loginUrl_on_login_failure() throws Exception {
+        final LoginServlet servlet = spy(new LoginServlet());
+        final ServletContext servletContext = mock(ServletContext.class);
+        RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
+        doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
+        // Malicious loginUrl using semicolon-based path traversal
+        doReturn("/apps/..;/..;/serverAPI").when(req).getParameter(LoginServlet.LOGIN_URL_PARAM_NAME);
+        doReturn(servletContext).when(servlet).getServletContext();
+        doReturn(requestDispatcher).when(servletContext).getRequestDispatcher(anyString());
+        doThrow(new LoginFailedException("")).when(servlet).doLogin(req, resp);
+
+        servlet.doPost(req, resp);
+
+        // Verify the dispatched path has semicolons stripped and is normalized.
+        // After sanitization: /apps/..;/..;/serverAPI -> /apps/../../serverAPI
+        // After normalization: /apps/../../serverAPI -> /../serverAPI (.. past root kept by URI.normalize())
+        // The HttpAPIServlet FORWARD guard is the final defense that blocks this dispatch.
+        org.mockito.ArgumentCaptor<String> pathCaptor = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(servletContext).getRequestDispatcher(pathCaptor.capture());
+        String dispatchedPath = pathCaptor.getValue();
+        assertThat(dispatchedPath).doesNotContain(";");
+        assertThat(dispatchedPath).doesNotStartWith("/apps/");
+    }
+
+    @Test
+    public void should_fallback_to_login_page_when_loginUrl_has_invalid_uri_chars() throws Exception {
+        final LoginServlet servlet = spy(new LoginServlet());
+        final ServletContext servletContext = mock(ServletContext.class);
+        RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
+        doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
+        // loginUrl with characters invalid for URI (curly braces trigger URISyntaxException)
+        doReturn("/apps/{invalid}/page").when(req).getParameter(LoginServlet.LOGIN_URL_PARAM_NAME);
+        doReturn(servletContext).when(servlet).getServletContext();
+        doReturn(requestDispatcher).when(servletContext).getRequestDispatcher(anyString());
+        doThrow(new LoginFailedException("")).when(servlet).doLogin(req, resp);
+
+        servlet.doPost(req, resp);
+
+        // Should fall back to the default login page instead of crashing
+        org.mockito.ArgumentCaptor<String> pathCaptor = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(servletContext).getRequestDispatcher(pathCaptor.capture());
+        assertThat(pathCaptor.getValue()).startsWith(AuthenticationManager.LOGIN_PAGE);
+    }
 }

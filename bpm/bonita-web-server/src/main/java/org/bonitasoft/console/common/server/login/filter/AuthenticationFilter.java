@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AuthenticationFilter extends ExcludingPatternFilter {
 
-    protected static final String AUTHENTICATION_FILTER_EXCLUDED_PAGES_PATTERN = "^/(bonita/)?(login.jsp$)|(apps/.+/API/)|(portal/resource/.+/API/)";
+    protected static final String AUTHENTICATION_FILTER_EXCLUDED_PAGES_PATTERN = "^/(bonita/)?(?:(login\\.jsp$)|(apps/.+/API/)|(portal/resource/.+/API/))";
 
     protected static final String REDIRECT_PARAM = "redirectWhenUnauthorized";
 

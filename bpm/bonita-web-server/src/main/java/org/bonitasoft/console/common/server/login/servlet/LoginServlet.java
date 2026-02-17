@@ -15,6 +15,8 @@ package org.bonitasoft.console.common.server.login.servlet;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
@@ -25,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
+import org.bonitasoft.console.common.server.filter.PathSanitizer;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
 import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.login.utils.RedirectUrlBuilder;
@@ -173,8 +176,23 @@ public class LoginServlet extends HttpServlet {
                     loginURL = AuthenticationManager.LOGIN_PAGE;
                     getServletContext().getRequestDispatcher(loginURL).forward(request, response);
                 } else {
-                    getServletContext().getRequestDispatcher(createRedirectUrl(loginURL, locale)).forward(request,
-                            response);
+                    // Defense-in-depth: sanitize user-supplied loginURL before passing
+                    // to getRequestDispatcher(). Strip path parameters (semicolons) to
+                    // prevent ..;-based traversal, then normalize to collapse any ../
+                    String sanitizedLoginURL;
+                    try {
+                        sanitizedLoginURL = PathSanitizer.stripPathParameters(loginURL);
+                        String normalizedPath = new URI(sanitizedLoginURL).normalize().getPath();
+                        sanitizedLoginURL = normalizedPath != null ? normalizedPath
+                                : AuthenticationManager.LOGIN_PAGE;
+                    } catch (URISyntaxException uriEx) {
+                        LOGGER.warn("Invalid loginURL [{}], falling back to default login page: {}",
+                                loginURL, uriEx.getMessage());
+                        sanitizedLoginURL = AuthenticationManager.LOGIN_PAGE;
+                    }
+                    getServletContext()
+                            .getRequestDispatcher(createRedirectUrl(sanitizedLoginURL, locale))
+                            .forward(request, response);
                 }
             } catch (final Exception e1) {
                 if (LOGGER.isErrorEnabled()) {
