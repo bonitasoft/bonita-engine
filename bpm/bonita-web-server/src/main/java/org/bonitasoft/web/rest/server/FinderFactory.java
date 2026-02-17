@@ -16,10 +16,6 @@ package org.bonitasoft.web.rest.server;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResourceFinder;
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResourceFinder;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
 
@@ -39,10 +35,7 @@ public class FinderFactory {
     }
 
     protected Map<Class<? extends ServerResource>, ResourceFinder> getDefaultFinders() {
-        final Map<Class<? extends ServerResource>, ResourceFinder> finders = new HashMap<>();
-        finders.put(ArchivedCaseVariableResource.class, new ArchivedCaseVariableResourceFinder());
-        finders.put(ArchivedCaseVariablesResource.class, new ArchivedCaseVariablesResourceFinder());
-        return finders;
+        return new HashMap<>();
     }
 
     public Finder create(final Class<? extends ServerResource> clazz) {

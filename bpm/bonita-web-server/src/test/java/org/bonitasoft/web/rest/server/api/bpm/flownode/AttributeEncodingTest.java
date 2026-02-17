@@ -15,10 +15,13 @@ package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.restlet.Application;
 import org.restlet.Client;
 import org.restlet.Component;
@@ -29,31 +32,51 @@ import org.restlet.Server;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Status;
+import org.restlet.engine.Engine;
+import org.restlet.engine.converter.ConverterHelper;
+import org.restlet.ext.jackson.JacksonConverter;
 import org.restlet.resource.Get;
 import org.restlet.routing.Router;
 
-public class AttributeEncodingTest {
+class AttributeEncodingTest {
 
     private static Component component;
-    private static Server server;
     private static String serverUrl;
+    private static List<ConverterHelper> savedConverters;
 
-    @BeforeClass
-    public static void start() throws Exception {
+    @BeforeAll
+    static void start() throws Exception {
+        // Save current converters and reset to defaults, to isolate from other tests
+        // that pollute the global Engine converter list (e.g. RestletTest subclasses
+        // calling BonitaRestletApplication.replaceJacksonConverter with BonitaJacksonConverter)
+        List<ConverterHelper> converters = Engine.getInstance().getRegisteredConverters();
+        savedConverters = new ArrayList<>(converters);
+        converters.removeIf(c -> c instanceof JacksonConverter
+                && !c.getClass().equals(JacksonConverter.class));
+        if (converters.stream().noneMatch(c -> c.getClass().equals(JacksonConverter.class))) {
+            converters.add(new JacksonConverter());
+        }
+
         component = new Component();
-        server = component.getServers().add(Protocol.HTTP, 0);
+        Server server = component.getServers().add(Protocol.HTTP, 0);
         final Application application = createApplication();
         component.getDefaultHost().attach(application);
         component.start();
         serverUrl = "http://localhost:" + server.getEphemeralPort();
     }
 
-    @AfterClass
-    public static void stop() throws Exception {
+    @AfterAll
+    static void stop() throws Exception {
         if (component != null && component.isStarted()) {
             component.stop();
         }
         component = null;
+        // Restore original converters
+        if (savedConverters != null) {
+            List<ConverterHelper> converters = Engine.getInstance().getRegisteredConverters();
+            converters.clear();
+            converters.addAll(savedConverters);
+        }
     }
 
     public static class GetTestResource extends CommonResource {
@@ -68,12 +91,15 @@ public class AttributeEncodingTest {
     }
 
     @Test
-    public void callResourceWithEncoding() throws Exception {
+    void callResourceWithEncoding_should_decode_japanese_characters_in_path() throws Exception {
         final Request request = new Request(Method.GET, serverUrl + "/test/varname_カキクケコ");
         final Client c = new Client(Protocol.HTTP);
-        final Response r = c.handle(request);
-        assertThat(r.getStatus()).isEqualTo(Status.SUCCESS_NO_CONTENT);
-        c.stop();
+        try {
+            final Response r = c.handle(request);
+            assertThat(r.getStatus()).isEqualTo(Status.SUCCESS_NO_CONTENT);
+        } finally {
+            c.stop();
+        }
     }
 
     public static class EncodedJsonTestResource extends CommonResource {
@@ -88,15 +114,16 @@ public class AttributeEncodingTest {
     }
 
     @Test
-    public void callResourceReturnsAnEncodedJson() throws Exception {
+    void callResourceReturnsAnEncodedJson_should_encode_japanese_characters_in_response() throws Exception {
         final Request request = new Request(Method.GET, serverUrl + "/test/");
         final Client c = new Client(Protocol.HTTP);
-        final Response r = c.handle(request);
-        assertThat(r.getStatus()).isEqualTo(Status.SUCCESS_OK);
-        final String entityAsText = r.getEntityAsText();
-        System.out.println(entityAsText);
-        assertThat(entityAsText).isEqualTo("{\"field\":\"カキクケコ\"}");
-        c.stop();
+        try {
+            final Response r = c.handle(request);
+            assertThat(r.getStatus()).isEqualTo(Status.SUCCESS_OK);
+            assertThat(r.getEntityAsText()).isEqualTo("{\"field\":\"カキクケコ\"}");
+        } finally {
+            c.stop();
+        }
     }
 
     protected static Application createApplication() {

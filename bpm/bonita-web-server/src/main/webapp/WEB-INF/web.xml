@@ -764,6 +764,7 @@
         <url-pattern>/API/bpm/message</url-pattern>
         <url-pattern>/API/bpm/activityVariable/*</url-pattern>
         <url-pattern>/API/bpm/archivedActivityVariable/*</url-pattern>
+        <url-pattern>/API/bpm/archivedCaseVariable/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>

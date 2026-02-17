@@ -16,8 +16,6 @@ package org.bonitasoft.web.rest.server;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
-import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -37,8 +35,6 @@ import org.restlet.routing.Template;
 public class BonitaRestletApplication extends Application {
 
     public static final String ROUTER_EXTENSION_PREFIX = "/extension/";
-
-    public static final String BPM_ARCHIVED_CASE_VARIABLE_URL = "/bpm/archivedCaseVariable";
 
     private final FinderFactory factory;
 
@@ -76,10 +72,6 @@ public class BonitaRestletApplication extends Application {
 
         // api extension
         router.attach(ROUTER_EXTENSION_PREFIX, factory.createExtensionResource(), Template.MODE_STARTS_WITH);
-
-        router.attach(BPM_ARCHIVED_CASE_VARIABLE_URL + "/{caseId}/{variableName}",
-                factory.create(ArchivedCaseVariableResource.class));
-        router.attach(BPM_ARCHIVED_CASE_VARIABLE_URL, factory.create(ArchivedCaseVariablesResource.class));
 
         return router;
     }
