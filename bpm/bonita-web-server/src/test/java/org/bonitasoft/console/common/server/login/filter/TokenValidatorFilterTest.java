@@ -211,6 +211,26 @@ public class TokenValidatorFilterTest {
     }
 
     @Test
+    public void testSemicolonTraversalUrlsMustNotBeExcluded() throws Exception {
+        // Semicolon traversal patterns must NOT bypass the CSRF token validation filter
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/system/session/..;/..;/..;/serverAPI/something", false);
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/..;/..;/serverAPI/something", false);
+        matchExcludePattern(
+                "http://host/bonita/portal/resource/page/API/system/session/..;/..;/..;/serverAPI/something", false);
+    }
+
+    @Test
+    public void testPercentEncodedSemicolonTraversalUrlsMustNotBeExcluded() throws Exception {
+        // Percent-encoded semicolons (%3b / %3B) must also NOT bypass the CSRF token validation filter
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/system/session/..%3b/..%3b/..%3b/serverAPI/something",
+                false);
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/..%3b/..%3b/serverAPI/something", false);
+        matchExcludePattern(
+                "http://host/bonita/portal/resource/page/API/system/session/..%3B/..%3B/..%3B/serverAPI/something",
+                false);
+    }
+
+    @Test
     public void testCompileNullPattern() throws Exception {
         assertThat(filter.compilePattern(null)).isNull();
     }

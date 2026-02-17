@@ -18,6 +18,8 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.restlet.jse:org.restlet:${Deps.restletVersion}"
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    // Embedded Tomcat for PathTraversalProtectionIT (CVE-233 integration test)
+    testImplementation "org.apache.tomcat.embed:tomcat-embed-core:${Deps.tomcatVersion}"
 }
 
 java {

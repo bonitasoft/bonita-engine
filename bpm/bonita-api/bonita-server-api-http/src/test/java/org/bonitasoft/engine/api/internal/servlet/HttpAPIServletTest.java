@@ -87,4 +87,28 @@ public class HttpAPIServletTest {
         verify(response, never()).sendError(anyInt());
     }
 
+    @Test
+    public void should_send_403_when_dispatch_type_is_forward() throws Exception {
+        HttpAPIServlet httpAPIServlet = spy(new HttpAPIServlet());
+        doReturn(javax.servlet.DispatcherType.FORWARD).when(request).getDispatcherType();
+
+        httpAPIServlet.init();
+        httpAPIServlet.doPost(request, response);
+
+        verify(response).sendError(403);
+        verify(httpAPIServlet, never()).callHttpApi(any(), any());
+    }
+
+    @Test
+    public void should_allow_request_dispatch_type() throws Exception {
+        HttpAPIServlet httpAPIServlet = spy(new HttpAPIServlet());
+        doReturn(javax.servlet.DispatcherType.REQUEST).when(request).getDispatcherType();
+        doNothing().when(httpAPIServlet).callHttpApi(any(), any());
+
+        httpAPIServlet.init();
+        httpAPIServlet.doPost(request, response);
+
+        verify(response, never()).sendError(anyInt());
+    }
+
 }

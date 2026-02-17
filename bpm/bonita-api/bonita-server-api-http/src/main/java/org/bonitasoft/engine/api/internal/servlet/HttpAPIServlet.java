@@ -45,6 +45,15 @@ public class HttpAPIServlet extends HttpServlet {
     @Override
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
+        // Defense-in-depth: reject FORWARD dispatches to /serverAPI/*.
+        // The /serverAPI endpoint is an internal engine HTTP API protected by a web.xml
+        // security-constraint, but security-constraints only apply to REQUEST dispatches
+        // (Servlet 3.0 spec). A path traversal attack could forward requests here from
+        // the /apps/* or /API/* namespaces, bypassing the security-constraint entirely.
+        if (req.getDispatcherType() == javax.servlet.DispatcherType.FORWARD) {
+            resp.sendError(SC_FORBIDDEN);
+            return;
+        }
         if (!httpApi.isEnabled()) {
             resp.sendError(SC_FORBIDDEN);
             return;
