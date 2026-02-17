@@ -153,6 +153,7 @@ commonsFileUpload = { group = "commons-fileupload", name = "commons-fileupload",
 commonsBeanUtils = { group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutilsVersion" }
 commonsCollections = { group = "org.apache.commons", name = "commons-collections4", version.ref = "commonsCollectionsVersion" }
 tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatVersion" }
+tomcatEmbedCore = { group = "org.apache.tomcat.embed", name = "tomcat-embed-core", version.ref = "tomcatVersion"}
 commonsCLI = { group = "commons-cli", name = "commons-cli", version.ref = "commonsCLIVersion" }
 commonsText = { group = "org.apache.commons", name = "commons-text", version.ref = "commonsTextVersion" }
 commonsValidator = { group = "commons-validator", name = "commons-validator", version.ref = "commonsValidatorVersion" }

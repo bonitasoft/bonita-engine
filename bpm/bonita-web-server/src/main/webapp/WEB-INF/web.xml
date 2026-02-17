@@ -119,7 +119,7 @@
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
-            <param-value>^/(bonita/)?(login.jsp$)|(apps/.+/API/)|(portal/resource/.+/API/)</param-value>
+            <param-value>^/(bonita/)?(?:(login\.jsp$)|(apps/.+/API/)|(portal/resource/.+/API/))</param-value>
         </init-param -->
         <init-param>
             <param-name>redirectWhenUnauthorized</param-name>
@@ -149,7 +149,7 @@
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
-            <param-value>^/(bonita/)?(apps/.+/$)|(portal/resource/.+/content/$)|(portal/custom-page/.+/$)|(portal/custom-page/API/)</param-value>
+            <param-value>^/(bonita/)?(?:(apps/.+/$)|(portal/resource/.+/content/$)|(portal/custom-page/.+/$)|(portal/custom-page/API/))</param-value>
         </init-param -->
     </filter>
 
@@ -170,7 +170,7 @@
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
-            <param-value>^/(bonita/)?(apps/.+/$)|(portal/resource/.+/content/$)|(portal/custom-page/.+/$)|(portal/custom-page/API/)</param-value>
+            <param-value>^/(bonita/)?(?:(apps/.+/$)|(portal/resource/.+/content/$)|(portal/custom-page/.+/$)|(portal/custom-page/API/))</param-value>
         </init-param -->
     </filter>
 
@@ -228,6 +228,8 @@
         -->
         <url-pattern>/portal/resource/*</url-pattern>
         <url-pattern>/apps/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthenticationFilter</filter-name>
