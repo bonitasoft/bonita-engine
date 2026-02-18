@@ -14,15 +14,21 @@
 package org.bonitasoft.engine.data.instance.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.Serializable;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.ForbiddenClassException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 
 public class XStreamFactoryTest {
+
+    @Rule
+    public RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
 
     @Test
     public void should_provide_xstream() {
@@ -76,6 +82,47 @@ public class XStreamFactoryTest {
         // then:
         assertThat(deserialized.getUsername()).isEqualTo("Romain");
         assertThat(deserialized.getPassword()).isEqualTo("nope");
+    }
+
+    @Test
+    public void xStream_should_reject_commons_collections4_gadget_chain_types() {
+        // given:
+        final XStream xStream = XStreamFactory.getXStream();
+        String maliciousXml = "<org.apache.commons.collections4.comparators.TransformingComparator>"
+                + "<decorated/><transformer/>"
+                + "</org.apache.commons.collections4.comparators.TransformingComparator>";
+
+        // when / then:
+        assertThatThrownBy(() -> xStream.fromXML(maliciousXml))
+                .isInstanceOf(ForbiddenClassException.class);
+    }
+
+    @Test
+    public void xStream_should_reject_javax_script_gadget_chain_types() {
+        // given:
+        final XStream xStream = XStreamFactory.getXStream();
+        String maliciousXml = "<javax.script.ScriptEngineManager/>";
+
+        // when / then:
+        assertThatThrownBy(() -> xStream.fromXML(maliciousXml))
+                .isInstanceOf(ForbiddenClassException.class);
+    }
+
+    @Test
+    public void xStream_should_use_custom_deny_list_from_system_property() {
+        // given: custom deny list via system property
+        XStreamFactory.remove(Thread.currentThread().getContextClassLoader());
+        System.setProperty("bonita.xstream.deny.packages", "java.awt.**");
+
+        // when:
+        final XStream xStream = XStreamFactory.getXStream();
+
+        // then: type matching the custom deny pattern should be rejected
+        assertThatThrownBy(() -> xStream.fromXML("<java.awt.Color/>"))
+                .isInstanceOf(ForbiddenClassException.class);
+
+        // cleanup: remove cached instance so other tests get fresh defaults
+        XStreamFactory.remove(Thread.currentThread().getContextClassLoader());
     }
 
     static class MyDataObject implements Serializable {

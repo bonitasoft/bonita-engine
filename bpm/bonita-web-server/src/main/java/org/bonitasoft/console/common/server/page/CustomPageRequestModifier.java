@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.bonitasoft.console.common.server.filter.PathSanitizer;
 import org.bonitasoft.web.toolkit.client.common.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,10 @@ public class CustomPageRequestModifier {
     public void forwardIfRequestIsAuthorized(final HttpServletRequest request, final HttpServletResponse response,
             final String apiPathShouldStartWith, final String apiPath) throws IOException, ServletException {
         try {
-            String encodedAPIPath = UriUtils.encodePath(apiPath, "UTF-8");
+            // Strip path parameters (semicolons) to prevent parser differential
+            // between URI.normalize() and Tomcat's getRequestDispatcher()
+            String sanitizedPath = PathSanitizer.stripPathParameters(apiPath);
+            String encodedAPIPath = UriUtils.encodePath(sanitizedPath, "UTF-8");
             URI uri = new URI(encodedAPIPath);
             if (!uri.normalize().toString().startsWith(apiPathShouldStartWith)) {
                 final String message = "attempt to access unauthorized path " + encodedAPIPath;

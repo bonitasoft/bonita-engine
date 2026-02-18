@@ -80,6 +80,28 @@ public class CustomPageRequestModifierTest {
     }
 
     @Test
+    public void check_should_not_authorize_semicolon_traversal_to_serverAPI() throws Exception {
+        String apiPath = "/API/system/session/..;/..;/..;/serverAPI/something";
+
+        CustomPageRequestModifier customPageRequestModifier = new CustomPageRequestModifier();
+        customPageRequestModifier.forwardIfRequestIsAuthorized(request, response, "/API", apiPath);
+
+        verify(response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+        verify(request, never()).getRequestDispatcher(anyString());
+    }
+
+    @Test
+    public void check_should_not_authorize_semicolon_traversal_to_WEB_INF() throws Exception {
+        String apiPath = "/API/a/..;anything/..;/..;/WEB-INF/web.xml";
+
+        CustomPageRequestModifier customPageRequestModifier = new CustomPageRequestModifier();
+        customPageRequestModifier.forwardIfRequestIsAuthorized(request, response, "/API", apiPath);
+
+        verify(response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+        verify(request, never()).getRequestDispatcher(anyString());
+    }
+
+    @Test
     public void check_should_authorize_valid_requests() throws Exception {
         String apiPath = "/API/living/0";
         when(request.getRequestDispatcher(apiPath)).thenReturn(requestDispatcher);

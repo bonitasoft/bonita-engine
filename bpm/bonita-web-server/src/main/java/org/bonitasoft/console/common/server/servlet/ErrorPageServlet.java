@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -48,6 +49,8 @@ public class ErrorPageServlet extends HttpServlet {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorPageServlet.class.getName());
 
+    private static final Pattern HTTP_STATUS_CODE = Pattern.compile("\\d{3}");
+
     /**
      * Static variable to avoid reading the error HTML page every time the error page is displayed
      */
@@ -68,6 +71,14 @@ public class ErrorPageServlet extends HttpServlet {
         try (PrintWriter output = response.getWriter()) {
             if (!StringUtils.isEmpty(pathInfo)) {
                 String errorCode = pathInfo.substring(1);
+                // Defense-in-depth: only accept 3-digit HTTP status codes.
+                // errorCode comes from user-controlled pathInfo and is concatenated
+                // into a getRequestDispatcher() path — without validation, a crafted
+                // pathInfo (e.g. "/../WEB-INF/web.xml%00") could reach arbitrary JSPs.
+                if (!HTTP_STATUS_CODE.matcher(errorCode).matches()) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
                 if (LOGGER.isInfoEnabled()) {
                     LOGGER.info("Displaying error page with code " + errorCode);
                 }
