@@ -16,6 +16,7 @@ package org.bonitasoft.console.common.server.servlet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -149,5 +150,35 @@ public class ErrorPageServletTest {
         errorServlet.doGet(request, response);
 
         verify(sc, times(1)).getRequestDispatcher("/500.jsp");
+    }
+
+    @Test
+    public void should_reject_non_numeric_error_code() throws Exception {
+        when(request.getPathInfo()).thenReturn("/../WEB-INF/web.xml");
+
+        errorServlet.doGet(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        verify(sc, never()).getRequestDispatcher(anyString());
+    }
+
+    @Test
+    public void should_reject_semicolon_traversal_in_error_code() throws Exception {
+        when(request.getPathInfo()).thenReturn("/..;/WEB-INF/web.xml");
+
+        errorServlet.doGet(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        verify(sc, never()).getRequestDispatcher(anyString());
+    }
+
+    @Test
+    public void should_reject_error_code_with_extra_characters() throws Exception {
+        when(request.getPathInfo()).thenReturn("/404abc");
+
+        errorServlet.doGet(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        verify(sc, never()).getRequestDispatcher(anyString());
     }
 }

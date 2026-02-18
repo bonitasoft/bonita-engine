@@ -15,6 +15,8 @@ package org.bonitasoft.console.common.server.login.servlet;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
@@ -26,6 +28,7 @@ import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerFactory;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
+import org.bonitasoft.console.common.server.filter.PathSanitizer;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
 import org.bonitasoft.console.common.server.login.LoginManager;
@@ -175,11 +178,23 @@ public class LoginServlet extends HttpServlet {
             try {
                 String loginURL = request.getParameter(AuthenticationManager.LOGIN_URL_PARAM_NAME);
                 if (loginURL == null) {
-                    final String redirectURL = getRedirectUrl(request, redirectAfterLogin);
-                    loginURL = getAuthenticationManager()
-                            .getLoginPageURL(new HttpServletRequestAccessor(request), redirectURL);
+                    loginURL = createDefaultRedirectUrl(request, redirectAfterLogin);
                 } else {
-                    loginURL = createRedirectUrl(loginURL, locale);
+                    // Defense-in-depth: sanitize user-supplied loginURL before passing
+                    // to getRequestDispatcher(). Strip path parameters (semicolons) to
+                    // prevent ..;-based traversal, then normalize to collapse any ../
+                    String sanitizedLoginURL;
+                    try {
+                        sanitizedLoginURL = PathSanitizer.stripPathParameters(loginURL);
+                        String normalizedPath = new URI(sanitizedLoginURL).normalize().getPath();
+                        sanitizedLoginURL = normalizedPath != null ? normalizedPath
+                                : AuthenticationManager.LOGIN_PAGE;
+                        loginURL = createRedirectUrl(sanitizedLoginURL, locale);
+                    } catch (URISyntaxException uriEx) {
+                        LOGGER.warn("Invalid loginURL [{}], falling back to default login page: {}",
+                                loginURL, uriEx.getMessage());
+                        loginURL = createDefaultRedirectUrl(request, redirectAfterLogin);
+                    }
                 }
                 if (loginURL.startsWith(request.getContextPath() + AuthenticationManager.LOGIN_PAGE)) {
                     request.setAttribute(LOGIN_FAIL_MESSAGE, LOGIN_FAIL_MESSAGE);
@@ -224,6 +239,13 @@ public class LoginServlet extends HttpServlet {
         RedirectUrlBuilder redirectUrlBuilder = new RedirectUrlBuilder(redirectURL);
         redirectUrlBuilder.appendParameter(LocaleUtils.PORTAL_LOCALE_PARAM, locale);
         return redirectUrlBuilder.build().getUrl();
+    }
+
+    private String createDefaultRedirectUrl(HttpServletRequest request, boolean redirectAfterLogin)
+            throws ServletException, AuthenticationManagerNotFoundException {
+        final String redirectURL = getRedirectUrl(request, redirectAfterLogin);
+        return getAuthenticationManager()
+                .getLoginPageURL(new HttpServletRequestAccessor(request), redirectURL);
     }
 
     protected void doLogin(final HttpServletRequest request, final HttpServletResponse response)

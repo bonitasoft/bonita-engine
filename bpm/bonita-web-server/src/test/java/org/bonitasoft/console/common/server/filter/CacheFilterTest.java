@@ -144,7 +144,7 @@ public class CacheFilterTest {
 
         cacheFilter.init(filterConfig);
 
-        final String patternToCompile = "^/(bonita/)?(login.jsp$)|(images/)|(redirectCasToCatchHash.jsp)|(loginservice)|(serverAPI)|(maintenance.jsp$)|(API/platform/)|(platformloginservice$)|(portal/scripts)|(/bonita/?$)|(logoutservice)";
+        final String patternToCompile = "^/(bonita/)?(?:(login\\.jsp$)|(images/)|(redirectCasToCatchHash\\.jsp)|(loginservice)|(serverAPI)|(maintenance\\.jsp$)|(API/platform/)|(platformloginservice$)|(portal/scripts)|(/bonita/?$)|(logoutservice))";
         assertThat(cacheFilter.compilePattern(patternToCompile)).isNotNull().has(new Condition<>() {
 
             @Override

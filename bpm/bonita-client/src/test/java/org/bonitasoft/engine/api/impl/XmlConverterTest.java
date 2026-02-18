@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import java.io.IOException;
 
 import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.security.ForbiddenClassException;
 import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -81,6 +82,42 @@ public class XmlConverterTest {
                 .isInstanceOf(BonitaRuntimeException.class)
                 .hasMessageStartingWith("Unable to deserialize object <malformed><org.bonitasoft.engine.")
                 .hasCauseInstanceOf(ConversionException.class);
+    }
+
+    @Test
+    public void should_reject_deserialization_of_gadget_chain_types() {
+        // given: XML payload referencing a denied gadget chain type
+        String maliciousXml = "<root>"
+                + "<javax.script.ScriptEngineManager/>"
+                + "</root>";
+
+        // when:
+        Throwable thrown = catchThrowable(() -> xmlConverter.fromXML(maliciousXml));
+
+        // then:
+        assertThat(thrown)
+                .isInstanceOf(BonitaRuntimeException.class)
+                .hasCauseInstanceOf(ForbiddenClassException.class);
+    }
+
+    @Test
+    public void should_use_custom_deny_list_from_system_property() {
+        try {
+            // given: custom deny list via system property
+            XmlConverter.reset();
+            System.setProperty("bonita.xstream.deny.packages", "java.awt.**");
+
+            // when: attempting to deserialize a type matching the custom deny pattern
+            Throwable thrown = catchThrowable(() -> new XmlConverter().fromXML("<root><java.awt.Color/></root>"));
+
+            // then:
+            assertThat(thrown)
+                    .isInstanceOf(BonitaRuntimeException.class)
+                    .hasCauseInstanceOf(ForbiddenClassException.class);
+        } finally {
+            System.clearProperty("bonita.xstream.deny.packages");
+            XmlConverter.reset();
+        }
     }
 
     @Test

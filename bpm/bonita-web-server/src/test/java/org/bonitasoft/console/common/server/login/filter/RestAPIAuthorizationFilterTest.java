@@ -294,6 +294,29 @@ public class RestAPIAuthorizationFilterTest {
     }
 
     @Test
+    public void testSemicolonTraversalUrlsMustNotBeExcluded() throws Exception {
+        // Semicolon traversal patterns must NOT bypass the authorization filter
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/system/i18ntranslation/..;/..;/..;/serverAPI/something",
+                false);
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/..;/..;/serverAPI/something", false);
+        matchExcludePattern(
+                "http://host/bonita/portal/resource/page/API/system/i18ntranslation/..;/..;/..;/serverAPI/something",
+                false);
+    }
+
+    @Test
+    public void testPercentEncodedSemicolonTraversalUrlsMustNotBeExcluded() throws Exception {
+        // Percent-encoded semicolons (%3b / %3B) must also NOT bypass the authorization filter
+        matchExcludePattern(
+                "http://host/bonita/apps/FAKE/API/system/i18ntranslation/..%3b/..%3b/..%3b/serverAPI/something",
+                false);
+        matchExcludePattern("http://host/bonita/apps/FAKE/API/..%3b/..%3b/serverAPI/something", false);
+        matchExcludePattern(
+                "http://host/bonita/portal/resource/page/API/system/i18ntranslation/..%3B/..%3B/..%3B/serverAPI/something",
+                false);
+    }
+
+    @Test
     public void testCompileNullPattern() {
         assertThat(restAPIAuthorizationFilter.compilePattern(null)).isNull();
     }
