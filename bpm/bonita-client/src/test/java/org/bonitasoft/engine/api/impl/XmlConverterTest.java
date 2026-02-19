@@ -101,6 +101,27 @@ public class XmlConverterTest {
     }
 
     @Test
+    public void should_reject_deserialization_of_java_net_URL() {
+        // given: XML payload containing a java.net.URL element (URLDNS gadget chain)
+        String maliciousXml = "<root>"
+                + "<java.net.URL>"
+                + "<protocol>http</protocol>"
+                + "<host>attacker.example.com</host>"
+                + "<port>80</port>"
+                + "<file>/</file>"
+                + "</java.net.URL>"
+                + "</root>";
+
+        // when:
+        Throwable thrown = catchThrowable(() -> xmlConverter.fromXML(maliciousXml));
+
+        // then:
+        assertThat(thrown)
+                .isInstanceOf(BonitaRuntimeException.class)
+                .hasCauseInstanceOf(ForbiddenClassException.class);
+    }
+
+    @Test
     public void should_use_custom_deny_list_from_system_property() {
         try {
             // given: custom deny list via system property
