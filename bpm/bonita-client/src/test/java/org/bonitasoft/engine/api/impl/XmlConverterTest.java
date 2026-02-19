@@ -80,7 +80,7 @@ public class XmlConverterTest {
         // then:
         assertThat(thrown)
                 .isInstanceOf(BonitaRuntimeException.class)
-                .hasMessageStartingWith("Unable to deserialize object <malformed><org.bonitasoft.engine.")
+                .hasMessage("Unable to deserialize object")
                 .hasCauseInstanceOf(ConversionException.class);
     }
 
