@@ -74,7 +74,9 @@ public class XmlConverter {
                 final ObjectInputStream in = getXStream().createObjectInputStream(xmlReader)) {
             return (T) in.readObject();
         } catch (final ClassNotFoundException | IOException | RuntimeException e) {
-            throw new BonitaRuntimeException("Unable to deserialize object " + object, e);
+            // Do not include the XML payload in the error message to prevent
+            // information disclosure of attacker-controlled input
+            throw new BonitaRuntimeException("Unable to deserialize object", e);
         }
     }
 
