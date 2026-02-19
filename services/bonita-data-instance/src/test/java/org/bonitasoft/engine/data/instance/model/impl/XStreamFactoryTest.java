@@ -109,6 +109,22 @@ public class XStreamFactoryTest {
     }
 
     @Test
+    public void xStream_should_reject_java_net_URL_gadget_chain_types() {
+        // given:
+        final XStream xStream = XStreamFactory.getXStream();
+        String maliciousXml = "<java.net.URL>"
+                + "<protocol>http</protocol>"
+                + "<host>attacker.example.com</host>"
+                + "<port>80</port>"
+                + "<file>/</file>"
+                + "</java.net.URL>";
+
+        // when / then:
+        assertThatThrownBy(() -> xStream.fromXML(maliciousXml))
+                .isInstanceOf(ForbiddenClassException.class);
+    }
+
+    @Test
     public void xStream_should_use_custom_deny_list_from_system_property() {
         // given: custom deny list via system property
         XStreamFactory.remove(Thread.currentThread().getContextClassLoader());
