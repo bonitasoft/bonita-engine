@@ -45,6 +45,14 @@ public final class XStreamDenyList {
             "groovy.lang.GroovyClassLoader",
             "org.codehaus.groovy.runtime.**",
             "javax.script.**",
+            "java.net.URL*",
+            "java.net.InetAddress*",
+            "javax.naming.**",
+            "com.sun.jndi.**",
+            "java.rmi.**",
+            "sun.rmi.**",
+            "com.mchange.**",
+            "org.apache.xalan.**",
     };
 
     private XStreamDenyList() {
