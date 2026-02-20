@@ -17,11 +17,16 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+import java.io.InvalidClassException;
+import java.lang.reflect.InaccessibleObjectException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.thoughtworks.xstream.security.ForbiddenClassException;
 import org.bonitasoft.engine.api.internal.ServerAPI;
+import org.bonitasoft.engine.api.internal.ServerWrappedException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.junit.Rule;
 import org.junit.Test;
@@ -92,6 +97,175 @@ public class HttpAPIServletCallTest {
                 "    <tenantId>1</tenantId>" +
                 "  </org.bonitasoft.engine.session.impl.APISessionImpl>" +
                 "</object-stream>");
+    }
+
+    @Test
+    public void should_sanitize_error_response_when_xstream_deny_list_blocks_type() throws Exception {
+        // given: a ForbiddenClassException from XStream deny list (simulated via mock to avoid
+        // Java module access issues with XStream's FieldDictionary on Java 17+)
+        MockHttpServletRequest request = MockMvcRequestBuilders
+                .post("http://localhost/serverAPI/org.bonitasoft.engine.api.LoginAPI/login")
+                .param("options", "<object-stream><map/></object-stream>")
+                .buildRequest(new MockServletContext());
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HttpAPIServletCall httpAPIServletCall = spy(new HttpAPIServletCall(request, response));
+        ServerAPI serverAPI = mock(ServerAPI.class);
+        doReturn(serverAPI).when(httpAPIServletCall).getServerAPI();
+        ForbiddenClassException forbidden = new ForbiddenClassException(java.net.URL.class);
+        when(serverAPI.invokeMethod(any(), any(), any(), any(), any()))
+                .thenThrow(new BonitaRuntimeException("Unable to deserialize object", forbidden));
+
+        // when:
+        httpAPIServletCall.doPost();
+
+        // then: response should contain a generic error, not security mechanism details
+        // Note: status code assertion omitted — ServletCall.error() flushes the output before
+        // calling setStatus(), so MockHttpServletResponse commits with 200 before the 500 is set.
+        // In production, the real servlet container buffers the response so 500 is effective.
+        String content = response.getContentAsString();
+        assertThat(content).contains("Invalid request");
+        assertThat(content).doesNotContain("ForbiddenClassException");
+        assertThat(content).doesNotContain("java.net.URL");
+        // NoPermission is the XStream security error type name — must not leak to clients
+        assertThat(content).doesNotContain("NoPermission");
+    }
+
+    @Test
+    public void should_return_full_error_response_for_non_security_exceptions() throws Exception {
+        // given: a request that triggers a non-security exception from the server API
+        MockHttpServletRequest request = MockMvcRequestBuilders
+                .post("http://localhost/serverAPI/org.bonitasoft.engine.api.LoginAPI/login")
+                .param("options", "<object-stream><map/></object-stream>")
+                .buildRequest(new MockServletContext());
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HttpAPIServletCall httpAPIServletCall = spy(new HttpAPIServletCall(request, response));
+        ServerAPI serverAPI = mock(ServerAPI.class);
+        doReturn(serverAPI).when(httpAPIServletCall).getServerAPI();
+        when(serverAPI.invokeMethod(any(), any(), any(), any(), any()))
+                .thenThrow(new BonitaRuntimeException("Something went wrong"));
+
+        // when:
+        httpAPIServletCall.doPost();
+
+        // then: response should contain the real exception, not the sanitized "Invalid request"
+        String content = response.getContentAsString();
+        assertThat(content).contains("BonitaRuntimeException");
+        assertThat(content).contains("Something went wrong");
+        assertThat(content).doesNotContain("Invalid request");
+    }
+
+    @Test
+    public void should_sanitize_error_response_when_jep290_filter_rejects_class() throws Exception {
+        // given: a request where the JEP 290 ObjectInputFilter rejects a class during deserialization
+        MockHttpServletRequest request = MockMvcRequestBuilders
+                .post("http://localhost/serverAPI/org.bonitasoft.engine.api.LoginAPI/login")
+                .param("options", "<object-stream><map/></object-stream>")
+                .buildRequest(new MockServletContext());
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HttpAPIServletCall httpAPIServletCall = spy(new HttpAPIServletCall(request, response));
+        ServerAPI serverAPI = mock(ServerAPI.class);
+        doReturn(serverAPI).when(httpAPIServletCall).getServerAPI();
+        InvalidClassException ice = new InvalidClassException("com.evil.Payload", "filter status: REJECTED");
+        when(serverAPI.invokeMethod(any(), any(), any(), any(), any()))
+                .thenThrow(new RuntimeException("deserialization failed", ice));
+
+        // when:
+        httpAPIServletCall.doPost();
+
+        // then: response should be sanitized
+        String content = response.getContentAsString();
+        assertThat(content).contains("Invalid request");
+        assertThat(content).doesNotContain("com.evil.Payload");
+        assertThat(content).doesNotContain("filter status: REJECTED");
+    }
+
+    @Test
+    public void should_sanitize_error_response_when_security_exception_is_deeply_nested() throws Exception {
+        // given: ForbiddenClassException wrapped two levels deep in the cause chain
+        MockHttpServletRequest request = MockMvcRequestBuilders
+                .post("http://localhost/serverAPI/org.bonitasoft.engine.api.LoginAPI/login")
+                .param("options", "<object-stream><map/></object-stream>")
+                .buildRequest(new MockServletContext());
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HttpAPIServletCall httpAPIServletCall = spy(new HttpAPIServletCall(request, response));
+        ServerAPI serverAPI = mock(ServerAPI.class);
+        doReturn(serverAPI).when(httpAPIServletCall).getServerAPI();
+        ForbiddenClassException forbidden = new ForbiddenClassException(java.net.URL.class);
+        RuntimeException nested = new RuntimeException("conversion failed",
+                new RuntimeException("inner wrapper", forbidden));
+        when(serverAPI.invokeMethod(any(), any(), any(), any(), any())).thenThrow(nested);
+
+        // when:
+        httpAPIServletCall.doPost();
+
+        // then: response should be sanitized despite the deep nesting
+        String content = response.getContentAsString();
+        assertThat(content).contains("Invalid request");
+        assertThat(content).doesNotContain("ForbiddenClassException");
+        assertThat(content).doesNotContain("java.net.URL");
+    }
+
+    @Test
+    public void should_sanitize_error_response_when_security_exception_wrapped_in_ServerWrappedException()
+            throws Exception {
+        // given: a ForbiddenClassException wrapped in ServerWrappedException (production wire-transport path)
+        MockHttpServletRequest request = MockMvcRequestBuilders
+                .post("http://localhost/serverAPI/org.bonitasoft.engine.api.LoginAPI/login")
+                .param("options", "<object-stream><map/></object-stream>")
+                .buildRequest(new MockServletContext());
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HttpAPIServletCall httpAPIServletCall = spy(new HttpAPIServletCall(request, response));
+        ServerAPI serverAPI = mock(ServerAPI.class);
+        doReturn(serverAPI).when(httpAPIServletCall).getServerAPI();
+        ForbiddenClassException forbidden = new ForbiddenClassException(java.net.URL.class);
+        when(serverAPI.invokeMethod(any(), any(), any(), any(), any()))
+                .thenThrow(new ServerWrappedException(forbidden));
+
+        // when:
+        httpAPIServletCall.doPost();
+
+        // then: response should be sanitized despite ServerWrappedException wrapping
+        String content = response.getContentAsString();
+        assertThat(content).contains("Invalid request");
+        assertThat(content).doesNotContain("ForbiddenClassException");
+        assertThat(content).doesNotContain("java.net.URL");
+    }
+
+    @Test
+    public void should_not_sanitize_error_response_for_non_jep290_InvalidClassException() throws Exception {
+        // given: an InvalidClassException caused by serialVersionUID mismatch (not a security rejection)
+        MockHttpServletRequest request = MockMvcRequestBuilders
+                .post("http://localhost/serverAPI/org.bonitasoft.engine.api.LoginAPI/login")
+                .param("options", "<object-stream><map/></object-stream>")
+                .buildRequest(new MockServletContext());
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HttpAPIServletCall httpAPIServletCall = spy(new HttpAPIServletCall(request, response));
+        ServerAPI serverAPI = mock(ServerAPI.class);
+        doReturn(serverAPI).when(httpAPIServletCall).getServerAPI();
+        InvalidClassException ice = new InvalidClassException("com.example.MyClass",
+                "local class incompatible: stream classdesc serialVersionUID = 123, local class serialVersionUID = 456");
+        when(serverAPI.invokeMethod(any(), any(), any(), any(), any()))
+                .thenThrow(new RuntimeException("deserialization failed", ice));
+
+        // when:
+        try {
+            httpAPIServletCall.doPost();
+        } catch (InaccessibleObjectException e) {
+            // On Java 17+, XStream fails to serialize IOException-derived exceptions
+            // due to module access restrictions (same issue documented in toResponse()).
+            // This is expected and not what we're testing.
+        }
+
+        // then: response should NOT contain the sanitized "Invalid request" message,
+        // proving isDeserializationSecurityException correctly returned false
+        String content = response.getContentAsString();
+        assertThat(content).doesNotContain("Invalid request");
     }
 
     // =================================================================================================================
