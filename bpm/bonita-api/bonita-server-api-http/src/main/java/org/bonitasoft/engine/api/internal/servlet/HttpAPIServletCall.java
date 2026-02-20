@@ -16,28 +16,40 @@ package org.bonitasoft.engine.api.internal.servlet;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thoughtworks.xstream.security.ForbiddenClassException;
 import org.apache.commons.fileupload.FileUploadException;
 import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.api.internal.servlet.impl.XmlConverter;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Julien Mege
  * @author Matthieu Chaffotte
  */
 public class HttpAPIServletCall extends ServletCall {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpAPIServletCall.class);
+
+    // JEP 290 filter rejection message — part of JDK internal format since JDK 9
+    // (see java.io.ObjectInputStream); may need updating if a future JDK changes this wording.
+    private static final String JEP290_FILTER_REJECTED_MSG = "filter status: REJECTED";
 
     private static final String SLASH = "/";
 
@@ -148,7 +160,24 @@ public class HttpAPIServletCall extends ServletCall {
         if (exception instanceof ServerWrappedException) {
             result = exception.getCause();
         }
+        if (isDeserializationSecurityException(result)) {
+            LOGGER.warn("Blocked suspected deserialization attack on {}", getRequestURL(), result);
+            // Serialize a plain String rather than a BonitaRuntimeException to avoid
+            // XStream's ThrowableConverter hitting Java module access restrictions
+            // when walking exception class hierarchies (e.g. IOException.serialVersionUID).
+            return xmlConverter.toXML("Invalid request");
+        }
         return xmlConverter.toXML(result);
+    }
+
+    private boolean isDeserializationSecurityException(Throwable t) {
+        // Check message to distinguish JEP 290 filter rejections from normal
+        // InvalidClassException causes (e.g. serialVersionUID mismatch)
+        return Stream.iterate(t, Objects::nonNull, Throwable::getCause)
+                .anyMatch(cause -> cause instanceof ForbiddenClassException
+                        || (cause instanceof InvalidClassException
+                                && cause.getMessage() != null
+                                && cause.getMessage().contains(JEP290_FILTER_REJECTED_MSG)));
     }
 
 }
