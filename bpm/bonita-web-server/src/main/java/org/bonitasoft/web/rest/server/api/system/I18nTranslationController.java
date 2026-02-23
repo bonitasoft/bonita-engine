@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import org.bonitasoft.console.common.server.i18n.I18n;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.bonitasoft.web.toolkit.client.common.i18n.AbstractI18n;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/API/system/i18ntranslation")
 public class I18nTranslationController extends AbstractRESTController {
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public List<Translation> getI18nTranslation(@RequestParam(value = "f", required = false) List<String> filters) {
         Map<String, String> filterMap = parseFilters(filters);
         String locale = filterMap != null ? filterMap.get("locale") : null;

@@ -23,9 +23,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.support.FormattingConversionService;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.accept.ContentNegotiationManager;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.resource.ResourceUrlProvider;
@@ -78,5 +80,11 @@ public class SpringWebConfiguration extends WebMvcConfigurationSupport {
     @Override
     protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.addAll(createBonitaMessageConverters());
+    }
+
+    @Override
+    protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        // enforces JSON as the default content type for content negotiation for Spring MVC APIs
+        configurer.defaultContentType(MediaType.APPLICATION_JSON);
     }
 }

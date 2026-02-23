@@ -22,7 +22,6 @@ import org.bonitasoft.engine.business.data.BusinessDataReference;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.web.rest.server.QueryParameterUtils;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Colin Puy
  */
 @RestController
-@RequestMapping(path = "/API/bdm/businessDataReference", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/API/bdm/businessDataReference")
 public class BusinessDataReferenceController extends AbstractRESTController {
 
     /**

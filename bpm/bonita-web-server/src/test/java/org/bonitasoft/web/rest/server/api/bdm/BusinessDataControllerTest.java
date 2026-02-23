@@ -66,7 +66,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
 
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("{\"name\":\"たこ焼き\"}"));
     }
@@ -86,7 +86,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                 get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/not_a_number").sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"exception":"class java.lang.IllegalArgumentException","message":"[ not_a_number ] must be a number"}"""));
@@ -143,7 +143,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                 get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983/child").sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"child":"Leo"}"""));
@@ -155,7 +155,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                 get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/wrong_id/child").sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"exception":"class java.lang.IllegalArgumentException","message":"[ wrong_id ] must be a number"}"""));
@@ -185,7 +185,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                 .accept(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(jsonResponse));
     }
 
@@ -199,7 +199,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"exception":"class java.lang.IllegalArgumentException","message":"query parameter ids is mandatory"}"""));
@@ -216,7 +216,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"exception":"class java.lang.IllegalArgumentException","message":"Bad parameter ids=1983,abc"}"""));
@@ -235,7 +235,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                                 {"exception":"class org.bonitasoft.engine.command.CommandNotFoundException","message":"not found"}""")
                 );
@@ -286,7 +286,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                         .accept(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(jsonResponse))
                 .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "3-5/4"));
     }
@@ -301,7 +301,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"exception":"class java.lang.IllegalArgumentException","message":"query parameter c (count) is mandatory"}"""));
@@ -318,7 +318,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isBadRequest()) // Status.CLIENT_ERROR_NOT_FOUND
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"exception":"class java.lang.IllegalArgumentException","message":"query parameter c (count) should be a number"}"""));
@@ -334,7 +334,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"exception":"class java.lang.IllegalArgumentException","message":"query parameter p (page) is mandatory"}"""));
@@ -351,7 +351,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content()
                         .json("""
                                 {"exception":"class java.lang.IllegalArgumentException","message":"query parameter p (page) should be a number"}"""));
@@ -370,7 +370,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                             {"exception":"class org.bonitasoft.engine.command.CommandNotFoundException","message":"Unable to read configuration file"}"""));
     }
@@ -388,7 +388,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
         // then
         perform
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                             {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"org.bonitasoft.engine.business.data.BusinessDataRepositoryException: repository error"}"""));
     }

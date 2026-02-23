@@ -27,7 +27,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +42,7 @@ public class ProcessDefinitionDesignController extends AbstractRESTController {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
+    @GetMapping
     public String getDesign(@PathVariable Long processDefinitionId, HttpSession httpSession)
             throws ProcessDefinitionNotFoundException, IOException, BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {

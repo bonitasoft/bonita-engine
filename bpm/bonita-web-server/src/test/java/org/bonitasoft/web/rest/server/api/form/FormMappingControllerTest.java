@@ -84,7 +84,7 @@ class FormMappingControllerTest extends AbstractControllerTest<FormMappingContro
                 .param("c", "10")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].task").value("myTask"));
     }
 
