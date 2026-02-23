@@ -75,7 +75,7 @@ owaspHtmlSanitizerVersion = "20260102.1"
 
 # Test dependency versions
 junit4Version = "4.13.2"
-junit5Version = "6.0.2"
+junit5Version = "6.0.3"
 awaitilityVersion = "4.3.0"
 assertjVersion = "3.27.7"
 xmlunitVersion = "1.6"
