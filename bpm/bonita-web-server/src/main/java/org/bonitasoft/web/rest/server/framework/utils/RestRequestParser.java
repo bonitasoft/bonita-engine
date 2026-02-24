@@ -80,14 +80,19 @@ public class RestRequestParser {
             apiPath = apiPath + pathInfo;
         }
         final String[] path = apiPath.split("/");
-        //ignoring the 2 first segments corresponding to the /API/ part
-        return parseRequest(path, 2);
+        // Find the "API" segment dynamically to handle both
+        // /API/extension/... and /portal/custom-page/API/extension/...
+        int apiIndex = Arrays.asList(path).indexOf("API");
+        if (apiIndex < 0) {
+            throw new APIMalformedUrlException("Missing API segment in request URL");
+        }
+        return parseRequest(path, apiIndex + 1);
     }
 
     protected RestRequestParser parseRequest(String[] path, int indexOfAPINameSegment) {
         int minimalNumberOfPathSegments = indexOfAPINameSegment + 2;
         if (path.length < minimalNumberOfPathSegments) {
-            throw new APIMalformedUrlException("Missing API or resource name [" + request.getRequestURL() + "]");
+            throw new APIMalformedUrlException("Missing API or resource name in request URL");
         }
         apiName = path[indexOfAPINameSegment];
         resourceName = path[indexOfAPINameSegment + 1];

@@ -13,15 +13,17 @@
  **/
 package org.bonitasoft.web.rest.server;
 
-import org.bonitasoft.web.rest.server.utils.BonitaJacksonConverter;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(MockitoJUnitRunner.class)
-public class BonitaRestletApplicationTest {
+import org.bonitasoft.web.rest.server.utils.BonitaJacksonConverter;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.restlet.routing.Router;
+
+@ExtendWith(MockitoExtension.class)
+class BonitaRestletApplicationTest {
 
     @Mock
     FinderFactory finderFactory;
@@ -30,16 +32,15 @@ public class BonitaRestletApplicationTest {
     BonitaJacksonConverter bonitaJacksonConverter;
 
     @Test
-    public void should_application_register_extension_resources() {
+    void should_build_router_with_no_routes() {
         //given
-        final BonitaRestletApplication bonitaRestletApplication = new BonitaRestletApplication(finderFactory,
-                bonitaJacksonConverter);
+        var bonitaRestletApplication = new BonitaRestletApplication(finderFactory, bonitaJacksonConverter);
 
         //when
-        bonitaRestletApplication.buildRouter();
+        Router router = bonitaRestletApplication.buildRouter();
 
         //then
-        Mockito.verify(finderFactory).createExtensionResource();
+        assertThat(router.getRoutes()).isEmpty();
     }
 
 }

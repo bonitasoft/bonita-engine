@@ -14,6 +14,7 @@
 package org.bonitasoft.web.rest.server.framework.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
 import javax.servlet.http.HttpServletMapping;
@@ -97,6 +98,54 @@ public class RestRequestParserTest {
         assertThat(restRequestParser.getResourceQualifiers().getPart(0)).isEqualTo("1");
         assertThat(restRequestParser.getResourceName()).isEqualTo("maintenance");
         assertThat(restRequestParser.getApiName()).isEqualTo("system");
+    }
+
+    @Test
+    public void should_parsePath_spring_mvc_custom_page_api_extension() {
+        doReturn(RestRequestParser.SPRING_REST_SERVLET_NAME).when(httpServletMapping).getServletName();
+        doReturn("/portal/custom-page/API/extension").when(httpServletRequest).getServletPath();
+        doReturn("/my-rest-api").when(httpServletRequest).getPathInfo();
+
+        restRequestParser.invoke();
+
+        assertThat(restRequestParser.getResourceQualifiers()).isNull();
+        assertThat(restRequestParser.getApiName()).isEqualTo("extension");
+        assertThat(restRequestParser.getResourceName()).isEqualTo("my-rest-api");
+    }
+
+    @Test
+    public void should_throw_when_spring_mvc_request_has_no_API_segment() {
+        doReturn(RestRequestParser.SPRING_REST_SERVLET_NAME).when(httpServletMapping).getServletName();
+        doReturn("/not/a/valid/path").when(httpServletRequest).getServletPath();
+
+        assertThatThrownBy(() -> restRequestParser.invoke())
+                .isInstanceOf(APIMalformedUrlException.class)
+                .hasMessageContaining("Missing API segment")
+                .hasMessageNotContaining("/not/a/valid/path");
+    }
+
+    @Test
+    public void should_throw_when_spring_mvc_request_has_no_resource_name() {
+        doReturn(RestRequestParser.SPRING_REST_SERVLET_NAME).when(httpServletMapping).getServletName();
+        doReturn("/API").when(httpServletRequest).getServletPath();
+
+        assertThatThrownBy(() -> restRequestParser.invoke())
+                .isInstanceOf(APIMalformedUrlException.class)
+                .hasMessageContaining("Missing API or resource name")
+                .hasMessageNotContaining("/API");
+    }
+
+    @Test
+    public void should_parsePath_spring_mvc_custom_page_api_extension_with_qualifier() {
+        doReturn(RestRequestParser.SPRING_REST_SERVLET_NAME).when(httpServletMapping).getServletName();
+        doReturn("/portal/custom-page/API/extension").when(httpServletRequest).getServletPath();
+        doReturn("/my-rest-api/resource1").when(httpServletRequest).getPathInfo();
+
+        restRequestParser.invoke();
+
+        assertThat(restRequestParser.getApiName()).isEqualTo("extension");
+        assertThat(restRequestParser.getResourceName()).isEqualTo("my-rest-api");
+        assertThat(restRequestParser.getResourceQualifiers().getPart(0)).isEqualTo("resource1");
     }
 
 }

@@ -752,21 +752,24 @@
     <servlet-mapping>
         <servlet-name>SpringRest</servlet-name>
         <!-- API resource URLs need to be listed here in order to avoid being picked up by Restlet which is bound to /API/* -->
-        <url-pattern>/API/system/maintenance</url-pattern>
-        <url-pattern>/API/system/i18ntranslation</url-pattern>
-        <url-pattern>/API/bpm/processInfo/*</url-pattern>
-        <url-pattern>/API/system/information</url-pattern>
-        <url-pattern>/API/bdm/businessData/*</url-pattern>
-        <url-pattern>/API/bdm/businessDataReference/*</url-pattern>
-        <url-pattern>/API/tenant/bdm</url-pattern>
+        <!-- /APISpringInternal/* serves as a workaround on Tomcat limitation on URL pattern with /* in the middle. See urlrewrite.xml for redirections: -->
         <url-pattern>/APISpringInternal/*</url-pattern>
-        <url-pattern>/API/form/mapping</url-pattern>
-        <url-pattern>/API/bpm/timerEventTrigger/*</url-pattern>
-        <url-pattern>/API/bpm/signal</url-pattern>
-        <url-pattern>/API/bpm/message</url-pattern>
+        <url-pattern>/portal/custom-page/API/extension/*</url-pattern>
+        <url-pattern>/API/bdm/businessDataReference/*</url-pattern>
+        <url-pattern>/API/bdm/businessData/*</url-pattern>
         <url-pattern>/API/bpm/activityVariable/*</url-pattern>
         <url-pattern>/API/bpm/archivedActivityVariable/*</url-pattern>
         <url-pattern>/API/bpm/archivedCaseVariable/*</url-pattern>
+        <url-pattern>/API/bpm/message</url-pattern>
+        <url-pattern>/API/bpm/processInfo/*</url-pattern>
+        <url-pattern>/API/bpm/signal</url-pattern>
+        <url-pattern>/API/bpm/timerEventTrigger/*</url-pattern>
+        <url-pattern>/API/extension/*</url-pattern>
+        <url-pattern>/API/form/mapping</url-pattern>
+        <url-pattern>/API/system/i18ntranslation</url-pattern>
+        <url-pattern>/API/system/information</url-pattern>
+        <url-pattern>/API/system/maintenance</url-pattern>
+        <url-pattern>/API/tenant/bdm</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>

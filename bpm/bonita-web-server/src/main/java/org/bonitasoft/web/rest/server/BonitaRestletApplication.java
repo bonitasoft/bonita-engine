@@ -27,14 +27,11 @@ import org.restlet.engine.Engine;
 import org.restlet.engine.converter.ConverterHelper;
 import org.restlet.ext.jackson.JacksonConverter;
 import org.restlet.routing.Router;
-import org.restlet.routing.Template;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class BonitaRestletApplication extends Application {
-
-    public static final String ROUTER_EXTENSION_PREFIX = "/extension/";
 
     private final FinderFactory factory;
 
@@ -68,10 +65,8 @@ public class BonitaRestletApplication extends Application {
     protected Router buildRouter() {
         final Context context = getContext();
         final Router router = new Router(context);
-        // WARNING: if you add a route you need to declare it in org.bonitasoft.web.rest.server.FinderFactory
-
-        // api extension
-        router.attach(ROUTER_EXTENSION_PREFIX, factory.createExtensionResource(), Template.MODE_STARTS_WITH);
+        // No more routes - all API endpoints have been migrated to Spring MVC controllers.
+        // This Restlet application will be removed entirely in a follow-up PR.
 
         return router;
     }

@@ -46,8 +46,4 @@ public class FinderFactory {
         return finder;
     }
 
-    public Finder createExtensionResource() {
-        return new ApiExtensionResourceFinder();
-    }
-
 }
