@@ -384,6 +384,23 @@ public class AuthenticationFilterTest {
     }
 
     @Test
+    public void testUrlsWithEncodedSpacesShouldMatchExcludePatterns() {
+        // URLs with %20 encoded spaces (e.g., process names with spaces) must still be correctly
+        // matched by the exclude pattern and not throw URISyntaxException during normalization.
+        matchExcludePattern("http://host/bonita/apps/My%20App/API/system/session/unusedId", true);
+        matchExcludePattern("http://host/bonita/portal/resource/page/API/system/session/my%20resource", true);
+    }
+
+    @Test
+    public void testEncodedSpacesWithSemicolonTraversalMustNotBeExcluded() {
+        // Combined %20 + semicolon traversal must still be blocked (no regression on CVE-233)
+        matchExcludePattern(
+                "http://host/bonita/apps/My%20App/API/system/session/..;/..;/..;/serverAPI/something", false);
+        matchExcludePattern(
+                "http://host/bonita/apps/My%20App/API/..%3b/..%3b/serverAPI/something", false);
+    }
+
+    @Test
     public void testMakeRedirectUrl() {
         when(httpRequest.getRequestURI()).thenReturn("/apps/appDirectoryBonita");
         final RedirectUrl redirectUrl = authenticationFilter.makeRedirectUrl(request);
