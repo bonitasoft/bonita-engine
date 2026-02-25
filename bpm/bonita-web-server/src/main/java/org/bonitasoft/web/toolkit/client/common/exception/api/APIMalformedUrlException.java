@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.toolkit.client.common.exception.api;
 
-import org.bonitasoft.web.toolkit.client.common.exception.http.JsonExceptionSerializer;
+import lombok.Getter;
 
 /**
  * @author Séverin Moussel
@@ -22,10 +22,11 @@ public class APIMalformedUrlException extends APIException {
 
     private static final long serialVersionUID = 3418532139473113744L;
 
+    @Getter
     private final String url;
 
     public APIMalformedUrlException(final String url) {
-        super((Exception) null);
+        super();
         this.url = url;
     }
 
@@ -34,22 +35,9 @@ public class APIMalformedUrlException extends APIException {
         this.url = url;
     }
 
-    /**
-     * @return the url
-     */
-    public String getUrl() {
-        return this.url;
-    }
-
-    @Override
-    protected JsonExceptionSerializer buildJson() {
-        return super.buildJson()
-                .appendAttribute("url", getUrl());
-    }
-
     @Override
     protected String defaultMessage() {
-        return "Malformed url : " + getUrl();
+        return "Malformed url";
     }
 
 }
