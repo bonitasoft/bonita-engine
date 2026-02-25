@@ -15,8 +15,10 @@ package org.bonitasoft.console.common.server.filter;
 
 import static java.lang.String.format;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -123,71 +125,78 @@ public class SanitizerFilter extends ExcludingPatternFilter {
         }
         // get body of request as Json
         var body = getJsonBody(req);
-        if (body != null) {
-            // sanitize body
-            final var sanitized = sanitize(body);
-            byte[] saneBodyBytes;
-            if (sanitized.isPresent()) {
-                // serialize the sanitized json node
-                saneBodyBytes = mapper.writeValueAsBytes(sanitized.get());
-            } else {
-                saneBodyBytes = mapper.writeValueAsBytes(body);
-            }
-            if (req instanceof MultiReadHttpServletRequest) {
-                // if the HttpServletRequest is already a MultiReadHttpServletRequest (already wrapped by another filter), we don't need to wrap it
-                chain.doFilter(req, response);
-            } else {
-                // wrap request with sanitized body for input stream
-                final var wrapper = new HttpServletRequestWrapper(req) {
-
-                    private ServletInputStream inputStream = null;
-
-                    @Override
-                    public ServletInputStream getInputStream() throws IOException {
-                        if (inputStream == null) {
-                            final ByteArrayInputStream is = new ByteArrayInputStream(saneBodyBytes);
-                            inputStream = new ServletInputStream() {
-
-                                @Override
-                                public int read() throws IOException {
-                                    return is.read();
-                                }
-
-                                @Override
-                                public boolean isFinished() {
-                                    return is.available() == 0;
-                                }
-
-                                @Override
-                                public boolean isReady() {
-                                    return !isFinished();
-                                }
-
-                                @Override
-                                public void setReadListener(ReadListener readListener) {
-                                    throw new UnsupportedOperationException("Unimplemented method 'setReadListener'");
-                                }
-                            };
-                        }
-                        return inputStream;
-                    }
-
-                    @Override
-                    public int getContentLength() {
-                        return saneBodyBytes.length;
-                    }
-
-                    @Override
-                    public long getContentLengthLong() {
-                        return saneBodyBytes.length;
-                    }
-
-                };
-                chain.doFilter(wrapper, response);
-            }
-        } else {
+        if (body == null) {
+            // request has no body
             chain.doFilter(req, response);
+            return;
         }
+        // sanitize body
+        final var sanitized = sanitize(body);
+        if (sanitized.isEmpty() && req instanceof MultiReadHttpServletRequest) {
+            // Body was not altered and request is a MultiReadHttpServletRequest
+            // (supports re-reading): pass the original request through unchanged
+            chain.doFilter(req, response);
+            return;
+        }
+        // Wrap the request with body bytes when either:
+        // - the body was sanitized (must forward sanitized content, even if the request is
+        //   already a MultiReadHttpServletRequest from an earlier filter), or
+        // - the request is a plain HttpServletRequest (input stream was consumed by
+        //   getJsonBody and cannot be re-read, so we must restore it).
+        byte[] saneBodyBytes = mapper.writeValueAsBytes(sanitized.orElse(body));
+        final var wrapper = new HttpServletRequestWrapper(req) {
+
+            private ServletInputStream inputStream = null;
+
+            @Override
+            public ServletInputStream getInputStream() throws IOException {
+                if (inputStream == null) {
+                    final ByteArrayInputStream is = new ByteArrayInputStream(saneBodyBytes);
+                    inputStream = new ServletInputStream() {
+
+                        @Override
+                        public int read() throws IOException {
+                            return is.read();
+                        }
+
+                        @Override
+                        public boolean isFinished() {
+                            return is.available() == 0;
+                        }
+
+                        @Override
+                        public boolean isReady() {
+                            return !isFinished();
+                        }
+
+                        @Override
+                        public void setReadListener(ReadListener readListener) {
+                            throw new UnsupportedOperationException(
+                                    "Unimplemented method 'setReadListener'");
+                        }
+                    };
+                }
+                return inputStream;
+            }
+
+            @Override
+            public int getContentLength() {
+                return saneBodyBytes.length;
+            }
+
+            @Override
+            public long getContentLengthLong() {
+                return saneBodyBytes.length;
+            }
+
+            @Override
+            public BufferedReader getReader() throws IOException {
+                String enc = Optional.ofNullable(getCharacterEncoding()).orElse("UTF-8");
+                return new BufferedReader(new InputStreamReader(getInputStream(), enc));
+            }
+
+        };
+        chain.doFilter(wrapper, response);
     }
 
     /**
