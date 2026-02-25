@@ -323,6 +323,87 @@ public class SanitizerFilterTest {
         }
     }
 
+    @Test
+    public void shouldSanitizeAttackWhenRequestIsMultiReadHttpServletRequest() throws Exception {
+        // Simulate the production scenario where TokenValidatorFilter or RestAPIAuthorizationFilter
+        // has already wrapped the request in a MultiReadHttpServletRequest
+        MultiReadHttpServletRequest multiReadRequest = mock(MultiReadHttpServletRequest.class);
+        when(multiReadRequest.getMethod()).thenReturn("PUT");
+        when(multiReadRequest.getCharacterEncoding()).thenReturn("UTF-8");
+        when(multiReadRequest.getContentType()).thenReturn("application/json");
+        when(multiReadRequest.getRequestURL()).thenReturn(new StringBuffer());
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
+        when(sanitizerFilter.getAttributesExcluded()).thenReturn(Collections.emptyList());
+
+        final String body = "{\"lastname\":\"<marquee onclick=\\\"alert('test')\\\">XSS</marquee>\"}";
+        var is = new ByteArrayInputStream(body.getBytes());
+        when(multiReadRequest.getInputStream()).thenReturn(getServletInputStream(is));
+
+        sanitizerFilter.init(filterConfig);
+        sanitizerFilter.doFilter(multiReadRequest, httpResponse, chain);
+
+        ArgumentCaptor<ServletRequest> requestCaptor = ArgumentCaptor.forClass(ServletRequest.class);
+        verify(chain, times(1)).doFilter(requestCaptor.capture(), any(ServletResponse.class));
+
+        ServletRequest r = requestCaptor.getValue();
+        var updatedBody = IOUtils.toString(r.getInputStream(), r.getCharacterEncoding());
+        ObjectMapper mapper = new ObjectMapper();
+        var json = mapper.readTree(updatedBody);
+        // The marquee tag and onclick should be stripped by the sanitizer
+        assertThat(json.get("lastname").asText()).doesNotContain("<marquee");
+        assertThat(json.get("lastname").asText()).doesNotContain("onclick");
+        assertThat(json.get("lastname").asText()).isEqualTo("XSS");
+    }
+
+    @Test
+    public void shouldSanitizeAttackWhenReadingBodyViaGetReader() throws Exception {
+        // Verify that getReader() also returns the sanitized body, not the original
+        when(httpRequest.getContentType()).thenReturn("application/json");
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
+        when(sanitizerFilter.getAttributesExcluded()).thenReturn(Collections.emptyList());
+
+        final String body = "{\"name\":\"<script>alert('xss')</script>safe\"}";
+        var is = new ByteArrayInputStream(body.getBytes());
+        when(httpRequest.getInputStream()).thenReturn(getServletInputStream(is));
+
+        sanitizerFilter.init(filterConfig);
+        sanitizerFilter.doFilter(httpRequest, httpResponse, chain);
+
+        ArgumentCaptor<ServletRequest> requestCaptor = ArgumentCaptor.forClass(ServletRequest.class);
+        verify(chain, times(1)).doFilter(requestCaptor.capture(), any(ServletResponse.class));
+
+        ServletRequest r = requestCaptor.getValue();
+        // Read via getReader() instead of getInputStream()
+        var readerBody = IOUtils.toString(r.getReader());
+        ObjectMapper mapper = new ObjectMapper();
+        var json = mapper.readTree(readerBody);
+        assertThat(json.get("name").asText()).doesNotContain("<script>");
+        assertThat(json.get("name").asText()).isEqualTo("safe");
+    }
+
+    @Test
+    public void shouldNotWrapMultiReadHttpServletRequestWhenBodyIsUnchanged() throws Exception {
+        // When the body is clean and the request is already a MultiReadHttpServletRequest,
+        // the original request should be passed through without wrapping
+        MultiReadHttpServletRequest multiReadRequest = mock(MultiReadHttpServletRequest.class);
+        when(multiReadRequest.getMethod()).thenReturn("PUT");
+        when(multiReadRequest.getCharacterEncoding()).thenReturn("UTF-8");
+        when(multiReadRequest.getContentType()).thenReturn("application/json");
+        when(multiReadRequest.getRequestURL()).thenReturn(new StringBuffer());
+        when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
+        when(sanitizerFilter.getAttributesExcluded()).thenReturn(Collections.emptyList());
+
+        final String body = "{\"lastname\":\"safe value\"}";
+        var is = new ByteArrayInputStream(body.getBytes());
+        when(multiReadRequest.getInputStream()).thenReturn(getServletInputStream(is));
+
+        sanitizerFilter.init(filterConfig);
+        sanitizerFilter.doFilter(multiReadRequest, httpResponse, chain);
+
+        // Verify the original MultiReadHttpServletRequest is passed through, not a wrapper
+        verify(chain, times(1)).doFilter(multiReadRequest, httpResponse);
+    }
+
     private ServletInputStream getServletInputStream(ByteArrayInputStream is) {
         return new ServletInputStream() {
 
