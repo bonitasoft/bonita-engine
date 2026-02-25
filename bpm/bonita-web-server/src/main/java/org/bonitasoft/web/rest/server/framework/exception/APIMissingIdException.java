@@ -26,9 +26,13 @@ public class APIMissingIdException extends APIMalformedUrlException {
         super(url);
     }
 
+    public APIMissingIdException(final String url, final String message) {
+        super(url, message);
+    }
+
     @Override
     protected String defaultMessage() {
-        return "Id of the item to retrieve is missing in url " + getUrl();
+        return "Id of the item to retrieve is missing in url";
     }
 
 }

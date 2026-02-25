@@ -87,7 +87,8 @@ public class RestRequestParser {
     protected RestRequestParser parseRequest(String[] path, int indexOfAPINameSegment) {
         int minimalNumberOfPathSegments = indexOfAPINameSegment + 2;
         if (path.length < minimalNumberOfPathSegments) {
-            throw new APIMalformedUrlException("Missing API or resource name [" + request.getRequestURL() + "]");
+            throw new APIMalformedUrlException(request.getRequestURL().toString(),
+                    "Missing API or resource name in request URL");
         }
         apiName = path[indexOfAPINameSegment];
         resourceName = path[indexOfAPINameSegment + 1];
