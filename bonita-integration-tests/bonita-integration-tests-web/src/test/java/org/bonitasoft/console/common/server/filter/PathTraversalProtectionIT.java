@@ -163,6 +163,14 @@ public class PathTraversalProtectionIT {
     }
 
     @Test
+    public void urlWithEncodedSpacesShouldPassThrough() throws Exception {
+        int status = get("/bonita/apps/My%20App/API/system/i18ntranslation");
+
+        assertThat(status).as("URL with encoded spaces in an excluded path should reach the servlet")
+                .isEqualTo(200);
+    }
+
+    @Test
     public void legitimateExcludedUrlShouldPassThrough() throws Exception {
         int status = get("/bonita/apps/myapp/API/system/i18ntranslation");
 

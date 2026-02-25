@@ -21,6 +21,7 @@ import javax.servlet.FilterConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriUtils;
 
 public class URLExcludePattern {
 
@@ -78,7 +79,11 @@ public class URLExcludePattern {
             }
             String decodedPath = java.net.URLDecoder.decode(rawPath, "UTF-8");
             String sanitizedPath = PathSanitizer.stripPathParameters(decodedPath);
-            String normalizedPath = new URI(sanitizedPath).normalize().getPath();
+            // Re-encode the sanitized path before creating the URI for normalization,
+            // because URL-decoding may have introduced literal spaces (from %20) that
+            // are illegal in URI syntax per RFC 3986.
+            String normalizedPath = new URI(UriUtils.encodePath(sanitizedPath, "UTF-8"))
+                    .normalize().getPath();
             boolean isExcluded = getExcludePattern().matcher(sanitizedPath).find()
                     && getExcludePattern().matcher(normalizedPath).find();
             if (LOGGER.isDebugEnabled()) {
