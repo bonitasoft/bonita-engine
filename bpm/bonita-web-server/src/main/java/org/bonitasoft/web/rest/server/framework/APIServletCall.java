@@ -277,7 +277,8 @@ public class APIServletCall extends ServletCall {
             if (id == null) {
                 final String inputStream = getInputStream();
                 if (inputStream.length() == 0) {
-                    throw new APIMissingIdException("Id of the element to delete is missing [" + inputStream + "]");
+                    throw new APIMissingIdException(getRequestURL(),
+                            "Id of the element to delete is missing");
                 }
 
                 // Parsing ids in Json input stream
@@ -292,13 +293,13 @@ public class APIServletCall extends ServletCall {
                         } else if (node instanceof TreeLeaf<?>) {
                             ids.add(APIID.makeAPIID(((TreeLeaf<String>) node).getValue()));
                         } else {
-                            throw new APIMissingIdException(
-                                    "Id of the elements to delete are missing or misswritten \"" + inputStream + "\"");
+                            throw new APIMissingIdException(getRequestURL(),
+                                    "Id of the elements to delete are missing or malformed");
                         }
                     }
                 } else {
-                    throw new APIMissingIdException(
-                            "Id of the elements to delete are missing or misswritten \"" + inputStream + "\"");
+                    throw new APIMissingIdException(getRequestURL(),
+                            "Id of the elements to delete are missing or malformed");
                 }
             }
 

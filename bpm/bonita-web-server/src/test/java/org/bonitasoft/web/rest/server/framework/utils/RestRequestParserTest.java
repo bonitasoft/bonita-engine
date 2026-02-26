@@ -67,12 +67,17 @@ public class RestRequestParserTest {
         assertThat(restRequestParser.getApiName()).isEqualTo("bpm");
     }
 
-    @Test(expected = APIMalformedUrlException.class)
+    @Test
     public void should_parsePath_with_bad_request() {
         doReturn("/bpm").when(httpServletRequest).getPathInfo();
         doReturn("/API").when(httpServletRequest).getServletPath();
+        var requestUrl = new StringBuffer("http://my-host/API/bpm");
+        doReturn(requestUrl).when(httpServletRequest).getRequestURL();
 
-        restRequestParser.invoke();
+        assertThatThrownBy(() -> restRequestParser.invoke())
+                .isInstanceOf(APIMalformedUrlException.class)
+                .hasMessage("Missing API or resource name in request URL")
+                .hasMessageNotContainingAny(requestUrl.toString(), "/API", "/bpm");
     }
 
     @Test
@@ -116,23 +121,29 @@ public class RestRequestParserTest {
     @Test
     public void should_throw_when_spring_mvc_request_has_no_API_segment() {
         doReturn(RestRequestParser.SPRING_REST_SERVLET_NAME).when(httpServletMapping).getServletName();
-        doReturn("/not/a/valid/path").when(httpServletRequest).getServletPath();
+        var path = "/not/a/valid/path";
+        doReturn(path).when(httpServletRequest).getServletPath();
+        var requestUrl = new StringBuffer("http://my-host" + path);
+        doReturn(requestUrl).when(httpServletRequest).getRequestURL();
 
         assertThatThrownBy(() -> restRequestParser.invoke())
                 .isInstanceOf(APIMalformedUrlException.class)
-                .hasMessageContaining("Missing API segment")
-                .hasMessageNotContaining("/not/a/valid/path");
+                .hasMessage("Missing API segment in request URL")
+                .hasMessageNotContainingAny(requestUrl.toString(), path);
     }
 
     @Test
     public void should_throw_when_spring_mvc_request_has_no_resource_name() {
         doReturn(RestRequestParser.SPRING_REST_SERVLET_NAME).when(httpServletMapping).getServletName();
-        doReturn("/API").when(httpServletRequest).getServletPath();
+        var path = "/API";
+        doReturn(path).when(httpServletRequest).getServletPath();
+        var requestUrl = new StringBuffer("http://my-host" + path);
+        doReturn(requestUrl).when(httpServletRequest).getRequestURL();
 
         assertThatThrownBy(() -> restRequestParser.invoke())
                 .isInstanceOf(APIMalformedUrlException.class)
-                .hasMessageContaining("Missing API or resource name")
-                .hasMessageNotContaining("/API");
+                .hasMessage("Missing API or resource name in request URL")
+                .hasMessageNotContainingAny(requestUrl.toString(), path);
     }
 
     @Test
