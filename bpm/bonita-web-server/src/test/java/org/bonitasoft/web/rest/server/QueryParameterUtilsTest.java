@@ -28,16 +28,19 @@ public class QueryParameterUtilsTest {
     @Test
     void parseFilterShouldBuildExpectedMap() {
         // given:
-        final List<String> filters = Arrays.asList("toto=17", "titi='EN_ECHEC'", "task=task=with=equal=in=name");
+        final List<String> filters = Arrays.asList("toto=17", "titi='EN_ECHEC'", "task=task=with=equal=in=name",
+                "list=value1,value2,value3", "anotherlist='value-1','value-2','value-3'");
 
         // when:
         final Map<String, String> parseFilters = parseFilters(filters);
 
         // then:
-        assertThat(parseFilters).hasSize(3);
+        assertThat(parseFilters).hasSize(5);
         assertThat(parseFilters.get("toto")).isEqualTo("17");
         assertThat(parseFilters.get("titi")).isEqualTo("'EN_ECHEC'");
         assertThat(parseFilters.get("task")).isEqualTo("task=with=equal=in=name");
+        assertThat(parseFilters.get("list")).isEqualTo("value1,value2,value3");
+        assertThat(parseFilters.get("anotherlist")).isEqualTo("'value-1','value-2','value-3'");
     }
 
     @Test

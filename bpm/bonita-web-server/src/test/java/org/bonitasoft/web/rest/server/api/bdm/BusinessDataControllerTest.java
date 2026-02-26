@@ -123,7 +123,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                 .andExpect(status().isInternalServerError())
                 .andExpect(content()
                         .json("""
-                                {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"org.bonitasoft.engine.business.data.BusinessDataRepositoryException: repository error"}"""));;
+                                {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"org.bonitasoft.engine.business.data.BusinessDataRepositoryException: repository error"}"""));
     }
 
     // =================================================================================================================
@@ -289,6 +289,99 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(jsonResponse))
                 .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "3-5/4"));
+    }
+
+    @Test
+    void should_call_custom_query_single_multivalued_query_parameter() throws Exception {
+        String jsonResponse = """
+                    [
+                        {"id": 123, "name": "Harry", "country": "US"},
+                        {"id": 124, "name": "Anna", "country": "US"},
+                        {"id": 129, "name": "Harry", "country": "Scotland"},
+                        {"id": 130, "name": "Anna", "country": "Catalunya"},
+                        {"id": 137, "name": "Anna", "country": "Quebec"},
+                        {"id": 145, "name": "Anna", "country": "Corsica"}
+                    ]
+                """;
+
+        final Answer<Serializable> answer = invocation -> {
+            assertThat(invocation.getArguments()).as("should have 2 parameters").hasSize(2);
+            assertThat(invocation.getArguments()[0]).as("should call command")
+                    .isEqualTo("getBusinessDataByQueryCommand");
+            final Map<String, Serializable> parameters = (Map<String, Serializable>) invocation.getArguments()[1];
+            assertThat(parameters).as("should have required  parameters").hasSize(6);
+            assertThat(parameters).as("should compute start index").containsEntry("startIndex", 2 * 6);
+            assertThat(parameters).containsEntry("maxResults", 6);
+            assertThat(parameters).containsEntry("queryName", "findByNames");
+            assertThat(parameters).containsEntry("businessDataURIPattern", BusinessDataFieldValue.URI_PATTERN);
+            assertThat(parameters).containsEntry("entityClassName", "org.bonitasoft.pojo.Employee");
+            assertThat(parameters).containsKey("queryParameters");
+
+            final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters
+                    .get("queryParameters");
+            assertThat(queryParameters).as("should compute search filters").hasSize(1);
+            assertThat(queryParameters).containsEntry("names", "Harry,Anna");
+
+            return new BusinessDataQueryResultImpl(jsonResponse, new BusinessDataQueryMetadataImpl(1, 2, 26L));
+        };
+        when(commandAPI.execute(anyString(), anyMap())).then(answer);
+
+        //then
+        mockMvc.perform(
+                get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByNames&c=6&p=2&f=names=Harry,Anna")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(jsonResponse))
+                .andExpect(header().string("Content-Range", "2-6/26"));
+    }
+
+    @Test
+    void should_call_custom_query_multiple_multivalued_query_parameters() throws Exception {
+        String jsonResponse = """
+                    [
+                        {"id": 129, "name": "Harry", "country": "Scotland"},
+                        {"id": 130, "name": "Anna", "country": "Catalunya"},
+                        {"id": 137, "name": "Anna", "country": "Quebec"},
+                        {"id": 145, "name": "Anna", "country": "Corsica"}
+                    ]
+                """;
+
+        final Answer<Serializable> answer = invocation -> {
+            assertThat(invocation.getArguments()).as("should have 2 parameters").hasSize(2);
+            assertThat(invocation.getArguments()[0]).as("should call command")
+                    .isEqualTo("getBusinessDataByQueryCommand");
+            final Map<String, Serializable> parameters = (Map<String, Serializable>) invocation.getArguments()[1];
+            assertThat(parameters).as("should have required  parameters").hasSize(6);
+            assertThat(parameters).as("should compute start index").containsEntry("startIndex", 4 * 8);
+            assertThat(parameters).containsEntry("maxResults", 8);
+            assertThat(parameters).containsEntry("queryName", "findByNamesAndCountries");
+            assertThat(parameters).containsEntry("businessDataURIPattern", BusinessDataFieldValue.URI_PATTERN);
+            assertThat(parameters).containsEntry("entityClassName", "org.bonitasoft.pojo.Employee");
+            assertThat(parameters).containsKey("queryParameters");
+
+            final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters
+                    .get("queryParameters");
+            assertThat(queryParameters).as("should compute search filters").hasSize(2);
+            assertThat(queryParameters).containsEntry("names", "Harry,Anna");
+            assertThat(queryParameters).containsEntry("countries", "Catalunya,Corsica,Scotland,Quebec");
+
+            return new BusinessDataQueryResultImpl(jsonResponse, new BusinessDataQueryMetadataImpl(1, 2, 36L));
+        };
+        when(commandAPI.execute(anyString(), anyMap())).then(answer);
+
+        //then
+        mockMvc.perform(
+                get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByNamesAndCountries&c=8&p=4&f=names=Harry,Anna&f=countries=Catalunya,Corsica,Scotland,Quebec")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(jsonResponse))
+                .andExpect(header().string("Content-Range", "4-8/36"));
     }
 
     @Test
