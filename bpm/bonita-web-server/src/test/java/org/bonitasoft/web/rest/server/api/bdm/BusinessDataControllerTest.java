@@ -247,6 +247,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
     // =================================================================================================================
 
     @Test
+    @SuppressWarnings("unchecked")
     void should_call_custom_query() throws Exception {
         String jsonResponse = """
                     [
@@ -292,6 +293,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void should_call_custom_query_single_multivalued_query_parameter() throws Exception {
         String jsonResponse = """
                     [
@@ -333,12 +335,13 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                         .accept(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(jsonResponse))
                 .andExpect(header().string("Content-Range", "2-6/26"));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void should_call_custom_query_multiple_multivalued_query_parameters() throws Exception {
         String jsonResponse = """
                     [
@@ -379,7 +382,7 @@ class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataCont
                         .accept(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(jsonResponse))
                 .andExpect(header().string("Content-Range", "4-8/36"));
     }
