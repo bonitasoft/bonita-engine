@@ -71,7 +71,7 @@ class TimerEventTriggerControllerTest extends AbstractControllerTest<TimerEventT
                 .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "0-1/1"))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1))
-                // Verify _string fields are present (backward compatibility with Restlet)
+                // Verify _string fields are present (backward compatibility)
                 .andExpect(jsonPath("$[0].id").value(triggerId))
                 .andExpect(jsonPath("$[0].id_string").value(String.valueOf(triggerId)))
                 .andExpect(jsonPath("$[0].eventInstanceId").value(eventInstanceId))

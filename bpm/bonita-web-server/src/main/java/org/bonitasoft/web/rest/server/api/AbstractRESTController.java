@@ -15,7 +15,6 @@ package org.bonitasoft.web.rest.server.api;
 
 import javax.servlet.http.HttpSession;
 
-import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
@@ -32,17 +31,9 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Parent class providing common methods for Bonita REST Controllers
  */
-@Slf4j
 public abstract class AbstractRESTController {
 
     public static final String API_SPRING_INTERNAL = "APISpringInternal";
-
-    public AbstractRESTController() {
-        // For testing purposes, to make sure that the new implementation is deployed and that
-        // we do not fallback on the Restlet implementation.
-        // FIXME: Will be removed once the entire Restlet refactoring is done:
-        log.info("Creating REST Controller {}", this.getClass().getName());
-    }
 
     public APISession getApiSession(HttpSession session) {
         APISession apiSession = (APISession) session.getAttribute(SessionUtil.API_SESSION_PARAM_KEY);

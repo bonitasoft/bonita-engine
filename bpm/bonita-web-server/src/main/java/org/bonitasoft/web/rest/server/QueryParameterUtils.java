@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Utilities to handle query parameters.
- * Shared between Restlet and SpringMVC controllers.
+ * Shared across Spring MVC controllers.
  */
 public class QueryParameterUtils {
 

@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Spring MVC Controller for Timer Event Triggers.
- * Converted from Restlet to Spring MVC.
  *
  * @author Emmanuel Duchastenier
  */

@@ -2,10 +2,6 @@ plugins {
     id('bonita-tests')
 }
 
-repositories {
-    maven { url = uri('https://maven.restlet.talend.com') }
-}
-
 dependencies {
     implementation project(':bpm:bonita-web-server')
     implementation project(':bonita-test-api')
@@ -17,7 +13,6 @@ dependencies {
     testImplementation libs.hamcrest
     testImplementation libs.mockitoCore
     testImplementation libs.assertj
-    testImplementation libs.restlet
     testImplementation libs.awaitility
     testImplementation libs.tomcatEmbedCore
 }

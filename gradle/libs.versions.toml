@@ -60,7 +60,6 @@ jsonSimpleVersion = "1.1.1"
 urlrewritefilterVersion = "4.0.4"
 jakartaJstlVersion = "1.2.6"
 jakartaJstlApiVersion = "1.2.7"
-restletVersion = "2.3.12"
 xbeanClassloaderVersion = "4.30"
 jgettextVersion = "0.15.1"
 hamcrestVersion = "3.0"
@@ -218,9 +217,6 @@ jsonSimple = { group = "com.googlecode.json-simple", name = "json-simple", versi
 urlrewritefilter = { group = "org.tuckey", name = "urlrewritefilter", version.ref = "urlrewritefilterVersion" }
 jakartaJstl = { group = "org.glassfish.web", name = "jakarta.servlet.jsp.jstl", version.ref = "jakartaJstlVersion" }
 jakartaJstlApi = { group = "jakarta.servlet.jsp.jstl", name = "jakarta.servlet.jsp.jstl-api", version.ref = "jakartaJstlApiVersion" }
-restlet = { group = "org.restlet.jse", name = "org.restlet", version.ref = "restletVersion" }
-restletServlet = { group = "org.restlet.jee", name = "org.restlet.ext.servlet", version.ref = "restletVersion" }
-restletJackson = { group = "org.restlet.jse", name = "org.restlet.ext.jackson", version.ref = "restletVersion" }
 xbeanClassloader = { group = "org.apache.xbean", name = "xbean-classloader", version.ref = "xbeanClassloaderVersion" }
 jgettext = { group = "org.fedorahosted.tennera", name = "jgettext", version.ref = "jgettextVersion" }
 hamcrest = { group = "org.hamcrest", name = "hamcrest", version.ref = "hamcrestVersion" }

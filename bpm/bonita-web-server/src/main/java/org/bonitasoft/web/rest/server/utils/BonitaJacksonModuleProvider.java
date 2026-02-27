@@ -30,7 +30,7 @@ import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeSerializer;
 /**
  * Provides Jackson module configuration for Bonita REST APIs.
  * <p>
- * This ensures backward compatibility with the Restlet JSON format, including:
+ * This ensures backward compatibility with the legacy JSON format, including:
  * <ul>
  * <li>_string suffix fields for numeric IDs (for JavaScript precision)</li>
  * <li>Custom date/time serialization</li>
@@ -46,7 +46,7 @@ public final class BonitaJacksonModuleProvider {
 
     /**
      * Creates a Jackson module with Bonita custom serializers.
-     * Same configuration as BonitaJacksonConverter for Restlet.
+     * Includes custom serializers for _string suffix fields and date/time handling.
      *
      * @return the configured Jackson module
      */

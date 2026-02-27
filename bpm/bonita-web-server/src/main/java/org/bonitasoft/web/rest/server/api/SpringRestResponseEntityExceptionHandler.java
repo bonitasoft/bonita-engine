@@ -83,7 +83,6 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     @ExceptionHandler(value = { MethodArgumentTypeMismatchException.class })
     public ResponseEntity<Object> handleInvalidParameters(HttpServletRequest req,
             MethodArgumentTypeMismatchException ex) {
-        // replicate the error message produced by former API written with Restlet (see CommonResource)
         String parameterName = ex.getName();
         if (log.isDebugEnabled()) {
             log.debug("Invalid parameter [{}] {}: {}", req.getPathInfo(), parameterName, ex.getMessage());
@@ -190,7 +189,6 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException exception, HttpHeaders headers, HttpStatus status,
             WebRequest request) {
-        // replicate the error message produced by former API written with Restlet (see CommonResource)
         String parameterName = exception.getParameterName();
 
         String mapping = parameterErrorNames.get(parameterName);
@@ -205,7 +203,6 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     private static ResponseEntity<Object> bonitaHandleException(Throwable exception, HttpStatus status) {
-        // replicate the behaviour of former API written with Restlet (see CommonResource)
         final Throwable cause = exception.getCause() != null ? exception.getCause() : exception;
         return generateErrorResponse(exception.getClass().getName(), status, cause.getMessage());
     }

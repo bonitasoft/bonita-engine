@@ -346,8 +346,7 @@
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
-    <!-- End Filter for restlet URLs -->
-
+    <!-- End Filter for Toolkit API URLs -->
     <!-- Platform and tenant listeners -->
     <!-- For Apps containing the engine server -->
     <listener>
@@ -365,15 +364,6 @@
     <servlet>
         <servlet-name>BonitaRestAPIServlet</servlet-name>
         <servlet-class>org.bonitasoft.web.rest.server.BonitaRestAPIServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>RestletServlet</servlet-name>
-        <servlet-class>org.bonitasoft.web.rest.server.BonitaRestletApplicationServlet</servlet-class>
-    </servlet>
-    <!-- Restlet servlet needs its own declaration for each URL pattern otherwise, only the first pattern works -->
-    <servlet>
-        <servlet-name>CustomPageRestletServlet</servlet-name>
-        <servlet-class>org.bonitasoft.web.rest.server.BonitaRestletApplicationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>SpringRest</servlet-name>
@@ -737,21 +727,12 @@
         <url-pattern>/platformlogoutservice</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestletServlet</servlet-name>
-        <url-pattern>/API/*</url-pattern>
-    </servlet-mapping>
-    <!-- Restlet servlet needs its own declaration for each URL pattern otherwise, only the first pattern works -->
-    <servlet-mapping>
-        <servlet-name>CustomPageRestletServlet</servlet-name>
-        <url-pattern>/portal/custom-page/API/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>BonitaRestAPIServlet</servlet-name>
         <url-pattern>/APIToolkit/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SpringRest</servlet-name>
-        <!-- API resource URLs need to be listed here in order to avoid being picked up by Restlet which is bound to /API/* -->
+        <!-- API resource URLs served by Spring MVC DispatcherServlet -->
         <!-- /APISpringInternal/* serves as a workaround on Tomcat limitation on URL pattern with /* in the middle. See urlrewrite.xml for redirections: -->
         <url-pattern>/APISpringInternal/*</url-pattern>
         <url-pattern>/portal/custom-page/API/extension/*</url-pattern>

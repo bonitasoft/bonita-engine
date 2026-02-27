@@ -30,8 +30,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.accept.FixedContentNegotiationStrategy;
-import org.springframework.web.accept.HeaderContentNegotiationStrategy;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
  * Test-purpose utility class to initialize MockMvc for REST controllers with session attributes.
@@ -50,22 +48,19 @@ public class RestControllerUtils {
         doReturn(apiSession).when(controller).getApiSession(any());
         sessionAttributes.put(SessionUtil.API_SESSION_PARAM_KEY, apiSession);
 
-        // Match the production SpringWebConfiguration: default to JSON content type
-        var contentNegotiationManager = new ContentNegotiationManager(
-                new HeaderContentNegotiationStrategy(),
-                new FixedContentNegotiationStrategy(MediaType.APPLICATION_JSON));
-
         StandaloneMockMvcBuilder builder = MockMvcBuilders
                 .standaloneSetup(controller)
                 .setControllerAdvice(new SpringRestResponseEntityExceptionHandler())
-                .setContentNegotiationManager(contentNegotiationManager);
+                // Match the production SpringWebConfiguration: default to JSON content type
+                // /!\ Make sure that both use the same configuration /!\
+                .setContentNegotiationManager(new ContentNegotiationManager(
+                        new FixedContentNegotiationStrategy(MediaType.APPLICATION_JSON)));
 
         builder.setMessageConverters(MESSAGE_CONVERTERS.toArray(new HttpMessageConverter<?>[0]));
 
         // Force UTF-8 response encoding so that MockHttpServletResponse.getContentAsString()
         // correctly decodes UTF-8 bytes (servlet spec defaults to ISO-8859-1)
-        var utf8Filter = new CharacterEncodingFilter(StandardCharsets.UTF_8.name(), false, true);
-        builder.addFilter(utf8Filter);
+        builder.defaultResponseCharacterEncoding(StandardCharsets.UTF_8);
 
         return builder.build();
     }

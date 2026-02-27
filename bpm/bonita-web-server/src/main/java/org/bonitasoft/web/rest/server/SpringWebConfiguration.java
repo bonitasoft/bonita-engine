@@ -68,8 +68,7 @@ public class SpringWebConfiguration extends WebMvcConfigurationSupport {
         // Use a temporary instance to access the protected addDefaultHttpMessageConverters
         new SpringWebConfiguration().addDefaultHttpMessageConverters(converters);
 
-        // Replace the default Jackson converter with one configured with Bonita
-        // custom serializers for backward compatibility with Restlet JSON format
+        // Replace the default Jackson converter with one configured with Bonita custom serializers
         converters.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);
         ObjectMapper objectMapper = new ObjectMapper();
         BonitaJacksonModuleProvider.configureObjectMapper(objectMapper);
@@ -85,6 +84,7 @@ public class SpringWebConfiguration extends WebMvcConfigurationSupport {
     @Override
     protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         // enforces JSON as the default content type for content negotiation for Spring MVC APIs
+        // /!\ Make sure that RestControllerUtils uses the same configuration /!\
         configurer.defaultContentType(MediaType.APPLICATION_JSON);
     }
 }

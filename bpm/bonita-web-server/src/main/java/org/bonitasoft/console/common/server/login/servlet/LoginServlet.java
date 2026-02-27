@@ -41,10 +41,9 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
-import org.restlet.data.MediaType;
-import org.restlet.engine.header.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 
 /**
  * @author Anthony Birembaut, Ruiheng Fan, Chong Zhao, Haojie Yuan
@@ -103,7 +102,8 @@ public class LoginServlet extends HttpServlet {
             throw new ServletException(e);
         }
         if (request.getContentType() != null
-                && !MediaType.APPLICATION_WWW_FORM.equals(ContentType.readMediaType(request.getContentType()))) {
+                && !MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(
+                        MediaType.parseMediaType(request.getContentType()))) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(
                         "The only content type supported by this service is application/x-www-form-urlencoded. The content-type request header needs to be set accordingly.");
