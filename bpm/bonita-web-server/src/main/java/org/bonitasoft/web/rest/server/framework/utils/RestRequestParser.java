@@ -63,12 +63,41 @@ public class RestRequestParser {
 
     protected RestRequestParser parseLegacyAPIRequest() {
         String pathInfo = request.getPathInfo();
-        if (pathInfo == null || pathInfo.split("/").length < 3) {
-            // it's not an URL like API/bpm/...
-            pathInfo = request.getServletPath();
+        if (pathInfo != null && pathInfo.split("/").length >= 3) {
+            // pathInfo is set by the servlet container when a servlet is mapped to a wildcard
+            // pattern (e.g. /API/*). In that case, pathInfo starts with /<apiName>/...
+            final String[] path = pathInfo.split("/");
+            return parseRequest(path, 1);
         }
-        final String[] path = pathInfo.split("/");
-        //ignoring the first segment corresponding to the empty string before the first /
+        if (pathInfo != null) {
+            // pathInfo exists but is too short — a specific servlet is mapped to a sub-path
+            // (e.g. /API/avatars/*). In that case, servletPath = "/API/avatars" and
+            // pathInfo = "/17". Combine them and parse from index 1 so that "API" is included
+            // as apiName, matching permission entries like "GET|API/avatars".
+            final String[] path = (request.getServletPath() + pathInfo).split("/");
+            return parseRequest(path, 1);
+        }
+        // pathInfo is null — either an exact-match servlet (e.g. /API/documentDownload)
+        // or the default servlet handles it. servletPath contains the full path.
+        final String[] path = request.getServletPath().split("/");
+        List<String> segments = Arrays.asList(path);
+        int apiIndex = segments.indexOf("API");
+        if (apiIndex < 0) {
+            apiIndex = segments.indexOf("APIToolkit");
+        }
+        if (apiIndex >= 0) {
+            int segmentsAfterApi = path.length - apiIndex - 1;
+            if (segmentsAfterApi >= 2) {
+                // Deep URL like /API/living/application — skip "API", use living/application
+                return parseRequest(path, apiIndex + 1);
+            }
+            // Flat URL like /API/documentDownload — include "API" as apiName,
+            // matching permission entries like "GET|API/documentDownload"
+            return parseRequest(path, apiIndex);
+        }
+        // No "API" or "APIToolkit" segment — URL is under /portal/ or /services/
+        // (e.g. /portal/imageUpload, /portal/documentDownload). Parse from index 1
+        // so that apiName = "portal" and resourceName = "imageUpload".
         return parseRequest(path, 1);
     }
 
