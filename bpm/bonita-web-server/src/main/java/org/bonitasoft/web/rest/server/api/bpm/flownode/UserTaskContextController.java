@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserTaskContextController extends AbstractRESTController {
 
     @GetMapping
-    public Map<String, Serializable> getUserTaskContext(@PathVariable Long taskId, HttpSession session)
+    public Map<String, Serializable> getUserTaskContext(@PathVariable long taskId, HttpSession session)
             throws Exception {
         final Map<String, Serializable> resultMap = new HashMap<>();
 

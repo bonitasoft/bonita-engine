@@ -34,6 +34,10 @@ import org.springframework.http.MediaType;
 
 class BusinessDataReferenceControllerTest extends AbstractControllerTest<BusinessDataReferenceController> {
 
+    private static final long FAKE_CASE_ID = 486L;
+    private static final String FAKE_DATA_NAME = "myEmployee";
+    private static final String FAKE_EXCEPTION_MESSAGE = "fake exception message";
+
     @Mock
     protected BusinessDataAPI businessDataAPI;
 
@@ -66,14 +70,16 @@ class BusinessDataReferenceControllerTest extends AbstractControllerTest<Busines
     @Test
     void should_return_the_simple_reference_of_the_business_data_of_the_process_instance() throws Exception {
         // given
-        SimpleBusinessDataReference reference = buildSimpleEmployeeReference("myEmployee", 487467354L);
-        when(businessDataAPI.getProcessBusinessDataReference("myEmployee", 486L)).thenReturn(reference);
+        SimpleBusinessDataReference reference = buildSimpleEmployeeReference(FAKE_DATA_NAME, 487467354L);
+        when(businessDataAPI.getProcessBusinessDataReference(FAKE_DATA_NAME, FAKE_CASE_ID)).thenReturn(reference);
 
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference/486/myEmployee")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference/{caseId}/{dataName}", FAKE_CASE_ID, FAKE_DATA_NAME)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                         {
                           "name": "myEmployee",
@@ -82,20 +88,23 @@ class BusinessDataReferenceControllerTest extends AbstractControllerTest<Busines
                           "storageId_string": "487467354",
                           "link": "API/bdm/businessData/com.bonitasoft.pojo.Employee/487467354"
                         }
-                        """));
+                        """, true));
     }
 
     @Test
     void should_return_the_multi_reference_of_the_business_data_of_the_process_instance() throws Exception {
         // given
-        MultipleBusinessDataReference reference = buildMultipleEmployeeReference("myEmployee", 487467354L, 48674634L);
-        when(businessDataAPI.getProcessBusinessDataReference("myEmployee", 486L)).thenReturn(reference);
+        MultipleBusinessDataReference reference = buildMultipleEmployeeReference(FAKE_DATA_NAME, 487467354L,
+                48674634L);
+        when(businessDataAPI.getProcessBusinessDataReference(FAKE_DATA_NAME, FAKE_CASE_ID)).thenReturn(reference);
 
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference/486/myEmployee")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference/{caseId}/{dataName}", FAKE_CASE_ID, FAKE_DATA_NAME)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                         {
                           "name": "myEmployee",
@@ -104,29 +113,39 @@ class BusinessDataReferenceControllerTest extends AbstractControllerTest<Busines
                           "storageIds_string": ["487467354", "48674634"],
                           "link": "API/bdm/businessData/com.bonitasoft.pojo.Employee/findByIds?ids=487467354,48674634"
                         }
-                        """));
+                        """, true));
     }
 
     @Test
     void should_respond_bad_request_when_caseId_pathparam_is_not_a_number() throws Exception {
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference/foo/myEmployee")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+        var caseId = "foo";
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference/{caseId}/{dataName}", caseId, FAKE_DATA_NAME)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("[ %s ] must be a number".formatted(caseId)));
     }
 
     @Test
     void should_return_a_not_found_status_when_business_data_is_not_found() throws Exception {
         // given
-        when(businessDataAPI.getProcessBusinessDataReference("myEmployee", 486L))
-                .thenThrow(new DataNotFoundException(new Exception("message")));
+        when(businessDataAPI.getProcessBusinessDataReference(FAKE_DATA_NAME, FAKE_CASE_ID))
+                .thenThrow(new DataNotFoundException(new Exception(FAKE_EXCEPTION_MESSAGE)));
 
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference/486/myEmployee")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference/{caseId}/{dataName}", FAKE_CASE_ID, FAKE_DATA_NAME)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(DataNotFoundException.class.toString()))
+                .andExpect(jsonPath("$.message").value(FAKE_EXCEPTION_MESSAGE));
+
     }
 
     // =================================================================================================================
@@ -139,90 +158,116 @@ class BusinessDataReferenceControllerTest extends AbstractControllerTest<Busines
         List<BusinessDataReference> references = new ArrayList<>();
         references.add(buildSimpleEmployeeReference("john", 487467354L));
         references.add(buildMultipleEmployeeReference("Ateam", 687646784L, 2313213874354L));
-        when(businessDataAPI.getProcessBusinessDataReferences(486L, 10, 10)).thenReturn(references);
+        when(businessDataAPI.getProcessBusinessDataReferences(FAKE_CASE_ID, 10, 10)).thenReturn(references);
 
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference")
-                .param("f", "caseId=486")
-                .param("p", "1")
-                .param("c", "10")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference")
+                        .param("f", "caseId=" + FAKE_CASE_ID)
+                        .param("p", "1")
+                        .param("c", "10")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("""
-                        [
-                          {
-                            "name": "john",
-                            "type": "com.bonitasoft.pojo.Employee",
-                            "storageId": 487467354,
-                            "storageId_string": "487467354"
-                          },
-                          {
-                            "name": "Ateam",
-                            "type": "com.bonitasoft.pojo.Employee",
-                            "storageIds": [687646784, 2313213874354],
-                            "storageIds_string": ["687646784", "2313213874354"]
-                          }
-                        ]
-                        """));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(
+                        """
+                                [
+                                  {
+                                    "name": "john",
+                                    "type": "com.bonitasoft.pojo.Employee",
+                                    "storageId": 487467354,
+                                    "storageId_string": "487467354",
+                                    "link": "API/bdm/businessData/com.bonitasoft.pojo.Employee/487467354"
+                                  },
+                                  {
+                                    "name": "Ateam",
+                                    "type": "com.bonitasoft.pojo.Employee",
+                                    "storageIds": [687646784, 2313213874354],
+                                    "storageIds_string": ["687646784", "2313213874354"],
+                                    "link": "API/bdm/businessData/com.bonitasoft.pojo.Employee/findByIds?ids=687646784,2313213874354"
+                                  }
+                                ]
+                                """,
+                        true));
     }
 
     @Test
     void should_respond_bad_request_when_caseId_filter_not_specified() throws Exception {
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference")
-                .param("f", "unknownfilter=123")
-                .param("p", "0")
-                .param("c", "10")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference")
+                        .param("f", "unknownfilter=123")
+                        .param("p", "0")
+                        .param("c", "10")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("filter caseId is mandatory"));
     }
 
     @Test
     void should_be_valid_when_extra_unwanted_filter_is_provided() throws Exception {
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference")
-                .param("f", "unknownfilter=123,caseId=456")
-                .param("p", "0")
-                .param("c", "10")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference")
+                        .param("f", "unknownfilter=123")
+                        .param("f", "caseId=" + FAKE_CASE_ID)
+                        .param("p", "0")
+                        .param("c", "10")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("[]", true));
     }
 
     @Test
     void should_respond_bad_request_when_caseId_filter_is_not_a_number() throws Exception {
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference")
-                .param("f", "caseId=toto")
-                .param("p", "0")
-                .param("c", "10")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference")
+                        .param("f", "caseId=toto")
+                        .param("p", "0")
+                        .param("c", "10")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("filter caseId must be a number"));
     }
 
     @Test
     void should_respond_bad_request_when_page_parameter_is_missing() throws Exception {
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference")
-                .param("f", "caseId=486")
-                .param("c", "10")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference")
+                        .param("f", "caseId=" + FAKE_CASE_ID)
+                        .param("c", "10")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("query parameter p (page) is mandatory"));
     }
 
     @Test
     void should_respond_bad_request_when_count_parameter_is_missing() throws Exception {
         // when/then
-        mockMvc.perform(get("/API/bdm/businessDataReference")
-                .param("f", "caseId=486")
-                .param("p", "0")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(
+                get("/API/bdm/businessDataReference")
+                        .param("f", "caseId=" + FAKE_CASE_ID)
+                        .param("p", "0")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("query parameter c (count) is mandatory"));
     }
 
 }

@@ -35,7 +35,7 @@ public class UserTaskContractController extends AbstractRESTController {
     protected final ContractTypeConverter typeConverterUtil = new ContractTypeConverter(ISO_8601_DATE_PATTERNS);
 
     @GetMapping
-    public ResponseEntity<ContractDefinition> getContract(@PathVariable final Long taskId, HttpSession session)
+    public ResponseEntity<ContractDefinition> getContract(@PathVariable final long taskId, HttpSession session)
             throws BonitaException {
         ContractDefinition contract = getProcessAPI(session).getUserTaskContract(taskId);
         ContractDefinition adaptedContract = typeConverterUtil.getAdaptedContractDefinition(contract);

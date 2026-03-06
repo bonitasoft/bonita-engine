@@ -68,7 +68,7 @@ class ArchivedCaseContextControllerTest extends AbstractControllerTest<ArchivedC
                             "Ticket": "ticketValue",
                             "Count": 42
                         }
-                        """));
+                        """, true));
     }
 
     @Test

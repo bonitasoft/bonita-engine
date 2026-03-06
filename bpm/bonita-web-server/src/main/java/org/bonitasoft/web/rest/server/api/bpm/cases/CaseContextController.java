@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CaseContextController extends AbstractRESTController {
 
     @GetMapping
-    public Map<String, Serializable> getCaseContext(@PathVariable Long caseId, HttpSession httpSession)
+    public Map<String, Serializable> getCaseContext(@PathVariable long caseId, HttpSession httpSession)
             throws Exception {
         Map<String, Serializable> resultMap = new HashMap<>();
         Map<String, Serializable> caseExecutionContext = getProcessAPI(httpSession)

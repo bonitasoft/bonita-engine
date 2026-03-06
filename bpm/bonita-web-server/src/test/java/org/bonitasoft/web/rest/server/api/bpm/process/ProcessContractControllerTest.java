@@ -71,21 +71,54 @@ class ProcessContractControllerTest extends AbstractControllerTest<ProcessContra
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(
-                        "{\"constraints\":[{\"name\":\"aRule\",\"expression\":\"an expression\",\"explanation\":\"an explanation\"}],\"inputs\":[{\"type\":\"TEXT\",\"description\":\"aDescription\",\"name\":\"anInput\"},{\"inputs\":[{\"type\":\"TEXT\",\"description\":\"aDescription\",\"name\":\"anInput\"}],\"description\":\"description\",\"name\":\"complexInput\",\"multiple\":true}]}"));
+                .andExpect(content().json("""
+                        {
+                          "inputs": [
+                            {
+                              "inputs": [],
+                              "type": "TEXT",
+                              "description": "aDescription",
+                              "name": "anInput",
+                              "multiple": false
+                            },
+                            {
+                              "inputs": [
+                                {
+                                  "inputs": [],
+                                  "type": "TEXT",
+                                  "description": "aDescription",
+                                  "name": "anInput",
+                                  "multiple": false
+                                }
+                              ],
+                              "type": null,
+                              "description": "description",
+                              "name": "complexInput",
+                              "multiple": true
+                            }
+                          ],
+                          "constraints": [
+                            {
+                              "name": "aRule",
+                              "expression": "an expression",
+                              "explanation": "an explanation",
+                              "inputNames": []
+                            }
+                          ]
+                        }""", true));
     }
 
     @Test
     void should_respond_404_Not_found_when_process_definition_is_not_found_when_getting_contract()
-                        throws Exception {
-                when(processAPI.getProcessContract(PROCESS_DEFINITION_ID))
-                                .thenThrow(new ProcessDefinitionNotFoundException("process definition not found"));
+            throws Exception {
+        when(processAPI.getProcessContract(PROCESS_DEFINITION_ID))
+                .thenThrow(new ProcessDefinitionNotFoundException("process definition not found"));
 
-                mockMvc.perform(get(TEST_CONTRACT_API_URL)
-                                .sessionAttrs(sessionAttributes)
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isNotFound());
-        }
+        mockMvc.perform(get(TEST_CONTRACT_API_URL)
+                .sessionAttrs(sessionAttributes)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     void should_respond_204_when_there_is_no_contract_on_the_process() throws Exception {

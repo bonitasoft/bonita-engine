@@ -53,7 +53,7 @@ public class BusinessDataReferenceController extends AbstractRESTController {
      */
     @GetMapping("/{caseId}/{dataName}")
     public BusinessDataReferenceClient getProcessBusinessDataReference(
-            @PathVariable Long caseId,
+            @PathVariable long caseId,
             @PathVariable String dataName,
             HttpSession httpSession) throws DataNotFoundException, BonitaException {
         BusinessDataReference reference = getBusinessDataAPI(httpSession)
@@ -72,13 +72,8 @@ public class BusinessDataReferenceController extends AbstractRESTController {
      *
      * </p>
      *
-     * @param filters standard filter set that MUST contain a filter named caseId and containing the process instance
-     *        ID:
-     *
-     *        <pre>
-     *        f = caseId = 123
-     *        </pre>
-     *
+     * @param filters standard filter set that MUST contain a filter named <code>caseId</code> and containing the
+     *        process instance ID: <code>f=caseId=123</code>
      * @param page the page number (0-based)
      * @param count the number of results per page
      * @param httpSession the HTTP session
@@ -88,11 +83,11 @@ public class BusinessDataReferenceController extends AbstractRESTController {
     @GetMapping
     public List<BusinessDataReferenceClient> getProcessBusinessDataReferences(
             @RequestParam("f") List<String> filters,
-            @RequestParam("p") Integer page,
-            @RequestParam("c") Integer count,
+            @RequestParam("p") int page,
+            @RequestParam("c") int count,
             HttpSession httpSession) throws BonitaException {
 
-        Long caseId = QueryParameterUtils.extractLongFilterFromFilterList(filters, "caseId");
+        long caseId = QueryParameterUtils.extractMandatoryLongFilter(filters, "caseId");
         List<BusinessDataReference> references = getBusinessDataAPI(httpSession)
                 .getProcessBusinessDataReferences(caseId, page * count, count);
         return references.stream()

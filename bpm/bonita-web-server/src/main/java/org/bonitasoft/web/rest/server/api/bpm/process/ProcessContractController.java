@@ -35,7 +35,7 @@ public class ProcessContractController extends AbstractRESTController {
     protected final ContractTypeConverter typeConverterUtil = new ContractTypeConverter(ISO_8601_DATE_PATTERNS);
 
     @GetMapping
-    public ResponseEntity<ContractDefinition> getContract(@PathVariable final Long processDefinitionId,
+    public ResponseEntity<ContractDefinition> getContract(@PathVariable final long processDefinitionId,
             HttpSession session)
             throws BonitaException {
         ContractDefinition processContract = getProcessAPI(session).getProcessContract(processDefinitionId);

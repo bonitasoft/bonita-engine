@@ -13,17 +13,10 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.process;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -71,7 +64,15 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
     }
 
     private String aComplexInputAsJson() {
-        return "{\"aBoolean\":true, \"aString\":\"hello world\", \"a_complex_type\":{\"aNumber\":2, \"aBoolean\":false}}";
+        return """
+                {
+                    "aBoolean": true,
+                    "aString": "hello world",
+                    "a_complex_type": {
+                        "aNumber": 2,
+                        "aBoolean": false
+                    }
+                }""";
     }
 
     private Map<String, Serializable> aComplexInput() {
@@ -94,7 +95,7 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
         final ProcessInstanceImpl processInstance = new ProcessInstanceImpl("complexProcessInstance");
         processInstance.setId(12L);
         when(processAPI.getProcessContract(PROCESS_DEFINITION_ID)).thenReturn(contractDefinition);
-        when(processAPI.startProcessWithInputs(anyLong(), any(Map.class)))
+        when(processAPI.startProcessWithInputs(anyLong(), anyMap()))
                 .thenReturn(processInstance);
 
         mockMvc.perform(post("/APISpringInternal/bpm/process/" + PROCESS_DEFINITION_ID + "/instantiation")
@@ -102,7 +103,8 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(aComplexInputAsJson()))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"caseId\":12}"));
+                .andExpect(content().json("""
+                        {"caseId": 12}""", true));
 
         verify(processAPI).startProcessWithInputs(eq(PROCESS_DEFINITION_ID), eq(expectedComplexInput));
     }
@@ -115,7 +117,7 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
         processInstance.setId(99L);
         doReturn(contractDefinition).when(processAPI).getProcessContract(PROCESS_DEFINITION_ID);
         doReturn(processInstance).when(processAPI).startProcessWithInputs(eq(userId), eq(PROCESS_DEFINITION_ID),
-                any(Map.class));
+                anyMap());
 
         mockMvc.perform(post("/APISpringInternal/bpm/process/" + PROCESS_DEFINITION_ID + "/instantiation")
                 .sessionAttrs(sessionAttributes)
@@ -123,7 +125,8 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(aComplexInputAsJson()))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"caseId\":99}"));
+                .andExpect(content().json("""
+                        {"caseId": 99}""", true));
 
         verify(processAPI).startProcessWithInputs(eq(userId), eq(PROCESS_DEFINITION_ID),
                 eq(expectedComplexInput));
@@ -136,7 +139,7 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
                 new RuntimeException("Rate limit exceeded"), retryAfterTimestamp);
 
         when(processAPI.getProcessContract(PROCESS_DEFINITION_ID)).thenReturn(contractDefinition);
-        when(processAPI.startProcessWithInputs(anyLong(), any(Map.class)))
+        when(processAPI.startProcessWithInputs(anyLong(), anyMap()))
                 .thenThrow(exception);
 
         mockMvc.perform(post("/APISpringInternal/bpm/process/" + PROCESS_DEFINITION_ID + "/instantiation")
@@ -152,14 +155,17 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
         final ProcessExecutionException exception = new ProcessExecutionException("Process execution failed");
 
         when(processAPI.getProcessContract(PROCESS_DEFINITION_ID)).thenReturn(contractDefinition);
-        when(processAPI.startProcessWithInputs(anyLong(), any(Map.class)))
+        when(processAPI.startProcessWithInputs(anyLong(), anyMap()))
                 .thenThrow(exception);
 
         mockMvc.perform(post("/APISpringInternal/bpm/process/" + PROCESS_DEFINITION_ID + "/instantiation")
                 .sessionAttrs(sessionAttributes)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(aComplexInputAsJson()))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.exception").value(ProcessExecutionException.class.toString()))
+                .andExpect(jsonPath("$.message")
+                        .value("Unable to start the process with ID 2 (consult the logs for more information)."));
     }
 
     @Test
@@ -171,7 +177,7 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
                 null);
 
         when(processAPI.getProcessContract(PROCESS_DEFINITION_ID)).thenReturn(contractDefinition);
-        when(processAPI.startProcessWithInputs(anyLong(), any(Map.class)))
+        when(processAPI.startProcessWithInputs(anyLong(), anyMap()))
                 .thenThrow(exception);
 
         // ContractViolationException is wrapped in BonitaException and handled by the
@@ -180,7 +186,9 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
                 .sessionAttrs(sessionAttributes)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(aComplexInputAsJson()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("Detailed message about contract violations"));
     }
 
     @Test
@@ -195,7 +203,8 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"caseId\":77}"));
+                .andExpect(content().json("""
+                        {"caseId": 77}""", true));
 
         verify(processAPI).startProcessWithInputs(eq(PROCESS_DEFINITION_ID), any());
     }
@@ -208,6 +217,6 @@ public class ProcessInstantiationControllerTest extends AbstractControllerTest<P
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(aComplexInputAsJson()))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("'user' URL query parameter should be Integer")));
+                .andExpect(content().string("'user' URL query parameter should be Integer. Received 'invalid'"));
     }
 }

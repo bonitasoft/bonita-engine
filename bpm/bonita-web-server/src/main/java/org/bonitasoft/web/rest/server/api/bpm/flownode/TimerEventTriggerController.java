@@ -56,7 +56,7 @@ public class TimerEventTriggerController extends AbstractRESTController {
      */
     @GetMapping
     public ResponseEntity<List<TimerEventTriggerInstance>> searchTimerEventTriggers(
-            @RequestParam(value = "caseId") Long caseId,
+            @RequestParam(value = "caseId") long caseId,
             @RequestParam(value = "p", defaultValue = "0") int page,
             @RequestParam(value = "c", defaultValue = "10") int count,
             HttpSession httpSession) throws BonitaException {
@@ -89,7 +89,7 @@ public class TimerEventTriggerController extends AbstractRESTController {
      * @throws BonitaException if an error occurs
      */
     @PutMapping("/{id}")
-    public TimerEventTrigger updateTimerEventTrigger(@PathVariable Long id, @RequestBody TimerEventTrigger trigger,
+    public TimerEventTrigger updateTimerEventTrigger(@PathVariable long id, @RequestBody TimerEventTrigger trigger,
             HttpSession httpSession) throws BonitaException {
         final Date executionDate = new Date(trigger.executionDate());
         final Date updatedDate = getProcessAPI(httpSession).updateExecutionDateOfTimerEventTriggerInstance(id,

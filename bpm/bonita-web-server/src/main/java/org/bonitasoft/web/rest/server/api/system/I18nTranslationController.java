@@ -13,13 +13,11 @@
  **/
 package org.bonitasoft.web.rest.server.api.system;
 
-import static org.bonitasoft.web.rest.server.QueryParameterUtils.parseFilters;
-
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.console.common.server.i18n.I18n;
+import org.bonitasoft.web.rest.server.QueryParameterUtils;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.bonitasoft.web.toolkit.client.common.i18n.AbstractI18n;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,12 +34,7 @@ public class I18nTranslationController extends AbstractRESTController {
 
     @GetMapping
     public List<Translation> getI18nTranslation(@RequestParam(value = "f", required = false) List<String> filters) {
-        Map<String, String> filterMap = parseFilters(filters);
-        String locale = filterMap != null ? filterMap.get("locale") : null;
-
-        if (locale == null) {
-            throw new IllegalArgumentException("Request should contain 'locale' parameter.");
-        }
+        String locale = QueryParameterUtils.extractMandatoryStringFilter(filters, "locale");
 
         return getI18n().getLocale(AbstractI18n.stringToLocale(locale))
                 .entrySet().stream()

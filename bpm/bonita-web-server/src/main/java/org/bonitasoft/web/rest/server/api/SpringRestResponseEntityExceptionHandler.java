@@ -35,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -98,7 +99,9 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
 
         Object value = ex.getValue();
         Class<?> requiredType = ex.getRequiredType();
-        boolean isNumber = Integer.class.equals(requiredType) || Long.class.equals(requiredType);
+        // Check if the required type is a number (handle primitive types and primitive objects, e.g. int and Integer)
+        boolean isNumber = requiredType != null
+                && Number.class.isAssignableFrom(ClassUtils.resolvePrimitiveIfNecessary(requiredType));
         if (isNumber) {
             return bonitaHandleException(new IllegalArgumentException("[ " + value + " ] must be a number"),
                     HttpStatus.BAD_REQUEST);

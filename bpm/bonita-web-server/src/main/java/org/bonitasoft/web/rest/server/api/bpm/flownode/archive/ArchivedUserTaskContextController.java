@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArchivedUserTaskContextController extends AbstractRESTController {
 
     @GetMapping
-    public Map<String, Serializable> getArchivedUserTaskContext(@PathVariable Long archivedTaskId, HttpSession session)
+    public Map<String, Serializable> getArchivedUserTaskContext(@PathVariable long archivedTaskId, HttpSession session)
             throws Exception {
         return getProcessAPI(session).getArchivedUserTaskExecutionContext(archivedTaskId);
     }

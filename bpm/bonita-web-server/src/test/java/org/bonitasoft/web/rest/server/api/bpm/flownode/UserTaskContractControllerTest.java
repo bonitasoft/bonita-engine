@@ -83,7 +83,8 @@ class UserTaskContractControllerTest extends AbstractControllerTest<UserTaskCont
                                         ]}
                                     ]
                                 }
-                                """));
+                                """,
+                                true));
     }
 
     @Test

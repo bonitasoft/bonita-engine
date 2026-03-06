@@ -71,7 +71,7 @@ class CaseContextControllerTest extends AbstractControllerTest<CaseContextContro
                             "Ticket": "ticketValue",
                             "Count": 42
                         }
-                        """));
+                        """, true));
     }
 
     @Test
@@ -120,7 +120,7 @@ class CaseContextControllerTest extends AbstractControllerTest<CaseContextContro
                                 "link": "API/bdm/businessData/com.bonitasoft.pojo.Employee/487467354"
                             }
                         }
-                        """));
+                        """, true));
     }
 
     @Test
@@ -151,6 +151,7 @@ class CaseContextControllerTest extends AbstractControllerTest<CaseContextContro
                                         "link": "API/bdm/businessData/com.bonitasoft.pojo.Employee/findByIds?ids=687646784,2313213874354"
                                     }
                                 }
-                                """));
+                                """,
+                                true));
     }
 }

@@ -50,7 +50,8 @@ public class RestControllerUtils {
 
         StandaloneMockMvcBuilder builder = MockMvcBuilders
                 .standaloneSetup(controller)
-                .setControllerAdvice(new SpringRestResponseEntityExceptionHandler())
+                .setControllerAdvice(new SpringRestResponseEntityExceptionHandler(),
+                        new FilterParameterBindingAdvice())
                 // Match the production SpringWebConfiguration: default to JSON content type
                 // /!\ Make sure that both use the same configuration /!\
                 .setContentNegotiationManager(new ContentNegotiationManager(

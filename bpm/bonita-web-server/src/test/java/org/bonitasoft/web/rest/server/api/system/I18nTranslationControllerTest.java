@@ -17,8 +17,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,9 +56,11 @@ class I18nTranslationControllerTest extends AbstractControllerTest<I18nTranslati
 
         when(i18n.getLocale(AbstractI18n.LOCALE.fr)).thenReturn(translations);
 
-        mockMvc.perform(get("/API/system/i18ntranslation?f=locale=fr")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get("/API/system/i18ntranslation")
+                        .param("f", "locale=fr")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
@@ -68,23 +69,44 @@ class I18nTranslationControllerTest extends AbstractControllerTest<I18nTranslati
                             {"key": "key2", "value": "autre méssage"},
                             {"key": "key3", "value": "~%^*µ"}
                         ]
-                        """));
+                        """, true));
     }
 
     @Test
-    void should_return_http400_error_code_when_no_queryString() throws Exception {
+    void should_return_http400_error_code_when_no_filter_param() throws Exception {
         mockMvc.perform(get("/API/system/i18ntranslation")
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("filter locale is mandatory"));
     }
 
     @Test
-    void should_return_http400_error_code_when_no_locale_param() throws Exception {
-        mockMvc.perform(get("/API/system/i18ntranslation?f=test")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+    void should_return_http400_error_code_when_no_locale_filter_param() throws Exception {
+        mockMvc.perform(
+                get("/API/system/i18ntranslation")
+                        .param("f", "test")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("filter locale is mandatory"));
+    }
+
+    @Test
+    void should_return_http400_error_code_when_empty_locale_filter_param() throws Exception {
+        mockMvc.perform(
+                get("/API/system/i18ntranslation")
+                        .param("f", "locale=")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("filter locale is mandatory"));
     }
 
 }

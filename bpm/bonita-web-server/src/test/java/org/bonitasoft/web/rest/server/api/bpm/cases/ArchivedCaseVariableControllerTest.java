@@ -91,10 +91,13 @@ class ArchivedCaseVariableControllerTest extends AbstractControllerTest<Archived
 
     @Test
     void getArchivedCaseVariable_should_return_400_when_case_id_is_not_a_number() throws Exception {
-        mockMvc.perform(get(API_URL + "/notANumber/myVar")
+        var caseId = "notANumber";
+        mockMvc.perform(get(API_URL + "/" + caseId + "/myVar")
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("[ %s ] must be a number".formatted(caseId)));
     }
 
     @Test
@@ -145,7 +148,9 @@ class ArchivedCaseVariableControllerTest extends AbstractControllerTest<Archived
                 .param("c", "10")
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("filter case_id is mandatory"));
     }
 
     @Test
@@ -192,7 +197,9 @@ class ArchivedCaseVariableControllerTest extends AbstractControllerTest<Archived
                 .param("c", "10")
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("filter case_id must be a number"));
     }
 
     @Test

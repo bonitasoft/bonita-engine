@@ -14,6 +14,8 @@
 package org.bonitasoft.web.rest.server.api.form;
 
 import static java.util.Collections.nCopies;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,10 +26,14 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingType;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -109,6 +115,7 @@ class FormMappingControllerTest extends AbstractControllerTest<FormMappingContro
                 .param("c", "10")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value("11125555888888"))
                 .andExpect(jsonPath("$[0].processDefinitionId").value("4871148324840256385"))
                 .andExpect(jsonPath("$[0].pageId").value("1"))
@@ -128,4 +135,39 @@ class FormMappingControllerTest extends AbstractControllerTest<FormMappingContro
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "0-10/11"));
     }
+
+    @Test
+    void should_pass_correct_search_options() throws Exception {
+        SearchResult<FormMapping> searchResult = mock(SearchResult.class);
+        doReturn(List.of()).when(searchResult).getResult();
+        doReturn(0L).when(searchResult).getCount();
+        ArgumentCaptor<SearchOptions> captor = ArgumentCaptor.forClass(SearchOptions.class);
+        doReturn(searchResult).when(processAPI).searchFormMappings(captor.capture());
+
+        mockMvc.perform(get("/API/form/mapping")
+                .sessionAttrs(sessionAttributes)
+                .param("p", "2")
+                .param("c", "10")
+                .param("s", "mySearch")
+                .param("o", "id ASC")
+                .param("f", "type=TASK")
+                .param("f", "processDefinitionId=12345")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        SearchOptions options = captor.getValue();
+        assertThat(options.getStartIndex()).isEqualTo(20); // page 2 * count 10
+        assertThat(options.getMaxResults()).isEqualTo(10);
+        assertThat(options.getSearchTerm()).isEqualTo("mySearch");
+        assertThat(options.getSorts()).hasSize(1);
+        assertThat(options.getSorts().get(0).getField()).isEqualTo("id");
+        assertThat(options.getSorts().get(0).getOrder()).isEqualTo(Order.ASC);
+        assertThat(options.getFilters())
+                .hasSize(2)
+                .extracting(SearchFilter::getField, SearchFilter::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("type", FormMappingType.TASK),
+                        tuple("processDefinitionId", "12345"));
+    }
+
 }

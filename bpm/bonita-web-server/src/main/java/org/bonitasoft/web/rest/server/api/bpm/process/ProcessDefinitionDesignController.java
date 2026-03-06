@@ -43,7 +43,7 @@ public class ProcessDefinitionDesignController extends AbstractRESTController {
     }
 
     @GetMapping
-    public String getDesign(@PathVariable Long processDefinitionId, HttpSession httpSession)
+    public String getDesign(@PathVariable long processDefinitionId, HttpSession httpSession)
             throws ProcessDefinitionNotFoundException, IOException, BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         final DesignProcessDefinition design = getProcessAPI(httpSession)

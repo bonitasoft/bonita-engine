@@ -14,7 +14,6 @@
 package org.bonitasoft.web.rest.server.api.bpm.cases;
 
 import static org.bonitasoft.web.rest.server.APIPaginationUtils.buildContentRange;
-import static org.bonitasoft.web.rest.server.QueryParameterUtils.extractLongFilterFromFilterList;
 
 import java.util.List;
 
@@ -23,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.web.rest.model.bpm.cases.ArchivedCaseVariable;
 import org.bonitasoft.web.rest.model.bpm.cases.CaseVariableItem;
+import org.bonitasoft.web.rest.server.QueryParameterUtils;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +52,7 @@ public class ArchivedCaseVariableController extends AbstractRESTController {
             @RequestParam("c") int count,
             @RequestParam(value = "f", required = false) List<String> filters,
             HttpSession session) throws Exception {
-        long caseId = extractLongFilterFromFilterList(filters, CaseVariableItem.ATTRIBUTE_CASE_ID);
+        long caseId = QueryParameterUtils.extractMandatoryLongFilter(filters, CaseVariableItem.ATTRIBUTE_CASE_ID);
         List<ArchivedDataInstance> allResults = getProcessAPI(session)
                 .getArchivedProcessDataInstances(caseId, 0, Integer.MAX_VALUE);
         List<ArchivedCaseVariable> pagedResults = allResults.stream()
