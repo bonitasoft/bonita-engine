@@ -140,6 +140,30 @@ public class HTTPServerAPIIT {
                 .hasMessageStartingWith("Error while executing POST request (http code: 401)");
     }
 
+    @Test
+    public void invokeMethodWithIdleConnectionEvictionAndConnectionTimeToLive() throws Exception {
+        Map<String, String> configuration = new HashMap<>();
+        configuration.put("server.url", baseResourceUrl);
+        configuration.put("application.name", APPLICATION_NAME);
+        configuration.put("connections.max", "1");
+        configuration.put("connections.evictIdleSeconds", "1");
+        configuration.put("connections.timeToLive", "1");
+        configuration.put("basicAuthentication.active", "true");
+        configuration.put("basicAuthentication.username", "john");
+        configuration.put("basicAuthentication.password", "doe");
+
+        HTTPServerAPI httpServerAPI = new HTTPServerAPI(configuration);
+
+        // first request opens connection
+        httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, null);
+
+        // wait long enough for eviction
+        Thread.sleep(1500);
+
+        // second request should still succeed even if previous connection was evicted
+        httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, null);
+    }
+
     private static final class BonitaHandler extends AbstractHandler {
 
         @Override

@@ -17,6 +17,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
@@ -129,6 +130,40 @@ public class HTTPServerAPITest {
         byte[] content = outputStream.toByteArray();
         String contentAsString = new String(content, Charset.forName("UTF-8"));
         assertThat(contentAsString).as("Content").contains("välue", "Välue36");
+    }
+
+    @Test
+    public void should_throw_exception_when_evict_idle_is_not_a_number() throws Exception {
+        Field httpclient = HTTPServerAPI.class.getDeclaredField("httpclient");
+        httpclient.setAccessible(true);
+        httpclient.set(null, null);
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put(HTTPServerAPI.SERVER_URL, "localhost:8080");
+        map.put(HTTPServerAPI.APPLICATION_NAME, "bonita");
+        map.put(HTTPServerAPI.CONNECTIONS_EVICT_IDLE, "not_a_number");
+
+        assertThatThrownBy(() -> new HTTPServerAPI(map))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("connections.evictIdleAfter")
+                .hasMessageContaining("must be set to a number");
+    }
+
+    @Test
+    public void should_throw_exception_when_time_to_live_is_not_a_number() throws Exception {
+        Field httpclient = HTTPServerAPI.class.getDeclaredField("httpclient");
+        httpclient.setAccessible(true);
+        httpclient.set(null, null);
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put(HTTPServerAPI.SERVER_URL, "localhost:8080");
+        map.put(HTTPServerAPI.APPLICATION_NAME, "bonita");
+        map.put(HTTPServerAPI.CONNECTIONS_TIME_TO_LIVE, "not_a_number");
+
+        assertThatThrownBy(() -> new HTTPServerAPI(map))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("connections.timeToLive")
+                .hasMessageContaining("must be set to a number");
     }
 
 }

@@ -24,6 +24,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -84,6 +85,8 @@ public class HTTPServerAPI implements ServerAPI {
     // package-private for testing purpose
     static final String APPLICATION_NAME = "application.name";
     static final String CONNECTIONS_MAX = "connections.max";
+    static final String CONNECTIONS_EVICT_IDLE = "connections.evictIdleAfter";
+    static final String CONNECTIONS_TIME_TO_LIVE = "connections.timeToLive";
 
     private final String serverUrl;
 
@@ -125,6 +128,26 @@ public class HTTPServerAPI implements ServerAPI {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
                     "Client connection pool size '" + CONNECTIONS_MAX + "' must be set to a number");
+        }
+        String evictIdleAfter = parameters.get(CONNECTIONS_EVICT_IDLE);
+        if (evictIdleAfter != null) {
+            try {
+                long evictIdleSeconds = Long.parseLong(evictIdleAfter);
+                builder.evictIdleConnections(evictIdleSeconds, TimeUnit.SECONDS);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(
+                        "'" + CONNECTIONS_EVICT_IDLE + "' must be set to a number (seconds)");
+            }
+        }
+        String timeToLive = parameters.get(CONNECTIONS_TIME_TO_LIVE);
+        if (timeToLive != null) {
+            try {
+                long ttlSeconds = Long.parseLong(timeToLive);
+                builder.setConnectionTimeToLive(ttlSeconds, TimeUnit.SECONDS);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(
+                        "'" + CONNECTIONS_TIME_TO_LIVE + "' must be set to a number (seconds)");
+            }
         }
         return builder.build();
     }
