@@ -79,6 +79,59 @@ public class HTTPServerAPITest {
     }
 
     @Test
+    public void should_have_evict_idle_configured() throws Exception {
+        Field httpClientField = HTTPServerAPI.class.getDeclaredField("httpclient");
+        httpClientField.setAccessible(true);
+        httpClientField.set(null, null);
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put(HTTPServerAPI.SERVER_URL, "localhost:8080");
+        map.put(HTTPServerAPI.APPLICATION_NAME, "bonita");
+        map.put(HTTPServerAPI.CONNECTIONS_EVICT_IDLE, "123");
+        new HTTPServerAPI(map);
+
+        HttpClient httpClient = (HttpClient) httpClientField.get(null);
+        Field closeablesField = httpClient.getClass().getDeclaredField("closeables");
+        closeablesField.setAccessible(true);
+        List<?> closeables = (List<?>) closeablesField.get(httpClient);
+        Object firstCloseable = closeables.get(0);
+        Field connectionEvictorField = firstCloseable.getClass().getDeclaredField("val$connectionEvictor");
+        connectionEvictorField.setAccessible(true);
+        Object connectionEvictor = connectionEvictorField.get(firstCloseable);
+        Field maxIdleTimeMsField = connectionEvictor.getClass().getDeclaredField("maxIdleTimeMs");
+        maxIdleTimeMsField.setAccessible(true);
+        long maxIdleTimeMs = (long) maxIdleTimeMsField.get(connectionEvictor);
+
+        assertThat(maxIdleTimeMs).isEqualTo(123000L);
+    }
+
+    @Test
+    public void should_have_time_to_live_configured() throws Exception {
+        Field httpClientField = HTTPServerAPI.class.getDeclaredField("httpclient");
+        httpClientField.setAccessible(true);
+        httpClientField.set(null, null);
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put(HTTPServerAPI.SERVER_URL, "localhost:8080");
+        map.put(HTTPServerAPI.APPLICATION_NAME, "bonita");
+        map.put(HTTPServerAPI.CONNECTIONS_TIME_TO_LIVE, "123");
+        new HTTPServerAPI(map);
+
+        HttpClient httpClient = (HttpClient) httpClientField.get(null);
+        Field connManagerField = httpClient.getClass().getDeclaredField("connManager");
+        connManagerField.setAccessible(true);
+        PoolingHttpClientConnectionManager connectionManager = (PoolingHttpClientConnectionManager) connManagerField.get(httpClient);
+        Field pool = connectionManager.getClass().getDeclaredField("pool");
+        pool.setAccessible(true);
+        Object poolInstance = pool.get(connectionManager);
+        Field timeToLiveField = poolInstance.getClass().getDeclaredField("timeToLive");
+        timeToLiveField.setAccessible(true);
+        long timeToLiveValue = (long) timeToLiveField.get(poolInstance);
+
+        assertThat(timeToLiveValue).isEqualTo(123L);
+    }
+
+    @Test
     public void should_invoke_method_catch_and_wrap_UndeclaredThrowableException() throws Throwable {
         //given:
         final Map<String, Serializable> options = new HashMap<>();
