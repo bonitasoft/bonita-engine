@@ -65,7 +65,7 @@
             <param-value>nosniff</param-value>
         </init-param>
         <!--
-            The there is no default excludePattern for this filter, but you can uncomment it and add one if you need to
+            There is no default excludePattern for this filter, but you can uncomment it and add one if you need to
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
@@ -79,19 +79,7 @@
         <filter-class>org.bonitasoft.console.common.server.login.filter.RestAPIAuthorizationFilter</filter-class>
         <!--
             We need to let a set of URL accessible in order to serve the translations
-            The excludePattern default value is the one commented out bellow, but you can uncomment it and add new patterns if you need to
-        -->
-        <!-- init-param>
-            <param-name>excludePattern</param-name>
-            <param-value>^/(bonita/)?((apps/.+/)|(portal/resource/.+/))?(API|APIToolkit)/system/(i18ntranslation|feature)</param-value>
-        </init-param-->
-    </filter>
-    <filter>
-        <filter-name>RestAPIAuthorizationFilterToolkit</filter-name>
-        <filter-class>org.bonitasoft.console.common.server.login.filter.RestAPIAuthorizationFilter</filter-class>
-        <!--
-            We need to let a set of URL accessible in order to serve the translations
-            The excludePattern default value is the one commented out bellow, but you can uncomment it and add new patterns if you need to
+            The excludePattern default value is the one commented out below, but you can uncomment it and add new patterns if you need to
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
@@ -109,7 +97,7 @@
         <filter-class>org.bonitasoft.console.common.server.login.filter.TokenValidatorFilter</filter-class>
         <!--
             We need to let a set of URL accessible in order to handle the translations on the login page and token request
-            The excludePattern default value is the one commented out bellow, but you can uncomment it and add new patterns if you need to
+            The excludePattern default value is the one commented out below, but you can uncomment it and add new patterns if you need to
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
@@ -123,7 +111,7 @@
             The AuthenticationFilter check credentials when access is requested
             However, to ensure authentication redirect and/or error handling works properly,
             we need to let a set of pages not securized :
-            The excludePattern default value is the one commented out bellow, but you can uncomment it and add new patterns if you need to
+            The excludePattern default value is the one commented out below, but you can uncomment it and add new patterns if you need to
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
@@ -158,7 +146,7 @@
         </init-param>
         <!--
             We need to let a set of URL not cached (the ones serving the HTML content) in order to handle the sessions timeout
-            The excludePattern default value is the one commented out bellow, but you can uncomment it and add new patterns if you need to
+            The excludePattern default value is the one commented out below, but you can uncomment it and add new patterns if you need to
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
@@ -179,7 +167,7 @@
         </init-param>
         <!--
             We need to let a set of URL not cached (the ones serving the HTML content) in order to handle the sessions timeout
-            The excludePattern default value is the one commented out bellow, but you can uncomment it and add new patterns if you need to
+            The excludePattern default value is the one commented out below, but you can uncomment it and add new patterns if you need to
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
@@ -211,6 +199,7 @@
         <url-pattern>/portal/runreport</url-pattern>
         <url-pattern>/API/*</url-pattern>
         <url-pattern>/APIToolkit/*</url-pattern>
+        <url-pattern>/APISpringInternal/*</url-pattern>
         <url-pattern>/portal/custom-page/API/*</url-pattern>
         <url-pattern>/portal.js/index.html</url-pattern>
         <!-- New manage on no cache Filter -->
@@ -236,6 +225,7 @@
         <filter-name>TokenValidatorFilter</filter-name>
         <url-pattern>/API/*</url-pattern>
         <url-pattern>/APIToolkit/*</url-pattern>
+        <url-pattern>/APISpringInternal/*</url-pattern>
         <!--
             In the case of a custom page served in a custom profile calls to the
             REST API are done though /portal/custom-page/API
@@ -269,6 +259,7 @@
         <filter-name>RestAPIAuthorizationFilter</filter-name>
         <url-pattern>/API/*</url-pattern>
         <url-pattern>/APIToolkit/*</url-pattern>
+        <url-pattern>/APISpringInternal/*</url-pattern>
         <!-- see TokenValidatorFilter comment -->
         <url-pattern>/portal/custom-page/API/*</url-pattern>
         <url-pattern>/services/*</url-pattern>
@@ -290,12 +281,6 @@
         <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>RestAPIAuthorizationFilterToolkit</filter-name>
-        <url-pattern>/APIToolkit/*</url-pattern>
-        <!-- No need to handle the forward as requests forwarded to this URL are already filtered by RestAPIAuthorizationFilter -->
-        <dispatcher>REQUEST</dispatcher>
-    </filter-mapping>
-    <filter-mapping>
         <filter-name>TokenGeneratorFilter</filter-name>
         <url-pattern>/API/system/session/*</url-pattern>
         <url-pattern>/APIToolkit/system/session/*</url-pattern>
@@ -307,6 +292,7 @@
         <filter-name>SanitizerFilter</filter-name>
         <url-pattern>/API/*</url-pattern>
         <url-pattern>/APIToolkit/*</url-pattern>
+        <url-pattern>/APISpringInternal/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
