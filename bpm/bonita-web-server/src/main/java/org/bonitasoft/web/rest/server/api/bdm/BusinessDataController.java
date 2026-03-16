@@ -27,7 +27,6 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryResult;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -99,7 +98,7 @@ public class BusinessDataController extends AbstractRESTController {
                 "getBusinessDataByQueryCommand",
                 parameters);
 
-        var json = (String) businessDataQueryResult.getJsonResults();
+        var responseBody = (String) businessDataQueryResult.getJsonResults();
 
         // Build response with proper headers
         final var businessDataQueryMetadata = businessDataQueryResult.getBusinessDataQueryMetadata();
@@ -109,7 +108,7 @@ public class BusinessDataController extends AbstractRESTController {
         }
         HttpHeaders headers = buildHttpHeaders(searchPageSize, searchPageNumber, totalCount);
 
-        return new ResponseEntity<>(json, headers, HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(responseBody);
     }
 
     private static HttpHeaders buildHttpHeaders(Integer searchPageSize, Integer searchPageNumber, Long totalCount) {

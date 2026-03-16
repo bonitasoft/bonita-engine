@@ -26,6 +26,7 @@ import org.bonitasoft.console.common.server.page.RestApiRenderer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.web.extension.rest.RestApiResponse;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@ConditionalOnSingleCandidate(ApiExtensionController.class)
 @RequestMapping({ "/API/extension", "/portal/custom-page/API/extension" })
 public class ApiExtensionController extends AbstractRESTController {
 
@@ -44,8 +46,7 @@ public class ApiExtensionController extends AbstractRESTController {
         this(new RestApiRenderer(), new PageMappingService());
     }
 
-    // Visible for testing
-    ApiExtensionController(RestApiRenderer restApiRenderer, PageMappingService pageMappingService) {
+    protected ApiExtensionController(RestApiRenderer restApiRenderer, PageMappingService pageMappingService) {
         this.restApiRenderer = restApiRenderer;
         this.pageMappingService = pageMappingService;
     }
