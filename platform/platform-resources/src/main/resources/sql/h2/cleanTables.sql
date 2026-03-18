@@ -57,6 +57,7 @@ DELETE FROM page_mapping;
 DELETE FROM proc_parameter;
 DELETE FROM arch_bpm_failure;
 DELETE FROM bpm_failure;
+DELETE FROM data_retention_config;
 
 -- do NOT clear directly PLATFORM table, Hibernate needs to update its cache to know the platform has been deleted
  

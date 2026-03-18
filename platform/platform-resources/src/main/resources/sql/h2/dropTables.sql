@@ -65,3 +65,4 @@ DROP TABLE tenant_resource;
 DROP TABLE icon;
 DROP TABLE arch_bpm_failure;
 DROP TABLE bpm_failure;
+DROP TABLE data_retention_config;

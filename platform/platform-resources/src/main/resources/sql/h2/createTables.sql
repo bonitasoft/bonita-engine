@@ -989,3 +989,14 @@ CREATE INDEX idx_arch_bpm_failure_flownodeinstanceid ON arch_bpm_failure (flowNo
 CREATE INDEX idx_arch_bpm_failure_processinstanceid ON arch_bpm_failure (processInstanceId);
 CREATE INDEX idx_arch_bpm_failure_rootprocessinstanceid ON arch_bpm_failure (rootProcessInstanceId);
 CREATE INDEX idx_arch_bpm_failure_processdefinitionid ON arch_bpm_failure (processDefinitionId);
+
+CREATE TABLE data_retention_config (
+    id                  BIGINT NOT NULL,
+    data_classname      VARCHAR(255) NOT NULL,
+    reference_date      VARCHAR(20) NOT NULL,
+    retention_days      INT NOT NULL,
+    created_at          BIGINT NOT NULL,
+    updated_at          BIGINT NOT NULL,
+    CONSTRAINT pk_data_retention_config PRIMARY KEY (id),
+    CONSTRAINT uk_data_retention_config_classname UNIQUE (data_classname)
+);
