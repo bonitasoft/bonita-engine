@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -25,6 +26,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.util.ReflectionTestUtils.getField;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -37,17 +40,20 @@ import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
 import org.bonitasoft.console.common.server.auth.impl.standard.StandardAuthenticationManagerImpl;
+import org.bonitasoft.console.common.server.login.AccountLockedException;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
 import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.server.login.LoginFailureTracker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -387,8 +393,86 @@ public class LoginServletTest {
         servlet.doPost(req, resp);
 
         // Should fall back to the default login page instead of crashing
-        org.mockito.ArgumentCaptor<String> pathCaptor = org.mockito.ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> pathCaptor = ArgumentCaptor.forClass(String.class);
         verify(servletContext).getRequestDispatcher(pathCaptor.capture());
         assertThat(pathCaptor.getValue()).startsWith(AuthenticationManager.LOGIN_PAGE);
+    }
+
+    @Test
+    public void should_set_account_locked_message_when_AccountLockedException_on_redirect() throws Exception {
+        final LoginServlet servlet = spy(new LoginServlet());
+        final ServletContext servletContext = mock(ServletContext.class);
+        RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
+        doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
+        doReturn(servletContext).when(servlet).getServletContext();
+        doReturn(requestDispatcher).when(servletContext).getRequestDispatcher(anyString());
+        doThrow(new AccountLockedException("Too many failed login attempts. Please try again later.")).when(servlet)
+                .doLogin(req, resp);
+
+        servlet.doPost(req, resp);
+
+        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        verify(req).setAttribute(eq(LoginServlet.LOGIN_FAIL_MESSAGE),
+                messageCaptor.capture());
+        assertThat(messageCaptor.getValue()).isEqualTo("accountLockedMessage");
+    }
+
+    @Test
+    public void should_return_429_with_retry_after_header_when_AccountLockedException_and_no_redirect()
+            throws Exception {
+        final LoginServlet servlet = spy(new LoginServlet());
+        LoginFailureTracker tracker = mock(LoginFailureTracker.class);
+        doReturn(600L).when(tracker).getLockoutDurationSeconds();
+        setField(servlet, "loginFailureTracker", tracker);
+        doThrow(new AccountLockedException("Too many failed login attempts. Please try again later.")).when(servlet)
+                .doLogin(req, resp);
+
+        servlet.doPost(req, resp);
+
+        verify(resp).setStatus(429);
+        verify(resp).setHeader("Retry-After", "600");
+    }
+
+    @Test
+    public void should_init_resolve_tracker_from_spring_context_and_pass_to_login_manager() throws Exception {
+        // given
+        final LoginServlet servlet = spy(new LoginServlet());
+        final ServletContext servletContext = mock(ServletContext.class);
+        final LoginFailureTracker tracker = mock(LoginFailureTracker.class);
+
+        // Mock the ServletConfig to return our mock ServletContext
+        javax.servlet.ServletConfig servletConfig = mock(javax.servlet.ServletConfig.class);
+        doReturn(servletContext).when(servletConfig).getServletContext();
+
+        // Mock Spring context lookup
+        org.springframework.web.context.WebApplicationContext springContext = mock(
+                org.springframework.web.context.WebApplicationContext.class);
+        doReturn(springContext).when(servletContext).getAttribute(
+                org.springframework.web.context.WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+        doReturn(tracker).when(springContext).getBean(LoginFailureTracker.class);
+
+        // when
+        servlet.init(servletConfig);
+
+        // then — the tracker resolved from Spring context is stored in the servlet
+        assertThat(getField(servlet, "loginFailureTracker")).isSameAs(tracker);
+    }
+
+    @Test
+    public void should_set_login_fail_message_when_LoginFailedException_on_redirect() throws Exception {
+        final LoginServlet servlet = spy(new LoginServlet());
+        final ServletContext servletContext = mock(ServletContext.class);
+        RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
+        doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
+        doReturn(servletContext).when(servlet).getServletContext();
+        doReturn(requestDispatcher).when(servletContext).getRequestDispatcher(anyString());
+        doThrow(new LoginFailedException("wrong credentials")).when(servlet).doLogin(req, resp);
+
+        servlet.doPost(req, resp);
+
+        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        verify(req).setAttribute(eq(LoginServlet.LOGIN_FAIL_MESSAGE),
+                messageCaptor.capture());
+        assertThat(messageCaptor.getValue()).isEqualTo("loginFailMessage");
     }
 }

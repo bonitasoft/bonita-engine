@@ -45,8 +45,12 @@ import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.engine.mdc.MDCHelper.CheckedCallable4;
 import org.bonitasoft.engine.mdc.UserIdMDC;
 import org.bonitasoft.engine.session.Session;
+import org.bonitasoft.web.server.login.LoginFailureTracker;
+import org.bonitasoft.web.server.login.LoginFailureTrackerAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 /**
  * @author Vincent Elcrin
@@ -63,6 +67,8 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
     public static final String ERROR_PAGE_REQUEST_PATH_REGEX = "/portal/resource/app/appDirectoryBonita/error-\\d+/(content|theme)/.*";
 
     protected boolean redirectWhenUnauthorized;
+
+    private LoginFailureTracker loginFailureTracker;
 
     /**
      * Logger
@@ -88,6 +94,11 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
         String redirectInitParam = filterConfig.getInitParameter(REDIRECT_PARAM);
         redirectWhenUnauthorized = redirectInitParam != null ? Boolean.parseBoolean(redirectInitParam) : true;
         super.init(filterConfig);
+        loginFailureTracker = LoginFailureTrackerAccessor
+                .getLoginFailureTracker(filterConfig.getServletContext());
+        for (AuthenticationRule rule : rules) {
+            rule.setLoginFailureTracker(loginFailureTracker);
+        }
     }
 
     @Override
@@ -119,6 +130,8 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 }
             }
+        } catch (AccountLockedRuntimeException e) {
+            handleAccountLockoutException(response, e);
         } catch (PlatformUnderMaintenanceException e) {
             handlePlatformUnderMaintenanceException(requestAccessor, response, e);
         } catch (final EngineUserNotFoundOrInactive e) {
@@ -198,6 +211,16 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
         TenantAdministrationAPI tenantAdministrationAPI = TenantAPIAccessor
                 .getTenantAdministrationAPI(requestAccessor.getApiSession());
         return tenantAdministrationAPI.isPaused();
+    }
+
+    protected void handleAccountLockoutException(final HttpServletResponse response,
+            final AccountLockedRuntimeException e) {
+        LOGGER.debug("Account locked out: {}", e.getMessage());
+        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+        if (loginFailureTracker != null) {
+            response.setHeader(HttpHeaders.RETRY_AFTER,
+                    String.valueOf(loginFailureTracker.getLockoutDurationSeconds()));
+        }
     }
 
     protected void handleUserNotFoundOrInactiveException(final HttpServletRequestAccessor requestAccessor,
