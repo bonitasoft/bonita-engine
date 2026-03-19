@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerFactory;
@@ -34,6 +35,7 @@ import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.user.User;
+import org.bonitasoft.web.server.login.LoginFailureTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +50,20 @@ public class LoginManager {
 
     protected TokenGenerator tokenGenerator = new TokenGenerator();
     protected PortalCookies portalCookies = new PortalCookies();
+    protected LoginFailureTracker loginFailureTracker;
+
+    /**
+     * @deprecated Use {@link #LoginManager(LoginFailureTracker)} instead.
+     *             This constructor disables brute-force login protection.
+     */
+    @Deprecated
+    public LoginManager() {
+        this(null);
+    }
+
+    public LoginManager(LoginFailureTracker loginFailureTracker) {
+        this.loginFailureTracker = loginFailureTracker;
+    }
 
     /**
      * Performs the login using the appropriate AuthenticationManager implementation for authentication, logging in on
@@ -64,22 +80,46 @@ public class LoginManager {
     public void loginInternal(HttpServletRequestAccessor request, HttpServletResponse response, UserLogger userLoger,
             Credentials credentials)
             throws AuthenticationFailedException, ServletException, LoginFailedException {
-        AuthenticationManager authenticationManager = getAuthenticationManager();
-        Map<String, Serializable> credentialsMap = authenticationManager.authenticate(request, credentials);
-        // In case of a login with the login service we invalidate the session and create a new one.
-        // Otherwise, logging in with the credentials in the request (SSO) it is not mandatory it depends on the AuthenticationManager implementation used
-        // some SSO mechanisms already handle it (SAML, OIDC).
-        Boolean invalidateAndRecreateHTTPSessionIfSet = (Boolean) credentialsMap
-                .remove(AuthenticationManager.INVALIDATE_SESSION);
-        boolean invalidateAndRecreateHTTPSession = invalidateAndRecreateHTTPSessionIfSet == null
-                || invalidateAndRecreateHTTPSessionIfSet.booleanValue();
-        if (credentialsMap.isEmpty()) {
-            if (credentials.getName() == null || credentials.getName().isEmpty()) {
-                LOGGER.debug("There are no credentials in the request");
-                throw new AuthenticationFailedException("No credentials in request");
-            }
+        String username = credentials.getName();
+        boolean shouldTrackLoginFailures = loginFailureTracker != null && StringUtils.isNotEmpty(username);
+        // Note: returning 429 (locked) vs 401 (bad credentials) reveals whether a username exists.
+        // This is an intentional usability trade-off — the lockout message helps legitimate users
+        // understand why they cannot log in, and username enumeration is low-risk given that
+        // the login page itself already exposes whether an account is valid.
+        if (shouldTrackLoginFailures && loginFailureTracker.isLockedOut(username)) {
+            LOGGER.warn(
+                    "Login attempt rejected for user [{}]: account temporarily locked due to too many failed attempts",
+                    username);
+            throw new AccountLockedException("Too many failed login attempts. Please try again later.");
         }
-        APISession apiSession = loginWithAppropriateCredentials(userLoger, credentials, credentialsMap);
+        AuthenticationManager authenticationManager = getAuthenticationManager();
+        APISession apiSession;
+        boolean invalidateAndRecreateHTTPSession;
+        try {
+            Map<String, Serializable> credentialsMap = authenticationManager.authenticate(request, credentials);
+            // In case of a login with the login service we invalidate the session and create a new one.
+            // Otherwise, logging in with the credentials in the request (SSO) it is not mandatory it depends on the AuthenticationManager implementation used
+            // some SSO mechanisms already handle it (SAML, OIDC).
+            Boolean invalidateAndRecreateHTTPSessionIfSet = (Boolean) credentialsMap
+                    .remove(AuthenticationManager.INVALIDATE_SESSION);
+            invalidateAndRecreateHTTPSession = invalidateAndRecreateHTTPSessionIfSet == null
+                    || invalidateAndRecreateHTTPSessionIfSet.booleanValue();
+            if (credentialsMap.isEmpty()) {
+                if (credentials.getName() == null || credentials.getName().isEmpty()) {
+                    LOGGER.debug("There are no credentials in the request");
+                    throw new AuthenticationFailedException("No credentials in request");
+                }
+            }
+            apiSession = loginWithAppropriateCredentials(userLoger, credentials, credentialsMap);
+        } catch (LoginFailedException | AuthenticationFailedException e) {
+            if (shouldTrackLoginFailures) {
+                loginFailureTracker.recordFailure(username);
+            }
+            throw e;
+        }
+        if (shouldTrackLoginFailures) {
+            loginFailureTracker.resetFailures(username);
+        }
         storeCredentials(request, apiSession, invalidateAndRecreateHTTPSession);
         portalCookies.addCSRFTokenCookieToResponse(request.asHttpServletRequest(), response,
                 tokenGenerator.createOrLoadToken(request.getHttpSession()));
