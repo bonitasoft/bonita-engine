@@ -28,6 +28,7 @@ import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
 import org.bonitasoft.console.common.server.filter.PathSanitizer;
+import org.bonitasoft.console.common.server.login.AccountLockedException;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
 import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.login.utils.RedirectUrlBuilder;
@@ -40,10 +41,14 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.server.login.LoginFailureTracker;
+import org.bonitasoft.web.server.login.LoginFailureTrackerAccessor;
 import org.restlet.data.MediaType;
 import org.restlet.engine.header.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 /**
  * @author Anthony Birembaut, Ruiheng Fan, Chong Zhao, Haojie Yuan
@@ -66,6 +71,11 @@ public class LoginServlet extends HttpServlet {
     protected static final String LOGIN_FAIL_MESSAGE = "loginFailMessage";
 
     /**
+     * account locked message — must match the string literal in login.jsp (line 58)
+     */
+    protected static final String ACCOUNT_LOCKED_MESSAGE = "accountLockedMessage";
+
+    /**
      * the URL param for the login page
      */
     protected static final String LOGIN_URL_PARAM_NAME = "loginUrl";
@@ -74,6 +84,14 @@ public class LoginServlet extends HttpServlet {
      * System property to allow login with GET from the development suite
      */
     public static final String ENABLE_DEV_SUITE_LOGIN = "org.bonitasoft.web.login.get.enabled";
+
+    private LoginFailureTracker loginFailureTracker;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        loginFailureTracker = LoginFailureTrackerAccessor.getLoginFailureTracker(getServletContext());
+    }
 
     /**
      * Necessary studio integration (username and password are passed in the URL in development mode)
@@ -167,10 +185,13 @@ public class LoginServlet extends HttpServlet {
     private void handleException(final HttpServletRequest request, final HttpServletResponse response,
             final boolean redirectAfterLogin,
             final Exception e, final String locale) throws ServletException {
-        // if there a redirect=false attribute in the request do nothing (API login), otherwise, redirect (Portal login)
         if (redirectAfterLogin) {
             try {
-                request.setAttribute(LOGIN_FAIL_MESSAGE, LOGIN_FAIL_MESSAGE);
+                if (e instanceof AccountLockedException) {
+                    request.setAttribute(LOGIN_FAIL_MESSAGE, ACCOUNT_LOCKED_MESSAGE);
+                } else {
+                    request.setAttribute(LOGIN_FAIL_MESSAGE, LOGIN_FAIL_MESSAGE);
+                }
                 String loginURL = request.getParameter(LOGIN_URL_PARAM_NAME);
                 if (loginURL == null) {
                     loginURL = AuthenticationManager.LOGIN_PAGE;
@@ -204,7 +225,15 @@ public class LoginServlet extends HttpServlet {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(e.getMessage());
             }
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            if (e instanceof AccountLockedException) {
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+                if (loginFailureTracker != null) {
+                    response.setHeader(HttpHeaders.RETRY_AFTER,
+                            String.valueOf(loginFailureTracker.getLockoutDurationSeconds()));
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
         }
     }
 
@@ -237,7 +266,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     protected LoginManager getLoginManager() {
-        return new LoginManager();
+        return new LoginManager(loginFailureTracker);
     }
 
     static String dropPassword(final String content) {
