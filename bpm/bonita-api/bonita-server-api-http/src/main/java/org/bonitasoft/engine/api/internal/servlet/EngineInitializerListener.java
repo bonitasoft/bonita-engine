@@ -76,6 +76,8 @@ public class EngineInitializerListener implements ServletContextListener {
         AnnotationConfigWebApplicationContext webApplicationContext = new AnnotationConfigWebApplicationContext();
         webApplicationContext.setParent(engineContext);
         webApplicationContext.setServletContext(event.getServletContext());
+        //required for login configuration beans (Brute force protection, etc.)
+        webApplicationContext.scan("org.bonitasoft.web.server");
         //A web application context needs to be referenced in the Servlet context so that servlet and filters beans handled by Spring web can use it
         event.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE,
                 webApplicationContext);

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.LoginManager;
+import org.bonitasoft.web.server.login.LoginFailureTracker;
 
 /**
  * Created by Vincent Elcrin
@@ -31,6 +32,7 @@ import org.bonitasoft.console.common.server.login.LoginManager;
 public abstract class AuthenticationRule {
 
     private LoginManager loginManager = null;
+    private LoginFailureTracker loginFailureTracker;
 
     /*
      * @return whether the process needs to be aborted or not
@@ -38,9 +40,15 @@ public abstract class AuthenticationRule {
     public abstract boolean doAuthorize(HttpServletRequestAccessor request, HttpServletResponse response)
             throws ServletException;
 
+    void setLoginFailureTracker(LoginFailureTracker loginFailureTracker) {
+        this.loginFailureTracker = loginFailureTracker;
+        // Reset so that getLoginManager() re-creates it with the new tracker
+        this.loginManager = null;
+    }
+
     protected LoginManager getLoginManager() {
         if (loginManager == null) {
-            loginManager = new LoginManager();
+            loginManager = new LoginManager(loginFailureTracker);
         }
         return loginManager;
     }

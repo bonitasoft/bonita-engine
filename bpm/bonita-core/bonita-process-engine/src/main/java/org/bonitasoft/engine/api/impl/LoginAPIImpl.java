@@ -112,15 +112,9 @@ public class LoginAPIImpl implements LoginAPI {
         final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<>(credentials);
         credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
         sessionAccessor.setTenantId(sTenant.getId());
-        try {
-            final SSession sSession = transactionService
-                    .executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
-            return ModelConvertor.toAPISession(sSession, sTenant.getName());
-        } catch (Exception e) {
-            //avoid brut force... (should be done differently, but it is the behavior since 6.0.0)
-            Thread.sleep(3000);
-            throw e;
-        }
+        final SSession sSession = transactionService
+                .executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
+        return ModelConvertor.toAPISession(sSession, sTenant.getName());
     }
 
     private STenant getTenant(final ServiceAccessor serviceAccessor)

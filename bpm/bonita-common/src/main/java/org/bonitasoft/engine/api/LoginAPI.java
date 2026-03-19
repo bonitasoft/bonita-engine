@@ -36,6 +36,12 @@ public interface LoginAPI {
 
     /**
      * Connects the user in order to use API methods of the default tenant.
+     * <p>
+     * Brute-force protection for web-based login requests is handled at the servlet layer,
+     * which enforces per-user rate limiting with HTTP 429 responses after repeated failures.
+     * Callers using the Java API directly (embedded engine, without the web layer) should
+     * implement their own rate-limiting or account lockout mechanism if the login endpoint
+     * is exposed to untrusted input.
      *
      * @param userName
      *        the user name
@@ -51,6 +57,12 @@ public interface LoginAPI {
 
     /**
      * Connects the user in order to use API methods of the default tenant.
+     * <p>
+     * Brute-force protection for web-based login requests is handled at the servlet layer,
+     * which enforces per-user rate limiting with HTTP 429 responses after repeated failures.
+     * Callers using the Java API directly (embedded engine, without the web layer) should
+     * implement their own rate-limiting or account lockout mechanism if the login endpoint
+     * is exposed to untrusted input.
      *
      * @param credentials
      *        the properties to use to login

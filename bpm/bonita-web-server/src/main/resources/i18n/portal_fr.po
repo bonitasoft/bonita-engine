@@ -284,6 +284,9 @@ msgstr "Impossible d'obtenir des définitions de données de processus, car %pro
 msgid "Unable to log in. Please check your username and password."
 msgstr "Impossible de se connecter. Veuillez vérifier votre nom d'utilisateur et le mot de passe."
 
+msgid "Too many failed login attempts. Please try again later."
+msgstr "Trop de tentatives de connexion. Veuillez réessayer plus tard."
+
 msgid "User"
 msgstr "Utilisateur"
 

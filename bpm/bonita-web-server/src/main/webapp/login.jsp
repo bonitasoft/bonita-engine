@@ -54,6 +54,10 @@
     else if ("noProfileForUser".equals(loginFailMessage)) {
         errorMessage = i18n.t_("Login failed. No profile has been set up for this user. Contact your administrator.");
     }
+    // Account locked due to too many failed attempts (constant defined in LoginServlet.ACCOUNT_LOCKED_MESSAGE)
+    else if ("accountLockedMessage".equals(loginFailMessage)) {
+        errorMessage = i18n.t_("Too many failed login attempts. Please try again later.");
+    }
  	// Login or password error
     else if ("loginFailMessage".equals(loginFailMessage)) {
         errorMessage = i18n.t_("Unable to log in. Please check your username and password.");
