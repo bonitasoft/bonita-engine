@@ -287,6 +287,9 @@ msgstr "プロセスのデータ定義を取得できません。 プロセス�
 msgid "Unable to log in. Please check your username and password."
 msgstr "ログインできません。ユーザー名とパスワードを確認してください。"
 
+msgid "Too many failed login attempts. Please try again later."
+msgstr "ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。"
+
 msgid "User"
 msgstr "利用者"
 

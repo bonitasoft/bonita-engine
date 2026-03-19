@@ -287,6 +287,9 @@ msgstr "Impossível obter definições de dados do processo, processo %processId
 msgid "Unable to log in. Please check your username and password."
 msgstr "Não foi possível logar. Por favor, verifique seu nome de usuário e senha."
 
+msgid "Too many failed login attempts. Please try again later."
+msgstr "Muitas tentativas de login falharam. Por favor, tente novamente mais tarde."
+
 msgid "User"
 msgstr "Usuário"
 

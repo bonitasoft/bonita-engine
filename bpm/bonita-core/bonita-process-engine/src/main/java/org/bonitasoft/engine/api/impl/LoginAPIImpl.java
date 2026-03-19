@@ -102,15 +102,9 @@ public class LoginAPIImpl implements LoginAPI {
         final LoginService loginService = serviceAccessor.getLoginService();
         final TransactionService transactionService = serviceAccessor.getTransactionService();
 
-        try {
-            final SSession sSession = transactionService
-                    .executeInTransaction(() -> loginService.login(credentials));
-            return ModelConvertor.toAPISession(sSession);
-        } catch (Exception e) {
-            //avoid brut force... (should be done differently, but it is the behavior since 6.0.0)
-            Thread.sleep(3000);
-            throw e;
-        }
+        final SSession sSession = transactionService
+                .executeInTransaction(() -> loginService.login(credentials));
+        return ModelConvertor.toAPISession(sSession);
     }
 
     private SPlatform getPlatform(final ServiceAccessor serviceAccessor)
