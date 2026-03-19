@@ -32,14 +32,17 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
+import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.login.utils.RedirectUrl;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.server.login.LoginFailureTracker;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.stubbing.Answer;
+import org.springframework.web.context.WebApplicationContext;
 
 public class AuthenticationFilterTest {
 
@@ -233,6 +236,46 @@ public class AuthenticationFilterTest {
         verify(authenticationFilter).handleUserNotFoundOrInactiveException(request, httpResponse,
                 engineUserNotFoundOrInactive);
         verify(authenticationFilter).redirectTo(request, httpResponse, AuthenticationFilter.USER_NOT_FOUND_JSP);
+    }
+
+    @Test
+    public void testAccountLockoutExceptionOnDoFilteringReturns429WithRetryAfter() throws Exception {
+        when(httpRequest.getServletPath()).thenReturn("/apps");
+        when(httpRequest.getPathInfo()).thenReturn("/app/home");
+
+        AccountLockedRuntimeException accountLockoutException = new AccountLockedRuntimeException("Account is locked");
+        authenticationFilter.addRule(createThrowingExceptionRule(accountLockoutException));
+
+        // Set up a tracker with a lockout duration
+        LoginFailureTracker tracker = mock(LoginFailureTracker.class);
+        when(tracker.getLockoutDurationSeconds()).thenReturn(300L);
+        WebApplicationContext springContext = mock(WebApplicationContext.class);
+        when(springContext.getBean(LoginFailureTracker.class)).thenReturn(tracker);
+        when(servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
+                .thenReturn(springContext);
+        authenticationFilter.init(filterConfig);
+
+        authenticationFilter.doAuthenticationFiltering(request, httpResponse, chain);
+
+        verify(httpResponse).setStatus(429);
+        verify(httpResponse).setHeader("Retry-After", "300");
+        verify(chain, never()).doFilter(httpRequest, httpResponse);
+    }
+
+    @Test
+    public void testAccountLockoutExceptionReturns429WithoutRetryAfterWhenNoTracker() throws Exception {
+        when(httpRequest.getServletPath()).thenReturn("/apps");
+        when(httpRequest.getPathInfo()).thenReturn("/app/home");
+
+        AccountLockedRuntimeException accountLockoutException = new AccountLockedRuntimeException("Account is locked");
+        authenticationFilter.addRule(createThrowingExceptionRule(accountLockoutException));
+
+        // No Spring context → loginFailureTracker stays null (setUp default)
+        authenticationFilter.doAuthenticationFiltering(request, httpResponse, chain);
+
+        verify(httpResponse).setStatus(429);
+        verify(httpResponse, never()).setHeader(eq("Retry-After"), anyString());
+        verify(chain, never()).doFilter(httpRequest, httpResponse);
     }
 
     @Test
@@ -476,6 +519,54 @@ public class AuthenticationFilterTest {
                 throw e;
             }
         };
+    }
+
+    @Test
+    public void init_should_set_login_failure_tracker_on_rules_when_spring_context_has_bean() throws Exception {
+        LoginFailureTracker tracker = mock(LoginFailureTracker.class);
+        WebApplicationContext springContext = mock(WebApplicationContext.class);
+        when(springContext.getBean(LoginFailureTracker.class)).thenReturn(tracker);
+
+        ServletContext servletContextWithSpring = mock(ServletContext.class);
+        when(servletContextWithSpring.getContextPath()).thenReturn("");
+        when(servletContextWithSpring.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
+                .thenReturn(springContext);
+
+        FilterConfig filterConfigWithSpring = mock(FilterConfig.class);
+        when(filterConfigWithSpring.getServletContext()).thenReturn(servletContextWithSpring);
+        when(filterConfigWithSpring.getInitParameterNames()).thenReturn(Collections.emptyEnumeration());
+
+        AuthenticationFilter filter = spy(new AuthenticationFilter());
+        doReturn(authenticationManager).when(filter).getAuthenticationManager();
+        filter.init(filterConfigWithSpring);
+
+        // The default rule (AlreadyLoggedInRule) should have received the tracker
+        assertThat(filter.getRules()).isNotEmpty();
+        // Verify by calling getLoginManager() — it should create a LoginManager with the tracker
+        // We verify indirectly: a rule added before init() should get the tracker via init()
+        AuthenticationRule rule = filter.getRules().getFirst();
+        LoginManager loginManager = rule.getLoginManager();
+        assertThat(loginManager).extracting("loginFailureTracker").isSameAs(tracker);
+    }
+
+    @Test
+    public void init_should_set_null_tracker_on_rules_when_no_spring_context() throws Exception {
+        // servletContext mock does not have a Spring WebApplicationContext attribute
+        AuthenticationFilter filter = spy(new AuthenticationFilter());
+        doReturn(authenticationManager).when(filter).getAuthenticationManager();
+
+        FilterConfig filterConfigNoSpring = mock(FilterConfig.class);
+        ServletContext servletContextNoSpring = mock(ServletContext.class);
+        when(servletContextNoSpring.getContextPath()).thenReturn("");
+        when(filterConfigNoSpring.getServletContext()).thenReturn(servletContextNoSpring);
+        when(filterConfigNoSpring.getInitParameterNames()).thenReturn(Collections.emptyEnumeration());
+
+        filter.init(filterConfigNoSpring);
+
+        assertThat(filter.getRules()).isNotEmpty();
+        AuthenticationRule rule = filter.getRules().getFirst();
+        LoginManager loginManager = rule.getLoginManager();
+        assertThat(loginManager).extracting("loginFailureTracker").isNull();
     }
 
 }

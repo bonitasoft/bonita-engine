@@ -14,6 +14,7 @@
 package org.bonitasoft.console.common.server.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -34,6 +35,7 @@ import org.bonitasoft.console.common.server.login.credentials.UserLogger;
 import org.bonitasoft.console.common.server.login.filter.TokenGenerator;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.user.User;
+import org.bonitasoft.web.server.login.LoginFailureTracker;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,9 +68,12 @@ public class LoginManagerTest {
     @Mock
     TokenGenerator tokenGenerator;
 
+    @Mock
+    LoginFailureTracker loginFailureTracker;
+
     @Spy
     @InjectMocks
-    LoginManager loginManager = new LoginManager();
+    LoginManager loginManager = new LoginManager(null);
 
     HttpServletRequestAccessor requestAccessor;
 
@@ -174,5 +179,94 @@ public class LoginManagerTest {
         verify(tokenGenerator).createOrLoadToken(session);
         verify(tokenGenerator, never()).setTokenToResponseHeader(any(HttpServletResponse.class), anyString());
         assertThat(response.getCookie(TokenGenerator.X_BONITA_API_TOKEN).getValue()).isEqualTo("123");
+    }
+
+    @Test
+    public void loginInternal_should_throw_LoginFailedException_when_user_is_locked_out() throws Exception {
+        final Credentials credentials = new StandardCredentials("lockedUser", "password");
+        when(loginFailureTracker.isLockedOut("lockedUser")).thenReturn(true);
+
+        assertThatThrownBy(() -> loginManager.loginInternal(requestAccessor, response, userLogger, credentials))
+                .isInstanceOf(AccountLockedException.class)
+                .hasMessageContaining("Too many failed login attempts");
+
+        verify(userLogger, never()).doLogin(any(Credentials.class));
+    }
+
+    @Test
+    public void loginInternal_should_record_failure_on_login_failure() throws Exception {
+        final Credentials credentials = new StandardCredentials("user1", "wrongPassword");
+        doReturn(authenticationManager).when(loginManager).getAuthenticationManager();
+        doThrow(LoginFailedException.class).when(userLogger).doLogin(credentials);
+
+        assertThatThrownBy(() -> loginManager.loginInternal(requestAccessor, response, userLogger, credentials))
+                .isInstanceOf(LoginFailedException.class);
+
+        verify(loginFailureTracker).recordFailure("user1");
+    }
+
+    @Test
+    public void loginInternal_should_record_failure_on_authentication_failure() throws Exception {
+        final Credentials credentials = new StandardCredentials("user1", "password");
+        doReturn(authenticationManager).when(loginManager).getAuthenticationManager();
+        doThrow(AuthenticationFailedException.class).when(authenticationManager).authenticate(requestAccessor,
+                credentials);
+
+        assertThatThrownBy(() -> loginManager.loginInternal(requestAccessor, response, userLogger, credentials))
+                .isInstanceOf(AuthenticationFailedException.class);
+
+        verify(loginFailureTracker).recordFailure("user1");
+    }
+
+    @Test
+    public void loginInternal_should_reset_failures_on_successful_login() throws Exception {
+        final Credentials credentials = new StandardCredentials("user1", "password");
+        doReturn(authenticationManager).when(loginManager).getAuthenticationManager();
+        doReturn(apiSession).when(userLogger).doLogin(credentials);
+
+        loginManager.loginInternal(requestAccessor, response, userLogger, credentials);
+
+        verify(loginFailureTracker).resetFailures("user1");
+    }
+
+    @Test
+    public void loginInternal_should_not_check_lockout_when_username_is_empty() throws Exception {
+        LoginManager managerWithTracker = spy(new LoginManager(loginFailureTracker));
+        managerWithTracker.tokenGenerator = tokenGenerator;
+        managerWithTracker.portalCookies = new PortalCookies();
+        final Credentials credentials = new StandardCredentials("", "password");
+        doReturn(authenticationManager).when(managerWithTracker).getAuthenticationManager();
+        doReturn(Collections.emptyMap()).when(authenticationManager).authenticate(requestAccessor, credentials);
+
+        assertThatThrownBy(() -> managerWithTracker.loginInternal(requestAccessor, response, userLogger, credentials))
+                .isInstanceOf(AuthenticationFailedException.class);
+
+        verify(loginFailureTracker, never()).isLockedOut(anyString());
+    }
+
+    @Test
+    public void loginInternal_should_not_NPE_when_tracker_is_null_and_login_succeeds() throws Exception {
+        LoginManager managerWithoutTracker = spy(new LoginManager(null));
+        managerWithoutTracker.tokenGenerator = tokenGenerator;
+        managerWithoutTracker.portalCookies = new PortalCookies();
+        final Credentials credentials = new StandardCredentials("user1", "password");
+        doReturn(authenticationManager).when(managerWithoutTracker).getAuthenticationManager();
+        doReturn(apiSession).when(userLogger).doLogin(credentials);
+
+        managerWithoutTracker.loginInternal(requestAccessor, response, userLogger, credentials);
+
+        verify(userLogger).doLogin(credentials);
+    }
+
+    @Test
+    public void loginInternal_should_not_NPE_when_tracker_is_null_and_login_fails() throws Exception {
+        LoginManager managerWithoutTracker = spy(new LoginManager(null));
+        final Credentials credentials = new StandardCredentials("user1", "wrongPassword");
+        doReturn(authenticationManager).when(managerWithoutTracker).getAuthenticationManager();
+        doThrow(LoginFailedException.class).when(userLogger).doLogin(credentials);
+
+        assertThatThrownBy(
+                () -> managerWithoutTracker.loginInternal(requestAccessor, response, userLogger, credentials))
+                        .isInstanceOf(LoginFailedException.class);
     }
 }
