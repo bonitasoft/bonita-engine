@@ -46,9 +46,9 @@ import org.bonitasoft.web.server.login.LoginFailureTracker;
 import org.bonitasoft.web.server.login.LoginFailureTrackerAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 /**
  * @author Anthony Birembaut, Ruiheng Fan, Chong Zhao, Haojie Yuan
