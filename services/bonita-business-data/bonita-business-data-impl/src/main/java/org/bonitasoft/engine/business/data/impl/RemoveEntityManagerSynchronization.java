@@ -14,13 +14,18 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Status;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class RemoveEntityManagerSynchronization implements BonitaTransactionSynchronization {
+
+    private static final Logger log = LoggerFactory.getLogger(RemoveEntityManagerSynchronization.class);
 
     private final ThreadLocal<EntityManager> localManager;
 
@@ -31,11 +36,30 @@ public class RemoveEntityManagerSynchronization implements BonitaTransactionSync
 
     @Override
     public void afterCompletion(final int txState) {
-        EntityManager entityManager = localManager.get();
-        if (entityManager != null) {
-            entityManager.close();
+        if (txState == Status.STATUS_UNKNOWN) {
+            log.error("BDM EntityManager cleanup after transaction completed with STATUS_UNKNOWN "
+                    + "(heuristic mixed outcome). Some XA resources may have committed while others rolled back. "
+                    + "The persistence context is in an undefined state and will be discarded. "
+                    + "Manual verification of business data consistency may be required.");
         }
-        localManager.remove();
+        try {
+            EntityManager entityManager = localManager.get();
+            // Ensure the EntityManager is not already closed before attempting to close it (EntityManager.close() throws
+            // an exception if the EntityManager is already closed)
+            if (entityManager != null && entityManager.isOpen()) {
+                try {
+                    entityManager.close();
+                } catch (Exception e) {
+                    log.warn("Failed to close BDM EntityManager during transaction completion (txState={}). "
+                            + "This may indicate a resource leak. The EntityManager reference will still be removed "
+                            + "from the thread to prevent stale state on the next operation.",
+                            txState, e);
+                    throw e;
+                }
+            }
+        } finally {
+            localManager.remove();
+        }
     }
 
 }
