@@ -40,6 +40,7 @@ import org.bonitasoft.engine.business.data.SBusinessDataRepositorySerializationE
 import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
 import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import org.bonitasoft.engine.commons.TypeConverterUtil;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,11 +67,18 @@ public class BusinessDataServiceImplTest {
     private BusinessDataReloader businessDataReloader;
     @Mock
     private CountQueryProvider countQueryProvider;
+    private ClassLoader originalClassLoader;
 
     private BusinessDataServiceImpl businessDataService;
 
     @Before
     public void before() {
+        // Guard against context classloader being nullified by Narayana-based integration tests
+        // (e.g. JPABusinessDataRepositoryImplITest) that run earlier in the same JVM
+        originalClassLoader = Thread.currentThread().getContextClassLoader();
+        if (originalClassLoader == null) {
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+        }
         final String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd",
                 "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS" };
         businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer,
@@ -78,6 +86,12 @@ public class BusinessDataServiceImplTest {
                 businessDataReloader, countQueryProvider));
         // Mock default standard shape enabled to true (matches runtime default)
         when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(true);
+    }
+
+    @After
+    public void after() {
+        // Restore original classloader
+        Thread.currentThread().setContextClassLoader(originalClassLoader);
     }
 
     @Test

@@ -14,11 +14,13 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -39,15 +41,19 @@ import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
-public class JPABusinessDataRepositoryImplTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class JPABusinessDataRepositoryImplTest {
 
     private static final long PRIMARY_KEY_1 = 1L;
 
@@ -70,8 +76,8 @@ public class JPABusinessDataRepositoryImplTest {
 
     private JPABusinessDataRepositoryImpl realJPABusinessDataRepository;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         realJPABusinessDataRepository = new JPABusinessDataRepositoryImpl(transactionService,
                 businessDataModelRepository, configuration, classLoaderService);
         repository = spy(
@@ -89,13 +95,13 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_constructor_add_listener_on_classloader() {
+    void should_constructor_add_listener_on_classloader() {
         //then
         verify(classLoaderService).addListener(ClassLoaderIdentifier.TENANT, realJPABusinessDataRepository);
     }
 
     @Test
-    public void should_stop_close_entityManagerFactory() {
+    void should_stop_close_entityManagerFactory() {
         // given
         EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
         doReturn(entityManagerFactory).when(repository).getEntityManagerFactory();
@@ -106,7 +112,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_onUpdate_recreate_the_entity_manager_factory() {
+    void should_onUpdate_recreate_the_entity_manager_factory() {
         //given
         EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
         doReturn(entityManagerFactory).when(repository).createEntityManagerFactory();
@@ -119,7 +125,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void onUpdate_should_not_throw_NPE_if_entity_manager_factory_is_null_but_still_recreate_the_factory() {
+    void onUpdate_should_not_throw_NPE_if_entity_manager_factory_is_null_but_still_recreate_the_factory() {
         //given
         EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
         doReturn(entityManagerFactory).when(repository).createEntityManagerFactory();
@@ -132,9 +138,9 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void findById_should_not_detach_entities() throws Exception {
+    void findById_should_not_detach_entities() throws Exception {
         final Address address1 = new Address(PRIMARY_KEY_1);
-        when(manager.find(Address.class, PRIMARY_KEY_1)).thenReturn(address1);
+        doReturn(address1).when(manager).find(Address.class, PRIMARY_KEY_1);
 
         final Address result = repository.findById(Address.class, PRIMARY_KEY_1);
 
@@ -142,119 +148,135 @@ public class JPABusinessDataRepositoryImplTest {
         verify(manager, never()).detach(any(Address.class));
     }
 
-    @Test(expected = SBusinessDataNotFoundException.class)
-    public void findById_should_throw_an_exception_when_not_found() throws Exception {
-        when(manager.find(Address.class, PRIMARY_KEY_1)).thenReturn(null);
+    @Test
+    void findById_should_throw_an_exception_when_not_found() {
+        doReturn(null).when(manager).find(Address.class, PRIMARY_KEY_1);
 
-        repository.findById(Address.class, PRIMARY_KEY_1);
-    }
-
-    @Test(expected = SBusinessDataNotFoundException.class)
-    public void findById_should_throw_an_exception_with_a_null_identifier() throws Exception {
-        repository.findById(Address.class, null);
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_findById_throw_retryable_when_persistenceException() throws Exception {
-        //given
-        doThrow(PersistenceException.class).when(manager).find(Address.class, PRIMARY_KEY_1);
-        //when
-        repository.findById(Address.class, PRIMARY_KEY_1);
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_findByIds_throw_retryable_when_persistenceException() {
-        //given
-        doThrow(PersistenceException.class).when(manager).createQuery(any(CriteriaQuery.class));
-        //when
-        repository.findByIds(Address.class, Collections.singletonList(PRIMARY_KEY_1));
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_findByIdentifiers_throw_retryable_when_persistenceException() {
-        //given
-        doThrow(PersistenceException.class).when(manager).find(Address.class, PRIMARY_KEY_1);
-        //when
-        repository.findByIdentifiers(Address.class, Collections.singletonList(PRIMARY_KEY_1));
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_findByNamedQuery_throw_retryable_when_persistenceException() throws Exception {
-        //given
-        TypedQuery typedQuery = mock(TypedQuery.class);
-        doThrow(PersistenceException.class).when(typedQuery).getSingleResult();
-        doReturn(typedQuery).when(manager).createNamedQuery(anyString(), any(Class.class));
-        //when
-        repository.findByNamedQuery("queryName", Address.class, Collections.<String, Serializable> emptyMap());
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_findListByNamedQuery_throw_retryable_when_persistenceException() {
-        //given
-        TypedQuery typedQuery = mock(TypedQuery.class);
-        doThrow(PersistenceException.class).when(typedQuery).getResultList();
-        doReturn(typedQuery).when(manager).createNamedQuery(anyString(), any(Class.class));
-        //when
-        repository.findListByNamedQuery("queryName", Address.class, Collections.<String, Serializable> emptyMap(), 0,
-                10);
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_find_throw_retryable_when_persistenceException() throws Exception {
-        //given
-        TypedQuery typedQuery = mock(TypedQuery.class);
-        doThrow(PersistenceException.class).when(typedQuery).getSingleResult();
-        doReturn(typedQuery).when(manager).createQuery(anyString(), any(Class.class));
-        //when
-        repository.find(Address.class, "the query as string", Collections.<String, Serializable> emptyMap());
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_findList_throw_retryable_when_persistenceException() {
-        //given
-        TypedQuery typedQuery = mock(TypedQuery.class);
-        doThrow(PersistenceException.class).when(typedQuery).getResultList();
-        doReturn(typedQuery).when(manager).createQuery(anyString(), any(Class.class));
-        //when
-        repository.findList(Address.class, "the query as string", Collections.<String, Serializable> emptyMap(), 0, 10);
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_persist_throw_retryable_exception_in_case_of_persistenceException() {
-        //given
-        doThrow(PersistenceException.class).when(manager).persist(any(Address.class));
-        //when
-        repository.persist(new Address(12));
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_merge_throw_retryable_exception_in_case_of_persistenceException() {
-        //given
-        doThrow(PersistenceException.class).when(manager).merge(any(Address.class));
-        //when
-        repository.merge(new Address(12));
-        //then exception
-    }
-
-    @Test(expected = SRetryableException.class)
-    public void should_remove_throw_retryable_exception_in_case_of_persistenceException() {
-        //given
-        doThrow(PersistenceException.class).when(manager).remove(any(Address.class));
-        //when
-        repository.remove(new Address(12));
-        //then exception
+        assertThatExceptionOfType(SBusinessDataNotFoundException.class)
+                .isThrownBy(() -> repository.findById(Address.class, PRIMARY_KEY_1));
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_string_array_to_collection() {
+    void findById_should_throw_an_exception_with_a_null_identifier() {
+        assertThatExceptionOfType(SBusinessDataNotFoundException.class)
+                .isThrownBy(() -> repository.findById(Address.class, null));
+    }
+
+    @Test
+    void findById_should_throw_retryable_when_persistenceException() {
+        //given
+        doThrow(PersistenceException.class).when(manager).find(Address.class, PRIMARY_KEY_1);
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.findById(Address.class, PRIMARY_KEY_1));
+    }
+
+    @Test
+    void findByIds_should_throw_retryable_when_persistenceException() {
+        //given
+        doThrow(PersistenceException.class).when(manager).createQuery(any(CriteriaQuery.class));
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.findByIds(Address.class, Collections.singletonList(PRIMARY_KEY_1)));
+    }
+
+    @Test
+    void findByIdentifiers_should_throw_retryable_when_persistenceException() {
+        //given
+        doThrow(PersistenceException.class).when(manager).find(Address.class, PRIMARY_KEY_1);
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(
+                        () -> repository.findByIdentifiers(Address.class, Collections.singletonList(PRIMARY_KEY_1)));
+    }
+
+    @Test
+    void findByNamedQuery_should_throw_retryable_when_persistenceException() {
+        //given
+        TypedQuery typedQuery = mock(TypedQuery.class);
+        doThrow(PersistenceException.class).when(typedQuery).getSingleResult();
+        doReturn(typedQuery).when(manager).createNamedQuery(anyString(), any(Class.class));
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.findByNamedQuery("queryName", Address.class,
+                        Collections.<String, Serializable> emptyMap()));
+    }
+
+    @Test
+    void findListByNamedQuery_should_throw_retryable_when_persistenceException() {
+        //given
+        TypedQuery typedQuery = mock(TypedQuery.class);
+        doThrow(PersistenceException.class).when(typedQuery).getResultList();
+        doReturn(typedQuery).when(manager).createNamedQuery(anyString(), any(Class.class));
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.findListByNamedQuery("queryName", Address.class,
+                        Collections.<String, Serializable> emptyMap(), 0, 10));
+    }
+
+    @Test
+    void find_should_throw_retryable_when_persistenceException() {
+        //given
+        TypedQuery typedQuery = mock(TypedQuery.class);
+        doThrow(PersistenceException.class).when(typedQuery).getSingleResult();
+        doReturn(typedQuery).when(manager).createQuery(anyString(), any(Class.class));
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.find(Address.class, "the query as string",
+                        Collections.<String, Serializable> emptyMap()));
+    }
+
+    @Test
+    void findList_should_throw_retryable_when_persistenceException() {
+        //given
+        TypedQuery typedQuery = mock(TypedQuery.class);
+        doThrow(PersistenceException.class).when(typedQuery).getResultList();
+        doReturn(typedQuery).when(manager).createQuery(anyString(), any(Class.class));
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.findList(Address.class, "the query as string",
+                        Collections.<String, Serializable> emptyMap(), 0, 10));
+    }
+
+    @Test
+    void persist_should_throw_retryable_exception_in_case_of_persistenceException() {
+        //given
+        doThrow(PersistenceException.class).when(manager).persist(any(Address.class));
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.persist(new Address(12)));
+    }
+
+    @Test
+    void merge_should_throw_retryable_exception_in_case_of_persistenceException() {
+        //given
+        doThrow(PersistenceException.class).when(manager).merge(any(Address.class));
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.merge(new Address(12)));
+    }
+
+    @Test
+    void remove_should_throw_retryable_exception_in_case_of_persistenceException() {
+        //given
+        doThrow(PersistenceException.class).when(manager).remove(any(Address.class));
+
+        //when/then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.remove(new Address(12)));
+    }
+
+    @Test
+    void checkParameterValue_should_transform_query_parameter_values_from_string_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new String[] { "v1", "v2" });
 
@@ -262,7 +284,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_int_array_to_collection() {
+    void checkParameterValue_should_transform_query_parameter_values_from_int_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new Integer[] { 1, 2 });
 
@@ -270,7 +292,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_float_array_to_collection() {
+    void checkParameterValue_should_transform_query_parameter_values_from_float_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new Float[] { 1.2f, 2.0f });
 
@@ -278,7 +300,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_double_array_to_collection() {
+    void checkParameterValue_should_transform_query_parameter_values_from_double_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new Double[] { 1.2d, 2.0d });
 
@@ -286,17 +308,168 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_long_array_to_collection() {
+    void checkParameterValue_should_transform_query_parameter_values_from_long_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new Long[] { 12l, 23456l });
 
         assertThat((Collection) collection).contains(12l, 23456l);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void should_check_supported_query_parameter_types() {
-        repository
-                .checkParameterValue(new Byte[] { 0x1, 0x2 });
+    @Test
+    void checkParameterValue_should_check_supported_query_parameter_types() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> repository.checkParameterValue(new Byte[] { 0x1, 0x2 }));
+    }
+
+    // --- Defensive getEntityManager() tests (BPA-321) ---
+
+    /**
+     * Helper to inject an EntityManager into the private ThreadLocal "managers" field
+     * and call the real getEntityManager() method (not the spied version).
+     */
+    private JPABusinessDataRepositoryImpl createRepositoryWithStaleEM(EntityManager staleEM,
+            EntityManager freshEM, EntityManagerFactory emf)
+            throws Exception {
+        JPABusinessDataRepositoryImpl repo = spy(
+                new JPABusinessDataRepositoryImpl(transactionService,
+                        businessDataModelRepository, configuration, classLoaderService));
+        doReturn(emf).when(repo).getEntityManagerFactory();
+
+        // Inject the stale EM into the private ThreadLocal
+        Field managersField = JPABusinessDataRepositoryImpl.class.getDeclaredField("managers");
+        managersField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        ThreadLocal<EntityManager> managers = (ThreadLocal<EntityManager>) managersField.get(repo);
+        managers.set(staleEM);
+
+        // The EMF will produce a fresh EM when asked
+        doReturn(freshEM).when(emf).createEntityManager();
+
+        return repo;
+    }
+
+    @Test
+    void getEntityManager_should_discard_stale_EM_not_joined_to_transaction() throws Exception {
+        //given
+        EntityManager staleEM = mock(EntityManager.class);
+        doReturn(true).when(staleEM).isOpen();
+        doReturn(false).when(staleEM).isJoinedToTransaction();
+
+        EntityManager freshEM = mock(EntityManager.class);
+        EntityManagerFactory emf = mock(EntityManagerFactory.class);
+
+        JPABusinessDataRepositoryImpl repo = createRepositoryWithStaleEM(staleEM, freshEM, emf);
+
+        //when
+        EntityManager result = repo.getEntityManager();
+
+        //then
+        verify(staleEM).close();
+        verify(emf).createEntityManager();
+        verify(freshEM).joinTransaction();
+        assertThat(result).isSameAs(freshEM);
+    }
+
+    @Test
+    void getEntityManager_should_discard_stale_EM_that_is_no_longer_open() throws Exception {
+        //given
+        EntityManager staleEM = mock(EntityManager.class);
+        doReturn(false).when(staleEM).isOpen();
+
+        EntityManager freshEM = mock(EntityManager.class);
+        EntityManagerFactory emf = mock(EntityManagerFactory.class);
+
+        JPABusinessDataRepositoryImpl repo = createRepositoryWithStaleEM(staleEM, freshEM, emf);
+
+        //when
+        EntityManager result = repo.getEntityManager();
+
+        //then
+        // staleEM.isOpen() returned false, so close() should NOT be called (already closed)
+        verify(staleEM, never()).close();
+        verify(emf).createEntityManager();
+        assertThat(result).isSameAs(freshEM);
+    }
+
+    @Test
+    void getEntityManager_should_discard_stale_EM_that_throws_on_state_check() throws Exception {
+        //given
+        EntityManager staleEM = mock(EntityManager.class);
+        // Simulates a broken EM where even isOpen() throws (completely broken session)
+        doThrow(new PersistenceException("Session/EntityManager is closed")).when(staleEM).isOpen();
+
+        EntityManager freshEM = mock(EntityManager.class);
+        EntityManagerFactory emf = mock(EntityManagerFactory.class);
+
+        JPABusinessDataRepositoryImpl repo = createRepositoryWithStaleEM(staleEM, freshEM, emf);
+
+        //when
+        EntityManager result = repo.getEntityManager();
+
+        //then
+        // isOpen() threw, so closeQuietly catches the exception and moves on
+        verify(staleEM, never()).close();
+        verify(emf).createEntityManager();
+        assertThat(result).isSameAs(freshEM);
+    }
+
+    @Test
+    void getEntityManager_should_reuse_EM_when_joined_to_current_transaction() throws Exception {
+        //given
+        EntityManager activeEM = mock(EntityManager.class);
+        doReturn(true).when(activeEM).isOpen();
+        doReturn(true).when(activeEM).isJoinedToTransaction();
+
+        EntityManagerFactory emf = mock(EntityManagerFactory.class);
+
+        JPABusinessDataRepositoryImpl repo = spy(
+                new JPABusinessDataRepositoryImpl(transactionService,
+                        businessDataModelRepository, configuration, classLoaderService));
+        doReturn(emf).when(repo).getEntityManagerFactory();
+
+        // Inject the active EM
+        Field managersField = JPABusinessDataRepositoryImpl.class.getDeclaredField("managers");
+        managersField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        ThreadLocal<EntityManager> managers = (ThreadLocal<EntityManager>) managersField.get(repo);
+        managers.set(activeEM);
+
+        //when
+        EntityManager result = repo.getEntityManager();
+
+        //then
+        verify(emf, never()).createEntityManager();
+        verify(activeEM, never()).close();
+        verify(activeEM).joinTransaction();
+        assertThat(result).isSameAs(activeEM);
+
+        // cleanup ThreadLocal
+        managers.remove();
+    }
+
+    @Test
+    void getEntityManager_should_close_new_EM_when_registerBonitaSynchronization_throws() throws Exception {
+        //given
+        EntityManager freshEM = mock(EntityManager.class);
+        doReturn(true).when(freshEM).isOpen();
+        EntityManagerFactory emf = mock(EntityManagerFactory.class);
+        doReturn(freshEM).when(emf).createEntityManager();
+
+        JPABusinessDataRepositoryImpl repo = spy(
+                new JPABusinessDataRepositoryImpl(transactionService,
+                        businessDataModelRepository, configuration, classLoaderService));
+        doReturn(emf).when(repo).getEntityManagerFactory();
+
+        doThrow(new STransactionNotFoundException("no active transaction"))
+                .when(transactionService).registerBonitaSynchronization(any());
+
+        //when
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(repo::getEntityManager)
+                .withCauseInstanceOf(STransactionNotFoundException.class);
+
+        //then
+        verify(freshEM).close();
     }
 
     class Address implements Entity {

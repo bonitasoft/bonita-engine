@@ -158,12 +158,11 @@ public class JTATransactionServiceImpl implements TransactionService {
     public void complete() throws STransactionCommitException, STransactionRollbackException {
         // Depending of the txManager status we either commit or rollback.
         final TransactionServiceContext txContext = getTransactionServiceContext();
+        // Capture TX identity early
+        String txId = null;
         try {
-            if (log.isTraceEnabled()) {
-                log.trace(
-                        "Completing transaction in thread " + Thread.currentThread().getId() + " "
-                                + txManager.getTransaction().toString());
-            }
+            txId = String.valueOf(txManager.getTransaction());
+            log.trace("Completing transaction in thread {} (txId={})", Thread.currentThread().getId(), txId);
             final int status = txManager.getStatus();
             if (status == Status.STATUS_NO_TRANSACTION) {
                 throw new STransactionCommitException("No transaction started.");
@@ -172,11 +171,7 @@ public class JTATransactionServiceImpl implements TransactionService {
                 return; // We do not manage the transaction boundaries
             }
             if (status == Status.STATUS_MARKED_ROLLBACK) {
-                if (log.isTraceEnabled()) {
-                    log.trace(
-                            "Rolling back transaction in thread " + Thread.currentThread().getId() + " "
-                                    + txManager.getTransaction().toString());
-                }
+                log.trace("Rolling back transaction in thread {} (txId={})", Thread.currentThread().getId(), txId);
                 txManager.rollback();
             } else {
                 try {
@@ -187,6 +182,11 @@ public class JTATransactionServiceImpl implements TransactionService {
                 }
             }
         } catch (final SystemException | HeuristicMixedException | HeuristicRollbackException | RollbackException e) {
+            log.warn("Transaction commit failed in thread {} (txId={}). "
+                    + "The 2-phase commit may have completed but a post-commit synchronization threw an exception. "
+                    + "Root cause: {}",
+                    Thread.currentThread().getId(), txId, ExceptionUtils.printRootCauseOnly(e));
+            log.debug("Full exception for transaction commit failure:", e);
             throw new STransactionCommitException(e);
         } finally {
             MDC.remove(MDCConstants.TRANSACTION_ID);

@@ -177,7 +177,7 @@ public class ExecuteConnectorWorkTest {
         assertThatThrownBy(work::get).satisfies(exception -> {
             assertThat(exception).hasCauseInstanceOf(SConnectorException.class);
             assertThat(exception.getCause())
-                    .hasMessageContaining("Unable to evaluate output operations of connectors and continue");
+                    .hasMessageContaining("Unable to evaluate output operations and continue flow for connector");
             assertThat(exception.getCause()).hasCauseInstanceOf(SOperationExecutionException.class);
         });
     }
