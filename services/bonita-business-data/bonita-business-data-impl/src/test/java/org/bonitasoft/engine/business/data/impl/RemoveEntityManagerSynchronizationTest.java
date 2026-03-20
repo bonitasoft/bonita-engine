@@ -16,8 +16,7 @@ package org.bonitasoft.engine.business.data.impl;
 import static javax.transaction.Status.STATUS_COMMITTED;
 import static javax.transaction.Status.STATUS_ROLLEDBACK;
 import static javax.transaction.Status.STATUS_UNKNOWN;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.concurrent.CountDownLatch;
@@ -55,7 +54,6 @@ class RemoveEntityManagerSynchronizationTest {
         //then
         verify(entityManager, never()).close();
         assertThat(localManager.get()).as("should remove entity manager").isNotNull();
-
     }
 
     @Test
@@ -145,10 +143,8 @@ class RemoveEntityManagerSynchronizationTest {
         doThrow(new PersistenceException("connection reset")).when(entityManager).close();
         RemoveEntityManagerSynchronization sync = new RemoveEntityManagerSynchronization(localManager);
 
-        //when - then: close() failure is re-thrown, but ThreadLocal is still cleaned up (via finally)
-        assertThatExceptionOfType(PersistenceException.class)
-                .isThrownBy(() -> sync.afterCompletion(STATUS_COMMITTED))
-                .withMessageContaining("connection reset");
+        //when - then: close() failure should be ignored, and ThreadLocal is still cleaned up (via finally)
+        assertThatNoException().isThrownBy(() -> sync.afterCompletion(STATUS_COMMITTED));
         verify(entityManager).close();
         assertThat(localManager.get())
                 .as("ThreadLocal should be cleaned up even when close() throws")
