@@ -19,6 +19,7 @@ dependencies {
     testImplementation libs.assertj
     testImplementation libs.jsonUnitFluent
     testImplementation libs.mockitoCore
+    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.logback
     testImplementation libs.narayanaJta
     testImplementation libs.springTest

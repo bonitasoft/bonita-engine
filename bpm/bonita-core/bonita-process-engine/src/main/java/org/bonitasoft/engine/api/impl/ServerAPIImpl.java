@@ -152,6 +152,11 @@ public class ServerAPIImpl implements ServerAPI {
         } catch (final UndeclaredThrowableException ute) {
             throw createServerWrappedException(ute);
         } catch (final Throwable cause) {
+            // Note: at this point the transaction outcome is uncertain — it may have
+            // committed before the failure occurred. The client will receive an error
+            // regardless.
+            logger.error("Unexpected failure during API call {}.{}() (session={})",
+                    apiInterfaceName, methodName, session, cause);
             final BonitaRuntimeException throwableToWrap = wrapThrowable(cause);
             fillGlobalContextForException(session, throwableToWrap);
             throw createServerWrappedException(throwableToWrap);
