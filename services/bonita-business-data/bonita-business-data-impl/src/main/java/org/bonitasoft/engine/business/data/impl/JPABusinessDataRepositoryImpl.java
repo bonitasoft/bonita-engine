@@ -37,6 +37,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.model.QueryParameterTypes;
 import org.bonitasoft.engine.bdm.model.field.Field;
@@ -54,17 +55,15 @@ import org.hibernate.Hibernate;
 import org.hibernate.QueryException;
 import org.hibernate.boot.archive.scan.internal.DisabledScanner;
 import org.hibernate.proxy.HibernateProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
  */
 
+@Slf4j
 public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, SingleClassLoaderListener {
 
-    private static final Logger log = LoggerFactory.getLogger(JPABusinessDataRepositoryImpl.class);
     private static final String BDR_PERSISTENCE_UNIT = "BDR";
 
     private final Map<String, Object> configuration;
@@ -183,17 +182,47 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
         }
 
         EntityManager manager = managers.get();
-        if (manager == null || !manager.isOpen()) {
+        if (manager != null && !isPartOfCurrentTransaction(manager)) {
+            log.warn("Stale BDM EntityManager detected: not part of the current transaction. "
+                    + "It will be replaced with a fresh one. "
+                    + "This typically happens after a JTA transaction timeout.");
+            closeQuietly(manager);
+            managers.remove();
+            manager = null;
+        }
+        if (manager == null) {
             manager = getEntityManagerFactory().createEntityManager();
             try {
                 transactionService.registerBonitaSynchronization(new RemoveEntityManagerSynchronization(managers));
             } catch (final STransactionNotFoundException stnfe) {
+                closeQuietly(manager);
                 throw new IllegalStateException(stnfe);
             }
             managers.set(manager);
         }
         manager.joinTransaction();
         return manager;
+    }
+
+    private boolean isPartOfCurrentTransaction(EntityManager manager) {
+        try {
+            return manager.isOpen() && manager.isJoinedToTransaction();
+        } catch (Exception e) {
+            log.warn("Stale BDM EntityManager detected (exception during transaction state check). "
+                    + "A fresh EntityManager will be created for the current transaction.", e);
+            return false;
+        }
+    }
+
+    private void closeQuietly(EntityManager manager) {
+        try {
+            if (manager.isOpen()) {
+                manager.close();
+            }
+        } catch (Exception e) {
+            log.warn("Failed to close stale BDM EntityManager. "
+                    + "This may indicate a resource leak if it happens repeatedly.", e);
+        }
     }
 
     @Override

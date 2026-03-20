@@ -17,6 +17,10 @@ dependencies {
     compileOnly libs.lombok
 
     testImplementation libs.junit4
+    testImplementation libs.junit5api
+    testRuntimeOnly libs.junitJupiterEngine
+    testRuntimeOnly libs.junitVintageEngine
+    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.assertj
     testImplementation libs.jsonUnitFluent
     testImplementation libs.mockitoCore
@@ -34,6 +38,10 @@ dependencies {
     // Property Based Test framework:
     testImplementation(libs.quickcheckCore)
     testImplementation(libs.quickcheckGenerators)
+}
+
+test {
+    useJUnitPlatform()
 }
 
 // run:

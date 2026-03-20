@@ -9,8 +9,16 @@ dependencies {
     api project(':services:bonita-session')
     testImplementation libs.assertj
     testImplementation libs.mockitoCore
+    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.junit4
+    testImplementation libs.junit5api
+    testRuntimeOnly libs.junitJupiterEngine
+    testRuntimeOnly libs.junitVintageEngine
     testImplementation libs.systemRules
     annotationProcessor libs.lombok
     compileOnly libs.lombok
+}
+
+test {
+    useJUnitPlatform()
 }

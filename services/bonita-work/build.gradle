@@ -8,9 +8,17 @@ dependencies {
     api libs.springJdbc
     api libs.springContext
     testImplementation libs.junit4
+    testImplementation libs.junit5api
+    testRuntimeOnly libs.junitJupiterEngine
+    testRuntimeOnly libs.junitVintageEngine
     testImplementation libs.awaitility
     testImplementation libs.assertj
     testImplementation libs.mockitoCore
+    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.systemRules
     testRuntimeOnly libs.logback
+}
+
+test {
+    useJUnitPlatform()
 }
