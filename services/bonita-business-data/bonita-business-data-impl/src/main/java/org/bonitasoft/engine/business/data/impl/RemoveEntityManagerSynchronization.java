@@ -54,7 +54,6 @@ public class RemoveEntityManagerSynchronization implements BonitaTransactionSync
                             + "This may indicate a resource leak. The EntityManager reference will still be removed "
                             + "from the thread to prevent stale state on the next operation.",
                             txState, e);
-                    throw e;
                 }
             }
         } finally {
