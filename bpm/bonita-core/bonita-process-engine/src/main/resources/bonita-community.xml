@@ -612,6 +612,11 @@
         <constructor-arg name="sequenceId" value="7" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
     </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.SDataRetentionConfig" />
+        <constructor-arg name="sequenceId" value="8" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
+    </bean>
 
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
         <constructor-arg name="txManager" ref="transactionManager" />
@@ -754,6 +759,8 @@
                 <entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="saComment" />
                 <!-- platform -->
                 <entry key="org.bonitasoft.engine.platform.model.SPlatform" value="platform" />
+                <!-- data retention config -->
+                <entry key="org.bonitasoft.engine.platform.model.SDataRetentionConfig" value="dataRetentionConfig" />
                 <!-- platform command -->
                 <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="platformCommand" />
                 <!-- page -->
@@ -831,6 +838,7 @@
                 <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
                 <value>org.bonitasoft.engine.platform.model.SPlatform</value>
+                <value>org.bonitasoft.engine.platform.model.SDataRetentionConfig</value>
                 <value>org.bonitasoft.engine.platform.command.model.SPlatformCommand</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
