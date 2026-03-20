@@ -17,6 +17,10 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 
     testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
@@ -34,6 +38,10 @@ dependencies {
     // Property Based Test framework:
     testImplementation("com.pholser:junit-quickcheck-core:${Deps.junitQuickCheck}")
     testImplementation("com.pholser:junit-quickcheck-generators:${Deps.junitQuickCheck}")
+}
+
+test {
+    useJUnitPlatform()
 }
 
 // run:
