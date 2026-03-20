@@ -63,11 +63,12 @@ class ConnectorExecutorSingleThreadTest {
     @BeforeEach
     void setUp() {
         meterRegistry = new SimpleMeterRegistry(
+                // So that micrometer updates its counters every 1 ms:
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
                 Clock.SYSTEM);
-        // Pool size 1: corePoolSize=1, maximumPoolSize=1, keepAlive=1, queueCapacity=1
-        connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, 1, 1, sessionAccessor, sessionService,
-                timeTracker, meterRegistry, TENANT_ID, new DefaultExecutorServiceMetricsProvider());
+        connectorExecutorImpl = new ConnectorExecutorImpl(sessionAccessor, sessionService,
+                timeTracker, meterRegistry, TENANT_ID, new DefaultExecutorServiceMetricsProvider(),
+                new ConnectorSingleThreadExecutorFactory(1));
         connectorExecutorImpl.start();
     }
 
