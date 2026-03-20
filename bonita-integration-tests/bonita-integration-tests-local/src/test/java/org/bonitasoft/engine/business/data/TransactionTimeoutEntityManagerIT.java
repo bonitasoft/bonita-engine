@@ -52,7 +52,7 @@ public class TransactionTimeoutEntityManagerIT extends CommonAPIIT {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         // Deploy a minimal BDM so the EntityManagerFactory is created
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
@@ -78,7 +78,7 @@ public class TransactionTimeoutEntityManagerIT extends CommonAPIIT {
             getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
             getTenantAdministrationAPI().resume();
         }
-        logoutOnTenant();
+        logout();
     }
 
     /**
