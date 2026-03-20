@@ -49,6 +49,7 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@lombok.extern.slf4j.Slf4j
 public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
     protected final long processDefinitionId;
@@ -161,9 +162,16 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                             executeOutputOperationsAndContinue(context, serviceAccessor, userTransactionService,
                                     sConnectorDefinition, r);
                         } catch (Exception e) {
+                            log.error("Unable to evaluate output operations and continue flow"
+                                    + " for connector '{}' (connectorInstanceId={},"
+                                    + " processDefinitionId={}, processInstanceId={})",
+                                    connectorDefinitionName, connectorInstanceId,
+                                    processDefinitionId, processInstanceId, e);
                             throw new CompletionException(
                                     new SConnectorException(
-                                            "Unable to evaluate output operations of connectors and continue", e));
+                                            "Unable to evaluate output operations and continue flow for connector '"
+                                                    + connectorDefinitionName + "'",
+                                            e));
                         }
                     });
         } finally {
