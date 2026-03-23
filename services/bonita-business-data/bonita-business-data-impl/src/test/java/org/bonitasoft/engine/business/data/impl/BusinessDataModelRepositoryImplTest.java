@@ -28,8 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import com.pholser.junit.quickcheck.Property;
-import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
@@ -47,22 +45,16 @@ import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.hibernate.tool.schema.spi.CommandAcceptanceException;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(JUnitQuickcheck.class)
+@RunWith(MockitoJUnitRunner.class)
 public class BusinessDataModelRepositoryImplTest {
 
     private static final long TENANT_ID = 67453L;
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private DependencyService dependencyService;
@@ -75,30 +67,23 @@ public class BusinessDataModelRepositoryImplTest {
     @Mock
     private SchemaManagerUpdate schemaManager;
 
-    @Mock
+    @Mock(lenient = true)
     private PlatformService platformService;
 
-    @Mock
+    @Mock(lenient = true)
     private SPlatformProperties platformProperties;
 
     private BusinessDataModelRepositoryImpl businessDataModelRepository;
 
-    private ClassLoader classLoader;
-
     @Before
-    public void setUp() {
-        // store the context ClassLoader of the current thread
-        classLoader = Thread.currentThread().getContextClassLoader();
+    public void setUp() throws Exception {
         doReturn(platformProperties).when(platformService).getSPlatformProperties();
         doReturn("1.0").when(platformProperties).getPlatformVersion();
+        // Prevent uninstall()/install() from nullifying the thread context classloader
+        // via classLoaderService.getClassLoader() returning null (default mock behavior)
+        doReturn(getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
         businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(platformService, dependencyService,
                 classLoaderService, schemaManager, tenantResourcesService, TENANT_ID));
-    }
-
-    @After
-    public void tearDown() {
-        // reset the context ClassLoader of the current thread
-        Thread.currentThread().setContextClassLoader(classLoader);
     }
 
     @Test
@@ -224,17 +209,19 @@ public class BusinessDataModelRepositoryImplTest {
         businessDataModelRepository.install(bom, 47L);
     }
 
-    @Property(trials = 30)
-    public void getInstalledBDMVersion_should_return_version_number(long version) throws Exception {
-        // given:
-        doReturn(Optional.of(version)).when(dependencyService).getIdOfDependencyOfArtifact(TENANT_ID, ScopeType.TENANT,
-                BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME);
+    @Test
+    public void getInstalledBDMVersion_should_return_version_number() throws Exception {
+        for (long version : new long[] { 0L, 1L, -1L, 42L, Long.MAX_VALUE, Long.MIN_VALUE }) {
+            // given:
+            doReturn(Optional.of(version)).when(dependencyService).getIdOfDependencyOfArtifact(TENANT_ID,
+                    ScopeType.TENANT, BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME);
 
-        // when:
-        final String installedBDMVersion = businessDataModelRepository.getInstalledBDMVersion();
+            // when:
+            final String installedBDMVersion = businessDataModelRepository.getInstalledBDMVersion();
 
-        // then:
-        assertThat(installedBDMVersion).isEqualTo(String.valueOf(version));
+            // then:
+            assertThat(installedBDMVersion).isEqualTo(String.valueOf(version));
+        }
     }
 
     @Test
@@ -243,7 +230,8 @@ public class BusinessDataModelRepositoryImplTest {
         doReturn(singletonList(new CommandAcceptanceException("Error executing DDL bla bla bla...",
                 new SQLSyntaxErrorException("ORA-02275: une telle contrainte référentielle existe déjà dans la table",
                         new Exception("Root Oracle Cause")))))
-                                .when(schemaManager).update(anySet());
+                                .when(schemaManager)
+                                .update(anySet());
 
         // when - then:
         assertThatExceptionOfType(SBusinessDataRepositoryDeploymentException.class)
@@ -264,7 +252,8 @@ public class BusinessDataModelRepositoryImplTest {
                                 new Exception("Root Oracle Cause"))),
                 new CommandAcceptanceException("CommandAcceptanceException bliblibli",
                         new SQLSyntaxErrorException("Hibernate error"))))
-                                .when(schemaManager).update(anySet());
+                                .when(schemaManager)
+                                .update(anySet());
 
         // when - then:
         assertThatExceptionOfType(SBusinessDataRepositoryDeploymentException.class)

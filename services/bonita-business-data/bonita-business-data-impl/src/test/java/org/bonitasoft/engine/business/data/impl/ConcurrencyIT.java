@@ -46,7 +46,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
-public class ConcurrencyTest {
+public class ConcurrencyIT {
 
     private static final long TENANT_ID = 654643L;
     private JPABusinessDataRepositoryImpl businessDataRepository;
