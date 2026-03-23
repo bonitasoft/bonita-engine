@@ -83,7 +83,6 @@ jsonUnitVersion = "5.0.0"
 systemRulesVersion = "1.19.0"
 systemLambdaVersion = "1.2.1"
 concurrentUnitVersion = "0.4.6"
-junitQuickCheck = "1.0"
 jettyVersion = "9.4.58.v20250814"
 jbossLoggingVersion = "3.6.1.Final"
 jsonassertVersion = "1.5.3"
@@ -250,8 +249,6 @@ jsonUnit = { group = "net.javacrumbs.json-unit", name = "json-unit-assertj", ver
 systemRules = { group = "com.github.stefanbirkner", name = "system-rules", version.ref = "systemRulesVersion" }
 systemLambda = { group = "com.github.stefanbirkner", name = "system-lambda", version.ref = "systemLambdaVersion" }
 concurrentUnit = { group = "net.jodah", name = "concurrentunit", version.ref = "concurrentUnitVersion" }
-quickcheckCore = { group = "com.pholser", name = "junit-quickcheck-core", version.ref = "junitQuickCheck" }
-quickcheckGenerators = { group = "com.pholser", name = "junit-quickcheck-generators", version.ref = "junitQuickCheck" }
 jettyServer = { group = "org.eclipse.jetty", name = "jetty-server", version.ref = "jettyVersion" }
 jettyServlet = { group = "org.eclipse.jetty", name = "jetty-servlet", version.ref = "jettyVersion" }
 jettySecurity = { group = "org.eclipse.jetty", name = "jetty-security", version.ref = "jettyVersion" }
