@@ -54,7 +54,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
-public class JPABusinessDataRepositoryImplITest {
+public class JPABusinessDataRepositoryImplIT {
 
     private static final long TENANT_ID = 54236235L;
 
