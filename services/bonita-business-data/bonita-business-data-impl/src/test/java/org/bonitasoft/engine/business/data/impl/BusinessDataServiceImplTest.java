@@ -40,7 +40,6 @@ import org.bonitasoft.engine.business.data.SBusinessDataRepositorySerializationE
 import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
 import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import org.bonitasoft.engine.commons.TypeConverterUtil;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,29 +66,16 @@ public class BusinessDataServiceImplTest {
     private BusinessDataReloader businessDataReloader;
     @Mock
     private CountQueryProvider countQueryProvider;
-    private ClassLoader originalClassLoader;
 
     private BusinessDataServiceImpl businessDataService;
 
     @Before
     public void before() {
-        // Guard against context classloader being nullified by Narayana-based integration tests
-        // (e.g. JPABusinessDataRepositoryImplITest) that run earlier in the same JVM
-        originalClassLoader = Thread.currentThread().getContextClassLoader();
-        if (originalClassLoader == null) {
-            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-        }
         final String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd",
                 "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS" };
         businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer,
                 businessDataModelRepository, new TypeConverterUtil(datePatterns),
                 businessDataReloader, countQueryProvider));
-    }
-
-    @After
-    public void after() {
-        // Restore original classloader
-        Thread.currentThread().setContextClassLoader(originalClassLoader);
     }
 
     @Test
@@ -124,14 +110,13 @@ public class BusinessDataServiceImplTest {
     @Test
     public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNull() {
         assertThatExceptionOfType(SBusinessDataNotFoundException.class)
-                .isThrownBy(() -> businessDataService.callJavaOperation(null, new EntityPojo(1L), "someMethod",
+                .isThrownBy(() -> businessDataService.callJavaOperation(null, pojo, "someMethod",
                         String.class.getName()));
     }
 
     @Test
     public void callJavaOperationShouldInvokeListMethod() {
-        final List<Entity> entities = new ArrayList<>();
-        entities.add(new EntityPojo(1L));
+        final List<Entity> entities = List.of(pojo);
         assertThatNoException()
                 .isThrownBy(() -> businessDataService.callJavaOperation(entities, entities, "contains",
                         Object.class.getName()));
@@ -149,16 +134,16 @@ public class BusinessDataServiceImplTest {
         //given
         doThrow(SBusinessDataNotFoundException.class).when(businessDataReloader).reloadEntitySoftly(pojo);
 
-        //when
+        //when - then
         assertThatExceptionOfType(SBusinessDataNotFoundException.class)
-                .isThrownBy(() -> businessDataService.callJavaOperation(pojo, new EntityPojo(1L), "getName",
+                .isThrownBy(() -> businessDataService.callJavaOperation(pojo, pojo, "getName",
                         String.class.getName()));
     }
 
     @Test
     public void callJavaOperationShouldThrowExceptionWhenInvokeFails() {
         assertThatExceptionOfType(SBusinessDataRepositoryException.class)
-                .isThrownBy(() -> businessDataService.callJavaOperation(pojo, new EntityPojo(1L), "someMethod",
+                .isThrownBy(() -> businessDataService.callJavaOperation(pojo, pojo, "someMethod",
                         String.class.getName()));
     }
 
@@ -322,18 +307,17 @@ public class BusinessDataServiceImplTest {
         assertThatExceptionOfType(SBusinessDataNotFoundException.class)
                 .isThrownBy(() -> businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities",
                         List.class.getName()))
-                .withMessage("Forbidden instance of org.bonitasoft.engine.business.data.impl.EntityPojo found. " +
+                .withMessage("Forbidden instance of " + EntityPojo.class.getName() + " found. " +
                         "It is only possible to reference persisted instances in an aggregation relation.");
     }
 
     @Test
     public void callJavaOperationWithEmptyList() throws Exception {
         //given
-        final List<EntityPojo> entities = List.of();
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities,
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, List.of(),
                 "setAggregationEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
