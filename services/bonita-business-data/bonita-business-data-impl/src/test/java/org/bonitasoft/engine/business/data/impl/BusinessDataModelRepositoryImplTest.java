@@ -230,8 +230,8 @@ public class BusinessDataModelRepositoryImplTest {
         doReturn(singletonList(new CommandAcceptanceException("Error executing DDL bla bla bla...",
                 new SQLSyntaxErrorException("ORA-02275: une telle contrainte référentielle existe déjà dans la table",
                         new Exception("Root Oracle Cause")))))
-                                .when(schemaManager)
-                                .update(anySet());
+                .when(schemaManager)
+                .update(anySet());
 
         // when - then:
         assertThatExceptionOfType(SBusinessDataRepositoryDeploymentException.class)
@@ -252,8 +252,8 @@ public class BusinessDataModelRepositoryImplTest {
                                 new Exception("Root Oracle Cause"))),
                 new CommandAcceptanceException("CommandAcceptanceException bliblibli",
                         new SQLSyntaxErrorException("Hibernate error"))))
-                                .when(schemaManager)
-                                .update(anySet());
+                .when(schemaManager)
+                .update(anySet());
 
         // when - then:
         assertThatExceptionOfType(SBusinessDataRepositoryDeploymentException.class)
