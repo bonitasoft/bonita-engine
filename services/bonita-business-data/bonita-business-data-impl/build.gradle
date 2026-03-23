@@ -1,4 +1,7 @@
-plugins { id 'bonita-docker-database' }
+plugins {
+    id 'bonita-docker-database'
+    id 'bonita-tests'
+}
 
 dependencies {
     api project(':bpm:bonita-common')
@@ -34,20 +37,10 @@ dependencies {
     testRuntimeOnly libs.mysql
     testRuntimeOnly libs.postgresql
     testRuntimeOnly libs.msSqlServer
-
-    // Property Based Test framework:
-    testImplementation(libs.quickcheckCore)
-    testImplementation(libs.quickcheckGenerators)
 }
 
 test {
     useJUnitPlatform()
 }
 
-// run:
-// ./gradlew mysqlDatabaseTest
-// ./gradlew oracleDatabaseTest
-// ./gradlew sqlserverDatabaseTest
-// ./gradlew postgresDatabaseTest
-// to run tests on specific docker DB:
-databaseIntegrationTest { includes '**/*Test.class' }
+databaseIntegrationTest { includes '**/*IT.class' }
