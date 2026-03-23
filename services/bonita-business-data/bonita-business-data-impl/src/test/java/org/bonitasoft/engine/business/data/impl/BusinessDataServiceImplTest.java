@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -40,11 +41,8 @@ import org.bonitasoft.engine.business.data.SBusinessDataRepositorySerializationE
 import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
 import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import org.bonitasoft.engine.commons.TypeConverterUtil;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -59,8 +57,6 @@ public class BusinessDataServiceImplTest {
     private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
     private static final String NEW_NAME = "new name";
     private final Entity pojo = new EntityPojo(1L);
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
     @Mock
     JsonBusinessDataSerializer jsonEntitySerializer;
     @Mock
@@ -71,94 +67,82 @@ public class BusinessDataServiceImplTest {
     @Mock
     private BusinessDataReloader businessDataReloader;
     @Mock
-    private Entity businessData;
-    @Mock
     private CountQueryProvider countQueryProvider;
-    private TypeConverterUtil typeConverterUtil;
-    private ClassLoader originalClassLoader;
 
     @Before
-    public void before() throws Exception {
-        // Guard against context classloader being nullified by Narayana-based integration tests
-        // (e.g. JPABusinessDataRepositoryImplITest) that run earlier in the same JVM
-        originalClassLoader = Thread.currentThread().getContextClassLoader();
-        if (originalClassLoader == null) {
-            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-        }
+    public void before() {
         final String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd",
                 "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS" };
-        typeConverterUtil = new TypeConverterUtil(datePatterns);
         businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer,
-                businessDataModelRepository, typeConverterUtil,
+                businessDataModelRepository, new TypeConverterUtil(datePatterns),
                 businessDataReloader, countQueryProvider));
     }
 
-    @After
-    public void after() {
-        // Restore original classloader
-        Thread.currentThread().setContextClassLoader(originalClassLoader);
-    }
-
     @Test
-    public void isBusinessDataShouldBeTrue() throws Exception {
-
-        final Entity pojo = new EntityPojo(1L);
+    public void isBusinessDataShouldBeTrue() {
         assertThat(businessDataService.isBusinessData(pojo)).isTrue();
     }
 
     @Test
-    public void isBusinessDataShouldBeTrueWithList() throws Exception {
-        assertThat(businessDataService.isBusinessData(Arrays.asList(pojo))).isTrue();
+    public void isBusinessDataShouldBeTrueWithList() {
+        assertThat(businessDataService.isBusinessData(List.of(pojo))).isTrue();
         assertThat(businessDataService.isBusinessData(new ArrayList<String>())).isTrue();
     }
 
     @Test
-    public void isBusinessDataShouldBeFalseWithList() throws Exception {
+    public void isBusinessDataShouldBeFalseWithList() {
         assertThat(businessDataService.isBusinessData("not a list")).isFalse();
-        assertThat(businessDataService.isBusinessData(Arrays.asList(new Long(1L)))).isFalse();
+        assertThat(businessDataService.isBusinessData(List.of(1L))).isFalse();
     }
 
     @Test
-    public void isBusinessDataShouldBeFalse() throws Exception {
+    public void isBusinessDataShouldBeFalse() {
         final Object pojo = new Object();
         assertThat(businessDataService.isBusinessData(pojo)).isFalse();
     }
 
     @Test
-    public void isBusinessDataShouldBeFalseWhenDataIsNull() throws Exception {
+    public void isBusinessDataShouldBeFalseWhenDataIsNull() {
         assertThat(businessDataService.isBusinessData(null)).isFalse();
 
     }
 
-    @Test(expected = SBusinessDataNotFoundException.class)
-    public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNull() throws Exception {
-        businessDataService.callJavaOperation(null, new EntityPojo(1L), "someMethod", String.class.getName());
+    @Test
+    public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNull() {
+        assertThatThrownBy(
+                () -> businessDataService.callJavaOperation(null, pojo, "someMethod", String.class.getName()))
+                        .isInstanceOf(SBusinessDataNotFoundException.class);
     }
 
     @Test
     public void callJavaOperationShouldInvokeListMethod() throws Exception {
-        final List<Entity> entities = new ArrayList<>();
-        entities.add(new EntityPojo(1L));
+        final List<Entity> entities = List.of(pojo);
         businessDataService.callJavaOperation(entities, entities, "contains", Object.class.getName());
     }
 
-    @Test(expected = SBusinessDataRepositoryException.class)
-    public void callJavaOperationShouldThrowExceptionWhenNotAnEntity() throws Exception {
-        businessDataService.callJavaOperation("not an entity", null, "getLengh", String.class.getName());
+    @Test
+    public void callJavaOperationShouldThrowExceptionWhenNotAnEntity() {
+        assertThatThrownBy(
+                () -> businessDataService.callJavaOperation("not an entity", null, "getLengh", String.class.getName()))
+                        .isInstanceOf(SBusinessDataRepositoryException.class);
     }
 
-    @Test(expected = SBusinessDataNotFoundException.class)
+    @Test
     public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNotFound() throws Exception {
         //given
         doThrow(SBusinessDataNotFoundException.class).when(businessDataReloader).reloadEntitySoftly(pojo);
 
-        //when
-        businessDataService.callJavaOperation(pojo, new EntityPojo(1L), "getName", String.class.getName());
+        //when then
+        assertThatThrownBy(
+                () -> businessDataService.callJavaOperation(pojo, pojo, "getName", String.class.getName()))
+                        .isInstanceOf(SBusinessDataNotFoundException.class);
     }
 
-    @Test(expected = SBusinessDataRepositoryException.class)
-    public void callJavaOperationShouldThrowExceptionWheninvokeFails() throws Exception {
-        businessDataService.callJavaOperation(pojo, new EntityPojo(1L), "someMethod", String.class.getName());
+    @Test
+    public void callJavaOperationShouldThrowExceptionWhenInvokeFails() {
+        assertThatThrownBy(
+                () -> businessDataService.callJavaOperation(pojo, pojo, "someMethod", String.class.getName()))
+                        .isInstanceOf(SBusinessDataRepositoryException.class);
     }
 
     @Test
@@ -309,7 +293,7 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void callJavaOperationShouldThrowExceptionWhenPersistenceIdIsNull() throws Exception {
+    public void callJavaOperationShouldThrowExceptionWhenPersistenceIdIsNull() {
         //given
         final Long persistenceId1 = 1562L;
 
@@ -318,25 +302,23 @@ public class BusinessDataServiceImplTest {
         final List<EntityPojo> entities = Arrays.asList(entity1, entity2);
         doReturn(EntityPojo.class).when(businessDataReloader).getEntityRealClass(entity2);
 
-        // expect
-        expectedException.expect(SBusinessDataNotFoundException.class);
-        expectedException.expectMessage(
-                "Forbidden instance of org.bonitasoft.engine.business.data.impl.EntityPojo found. It is only possible to reference persisted instances in an aggregation relation.");
-
-        //when
-        businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
+        //when then
+        assertThatThrownBy(
+                () -> businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities",
+                        List.class.getName()))
+                                .isInstanceOf(SBusinessDataNotFoundException.class)
+                                .hasMessageContaining(
+                                        "Forbidden instance of " + EntityPojo.class.getName() + " found. " +
+                                                "It is only possible to reference persisted instances in an aggregation relation.");
     }
 
     @Test
     public void callJavaOperationWithEmptyList() throws Exception {
         //given
-        final List<EntityPojo> entities = Arrays.asList();
-        final List<Long> keys = Arrays.asList();
-
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities,
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, List.of(),
                 "setAggregationEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
@@ -383,8 +365,8 @@ public class BusinessDataServiceImplTest {
         final EntityPojo entityPojo = new EntityPojo(1L);
         entityPojo.getAggregationEntities().add(entity1);
 
-        final List<EntityPojo> newEntities = Arrays.asList(entity2);
-        final List<Long> keys2 = Arrays.asList(persistenceId2);
+        final List<EntityPojo> newEntities = List.of(entity2);
+        final List<Long> keys2 = List.of(persistenceId2);
         doReturn(entityPojo).when(businessDataReloader).reloadEntitySoftly(entityPojo);
         // Cannot specify the real instance (instead of any()) because of proxy object that does not match (Mockito):
         doReturn(pojo.getClass()).when(businessDataReloader).getEntityRealClass(any(Entity.class));
@@ -409,12 +391,10 @@ public class BusinessDataServiceImplTest {
         assertThat(loadClass).isEqualTo(pojo.getClass());
     }
 
-    @Test(expected = SBusinessDataRepositoryException.class)
-    public void should_loadClass_throw_exception() throws Exception {
-        //when
-        businessDataService.loadClass("not a class");
-
-        //then exception
+    @Test
+    public void should_loadClass_throw_exception() {
+        assertThatThrownBy(() -> businessDataService.loadClass("not a class"))
+                .isInstanceOf(SBusinessDataRepositoryException.class);
     }
 
     @Test
@@ -431,16 +411,17 @@ public class BusinessDataServiceImplTest {
 
     }
 
-    @Test(expected = SBusinessDataRepositoryException.class)
+    @Test
     public void should_getJsonEntity_throw_exception() throws Exception {
         //given
         doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
         doThrow(SBusinessDataRepositorySerializationException.class).when(jsonEntitySerializer).serializeEntity(pojo,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
-        //when then exception
-        businessDataService.getJsonEntity(pojo.getClass().getName(), pojo.getPersistenceId(),
-                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        //when then
+        assertThatThrownBy(() -> businessDataService.getJsonEntity(pojo.getClass().getName(), pojo.getPersistenceId(),
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
+                        .isInstanceOf(SBusinessDataRepositoryException.class);
     }
 
     @Test
@@ -555,10 +536,6 @@ public class BusinessDataServiceImplTest {
 
     @Test
     public void getJsonQueryEntities_should_throw_exception_when_query_not_found() throws Exception {
-        expectedException.expect(SBusinessDataRepositoryException.class);
-        expectedException
-                .expectMessage("unable to get query wrongQuery for business object " + EntityPojo.class.getName());
-
         //given
         final EntityPojo entity = new EntityPojo(1562L);
         final Map<String, Serializable> parameters = new HashMap<>();
@@ -571,9 +548,13 @@ public class BusinessDataServiceImplTest {
         final BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
 
-        //when then exception
-        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "wrongQuery", parameters, 0, 10,
-                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        //when then
+        assertThatThrownBy(
+                () -> businessDataService.getJsonQueryEntities(entity.getClass().getName(), "wrongQuery", parameters,
+                        0, 10, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
+                                .isInstanceOf(SBusinessDataRepositoryException.class)
+                                .hasMessageContaining("unable to get query wrongQuery for business object "
+                                        + EntityPojo.class.getName());
     }
 
     @Test
@@ -620,12 +601,6 @@ public class BusinessDataServiceImplTest {
 
     @Test
     public void getJsonQueryEntities_should_check_parameters() throws Exception {
-        expectedException.expect(SBusinessDataRepositoryException.class);
-        expectedException.expectMessage("parameter(s) are missing for query named query :");
-        expectedException.expectMessage(PARAMETER_INTEGER);
-        expectedException.expectMessage(PARAMETER_STRING);
-        expectedException.expectMessage(PARAMETER_LONG);
-
         //given
         final EntityPojo entity = new EntityPojo(1562L);
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
@@ -633,9 +608,15 @@ public class BusinessDataServiceImplTest {
         final BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
 
-        //when then exception
-        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "query", null, 0, 10,
-                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        //when then
+        assertThatThrownBy(
+                () -> businessDataService.getJsonQueryEntities(entity.getClass().getName(), "query", null, 0, 10,
+                        PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
+                                .isInstanceOf(SBusinessDataRepositoryException.class)
+                                .hasMessageContaining("parameter(s) are missing for query named query :")
+                                .hasMessageContaining(PARAMETER_INTEGER)
+                                .hasMessageContaining(PARAMETER_STRING)
+                                .hasMessageContaining(PARAMETER_LONG);
     }
 
     private BusinessObjectModel getBusinessObjectModel(final EntityPojo entity) {
@@ -649,7 +630,7 @@ public class BusinessDataServiceImplTest {
 
         final BusinessObject businessObject = new BusinessObject();
         businessObject.setQualifiedName(entity.getClass().getName());
-        businessObject.setQueries(Arrays.asList(query));
+        businessObject.setQueries(List.of(query));
         businessObjectModel.getBusinessObjects().add(businessObject);
 
         return businessObjectModel;
@@ -675,7 +656,7 @@ public class BusinessDataServiceImplTest {
         verify(jsonEntitySerializer).serializeEntities(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
-    @Test(expected = SBusinessDataRepositoryException.class)
+    @Test
     public void getJsonEntities_should_throw_exception_if_the_serialization_fails() throws Exception {
         final long identifier1 = 1983L;
         final long identifier2 = 1990L;
@@ -691,8 +672,9 @@ public class BusinessDataServiceImplTest {
         when(jsonEntitySerializer.serializeEntities(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
                 .thenThrow(new SBusinessDataRepositorySerializationException("exception"));
 
-        businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers,
-                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        assertThatThrownBy(() -> businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
+                        .isInstanceOf(SBusinessDataRepositoryException.class);
     }
 
 }

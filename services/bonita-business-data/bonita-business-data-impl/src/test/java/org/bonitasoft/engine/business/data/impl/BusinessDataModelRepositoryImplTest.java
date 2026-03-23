@@ -15,11 +15,11 @@ package org.bonitasoft.engine.business.data.impl;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.commons.io.IOUtil.zip;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doReturn;
 
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -29,8 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import com.pholser.junit.quickcheck.Property;
-import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
@@ -49,21 +47,15 @@ import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(JUnitQuickcheck.class)
+@RunWith(MockitoJUnitRunner.class)
 public class BusinessDataModelRepositoryImplTest {
 
     private static final long TENANT_ID = 67453L;
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private DependencyService dependencyService;
@@ -76,18 +68,21 @@ public class BusinessDataModelRepositoryImplTest {
     @Mock
     private SchemaManagerUpdate schemaManager;
 
-    @Mock
+    @Mock(lenient = true)
     private PlatformService platformService;
 
-    @Mock
+    @Mock(lenient = true)
     private SPlatformProperties platformProperties;
 
     private BusinessDataModelRepositoryImpl businessDataModelRepository;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         doReturn(platformProperties).when(platformService).getSPlatformProperties();
         doReturn("1.0").when(platformProperties).getPlatformVersion();
+        // Prevent uninstall()/install() from nullifying the thread context classloader
+        // via classLoaderService.getClassLoader() returning null (default mock behavior)
+        doReturn(getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
         businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(platformService, dependencyService,
                 classLoaderService, schemaManager, tenantResourcesService, TENANT_ID));
     }
@@ -215,42 +210,41 @@ public class BusinessDataModelRepositoryImplTest {
         businessDataModelRepository.install(bom, 47L);
     }
 
-    @Property(trials = 30)
-    public void getInstalledBDMVersion_should_return_version_number(long version) throws Exception {
-        // given:
-        doReturn(Optional.of(version)).when(dependencyService).getIdOfDependencyOfArtifact(TENANT_ID, ScopeType.TENANT,
-                BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME);
+    @Test
+    public void getInstalledBDMVersion_should_return_version_number() throws Exception {
+        for (long version : new long[] { 0L, 1L, -1L, 42L, Long.MAX_VALUE, Long.MIN_VALUE }) {
+            // given:
+            doReturn(Optional.of(version)).when(dependencyService).getIdOfDependencyOfArtifact(TENANT_ID,
+                    ScopeType.TENANT, BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME);
 
-        // when:
-        final String installedBDMVersion = businessDataModelRepository.getInstalledBDMVersion();
+            // when:
+            final String installedBDMVersion = businessDataModelRepository.getInstalledBDMVersion();
 
-        // then:
-        assertThat(installedBDMVersion).isEqualTo(String.valueOf(version));
+            // then:
+            assertThat(installedBDMVersion).isEqualTo(String.valueOf(version));
+        }
     }
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     @Test
-    public void update_should_convert_exceptions_to_allow_to_see_entire_root_cause() throws Exception {
+    public void update_should_convert_exceptions_to_allow_to_see_entire_root_cause() {
         // given:
         doReturn(singletonList(new CommandAcceptanceException("Error executing DDL bla bla bla...",
                 new SQLSyntaxErrorException("ORA-02275: une telle contrainte référentielle existe déjà dans la table",
-                        new Exception("Root Oracle Cause"))))).when(schemaManager).update(anySet());
+                        new Exception("Root Oracle Cause")))))
+                                .when(schemaManager)
+                                .update(anySet());
 
-        // then:
-        expectedException.expect(SBusinessDataRepositoryDeploymentException.class);
-        expectedException.expectMessage(
-                "1: org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL bla bla bla...");
-        expectedException.expectMessage("caused by java.sql.SQLSyntaxErrorException");
-        expectedException.expectMessage("caused by java.lang.Exception: Root Oracle Cause");
-
-        // when:
-        businessDataModelRepository.update(new HashSet<>());
+        // when - then:
+        assertThatExceptionOfType(SBusinessDataRepositoryDeploymentException.class)
+                .isThrownBy(() -> businessDataModelRepository.update(new HashSet<>()))
+                .withMessageContaining(
+                        "1: org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL bla bla bla...")
+                .withMessageContaining("caused by java.sql.SQLSyntaxErrorException")
+                .withMessageContaining("caused by java.lang.Exception: Root Oracle Cause");
     }
 
     @Test
-    public void update_should_convert_all_exceptions_in_the_list() throws Exception {
+    public void update_should_convert_all_exceptions_in_the_list() {
         // given:
         doReturn(Arrays.asList(
                 new CommandAcceptanceException("Error executing DDL bla bla bla...",
@@ -258,19 +252,21 @@ public class BusinessDataModelRepositoryImplTest {
                                 "ORA-02275: une telle contrainte référentielle existe déjà dans la table",
                                 new Exception("Root Oracle Cause"))),
                 new CommandAcceptanceException("CommandAcceptanceException bliblibli",
-                        new SQLSyntaxErrorException("Hibernate error")))).when(schemaManager).update(anySet());
+                        new SQLSyntaxErrorException("Hibernate error"))))
+                                .when(schemaManager)
+                                .update(anySet());
 
-        // then:
-        expectedException.expect(SBusinessDataRepositoryDeploymentException.class);
-        expectedException.expectMessage(
-                "1: org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL bla bla bla...");
-        expectedException.expectMessage("caused by java.lang.Exception: Root Oracle Cause");
-        expectedException.expectMessage(
-                "2: org.hibernate.tool.schema.spi.CommandAcceptanceException: CommandAcceptanceException bliblibli");
-        expectedException.expectMessage("caused by java.sql.SQLSyntaxErrorException: Hibernate error");
-
-        // when:
-        businessDataModelRepository.update(new HashSet<>());
+        // when - then:
+        assertThatExceptionOfType(SBusinessDataRepositoryDeploymentException.class)
+                .isThrownBy(() -> businessDataModelRepository.update(new HashSet<>()))
+                .withMessageContaining(
+                        "1: org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL bla bla bla...")
+                .withMessageContaining(
+                        "caused by java.sql.SQLSyntaxErrorException: ORA-02275: une telle contrainte référentielle existe déjà dans la table")
+                .withMessageContaining("caused by java.lang.Exception: Root Oracle Cause")
+                .withMessageContaining(
+                        "2: org.hibernate.tool.schema.spi.CommandAcceptanceException: CommandAcceptanceException bliblibli")
+                .withMessageContaining("caused by java.sql.SQLSyntaxErrorException: Hibernate error");
     }
 
     @Test

@@ -90,7 +90,6 @@ class Deps {
     public static String systemRulesVersion = "1.19.0"
     public static String systemLambdaVersion = "1.2.0"
     public static String concurrentUnitVersion = "0.4.6"
-    public static String junitQuickCheck = "1.0"
     public static String jettyVersion = "9.4.9.v20180320"
     public static String jbossLoggingVersion = "3.1.3.GA"
     public static String commonsExecVersion = "1.3"
