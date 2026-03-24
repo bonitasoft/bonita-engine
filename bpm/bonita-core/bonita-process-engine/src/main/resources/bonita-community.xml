@@ -613,8 +613,13 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.SDataRetentionConfig" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.business.data.model.SDataRetentionConfig" />
         <constructor-arg name="sequenceId" value="8" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking" />
+        <constructor-arg name="sequenceId" value="9" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
     </bean>
 
@@ -760,7 +765,9 @@
                 <!-- platform -->
                 <entry key="org.bonitasoft.engine.platform.model.SPlatform" value="platform" />
                 <!-- data retention config -->
-                <entry key="org.bonitasoft.engine.platform.model.SDataRetentionConfig" value="dataRetentionConfig" />
+                <entry key="org.bonitasoft.engine.business.data.model.SDataRetentionConfig" value="dataRetentionConfig" />
+                <!-- data retention bdm tracking -->
+                <entry key="org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking" value="dataRetentionBdmTracking" />
                 <!-- platform command -->
                 <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="platformCommand" />
                 <!-- page -->
@@ -838,7 +845,8 @@
                 <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
                 <value>org.bonitasoft.engine.platform.model.SPlatform</value>
-                <value>org.bonitasoft.engine.platform.model.SDataRetentionConfig</value>
+                <value>org.bonitasoft.engine.business.data.model.SDataRetentionConfig</value>
+                <value>org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking</value>
                 <value>org.bonitasoft.engine.platform.command.model.SPlatformCommand</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
