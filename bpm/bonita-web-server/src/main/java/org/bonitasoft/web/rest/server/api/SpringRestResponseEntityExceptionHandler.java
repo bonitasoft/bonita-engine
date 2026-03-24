@@ -27,6 +27,7 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.business.data.BusinessDataCrudOperationException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.exception.UnavailableLockException;
@@ -120,6 +121,11 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     @ExceptionHandler(value = { NotFoundException.class })
     public ResponseEntity<Object> handleNotFound(NotFoundException exception) {
         return bonitaHandleException(exception, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = { AlreadyExistsException.class })
+    public ResponseEntity<Object> handleAlreadyExists(AlreadyExistsException exception) {
+        return bonitaHandleException(exception, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = { CommandExecutionException.class })
