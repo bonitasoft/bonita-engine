@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api;
 
+import static org.bonitasoft.engine.commons.ExceptionUtils.printLightWeightStacktrace;
 import static org.bonitasoft.web.rest.server.api.SpringResponseEntityUtils.generateErrorResponse;
 
 import java.lang.reflect.UndeclaredThrowableException;
@@ -66,7 +67,8 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<Object> defaultToInternalServerError(Exception exception) {
         // If no specific exception handler is found, log the error and return an internal server error:
-        log.error("Generic server-side error", exception);
+        log.error("Generic server-side error:\n{}", printLightWeightStacktrace(exception));
+        log.debug(exception.getMessage(), exception);
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

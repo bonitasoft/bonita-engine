@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2026 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,9 +13,20 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-public interface TenantElementsRestartSupervisor {
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.tenant.SingleNodeTaskCoordinator.TASK_CLEANUP_OBSOLETE_DATA;
+import static org.bonitasoft.engine.tenant.SingleNodeTaskCoordinator.TASK_RECOVERY;
 
-    boolean shouldRestartElements();
+import org.junit.jupiter.api.Test;
 
-    boolean willRestartElements();
+class SingleNodeTaskCoordinatorLocalTest {
+
+    private final SingleNodeTaskCoordinatorLocal coordinator = new SingleNodeTaskCoordinatorLocal();
+
+    @Test
+    void should_always_be_responsible_for_any_task() {
+        assertThat(coordinator.isResponsibleForTask(TASK_RECOVERY)).isTrue();
+        assertThat(coordinator.isResponsibleForTask(TASK_CLEANUP_OBSOLETE_DATA)).isTrue();
+        assertThat(coordinator.isResponsibleForTask("ANY_TASK")).isTrue();
+    }
 }
