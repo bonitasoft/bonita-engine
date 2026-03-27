@@ -357,11 +357,16 @@ public class IOUtil {
 
     private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder)
             throws IOException {
+        final String canonicalDestDir = outputFolder.getCanonicalPath() + File.separator;
         ZipEntry zipEntry;
         while ((zipEntry = zipInputstream.getNextEntry()) != null) {
             try {
                 // For each entry, a file is created in the output directory "folder"
                 final File outputFile = new File(outputFolder.getAbsolutePath(), zipEntry.getName());
+                // Prevent Zip Slip: ensure the resolved path stays within the output folder
+                if (!outputFile.getCanonicalPath().startsWith(canonicalDestDir)) {
+                    throw new IOException("Zip entry is outside of the target directory");
+                }
                 // If the entry is a directory, it creates in the output folder, and we go to the next entry (continue).
                 if (zipEntry.isDirectory()) {
                     mkdirs(outputFile);
