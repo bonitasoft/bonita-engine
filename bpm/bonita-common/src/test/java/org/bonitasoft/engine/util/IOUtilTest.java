@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,9 +24,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Test;
@@ -172,5 +179,74 @@ public class IOUtilTest {
         assertEquals("content2\ncontent2", new String(IOUtil.getAllContentFrom(new File(folder, "file2.txt"))));
 
         IOUtil.deleteDir(folder);
+    }
+
+    @Test
+    public void unzipToFolder_should_reject_zip_slip_file_attack() throws Exception {
+        final byte[] maliciousZip = createZipWithEntry("../../evil.txt", "malicious content");
+        final File folder = createTempFolder();
+
+        try {
+            assertThatThrownBy(() -> IOUtil.unzipToFolder(new ByteArrayInputStream(maliciousZip), folder))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageContaining("outside of the target directory");
+        } finally {
+            IOUtil.deleteDir(folder);
+        }
+    }
+
+    @Test
+    public void unzipToFolder_should_reject_zip_slip_directory_attack() throws Exception {
+        final byte[] maliciousZip = createZipWithDirectoryEntry("../../evil_dir/");
+        final File folder = createTempFolder();
+
+        try {
+            assertThatThrownBy(() -> IOUtil.unzipToFolder(new ByteArrayInputStream(maliciousZip), folder))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageContaining("outside of the target directory");
+        } finally {
+            IOUtil.deleteDir(folder);
+        }
+    }
+
+    @Test
+    public void unzipToFolder_should_allow_legitimate_nested_paths() throws Exception {
+        final HashMap<String, byte[]> hashMap = new HashMap<>(1);
+        hashMap.put("subdir/nested/file.txt", "nested content".getBytes());
+        final byte[] zip = IOUtil.zip(hashMap);
+        final File folder = createTempFolder();
+
+        try {
+            IOUtil.unzipToFolder(new ByteArrayInputStream(zip), folder);
+
+            final File nestedFile = new File(folder, "subdir/nested/file.txt");
+            assertThat(nestedFile).exists();
+            assertThat(new String(IOUtil.getAllContentFrom(nestedFile))).isEqualTo("nested content");
+        } finally {
+            IOUtil.deleteDir(folder);
+        }
+    }
+
+    private static File createTempFolder() throws IOException {
+        return Files.createTempDirectory("folder").toFile();
+    }
+
+    private static byte[] createZipWithEntry(String entryName, String content) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            zos.putNextEntry(new ZipEntry(entryName));
+            zos.write(content.getBytes());
+            zos.closeEntry();
+        }
+        return baos.toByteArray();
+    }
+
+    private static byte[] createZipWithDirectoryEntry(String dirName) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            zos.putNextEntry(new ZipEntry(dirName));
+            zos.closeEntry();
+        }
+        return baos.toByteArray();
     }
 }
