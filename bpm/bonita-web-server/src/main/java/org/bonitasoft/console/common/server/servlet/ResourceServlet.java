@@ -123,12 +123,10 @@ public abstract class ResourceServlet extends HttpServlet {
             final File file = new File(resourceFolder, fileName);
             final BonitaHomeFolderAccessor tenantFolder = new BonitaHomeFolderAccessor();
             if (!tenantFolder.isInFolder(resourceFolder, resourcesParentFolder)) {
-                throw new ServletException("For security reasons, access to this file paths "
-                        + resourceFolder.getAbsolutePath() + " is restricted.");
+                throw new ServletException("For security reasons, access to this file path is restricted.");
             }
             if (!tenantFolder.isInFolder(file, resourceFolder)) {
-                throw new ServletException("For security reasons, access to this file paths " + file.getAbsolutePath()
-                        + " is restricted.");
+                throw new ServletException("For security reasons, access to this file path is restricted.");
             }
 
             byte[] content;

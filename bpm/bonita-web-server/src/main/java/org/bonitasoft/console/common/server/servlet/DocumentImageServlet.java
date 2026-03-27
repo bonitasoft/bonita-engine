@@ -24,8 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
-import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.FormsResourcesUtils;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
 import org.bonitasoft.engine.bpm.document.Document;
@@ -67,9 +65,8 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
         final APISession apiSession = (APISession) request.getSession().getAttribute(API_SESSION_PARAM_KEY);
         byte[] content = null;
         if (filePath != null) {
-            final BonitaHomeFolderAccessor tempFolderAccessor = new BonitaHomeFolderAccessor();
             try {
-                final FileContent fileContent = tempFolderAccessor
+                final FileContent fileContent = bonitaHomeFolderAccessor
                         .retrieveUploadedTempContent(FilenameUtils.separatorsToSystem(filePath));
                 if (fileName == null) {
                     fileName = fileContent.getFileName();
@@ -133,21 +130,26 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
                 if (processDeployementDate == null) {
                     processDeployementDate = getProcessDefinitionDate(apiSession, processDefinitionID);
                 }
-                final File processDir = FormsResourcesUtils.getApplicationResourceDir(apiSession, processDefinitionID,
+                final File processDir = getProcessResourceDir(apiSession, processDefinitionID,
                         processDeployementDate);
                 final File resource = new File(processDir,
                         BUSINESS_ARCHIVE_RESOURCES_DIRECTORY + File.separator + resourcePath);
+                if (!bonitaHomeFolderAccessor.isInFolder(resource, processDir)) {
+                    throw new ServletException(
+                            "For security reasons, access to this file path is restricted.");
+                }
                 if (resource.exists()) {
                     fileName = resource.getName();
                     InputStream resourceInputStream = new FileInputStream(resource);
                     content = getFileContent(resourceInputStream, fileName, resource.length());
                 } else {
-                    final String errorMessage = "The target resource does not exist " + resource.getAbsolutePath();
                     if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error(errorMessage);
+                        LOGGER.error("The target resource does not exist {}", resource.getAbsolutePath());
                     }
-                    throw new IOException(errorMessage);
+                    throw new IOException("The target resource does not exist");
                 }
+            } catch (final ServletException e) {
+                throw e;
             } catch (final Exception e) {
                 final String errorMessage = "Error while retrieving the resource " + resourcePath;
                 if (LOGGER.isErrorEnabled()) {
