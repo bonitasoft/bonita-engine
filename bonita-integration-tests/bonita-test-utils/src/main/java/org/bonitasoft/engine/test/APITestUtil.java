@@ -49,6 +49,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
+import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.Query;
@@ -120,6 +121,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
@@ -128,6 +130,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
+import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivityInstances;
 import org.bonitasoft.engine.test.check.CheckNbOfOpenActivities;
@@ -1468,6 +1471,36 @@ public class APITestUtil extends PlatformTestUtil {
                 getCommandAPI().unregister(command.getName());
             }
         }
+    }
+
+    protected void cleanBdm() throws BonitaException {
+        TenantAdministrationAPI tenantAdministrationAPI = getTenantAdministrationAPI();
+        MaintenanceAPI maintenanceAPI = getMaintenanceAPI();
+        if (tenantAdministrationAPI.getBusinessDataModelResource() != TenantResource.NONE) {
+            if (maintenanceAPI.getMaintenanceDetails().getMaintenanceState() == MaintenanceDetails.State.DISABLED) {
+                maintenanceAPI.enableMaintenanceMode();
+            }
+            try {
+                tenantAdministrationAPI.cleanAndUninstallBusinessDataModel();
+            } finally {
+                maintenanceAPI.disableMaintenanceMode();
+            }
+        }
+    }
+
+    /**
+     * Deploys a Business Data Model, replacing any previously installed one.
+     * Handles pausing/resuming the tenant around the installation.
+     *
+     * @param bom the business object model to deploy
+     */
+    protected String installBusinessDataModel(BusinessObjectModel bom) throws Exception {
+        final byte[] zip = new BusinessObjectModelConverter().zip(bom);
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        var bdmVersion = getTenantAdministrationAPI().updateBusinessDataModel(zip);
+        getTenantAdministrationAPI().resume();
+        return bdmVersion;
     }
 
     public PlatformInformationAPI getPlatformInformationAPI() {

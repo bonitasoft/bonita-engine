@@ -15,6 +15,7 @@ package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -37,15 +38,20 @@ import javax.persistence.criteria.Selection;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking;
 import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
+import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -72,6 +78,9 @@ class JPABusinessDataRepositoryImplTest {
     private ClassLoaderService classLoaderService;
 
     @Mock
+    private DataRetentionBdmTrackingRepository bdmTrackingRepository;
+
+    @Mock
     EntityManager manager;
 
     private JPABusinessDataRepositoryImpl realJPABusinessDataRepository;
@@ -79,7 +88,7 @@ class JPABusinessDataRepositoryImplTest {
     @BeforeEach
     void setUp() {
         realJPABusinessDataRepository = new JPABusinessDataRepositoryImpl(transactionService,
-                businessDataModelRepository, configuration, classLoaderService);
+                businessDataModelRepository, configuration, classLoaderService, bdmTrackingRepository);
         repository = spy(
                 realJPABusinessDataRepository);
         doReturn(manager).when(repository).getEntityManager();
@@ -256,6 +265,120 @@ class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
+    void persist_should_track_creation_for_new_entity() throws SPersistenceException {
+        var entity = new EntityPojo(); // persistenceId == null → new entity
+        doAnswer(invocation -> {
+            ((EntityPojo) invocation.getArgument(0)).setPersistenceId(42L);
+            return null;
+        }).when(manager).persist(entity);
+
+        repository.persist(entity);
+
+        var captor = ArgumentCaptor.forClass(SDataRetentionBdmTracking.class);
+        verify(bdmTrackingRepository).create(captor.capture());
+        var tracking = captor.getValue();
+        assertThat(tracking.getDataId()).isEqualTo(42L);
+        assertThat(tracking.getDataClassname()).isEqualTo(EntityPojo.class.getName());
+        assertThat(tracking.getCreatedAt()).isPositive();
+        assertThat(tracking.getLastModifiedAt()).isEqualTo(tracking.getCreatedAt());
+    }
+
+    @Test
+    void persist_should_not_track_creation_for_existing_entity() throws SPersistenceException {
+        var entity = new EntityPojo(99L); // persistenceId != null → existing entity
+
+        repository.persist(entity);
+
+        verify(bdmTrackingRepository, never()).create(any());
+    }
+
+    @Test
+    void merge_should_track_creation_for_new_entity() throws SPersistenceException {
+        var entity = new EntityPojo(); // persistenceId == null → new entity
+        var mergedEntity = new EntityPojo(55L);
+        when(manager.merge(entity)).thenReturn(mergedEntity);
+
+        repository.merge(entity);
+
+        var captor = ArgumentCaptor.forClass(SDataRetentionBdmTracking.class);
+        verify(bdmTrackingRepository).create(captor.capture());
+        var tracking = captor.getValue();
+        assertThat(tracking.getDataId()).isEqualTo(55L);
+        assertThat(tracking.getDataClassname()).isEqualTo(EntityPojo.class.getName());
+    }
+
+    @Test
+    void merge_should_not_track_creation_for_existing_entity() throws SPersistenceException {
+        var entity = new EntityPojo(10L); // persistenceId != null → existing entity
+        when(manager.merge(entity)).thenReturn(entity);
+
+        repository.merge(entity);
+
+        verify(bdmTrackingRepository, never()).create(any());
+    }
+
+    @Test
+    void persist_null_entity_should_not_track() throws SPersistenceException {
+        repository.persist(null);
+
+        verify(manager, never()).persist(any());
+        verify(bdmTrackingRepository, never()).create(any());
+    }
+
+    @Test
+    void merge_null_entity_should_not_track() throws SPersistenceException {
+        repository.merge(null);
+
+        verify(manager, never()).merge(any());
+        verify(bdmTrackingRepository, never()).create(any());
+    }
+
+    @Test
+    void merge_should_use_original_classname_not_hibernate_proxy() throws SPersistenceException {
+        // given — input is a plain EntityPojo, but merge() returns a different type (simulating proxy)
+        var entity = new EntityPojo(); // persistenceId == null → new entity
+        var proxyResult = mock(Entity.class);
+        when(proxyResult.getPersistenceId()).thenReturn(77L);
+        doReturn(proxyResult).when(manager).merge(entity);
+
+        repository.merge(entity);
+
+        // then — dataClassname should be EntityPojo (from input), not the mock/proxy class
+        var captor = ArgumentCaptor.forClass(SDataRetentionBdmTracking.class);
+        verify(bdmTrackingRepository).create(captor.capture());
+        assertThat(captor.getValue().getDataClassname()).isEqualTo(EntityPojo.class.getName());
+        assertThat(captor.getValue().getDataId()).isEqualTo(77L);
+    }
+
+    @Test
+    void persist_should_throw_SBonitaRuntimeException_when_tracking_fails() throws SPersistenceException {
+        var entity = new EntityPojo(); // new entity
+        doAnswer(invocation -> {
+            ((EntityPojo) invocation.getArgument(0)).setPersistenceId(7L);
+            return null;
+        }).when(manager).persist(entity);
+        doThrow(new SPersistenceException("DB error")).when(bdmTrackingRepository).create(any());
+
+        assertThatThrownBy(() -> repository.persist(entity))
+                .isInstanceOf(SBonitaRuntimeException.class)
+                .hasMessageContaining("Failed to insert data retention tracking record")
+                .hasCauseInstanceOf(SPersistenceException.class);
+    }
+
+    @Test
+    void merge_should_throw_SBonitaRuntimeException_when_tracking_fails() throws SPersistenceException {
+        var entity = new EntityPojo(); // new entity
+        var mergedEntity = new EntityPojo(8L);
+        when(manager.merge(entity)).thenReturn(mergedEntity);
+        doThrow(new SPersistenceException("DB error")).when(bdmTrackingRepository).create(any());
+
+        assertThatThrownBy(() -> repository.merge(entity))
+                .isInstanceOf(SBonitaRuntimeException.class)
+                .hasMessageContaining("Failed to insert data retention tracking record")
+                .hasCauseInstanceOf(SPersistenceException.class);
+    }
+
+    @Test
     void merge_should_throw_retryable_exception_in_case_of_persistenceException() {
         //given
         doThrow(PersistenceException.class).when(manager).merge(any(Address.class));
@@ -332,7 +455,7 @@ class JPABusinessDataRepositoryImplTest {
             throws Exception {
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService));
+                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingRepository));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         // Inject the stale EM into the private ThreadLocal
@@ -424,7 +547,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService));
+                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingRepository));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         // Inject the active EM
@@ -457,7 +580,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService));
+                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingRepository));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         doThrow(new STransactionNotFoundException("no active transaction"))

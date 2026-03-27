@@ -688,6 +688,8 @@
                 <value>org/bonitasoft/engine/parameter/parameter.queries.hbm.xml</value>
                 <!-- BPM Failures -->
                 <value>org/bonitasoft/engine/core/failure/model/impl/hibernate/failure.queries.hbm.xml</value>
+                <!-- data retention bdm tracking -->
+                <value>org/bonitasoft/engine/business/data/model/impl/hibernate/data-retention-bdm-tracking.queries.hbm.xml</value>
             </set>
         </property>
         <property name="classAliasMappings">
@@ -1901,6 +1903,7 @@
                 <entry key="hibernate.cache.use_query_cache" value="false" />
             </map>
         </constructor-arg>
+        <constructor-arg name="bdmTrackingRepository" ref="dataRetentionBdmTrackingRepositoryImpl" />
     </bean>
 
 

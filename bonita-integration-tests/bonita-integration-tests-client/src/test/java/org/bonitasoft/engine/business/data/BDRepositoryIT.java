@@ -144,7 +144,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         model = buildBOM();
 
-        installBusinessDataModel(model);
+        installAndVerifyBusinessDataModel(model);
 
         assertThat(getTenantAdministrationAPI().isPaused())
                 .as("should have resume tenant after installing Business Object Model").isFalse();
@@ -220,7 +220,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                 .getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.UNRESOLVED);
 
-        installBusinessDataModel(bom);
+        installAndVerifyBusinessDataModel(bom);
 
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
@@ -340,12 +340,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "findExampleByAField", "com.company.ExampleBusinessObject"));
     }
 
-    private void installBusinessDataModel(final BusinessObjectModel bom) throws Exception {
-        final byte[] zip = getZip(bom);
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        final String businessDataModelVersion = getTenantAdministrationAPI().updateBusinessDataModel(zip);
-        getTenantAdministrationAPI().resume();
+    private void installAndVerifyBusinessDataModel(final BusinessObjectModel bom) throws Exception {
+        var businessDataModelVersion = installBusinessDataModel(bom);
         assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
         verifyBdmIsWellDeployed();
     }
@@ -2263,7 +2259,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         });
 
         //fix the BDM
-        installBusinessDataModel(businessObjectModel(
+        installAndVerifyBusinessDataModel(businessObjectModel(
                 bom -> bom.addBusinessObject(businessObject("com.acme.Cat",
                         bo -> {
                             bo.addField(stringField("name"));
@@ -2751,7 +2747,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void should_connector_using_bdm_still_work_after_bdm_update() throws Exception {
 
-        installBusinessDataModel(bomMyObjectWith1Field());
+        installAndVerifyBusinessDataModel(bomMyObjectWith1Field());
 
         //connector that call setter on the bdm object
         byte[] setNameConnectorJar = IOUtil.generateJar(singletonList(retrieveClientBDMModelJar()),
@@ -2791,7 +2787,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         log.info("install new BDM");
         //deploy a new version of the bdm that is compatible
-        installBusinessDataModel(bomMyObjectWith2Fields());
+        installAndVerifyBusinessDataModel(bomMyObjectWith2Fields());
 
         //connector should still work
 

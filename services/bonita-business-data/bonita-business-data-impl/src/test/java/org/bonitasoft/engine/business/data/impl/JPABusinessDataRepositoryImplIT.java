@@ -34,6 +34,7 @@ import javax.transaction.UserTransaction;
 
 import com.company.pojo.Employee;
 import com.company.pojo.Person;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
 import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -92,10 +93,12 @@ public class JPABusinessDataRepositoryImplIT {
         final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration());
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(
                 new BusinessDataModelRepositoryImpl(mock(PlatformService.class), mock(TenantDependencyService.class),
-                        classLoaderService, schemaManager, mock(TenantResourcesService.class)));
+                        classLoaderService, schemaManager, mock(TenantResourcesService.class),
+                        mock(DataRetentionBdmTrackingRepository.class)));
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,
-                        configuration.getJpaConfiguration(), classLoaderService));
+                        configuration.getJpaConfiguration(), classLoaderService,
+                        mock(DataRetentionBdmTrackingRepository.class)));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
         ut.begin();

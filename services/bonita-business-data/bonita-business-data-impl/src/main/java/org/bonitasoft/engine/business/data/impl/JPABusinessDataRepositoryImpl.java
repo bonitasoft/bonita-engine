@@ -41,12 +41,16 @@ import org.bonitasoft.engine.bdm.model.QueryParameterTypes;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking;
 import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SingleClassLoaderListener;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
+import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.hibernate.Hibernate;
@@ -76,14 +80,20 @@ public class JPABusinessDataRepositoryImpl
 
     private final UserTransactionService transactionService;
 
-    public JPABusinessDataRepositoryImpl(final UserTransactionService transactionService,
-            final BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration,
-            ClassLoaderService classLoaderService) {
+    private final DataRetentionBdmTrackingRepository bdmTrackingRepository;
+
+    public JPABusinessDataRepositoryImpl(
+            final UserTransactionService transactionService,
+            final BusinessDataModelRepository businessDataModelRepository,
+            final Map<String, Object> configuration,
+            ClassLoaderService classLoaderService,
+            DataRetentionBdmTrackingRepository bdmTrackingRepository) {
         this.transactionService = transactionService;
         this.businessDataModelRepository = businessDataModelRepository;
         this.configuration = new HashMap<>(configuration);
         this.configuration.put("hibernate.archive.scanner", DisabledScanner.class.getName());
         classLoaderService.addListener(ClassLoaderIdentifier.TENANT, this);
+        this.bdmTrackingRepository = bdmTrackingRepository;
     }
 
     @Override
@@ -399,26 +409,85 @@ public class JPABusinessDataRepositoryImpl
 
     @Override
     public void persist(final Entity entity) {
-        if (entity != null) {
-            final EntityManager entityManager = getEntityManager();
-            try {
-                entityManager.persist(entity);
-            } catch (final PersistenceException e) {
-                throw new SRetryableException(e);
+        if (entity == null) {
+            log.trace("Entity is null, nothing to persist");
+            return;
+        }
+        log.trace("Persisting entity of type {} with id {}", entity.getClass().getName(), entity.getPersistenceId());
+        try {
+            // Capture whether the entity is new before JPA assigns an ID
+            var isNew = entity.getPersistenceId() == null;
+
+            getEntityManager().persist(entity);
+
+            // Insert or update a data retention tracking record in the Bonita DB
+            if (isNew) {
+                trackCreation(entity, entity.getClass().getName());
+            } else {
+                trackUpdate(entity);
             }
+        } catch (final PersistenceException e) {
+            throw new SRetryableException(e);
         }
     }
 
     @Override
     public Entity merge(final Entity entity) {
-        if (entity != null) {
-            try {
-                return getEntityManager().merge(entity);
-            } catch (final PersistenceException e) {
-                throw new SRetryableException(e);
-            }
+        if (entity == null) {
+            log.trace("Entity is null, nothing to merge");
+            return null;
         }
-        return null;
+        log.trace("Merging entity of type {} with id {}", entity.getClass().getName(), entity.getPersistenceId());
+        try {
+            // Capture whether the entity is new before JPA assigns an ID
+            var isNew = entity.getPersistenceId() == null;
+            // Capture the real class name before merge, because merge() may return a Hibernate proxy
+            // whose getClass().getName() would be e.g. "Invoice$HibernateProxyXxx" instead of "Invoice"
+            var entityClassname = entity.getClass().getName();
+
+            Entity merged = getEntityManager().merge(entity);
+
+            // Insert or update a data retention tracking record in the Bonita DB,
+            // use the merged entity which has the JPA-assigned persistenceId
+            if (isNew) {
+                trackCreation(merged, entityClassname);
+            } else {
+                trackUpdate(merged);
+            }
+            return merged;
+        } catch (final PersistenceException e) {
+            throw new SRetryableException(e);
+        }
+    }
+
+    /**
+     * Inserts a tracking record in the Bonita DB for a newly created BDM entity.
+     * Called within the same JTA transaction as the BDM persist/merge, so both
+     * are rolled back together if either fails.
+     */
+    private void trackCreation(Entity entity, String entityClassname) {
+        log.debug("Tracking creation of new BDM entity {}#{}", entityClassname, entity.getPersistenceId());
+        long now = System.currentTimeMillis();
+        var tracking = SDataRetentionBdmTracking.builder()
+                .dataId(entity.getPersistenceId())
+                .dataClassname(entityClassname)
+                .createdAt(now)
+                .lastModifiedAt(now)
+                .build();
+        try {
+            bdmTrackingRepository.create(tracking);
+        } catch (SPersistenceException e) {
+            // Intentionally throwing an unchecked exception to roll back the entire JTA transaction,
+            // including the BDM entity creation. Tracking and BDM data must stay consistent.
+            throw new SBonitaRuntimeException("Failed to insert data retention tracking record for "
+                    + entityClassname + "#" + entity.getPersistenceId(), e);
+        }
+    }
+
+    private void trackUpdate(Entity entity) {
+        log.debug("Tracking update of existing BDM entity {}#{}", entity.getClass().getName(),
+                entity.getPersistenceId());
+        //TODO BPA-367
     }
 
     @Override

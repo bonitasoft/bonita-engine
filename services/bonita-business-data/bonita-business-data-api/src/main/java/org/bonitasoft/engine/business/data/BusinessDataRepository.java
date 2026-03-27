@@ -89,6 +89,9 @@ public interface BusinessDataRepository extends TenantLifecycleService {
 
     /**
      * Saves or updates an entity in the Business Data Repository.
+     * <p>
+     * This operation also inserts or updates a data retention tracking record in the Bonita DB
+     * via {@code DataRetentionBdmTrackingRepository} when a BDM entity is created or updated.
      *
      * @param entity the entity to save / update.
      */
@@ -102,7 +105,10 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     void remove(Entity entity);
 
     /**
-     * Reconnect the given entity with the persistence unit
+     * Reconnect the given entity with the persistence unit.
+     * <p>
+     * This operation also inserts or updates a data retention tracking record in the Bonita DB
+     * via {@code DataRetentionBdmTrackingRepository} when a BDM entity is created or updated.
      *
      * @param entity the entity to reconnect.
      * @return the connected entity.

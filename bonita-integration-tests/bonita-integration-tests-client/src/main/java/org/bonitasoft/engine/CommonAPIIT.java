@@ -23,8 +23,6 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.bonitasoft.engine.api.MaintenanceAPI;
-import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -37,10 +35,8 @@ import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.junit.Rule;
@@ -80,21 +76,6 @@ public abstract class CommonAPIIT extends APITestUtil {
         checkThereAreNoWaitingEventsLeft();
         cleanBdm();
         logout();
-    }
-
-    private void cleanBdm() throws BonitaException {
-        TenantAdministrationAPI tenantAdministrationAPI = getTenantAdministrationAPI();
-        MaintenanceAPI maintenanceAPI = getMaintenanceAPI();
-        if (tenantAdministrationAPI.getBusinessDataModelResource() != TenantResource.NONE) {
-            if (maintenanceAPI.getMaintenanceDetails().getMaintenanceState() == MaintenanceDetails.State.DISABLED) {
-                maintenanceAPI.enableMaintenanceMode();
-            }
-            try {
-                tenantAdministrationAPI.cleanAndUninstallBusinessDataModel();
-            } finally {
-                maintenanceAPI.disableMaintenanceMode();
-            }
-        }
     }
 
     private void checkThereAreNoWaitingEventsLeft() throws BonitaException {

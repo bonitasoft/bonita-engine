@@ -30,6 +30,7 @@ import java.util.Optional;
 
 import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -73,6 +74,9 @@ public class BusinessDataModelRepositoryImplTest {
     @Mock(lenient = true)
     private SPlatformProperties platformProperties;
 
+    @Mock
+    private DataRetentionBdmTrackingRepository bdmTrackingRepository;
+
     private BusinessDataModelRepositoryImpl businessDataModelRepository;
 
     @Before
@@ -83,7 +87,7 @@ public class BusinessDataModelRepositoryImplTest {
         // via classLoaderService.getClassLoader() returning null (default mock behavior)
         doReturn(getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
         businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(platformService, dependencyService,
-                classLoaderService, schemaManager, tenantResourcesService));
+                classLoaderService, schemaManager, tenantResourcesService, bdmTrackingRepository));
     }
 
     @Test

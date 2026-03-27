@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -38,6 +40,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -67,6 +70,7 @@ import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
+import org.bonitasoft.engine.services.SPersistenceException;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -75,34 +79,22 @@ import org.xml.sax.SAXException;
  */
 @Slf4j
 @Service("businessDataModelRepository")
+@RequiredArgsConstructor
 public class BusinessDataModelRepositoryImpl implements BusinessDataModelRepository {
 
     private static final String BDR_DEPENDENCY_NAME = "BDR";
     public static final String BDR_DEPENDENCY_FILENAME = BDR_DEPENDENCY_NAME + ".jar";
     private static final String CLIENT_BDM_ZIP = "client-bdm.zip";
-
     private static final String MODEL_JAR_NAME = "bdm-model.jar";
-
     private static final String DAO_JAR_NAME = "bdm-dao.jar";
-
     private static final String BOM_NAME = "bom.zip";
 
+    private final PlatformService platformService;
     private final TenantDependencyService dependencyService;
     private final ClassLoaderService classLoaderService;
-
     private final SchemaManager schemaManager;
     private final TenantResourcesService tenantResourcesService;
-    private final PlatformService platformService;
-
-    public BusinessDataModelRepositoryImpl(final PlatformService platformService,
-            final TenantDependencyService dependencyService, ClassLoaderService classLoaderService,
-            final SchemaManager schemaManager, TenantResourcesService tenantResourcesService) {
-        this.platformService = platformService;
-        this.dependencyService = dependencyService;
-        this.classLoaderService = classLoaderService;
-        this.schemaManager = schemaManager;
-        this.tenantResourcesService = tenantResourcesService;
-    }
+    private final DataRetentionBdmTrackingRepository bdmTrackingRepository;
 
     @Override
     public byte[] getClientBDMZip() throws SBusinessDataRepositoryException {
@@ -345,9 +337,24 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                     }
                 }
                 uninstall();
+                deleteAllBdmTracking();
             } catch (final IOException | JAXBException | SAXException ioe) {
                 throw new SBusinessDataRepositoryException(ioe);
             }
+        }
+    }
+
+    /**
+     * Deletes all BDM tracking records when the BDM is uninstalled.
+     * Tracking data becomes obsolete once the BDM schema is dropped.
+     */
+    private void deleteAllBdmTracking() throws SBusinessDataRepositoryException {
+        try {
+            // Pass empty filter to delete all records without any restriction
+            bdmTrackingRepository.deleteAll(Collections.emptyList());
+        } catch (SPersistenceException e) {
+            throw new SBusinessDataRepositoryException(
+                    "Failed to delete data retention BDM tracking records during BDM uninstall", e);
         }
     }
 
