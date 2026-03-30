@@ -13,11 +13,12 @@
  **/
 package org.bonitasoft.console.common.server.servlet;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessResourceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
@@ -56,7 +58,8 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
      * {@inheritDoc}
      */
     @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
 
         final String filePath = request.getParameter(FILE_PATH_PARAM);
         String fileName = request.getParameter(FILE_NAME_PARAM);
@@ -119,37 +122,21 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
                     processDefinitionID = getProcessDefinitionIDFromProcessInstanceID(apiSession,
                             Long.parseLong(instanceIDStr));
                 } else {
-                    final String errorMessage = "Error while retrieving the resource " + resourcePath
-                            + " : Either a process, instance or task is required in the URL";
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error(errorMessage);
-                    }
-                    throw new ServletException(errorMessage);
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            "Either a process, instance or task parameter is required in the URL");
+                    return;
                 }
-                Date processDeployementDate = getMigrationDate(apiSession, processDefinitionID);
-                if (processDeployementDate == null) {
-                    processDeployementDate = getProcessDefinitionDate(apiSession, processDefinitionID);
+                final ProcessAPI processAPI = bpmEngineAPIUtil.getProcessAPI(apiSession);
+                content = processAPI.getDocumentProcessResource(processDefinitionID, resourcePath);
+                fileName = resourcePath.contains("/")
+                        ? resourcePath.substring(resourcePath.lastIndexOf('/') + 1)
+                        : resourcePath;
+            } catch (final ProcessResourceNotFoundException e) {
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn(e.getMessage());
                 }
-                final File processDir = getProcessResourceDir(apiSession, processDefinitionID,
-                        processDeployementDate);
-                final File resource = new File(processDir,
-                        BUSINESS_ARCHIVE_RESOURCES_DIRECTORY + File.separator + resourcePath);
-                if (!bonitaHomeFolderAccessor.isInFolder(resource, processDir)) {
-                    throw new ServletException(
-                            "For security reasons, access to this file path is restricted.");
-                }
-                if (resource.exists()) {
-                    fileName = resource.getName();
-                    InputStream resourceInputStream = new FileInputStream(resource);
-                    content = getFileContent(resourceInputStream, fileName, resource.length());
-                } else {
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("The target resource does not exist {}", resource.getAbsolutePath());
-                    }
-                    throw new IOException("The target resource does not exist");
-                }
-            } catch (final ServletException e) {
-                throw e;
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
             } catch (final Exception e) {
                 final String errorMessage = "Error while retrieving the resource " + resourcePath;
                 if (LOGGER.isErrorEnabled()) {
