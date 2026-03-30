@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-02 15:47+0000\n"
+"POT-Creation-Date: 2026-03-19 17:28+0000\n"
 "PO-Revision-Date: 2024-01-01 00:00\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -263,6 +263,9 @@ msgstr "Ce rôle est déjà lié à l'acteur"
 msgid "This user has already been mapped to actor"
 msgstr "Cet utilisateur est déjà lié à l'acteur"
 
+msgid "Too many failed login attempts. Please try again later."
+msgstr "Trop de tentatives de connexion. Veuillez réessayer plus tard."
+
 msgid "Unable to deploy business archive"
 msgstr "Impossible de déployer le fichier .bar"
 
@@ -286,9 +289,6 @@ msgstr "Impossible d'obtenir des définitions de données de processus, car %pro
 
 msgid "Unable to log in. Please check your username and password."
 msgstr "Impossible de se connecter. Veuillez vérifier votre nom d'utilisateur et le mot de passe."
-
-msgid "Too many failed login attempts. Please try again later."
-msgstr "Trop de tentatives de connexion. Veuillez réessayer plus tard."
 
 msgid "User"
 msgstr "Utilisateur"
