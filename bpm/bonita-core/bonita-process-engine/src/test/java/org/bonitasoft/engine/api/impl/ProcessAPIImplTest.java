@@ -1655,8 +1655,8 @@ public class ProcessAPIImplTest {
     public void should_get_document_resource_from_process() throws Exception {
         doReturn(
                 new SBARResource("myDoc", BARResourceType.DOCUMENT, PROCESS_DEFINITION_ID, new byte[] { 4, 5, 6 }))
-                        .when(processResourcesService)
-                        .get(PROCESS_DEFINITION_ID, BARResourceType.DOCUMENT, "myDoc");
+                .when(processResourcesService)
+                .get(PROCESS_DEFINITION_ID, BARResourceType.DOCUMENT, "myDoc");
 
         byte[] myDoc = processAPI.getDocumentProcessResource(PROCESS_DEFINITION_ID, "myDoc");
 
