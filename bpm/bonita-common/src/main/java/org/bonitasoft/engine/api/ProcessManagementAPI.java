@@ -51,6 +51,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessExportException;
+import org.bonitasoft.engine.bpm.process.ProcessResourceNotFoundException;
 import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
@@ -975,6 +976,19 @@ public interface ProcessManagementAPI {
      */
     byte[] getExternalProcessResource(long processDefinitionId, String fileName)
             throws RetrieveException, FileNotFoundException;
+
+    /**
+     * Get a document resource from the process.
+     * Can only retrieve resources stored in the 'documents' folder of the business archive
+     *
+     * @param processDefinitionId id of the process definition
+     * @param fileName name of the file to retrieve inside the documents folder of the business archive
+     * @return the content of the file
+     * @throws RetrieveException if the resource cannot be read from the database
+     * @throws ProcessResourceNotFoundException if no resource with the given name exists in the process definition
+     */
+    byte[] getDocumentProcessResource(long processDefinitionId, String fileName)
+            throws RetrieveException, ProcessResourceNotFoundException;
 
     /**
      * Returns the identifier of the most recently deployed process definition with the given name. This method does not
