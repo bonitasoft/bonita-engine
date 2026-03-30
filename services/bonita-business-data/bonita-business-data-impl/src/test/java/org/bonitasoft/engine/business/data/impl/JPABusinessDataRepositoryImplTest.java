@@ -607,7 +607,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService));
+                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingRepository));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         //when + then
