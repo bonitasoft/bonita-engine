@@ -195,8 +195,20 @@ public class JPABusinessDataRepositoryImpl
                 throw new IllegalStateException(stnfe);
             }
             managers.set(manager);
+            log.debug("Created new BDM EntityManager for current transaction");
+        } else {
+            log.debug("Reusing existing BDM EntityManager in current transaction.");
         }
-        manager.joinTransaction();
+        try {
+            manager.joinTransaction();
+        } catch (Exception e) {
+            log.warn(
+                    "BDM EntityManager failed to join current transaction. This may indicate the transaction is already marked for rollback.",
+                    e);
+            closeQuietly(manager);
+            managers.remove();
+            throw e;
+        }
         return manager;
     }
 
@@ -233,6 +245,7 @@ public class JPABusinessDataRepositoryImpl
         try {
             entity = em.find(entityClass, primaryKey);
         } catch (final PersistenceException e) {
+            log.debug("BDM findById({}, id={}) failed", entityClass.getSimpleName(), primaryKey, e);
             //wrap in retryable exception because the issue might come from BDR reloading
             throw new SRetryableException(e);
         }
@@ -344,6 +357,7 @@ public class JPABusinessDataRepositoryImpl
             final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
             return find(resultClass, query, parameters);
         } catch (final PersistenceException e) {
+            log.debug("BDM findByNamedQuery('{}', {}) failed", queryName, resultClass.getSimpleName(), e);
             //wrap in retryable exception because the issue might come from BDR reloading
             throw new SRetryableException(e);
         }
@@ -357,6 +371,7 @@ public class JPABusinessDataRepositoryImpl
             final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
             return findList(query, parameters, startIndex, maxResults);
         } catch (final PersistenceException e) {
+            log.debug("BDM findListByNamedQuery('{}', {}) failed", queryName, resultClass.getSimpleName(), e);
             //wrap in retryable exception because the issue might come from BDR reloading
             throw new SRetryableException(e);
         }
