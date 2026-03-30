@@ -15,33 +15,30 @@ package org.bonitasoft.console.common.server.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.util.Date;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
+import org.bonitasoft.console.common.server.utils.BPMEngineAPIUtil;
+import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.bpm.process.ProcessResourceNotFoundException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentDownloadServletTest {
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Spy
     private DocumentDownloadServlet servlet;
@@ -52,50 +49,76 @@ public class DocumentDownloadServletTest {
     @Mock
     private APISession apiSession;
 
-    private File processDir;
+    @Mock
+    private BPMEngineAPIUtil bpmEngineAPIUtil;
+
+    @Mock
+    private ProcessAPI processAPI;
 
     @Before
     public void setUp() throws Exception {
-        processDir = temporaryFolder.newFolder("test-process");
-        File documentsDir = new File(processDir, DocumentDownloadServlet.BUSINESS_ARCHIVE_RESOURCES_DIRECTORY);
-        documentsDir.mkdirs();
-        Files.write(new File(documentsDir, "valid-resource.txt").toPath(), "test content".getBytes());
-
         request.getSession().setAttribute("apiSession", apiSession);
-
-        doReturn(null).when(servlet).getMigrationDate(any(), anyLong());
-        doReturn(new Date()).when(servlet).getProcessDefinitionDate(any(), anyLong());
-        doReturn(processDir).when(servlet).getProcessResourceDir(any(), anyLong(), any());
+        ReflectionTestUtils.setField(servlet, "bpmEngineAPIUtil", bpmEngineAPIUtil);
+        when(bpmEngineAPIUtil.getProcessAPI(apiSession)).thenReturn(processAPI);
     }
 
+    // Path traversal is rejected at the DB layer: the resource name is looked up by exact match,
+    // so traversal paths like "../../../etc/passwd" simply won't match any stored resource name.
     @Test
-    public void doGet_should_reject_path_traversal_in_resourceFileName() {
+    public void doGet_should_return_404_for_path_traversal_in_resourceFileName() throws Exception {
         request.setParameter("resourceFileName", "../../../etc/passwd");
         request.setParameter("process", "123");
+        when(processAPI.getDocumentProcessResource(anyLong(), anyString()))
+                .thenThrow(
+                        new ProcessResourceNotFoundException("No resource named ../../../etc/passwd in process 123"));
 
-        assertThatThrownBy(() -> servlet.doGet(request, response))
-                .isInstanceOf(ServletException.class)
-                .hasMessageContaining("security");
+        servlet.doGet(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
     }
 
     @Test
-    public void doGet_should_reject_path_traversal_escaping_process_directory() {
-        // ../../secret.txt resolves to <parent-of-processDir>/secret.txt, escaping processDir
+    public void doGet_should_return_404_for_path_traversal_escaping_process_directory() throws Exception {
         request.setParameter("resourceFileName", "../../secret.txt");
         request.setParameter("process", "123");
+        when(processAPI.getDocumentProcessResource(anyLong(), anyString()))
+                .thenThrow(new ProcessResourceNotFoundException("No resource named ../../secret.txt in process 123"));
 
-        assertThatThrownBy(() -> servlet.doGet(request, response))
-                .isInstanceOf(ServletException.class)
-                .hasMessageContaining("security");
+        servlet.doGet(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    @Test
+    public void doGet_should_return_400_when_no_process_instance_or_task_param() throws Exception {
+        request.setParameter("resourceFileName", "valid-resource.txt");
+
+        servlet.doGet(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_BAD_REQUEST);
     }
 
     @Test
     public void doGet_should_allow_valid_resource_path() throws Exception {
         request.setParameter("resourceFileName", "valid-resource.txt");
         request.setParameter("process", "123");
+        when(processAPI.getDocumentProcessResource(anyLong(), anyString()))
+                .thenReturn("test content".getBytes());
 
         servlet.doGet(request, response);
 
         assertThat(response.getContentAsByteArray()).isEqualTo("test content".getBytes());
+    }
+
+    @Test
+    public void doGet_should_wrap_RetrieveException_in_ServletException() throws Exception {
+        request.setParameter("resourceFileName", "valid-resource.txt");
+        request.setParameter("process", "123");
+        when(processAPI.getDocumentProcessResource(anyLong(), anyString()))
+                .thenThrow(new RetrieveException("DB error"));
+
+        assertThatThrownBy(() -> servlet.doGet(request, response))
+                .isInstanceOf(ServletException.class)
+                .hasCauseInstanceOf(RetrieveException.class);
     }
 }
