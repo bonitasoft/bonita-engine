@@ -595,6 +595,40 @@ class JPABusinessDataRepositoryImplTest {
         verify(freshEM).close();
     }
 
+    @Test
+    void getEntityManager_should_cleanup_and_rethrow_when_joinTransaction_fails() throws Exception {
+        //given
+        EntityManager freshEM = mock(EntityManager.class);
+        doReturn(true).when(freshEM).isOpen();
+        doThrow(new javax.persistence.TransactionRequiredException("TX is rollback-only"))
+                .when(freshEM).joinTransaction();
+        EntityManagerFactory emf = mock(EntityManagerFactory.class);
+        doReturn(freshEM).when(emf).createEntityManager();
+
+        JPABusinessDataRepositoryImpl repo = spy(
+                new JPABusinessDataRepositoryImpl(transactionService,
+                        businessDataModelRepository, configuration, classLoaderService, 1L));
+        doReturn(emf).when(repo).getEntityManagerFactory();
+
+        //when + then
+        assertThatExceptionOfType(javax.persistence.TransactionRequiredException.class)
+                .isThrownBy(repo::getEntityManager)
+                .withMessageContaining("TX is rollback-only");
+
+        verify(freshEM).close();
+
+        // Verify ThreadLocal was cleaned up: a second call should create a fresh EM,
+        // not reuse the poisoned one
+        EntityManager secondEM = mock(EntityManager.class);
+        doReturn(secondEM).when(emf).createEntityManager();
+        doNothing().when(secondEM).joinTransaction();
+
+        EntityManager result = repo.getEntityManager();
+
+        assertThat(result).isSameAs(secondEM);
+        verify(emf, times(2)).createEntityManager();
+    }
+
     class Address implements Entity {
 
         private static final long serialVersionUID = 2603989953326533907L;
