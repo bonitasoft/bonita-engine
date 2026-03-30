@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 11:55+0000\n"
+"POT-Creation-Date: 2026-03-19 17:10+0000\n"
 "PO-Revision-Date: 2024-01-01 00:00\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
@@ -263,6 +263,9 @@ msgstr "この役割は、既にアクターにアサインされています"
 msgid "This user has already been mapped to actor"
 msgstr "このユーザーは既にアクターにアサインされています。"
 
+msgid "Too many failed login attempts. Please try again later."
+msgstr "ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。"
+
 msgid "Unable to deploy business archive"
 msgstr "ビジネス アーカイブをデプロイすることはできません。"
 
@@ -286,9 +289,6 @@ msgstr "プロセスのデータ定義を取得できません。 プロセス�
 
 msgid "Unable to log in. Please check your username and password."
 msgstr "ログインできません。ユーザー名とパスワードを確認してください。"
-
-msgid "Too many failed login attempts. Please try again later."
-msgstr "ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。"
 
 msgid "User"
 msgstr "利用者"
