@@ -1652,6 +1652,37 @@ public class ProcessAPIImplTest {
     }
 
     @Test
+    public void should_get_document_resource_from_process() throws Exception {
+        doReturn(
+                new SBARResource("myDoc", BARResourceType.DOCUMENT, PROCESS_DEFINITION_ID, new byte[] { 4, 5, 6 }))
+                        .when(processResourcesService)
+                        .get(PROCESS_DEFINITION_ID, BARResourceType.DOCUMENT, "myDoc");
+
+        byte[] myDoc = processAPI.getDocumentProcessResource(PROCESS_DEFINITION_ID, "myDoc");
+
+        assertThat(myDoc).isEqualTo(new byte[] { 4, 5, 6 });
+    }
+
+    @Test
+    public void should_throw_ProcessResourceNotFoundException_when_getting_nonexistent_document_resource()
+            throws Exception {
+        expectedException.expect(ProcessResourceNotFoundException.class);
+
+        processAPI.getDocumentProcessResource(PROCESS_DEFINITION_ID, "nonexistent");
+    }
+
+    @Test
+    public void should_throw_RetrieveException_when_cant_read_database_for_document_resource() throws Exception {
+        doThrow(new SBonitaReadException(""))
+                .when(processResourcesService)
+                .get(PROCESS_DEFINITION_ID, BARResourceType.DOCUMENT, "myDoc");
+
+        expectedException.expect(RetrieveException.class);
+
+        processAPI.getDocumentProcessResource(PROCESS_DEFINITION_ID, "myDoc");
+    }
+
+    @Test
     public void should_invoke_deleteMessageAndDataInstanceOlderCreationDate_with_good_fields() throws Exception {
         long creationDate = System.currentTimeMillis();
 

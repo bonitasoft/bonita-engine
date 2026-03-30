@@ -2150,6 +2150,23 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public byte[] getDocumentProcessResource(final long processDefinitionId, final String fileName)
+            throws RetrieveException, ProcessResourceNotFoundException {
+        SBARResource resource;
+        try {
+            resource = getServiceAccessor().getProcessResourcesService().get(processDefinitionId,
+                    BARResourceType.DOCUMENT, fileName);
+        } catch (SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+        if (resource == null) {
+            throw new ProcessResourceNotFoundException(
+                    "No resource named " + fileName + " in the documents of process " + processDefinitionId);
+        }
+        return resource.getContent();
+    }
+
+    @Override
     public long getLatestProcessDefinitionId(final String processName) throws ProcessDefinitionNotFoundException {
         final ServiceAccessor serviceAccessor = getServiceAccessor();
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();

@@ -13,15 +13,12 @@
  **/
 package org.bonitasoft.console.common.server.servlet;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,15 +27,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bonitasoft.console.common.server.utils.BPMEngineAPIUtil;
-import org.bonitasoft.console.common.server.utils.BPMEngineException;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.FormsResourcesUtils;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessResourceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
@@ -98,11 +93,6 @@ public class DocumentDownloadServlet extends HttpServlet {
     protected static final String API_SESSION_PARAM_KEY = "apiSession";
 
     /**
-     * the name of the directory in which the resources are stored in the business archive (in /resources/forms)
-     */
-    protected static final String BUSINESS_ARCHIVE_RESOURCES_DIRECTORY = "documents";
-
-    /**
      * content storage id of the document downloaded
      */
     protected static final String CONTENT_STORAGE_ID_PARAM = "contentStorageId";
@@ -123,7 +113,8 @@ public class DocumentDownloadServlet extends HttpServlet {
      * {@inheritDoc}
      */
     @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
 
         final String filePath = request.getParameter(FILE_PATH_PARAM);
         String fileName = request.getParameter(FILE_NAME_PARAM);
@@ -200,37 +191,21 @@ public class DocumentDownloadServlet extends HttpServlet {
                     processDefinitionID = getProcessDefinitionIDFromProcessInstanceID(apiSession,
                             Long.parseLong(instanceIDStr));
                 } else {
-                    final String errorMessage = "Error while retrieving the resource " + resourcePath
-                            + " : Either a process, instance or task is required in the URL";
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error(errorMessage);
-                    }
-                    throw new ServletException(errorMessage);
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            "Either a process, instance or task parameter is required in the URL");
+                    return;
                 }
-                Date processDeployementDate = getMigrationDate(apiSession, processDefinitionID);
-                if (processDeployementDate == null) {
-                    processDeployementDate = getProcessDefinitionDate(apiSession, processDefinitionID);
+                final ProcessAPI processAPI = bpmEngineAPIUtil.getProcessAPI(apiSession);
+                content = processAPI.getDocumentProcessResource(processDefinitionID, resourcePath);
+                fileName = resourcePath.contains("/")
+                        ? resourcePath.substring(resourcePath.lastIndexOf('/') + 1)
+                        : resourcePath;
+            } catch (final ProcessResourceNotFoundException e) {
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn(e.getMessage());
                 }
-                final File processDir = getProcessResourceDir(apiSession, processDefinitionID,
-                        processDeployementDate);
-                final File resource = new File(processDir,
-                        BUSINESS_ARCHIVE_RESOURCES_DIRECTORY + File.separator + resourcePath);
-                if (!bonitaHomeFolderAccessor.isInFolder(resource, processDir)) {
-                    throw new ServletException(
-                            "For security reasons, access to this file path is restricted.");
-                }
-                if (resource.exists()) {
-                    fileName = resource.getName();
-                    InputStream resourceInputStream = new FileInputStream(resource);
-                    content = getFileContent(resourceInputStream, fileName, resource.length());
-                } else {
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("The target resource does not exist {}", resource.getAbsolutePath());
-                    }
-                    throw new IOException("The target resource does not exist");
-                }
-            } catch (final ServletException e) {
-                throw e;
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
             } catch (final Exception e) {
                 final String errorMessage = "Error while retrieving the resource " + resourcePath;
                 if (LOGGER.isErrorEnabled()) {
@@ -330,24 +305,4 @@ public class DocumentDownloadServlet extends HttpServlet {
         return processAPI.getProcessDefinitionIdFromProcessInstanceId(processInstanceID);
     }
 
-    protected Date getMigrationDate(final APISession session, final long processDefinitionID) throws BonitaException {
-        final ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(session);
-        final ProcessDeploymentInfo processDeploymentInfo = processAPI.getProcessDeploymentInfo(processDefinitionID);
-        Date migrationDate = null;
-        if (!processDeploymentInfo.getDeploymentDate().equals(processDeploymentInfo.getLastUpdateDate())) {
-            migrationDate = processDeploymentInfo.getLastUpdateDate();
-        }
-        return migrationDate;
-    }
-
-    protected Date getProcessDefinitionDate(final APISession session, final long processDefinitionID)
-            throws BonitaException {
-        final ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(session);
-        return processAPI.getProcessDeploymentInfo(processDefinitionID).getDeploymentDate();
-    }
-
-    protected File getProcessResourceDir(final APISession session, final long processDefinitionID,
-            final Date processDeploymentDate) throws BonitaException, BPMEngineException {
-        return FormsResourcesUtils.getApplicationResourceDir(session, processDefinitionID, processDeploymentDate);
-    }
 }
