@@ -31,6 +31,8 @@ public class RestRequestURIParser {
 
     //This constant should match the servlet name of DispatcherServlet as declared in servlet context
     public static final String SPRING_REST_SERVLET_NAME = "SpringRest";
+    //This constant should match the servlet name of CustomPageServlet as declared in servlet context
+    public static final String CUSTOM_PAGE_SERVLET_NAME = "CustomPageServlet";
 
     private static final String API_SEGMENT = "API";
     private static final String API_TOOLKIT_SEGMENT = "APIToolkit";
@@ -43,7 +45,7 @@ public class RestRequestURIParser {
     }
 
     public ParsedRestRequestURI parse() {
-        if (isSpringMvcServlet() || isToolkitServlet()) {
+        if (isSpringMvcServlet() || isToolkitServlet() || isCustomPageServlet()) {
             return parseSpringMvcOrToolkitRequest();
         }
         if (request.getPathInfo() != null) {
@@ -64,7 +66,20 @@ public class RestRequestURIParser {
     }
 
     /**
-     * For Spring MVC DispatcherServlet (servletName == "SpringRest").
+     * Checks whether the request is served by CustomPageServlet, mapped to /portal/custom-page/*.
+     * This assumes the servlet is mapped to that single wildcard prefix; if it were ever mapped
+     * to a deeper sub-path (e.g. /portal/custom-page/API/avatars/*), the request would not
+     * carry this servlet name and would instead be handled by parseWildcardServletRequest().
+     */
+    private boolean isCustomPageServlet() {
+        return CUSTOM_PAGE_SERVLET_NAME.equals(request.getHttpServletMapping().getServletName());
+    }
+
+    /**
+     * For Spring MVC DispatcherServlet (servletName == "SpringRest"),
+     * CustomPageServlet (servletName == "CustomPageServlet"),
+     * and BonitaRestAPIServlet (/APIToolkit/*).
+     * <p>
      * Handles both exact-match mappings (e.g. /API/system/maintenance where
      * servletPath = full path, pathInfo = null) and wildcard mappings
      * (e.g. /APISpringInternal/* where servletPath = /APISpringInternal,
@@ -72,9 +87,8 @@ public class RestRequestURIParser {
      * servletPath = /API/bpm/activityVariable, pathInfo = /3/myVar).
      * Concatenating servletPath + pathInfo always produces the full request path.
      * <p>
-     * For /APIToolkit/* (BonitaRestAPIServlet), we delegate to
-     * parseUsingApiSegmentLookup which already recognises APIToolkit
-     * via findApiSegmentIndex — same path as Spring MVC and direct-path requests.
+     * All three servlet types delegate to parseUsingApiSegmentLookup which
+     * locates the API/APIToolkit/APISpringInternal segment dynamically.
      */
     private ParsedRestRequestURI parseSpringMvcOrToolkitRequest() {
         String pathInfo = request.getPathInfo();
@@ -83,16 +97,28 @@ public class RestRequestURIParser {
     }
 
     /**
-     * Non-Spring nor toolkit wildcard servlets (pathInfo != null, not Spring MVC, not toolkit).
+     * Other wildcard servlets not recognised by name (pathInfo != null, not Spring MVC,
+     * not toolkit, not custom-page).
      * <p>
-     * Wildcard servlets (/API/avatars/*, /services/*, etc.) parse from
-     * index 1 to preserve the first path segment as apiName, matching
-     * permission entries like "GET|API/avatars".
+     * If the path contains an API segment (e.g. /portal/custom-page/API/avatars/*),
+     * parsing starts from that segment. Otherwise (e.g. /services/*), the servletPath
+     * is just a mapping prefix and is skipped — parsing uses pathInfo alone.
      */
     private ParsedRestRequestURI parseWildcardServletRequest() {
-        String fullPath = request.getServletPath() + request.getPathInfo();
+        String pathInfo = request.getPathInfo();
+        String fullPath = request.getServletPath() + pathInfo;
         String[] path = fullPath.split("/");
-        return parseRequest(path, 1);
+        int apiIndex = findApiSegmentIndex(Arrays.asList(path));
+        if (apiIndex >= 0) {
+            // When the servlet path includes a prefix before the API segment
+            // (e.g. /portal/custom-page/API/avatars/*), we must skip the prefix
+            // and parse from the API segment to match permission entries like "GET|API/avatars".
+            return parseRequest(path, apiIndex);
+        }
+        // No API segment: servletPath is just the mapping prefix (e.g. /services).
+        // Parse the resource structure from pathInfo alone.
+        String[] pathInfoSegments = pathInfo.split("/");
+        return parseRequest(pathInfoSegments, 1);
     }
 
     /**

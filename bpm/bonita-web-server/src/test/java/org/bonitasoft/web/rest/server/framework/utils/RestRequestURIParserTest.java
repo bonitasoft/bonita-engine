@@ -52,9 +52,9 @@ public class RestRequestURIParserTest {
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
-        assertThat(result.getResourceQualifiers().getPart(0)).isEqualTo("15");
-        assertThat(result.getResourceName()).isEqualTo("case");
         assertThat(result.getApiName()).isEqualTo("bpm");
+        assertThat(result.getResourceName()).isEqualTo("case");
+        assertThat(result.getResourceQualifiers().getPart(0)).isEqualTo("15");
     }
 
     @Test
@@ -63,9 +63,9 @@ public class RestRequestURIParserTest {
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
-        assertThat(result.getResourceQualifiers()).isNull();
         assertThat(result.getResourceName()).isEqualTo("case");
         assertThat(result.getApiName()).isEqualTo("bpm");
+        assertThat(result.getResourceQualifiers()).isNull();
     }
 
     @Test
@@ -115,14 +115,14 @@ public class RestRequestURIParserTest {
     @Test
     public void should_parsePath_when_wildcard_servlet_under_services() {
         // The RestAPIAuthorizationFilter is also mapped to /services/*.
-        // servletPath = "/services" and pathInfo = "/something".
-        doReturn("/something").when(httpServletRequest).getPathInfo();
+        // servletPath = "/services" and pathInfo = "/application/import".
+        doReturn("/application/import").when(httpServletRequest).getPathInfo();
         doReturn("/services").when(httpServletRequest).getServletPath();
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
-        assertThat(result.getApiName()).isEqualTo("services");
-        assertThat(result.getResourceName()).isEqualTo("something");
+        assertThat(result.getApiName()).isEqualTo("application");
+        assertThat(result.getResourceName()).isEqualTo("import");
         assertThat(result.getResourceQualifiers()).isNull();
     }
 
@@ -133,9 +133,9 @@ public class RestRequestURIParserTest {
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
-        assertThat(result.getResourceQualifiers()).isNull();
-        assertThat(result.getResourceName()).isEqualTo("maintenance");
         assertThat(result.getApiName()).isEqualTo("system");
+        assertThat(result.getResourceName()).isEqualTo("maintenance");
+        assertThat(result.getResourceQualifiers()).isNull();
     }
 
     @Test
@@ -146,9 +146,9 @@ public class RestRequestURIParserTest {
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
-        assertThat(result.getResourceQualifiers().getPart(0)).isEqualTo("1");
-        assertThat(result.getResourceName()).isEqualTo("maintenance");
         assertThat(result.getApiName()).isEqualTo("system");
+        assertThat(result.getResourceName()).isEqualTo("maintenance");
+        assertThat(result.getResourceQualifiers().getPart(0)).isEqualTo("1");
     }
 
     @Test
@@ -159,9 +159,9 @@ public class RestRequestURIParserTest {
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
-        assertThat(result.getResourceQualifiers()).isNull();
         assertThat(result.getApiName()).isEqualTo("extension");
         assertThat(result.getResourceName()).isEqualTo("my-rest-api");
+        assertThat(result.getResourceQualifiers()).isNull();
     }
 
     @Test
@@ -220,9 +220,9 @@ public class RestRequestURIParserTest {
     public void should_parsePath_when_servlet_mapped_to_specific_API_subpath() {
         // When a servlet is mapped to a specific sub-path like /API/avatars/*,
         // servletPath = "/API/avatars" and pathInfo = "/17" (just the ID).
-        // "API" must be included as apiName to match permission entry "GET|API/avatars".
-        doReturn("/17").when(httpServletRequest).getPathInfo();
         doReturn("/API/avatars").when(httpServletRequest).getServletPath();
+        doReturn("/17").when(httpServletRequest).getPathInfo();
+        // "API" must be included as apiName to match permission entry "GET|API/avatars".
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
@@ -233,18 +233,31 @@ public class RestRequestURIParserTest {
 
     @Test
     public void should_parsePath_when_servlet_mapped_to_portal_custom_page_API_subpath() {
-        // When a servlet is mapped to /portal/custom-page/API/avatars/*,
-        // servletPath includes the full prefix and pathInfo is just the ID.
-        doReturn("/17").when(httpServletRequest).getPathInfo();
-        doReturn("/portal/custom-page/API/avatars").when(httpServletRequest).getServletPath();
+        doReturn(RestRequestURIParser.CUSTOM_PAGE_SERVLET_NAME).when(httpServletMapping).getServletName();
+        // When a servlet is mapped to /portal/custom-page/*,
+        doReturn("/portal/custom-page").when(httpServletRequest).getServletPath();
+        // pathInfo includes the API, resource and ID.
+        doReturn("/API/identity/user/17").when(httpServletRequest).getPathInfo();
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
-        assertThat(result.getApiName()).isEqualTo("portal");
-        assertThat(result.getResourceName()).isEqualTo("custom-page");
-        assertThat(result.getResourceQualifiers().getPart(0)).isEqualTo("API");
-        assertThat(result.getResourceQualifiers().getPart(1)).isEqualTo("avatars");
-        assertThat(result.getResourceQualifiers().getPart(2)).isEqualTo("17");
+        assertThat(result.getApiName()).isEqualTo("identity");
+        assertThat(result.getResourceName()).isEqualTo("user");
+        assertThat(result.getResourceQualifiers().getPart(0)).isEqualTo("17");
+    }
+
+    @Test
+    public void should_parsePath_when_servlet_mapped_to_portal_custom_page_API_avatars_subpath() {
+        // When a servlet is mapped to /portal/custom-page/API/avatars/*,
+        // servletPath includes the full prefix and pathInfo is just the ID.
+        doReturn("/portal/custom-page/API/avatars").when(httpServletRequest).getServletPath();
+        doReturn("/17").when(httpServletRequest).getPathInfo();
+
+        ParsedRestRequestURI result = restRequestURIParser.parse();
+
+        assertThat(result.getApiName()).isEqualTo("API");
+        assertThat(result.getResourceName()).isEqualTo("avatars");
+        assertThat(result.getResourceQualifiers().getPart(0)).isEqualTo("17");
     }
 
     @Test
