@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
 import com.company.pojo.Employee;
-import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingService;
 import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
@@ -78,12 +78,12 @@ public class ConcurrencyIT {
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(
                 new BusinessDataModelRepositoryImpl(mock(PlatformService.class), mock(TenantDependencyService.class),
                         classLoaderService, schemaManager, mock(TenantResourcesService.class),
-                        mock(DataRetentionBdmTrackingRepository.class)));
+                        mock(DataRetentionBdmTrackingService.class)));
         final UserTransactionService transactionService = mock(UserTransactionService.class);
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,
                         configuration.getJpaConfiguration(), classLoaderService,
-                        mock(DataRetentionBdmTrackingRepository.class)));
+                        mock(DataRetentionBdmTrackingService.class)));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
 
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();

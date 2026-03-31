@@ -34,7 +34,7 @@ import javax.transaction.UserTransaction;
 
 import com.company.pojo.Employee;
 import com.company.pojo.Person;
-import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingService;
 import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -56,8 +56,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
 public class JPABusinessDataRepositoryImplIT {
-
-    private static final long TENANT_ID = 54236235L;
 
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
@@ -94,11 +92,11 @@ public class JPABusinessDataRepositoryImplIT {
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(
                 new BusinessDataModelRepositoryImpl(mock(PlatformService.class), mock(TenantDependencyService.class),
                         classLoaderService, schemaManager, mock(TenantResourcesService.class),
-                        mock(DataRetentionBdmTrackingRepository.class)));
+                        mock(DataRetentionBdmTrackingService.class)));
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,
                         configuration.getJpaConfiguration(), classLoaderService,
-                        mock(DataRetentionBdmTrackingRepository.class)));
+                        mock(DataRetentionBdmTrackingService.class)));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
         ut.begin();

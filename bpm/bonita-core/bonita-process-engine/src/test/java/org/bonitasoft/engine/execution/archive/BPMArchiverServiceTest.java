@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
@@ -77,6 +78,8 @@ public class BPMArchiverServiceTest {
     private ActivityInstanceService activityInstanceService;
     @Mock
     private BPMFailureService failureService;
+    @Mock
+    private DataRetentionBdmTrackingService dataRetentionBdmTrackingService;
     @Spy
     @InjectMocks
     private BPMArchiverService bpmArchiverService;
@@ -85,9 +88,16 @@ public class BPMArchiverServiceTest {
     public void archiveProcessInstance_should_archive_SRefBusinessDataInstances() throws Exception {
         final SProcessSimpleRefBusinessDataInstance ref1 = new SProcessSimpleRefBusinessDataInstance();
         ref1.setId(1L); // so that those 3 objects are not considered the same (in the verify)
+        ref1.setDataId(100L);
+        ref1.setDataClassName("com.company.model.Invoice");
         final SProcessSimpleRefBusinessDataInstance ref2 = new SProcessSimpleRefBusinessDataInstance();
         ref2.setId(2L);
+        ref2.setDataId(200L);
+        ref2.setDataClassName("com.company.model.Invoice");
         final SProcessMultiRefBusinessDataInstance ref3 = new SProcessMultiRefBusinessDataInstance();
+        ref3.setId(3L);
+        ref3.setDataIds(Arrays.asList(300L, 301L));
+        ref3.setDataClassName("com.company.model.LineItem");
         List<SRefBusinessDataInstance> sRefBusinessDataInstances = Arrays.asList(ref1, ref2, ref3);
         SProcessInstance processInstance = new SProcessInstance();
         processInstance.setId(451L);
@@ -107,6 +117,13 @@ public class BPMArchiverServiceTest {
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref1);
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref2);
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref3);
+
+        // Verify tracking upsert for simple refs
+        verify(dataRetentionBdmTrackingService).upsert(100L, "com.company.model.Invoice");
+        verify(dataRetentionBdmTrackingService).upsert(200L, "com.company.model.Invoice");
+        // Verify tracking upsert for multi ref (each data ID)
+        verify(dataRetentionBdmTrackingService).upsert(300L, "com.company.model.LineItem");
+        verify(dataRetentionBdmTrackingService).upsert(301L, "com.company.model.LineItem");
     }
 
     @Test

@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +39,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingService;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.SDataRetentionBdmTrackingException;
 import org.bonitasoft.engine.business.data.SchemaManager;
 import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
 import org.bonitasoft.engine.business.data.generator.BDMJarGenerationException;
@@ -70,7 +70,6 @@ import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
-import org.bonitasoft.engine.services.SPersistenceException;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -94,7 +93,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     private final ClassLoaderService classLoaderService;
     private final SchemaManager schemaManager;
     private final TenantResourcesService tenantResourcesService;
-    private final DataRetentionBdmTrackingRepository bdmTrackingRepository;
+    private final DataRetentionBdmTrackingService dataRetentionBdmTrackingService;
 
     @Override
     public byte[] getClientBDMZip() throws SBusinessDataRepositoryException {
@@ -350,9 +349,9 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
      */
     private void deleteAllBdmTracking() throws SBusinessDataRepositoryException {
         try {
-            // Pass empty filter to delete all records without any restriction
-            bdmTrackingRepository.deleteAll(Collections.emptyList());
-        } catch (SPersistenceException e) {
+            // Delete all records without any restriction
+            dataRetentionBdmTrackingService.deleteAll();
+        } catch (SDataRetentionBdmTrackingException e) {
             throw new SBusinessDataRepositoryException(
                     "Failed to delete data retention BDM tracking records during BDM uninstall", e);
         }

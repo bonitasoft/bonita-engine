@@ -1903,7 +1903,7 @@
                 <entry key="hibernate.cache.use_query_cache" value="false" />
             </map>
         </constructor-arg>
-        <constructor-arg name="bdmTrackingRepository" ref="dataRetentionBdmTrackingRepositoryImpl" />
+        <constructor-arg name="dataRetentionBdmTrackingService" ref="dataRetentionBdmTrackingService" />
     </bean>
 
 
@@ -2077,6 +2077,7 @@
         <constructor-arg name="contractDataService" ref="contractDataService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="dataRetentionBdmTrackingService" ref="dataRetentionBdmTrackingService" />
     </bean>
 
 </beans>

@@ -37,6 +37,14 @@ public interface DataRetentionBdmTrackingRepository {
     void create(SDataRetentionBdmTracking tracking) throws SPersistenceException;
 
     /**
+     * Updates the {@code last_modified_at} column of an existing tracking record.
+     *
+     * @param tracking the tracking record whose {@code lastModifiedAt} has been set to the new value
+     * @throws SPersistenceException if the update fails
+     */
+    void updateLastModifiedDate(SDataRetentionBdmTracking tracking) throws SPersistenceException;
+
+    /**
      * Finds a tracking record by BDM object identifier and class name.
      *
      * @param dataId the persistence ID of the tracked BDM object instance

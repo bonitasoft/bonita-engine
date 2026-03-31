@@ -16,6 +16,7 @@ package org.bonitasoft.engine.business.data.impl;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingRepository;
 import org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -25,6 +26,7 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
+import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -37,17 +39,20 @@ import org.springframework.stereotype.Repository;
  * All operations target the Bonita DB (not the Business Data DB).
  */
 @Repository
+@RequiredArgsConstructor
 public class DataRetentionBdmTrackingRepositoryImpl implements DataRetentionBdmTrackingRepository {
 
     private final PersistenceService persistenceService;
 
-    public DataRetentionBdmTrackingRepositoryImpl(PersistenceService persistenceService) {
-        this.persistenceService = persistenceService;
-    }
-
     @Override
     public void create(SDataRetentionBdmTracking tracking) throws SPersistenceException {
         persistenceService.insert(tracking);
+    }
+
+    @Override
+    public void updateLastModifiedDate(SDataRetentionBdmTracking tracking) throws SPersistenceException {
+        persistenceService.update(
+                UpdateDescriptor.buildSetField(tracking, "lastModifiedAt", tracking.getLastModifiedAt()));
     }
 
     @Override

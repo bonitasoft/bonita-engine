@@ -22,6 +22,8 @@ import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingService;
+import org.bonitasoft.engine.business.data.SDataRetentionBdmTrackingException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -69,7 +71,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SARecei
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASendTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubProcessActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
@@ -99,6 +103,7 @@ public class BPMArchiverService {
     private final DataInstanceService dataInstanceService;
     private final ActivityInstanceService activityInstanceService;
     private final BPMFailureService bpmFailureService;
+    private final DataRetentionBdmTrackingService dataRetentionBdmTrackingService;
 
     private static final int BATCH_SIZE = 100;
 
@@ -113,7 +118,8 @@ public class BPMArchiverService {
             ContractDataService contractDataService,
             DataInstanceService dataInstanceService,
             ActivityInstanceService activityInstanceService,
-            BPMFailureService bpmFailureService) {
+            BPMFailureService bpmFailureService,
+            DataRetentionBdmTrackingService dataRetentionBdmTrackingService) {
         this.archiveService = archiveService;
         this.processInstanceService = processInstanceService;
         this.documentService = documentService;
@@ -126,6 +132,7 @@ public class BPMArchiverService {
         this.dataInstanceService = dataInstanceService;
         this.activityInstanceService = activityInstanceService;
         this.bpmFailureService = bpmFailureService;
+        this.dataRetentionBdmTrackingService = dataRetentionBdmTrackingService;
     }
 
     public void archiveAndDeleteProcessInstance(final SProcessInstance processInstance) throws SArchivingException {
@@ -198,10 +205,48 @@ public class BPMArchiverService {
                 i += BATCH_SIZE;
                 for (final SRefBusinessDataInstance sRefBusinessDataInstance : refBusinessDataInstances) {
                     refBusinessDataService.archiveRefBusinessDataInstance(sRefBusinessDataInstance);
+                    upsertTrackingForRefBusinessData(sRefBusinessDataInstance);
                 }
             } while (refBusinessDataInstances.size() == BATCH_SIZE);
         } catch (final SBonitaException e) {
             throw new SArchivingException("Unable to archive RefBusinessDataInstance", e);
+        }
+    }
+
+    /**
+     * Upserts the {@code last_modified_at} timestamp in the {@code data_retention_bdm_tracking}
+     * table for every BDM entity referenced by the given business data instance.
+     * <p>Handles both single-valued references ({@link SSimpleRefBusinessDataInstance})
+     * and multivalued references ({@link SProcessMultiRefBusinessDataInstance}).
+     * References with a {@code null} data ID (unassigned BDM variable) are skipped.
+     */
+    private void upsertTrackingForRefBusinessData(SRefBusinessDataInstance refBusinessDataInstance)
+            throws SDataRetentionBdmTrackingException {
+        String dataClassname = refBusinessDataInstance.getDataClassName();
+        if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance simpleRef) {
+            Long dataId = simpleRef.getDataId();
+            if (dataId != null) {
+                dataRetentionBdmTrackingService.upsert(dataId, dataClassname);
+            } else {
+                log.warn("Data id is null for SSimpleRefBusinessDataInstance with name {}, " +
+                        "cannot update tracking for business data with class name {}",
+                        simpleRef.getName(), dataClassname);
+            }
+        } else if (refBusinessDataInstance instanceof SProcessMultiRefBusinessDataInstance multiRef) {
+            for (Long dataId : multiRef.getDataIds()) {
+                if (dataId != null) {
+                    dataRetentionBdmTrackingService.upsert(dataId, dataClassname);
+                } else {
+                    log.warn("Data id is null for SProcessMultiRefBusinessDataInstance with name {}, " +
+                            "cannot update tracking for business data with class name {}",
+                            multiRef.getName(), dataClassname);
+                }
+            }
+        } else {
+            // Should never happen
+            log.warn("Unknown type of SRefBusinessDataInstance {}, " +
+                    "cannot update tracking for business data with id {} and class name {}",
+                    refBusinessDataInstance.getClass().getName(), refBusinessDataInstance.getId(), dataClassname);
         }
     }
 
