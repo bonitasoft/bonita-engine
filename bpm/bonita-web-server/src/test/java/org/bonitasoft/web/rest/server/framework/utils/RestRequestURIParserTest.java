@@ -220,9 +220,9 @@ public class RestRequestURIParserTest {
     public void should_parsePath_when_servlet_mapped_to_specific_API_subpath() {
         // When a servlet is mapped to a specific sub-path like /API/avatars/*,
         // servletPath = "/API/avatars" and pathInfo = "/17" (just the ID).
+        // "API" must be included as apiName to match permission entry "GET|API/avatars".
         doReturn("/API/avatars").when(httpServletRequest).getServletPath();
         doReturn("/17").when(httpServletRequest).getPathInfo();
-        // "API" must be included as apiName to match permission entry "GET|API/avatars".
 
         ParsedRestRequestURI result = restRequestURIParser.parse();
 
