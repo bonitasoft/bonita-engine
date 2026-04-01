@@ -19,9 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.console.common.server.page.CustomPageService;
-import org.bonitasoft.console.common.server.utils.BPMEngineException;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.FormsResourcesUtils;
 import org.bonitasoft.console.common.server.utils.PlatformManagementUtils;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
@@ -29,7 +27,6 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -98,16 +95,6 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
             final ProcessDefinition deployedArchive = engineClient.deploy(businessArchive);
             final ProcessDeploymentInfo processDeploymentInfo = engineClient
                     .getProcessDeploymentInfo(deployedArchive.getId());
-
-            try {
-                FormsResourcesUtils.retrieveApplicationFiles(
-                        getEngineSession(),
-                        processDeploymentInfo.getProcessId(),
-                        processDeploymentInfo.getDeploymentDate());
-            } catch (IOException | ProcessDefinitionNotFoundException | BPMEngineException e) {
-                throw new APIException("", e);
-            }
-
             return convertEngineToConsoleItem(processDeploymentInfo);
         } finally {
             getTenantFolder().removeUploadedTempContent(process.getAttributes().get(FILE_UPLOAD));
@@ -183,7 +170,6 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
     public void delete(final List<APIID> ids) {
         for (final APIID id : ids) {
             removeProcessPagesFromHome(id);
-            FormsResourcesUtils.removeApplicationFiles(getEngineSession(), id.toLong());
         }
         final ProcessEngineClient engineClient = getProcessEngineClient();
         engineClient.deleteDisabledProcesses(APIID.toLongList(ids));
