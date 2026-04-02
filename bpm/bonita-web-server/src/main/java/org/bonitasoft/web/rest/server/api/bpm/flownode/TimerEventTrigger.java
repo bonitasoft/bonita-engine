@@ -13,5 +13,4 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
-public record TimerEventTrigger(Long executionDate) {
-}
+public record TimerEventTrigger(Long executionDate) {}

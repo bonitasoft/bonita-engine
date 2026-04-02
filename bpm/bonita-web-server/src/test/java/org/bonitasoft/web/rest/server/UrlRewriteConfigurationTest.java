@@ -102,6 +102,5 @@ class UrlRewriteConfigurationTest {
         return null;
     }
 
-    private record UrlRewriteRule(String from, String to) {
-    }
+    private record UrlRewriteRule(String from, String to) {}
 }

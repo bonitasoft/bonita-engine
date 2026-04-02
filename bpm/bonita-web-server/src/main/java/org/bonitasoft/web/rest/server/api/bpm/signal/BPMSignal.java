@@ -16,5 +16,4 @@ package org.bonitasoft.web.rest.server.api.bpm.signal;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record BPMSignal(String name) {
-}
+public record BPMSignal(String name) {}

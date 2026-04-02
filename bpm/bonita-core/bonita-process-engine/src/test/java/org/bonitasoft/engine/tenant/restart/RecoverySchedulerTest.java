@@ -55,7 +55,8 @@ class RecoverySchedulerTest {
 
     @Test
     void should_catch_exception_on_error_during_call_of_isResponsibleForRecovery() {
-        when(singleNodeTaskCoordinator.isResponsibleForTask(SingleNodeTaskCoordinator.TASK_RECOVERY)).thenThrow(new IllegalStateException("BAD"));
+        when(singleNodeTaskCoordinator.isResponsibleForTask(SingleNodeTaskCoordinator.TASK_RECOVERY))
+                .thenThrow(new IllegalStateException("BAD"));
 
         recoveryScheduler.triggerRecoveryOfAllElements();
 

@@ -151,9 +151,9 @@ class UserTaskExecutionControllerTest extends AbstractControllerTest<UserTaskExe
                         .sessionAttrs(sessionAttributes)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"key\": \"value\"}"))
-                        // Note: Exception response format in MockMvc may differ from runtime,
-                        // so we only verify the status code as per the conversion guide's recommendation
-                        .andExpect(status().isBadRequest()));
+                // Note: Exception response format in MockMvc may differ from runtime,
+                // so we only verify the status code as per the conversion guide's recommendation
+                .andExpect(status().isBadRequest()));
 
         assertThat(log).containsPattern("INFO.*\nExplanations:\nfirst explanation\nsecond explanation");
     }

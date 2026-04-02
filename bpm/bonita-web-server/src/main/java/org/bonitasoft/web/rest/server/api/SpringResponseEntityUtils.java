@@ -31,6 +31,5 @@ public class SpringResponseEntityUtils {
         return generateErrorResponse(exception.getClass().getName(), status, exception.getMessage());
     }
 
-    public record ResponseError(String exception, String message) {
-    }
+    public record ResponseError(String exception, String message) {}
 }

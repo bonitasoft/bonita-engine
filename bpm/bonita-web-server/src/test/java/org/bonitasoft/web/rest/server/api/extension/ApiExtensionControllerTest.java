@@ -89,8 +89,8 @@ class ApiExtensionControllerTest extends AbstractControllerTest<ApiExtensionCont
         when(restApiRenderer.handleRestApiCall(any(), any())).thenReturn(null);
 
         mockMvc.perform(get(API_URL)
-                        .sessionAttrs(sessionAttributes)
-                        .accept(MediaType.APPLICATION_JSON))
+                .sessionAttrs(sessionAttributes)
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -99,8 +99,8 @@ class ApiExtensionControllerTest extends AbstractControllerTest<ApiExtensionCont
         when(restApiRenderer.handleRestApiCall(any(), any())).thenThrow(new BonitaException("error message"));
 
         mockMvc.perform(get(API_URL)
-                        .sessionAttrs(sessionAttributes)
-                        .accept(MediaType.APPLICATION_JSON))
+                .sessionAttrs(sessionAttributes)
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
