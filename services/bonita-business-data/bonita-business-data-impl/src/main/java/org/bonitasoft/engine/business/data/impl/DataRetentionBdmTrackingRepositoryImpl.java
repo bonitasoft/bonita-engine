@@ -74,6 +74,31 @@ public class DataRetentionBdmTrackingRepositoryImpl implements DataRetentionBdmT
     }
 
     @Override
+    public List<SDataRetentionBdmTracking> getExpiredByCreatedDate(String dataClassname, long deadline)
+            throws SBonitaReadException {
+        return persistenceService.selectList(new SelectListDescriptor<>(
+                "getExpiredTrackingByClassnameAndCreatedAt",
+                Map.of("dataClassname", dataClassname, "deadline", deadline),
+                SDataRetentionBdmTracking.class,
+                QueryOptions.ALL_RESULTS));
+    }
+
+    @Override
+    public List<SDataRetentionBdmTracking> getExpiredByLastModifiedDate(String dataClassname, long deadline)
+            throws SBonitaReadException {
+        return persistenceService.selectList(new SelectListDescriptor<>(
+                "getExpiredTrackingByClassnameAndLastModifiedAt",
+                Map.of("dataClassname", dataClassname, "deadline", deadline),
+                SDataRetentionBdmTracking.class,
+                QueryOptions.ALL_RESULTS));
+    }
+
+    @Override
+    public void delete(SDataRetentionBdmTracking tracking) throws SPersistenceException {
+        persistenceService.delete(tracking);
+    }
+
+    @Override
     public void deleteAll(List<FilterOption> filterOptions) throws SPersistenceException {
         persistenceService.deleteAll(SDataRetentionBdmTracking.class, filterOptions);
     }

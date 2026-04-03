@@ -15,4 +15,16 @@
     WHERE t.dataClassname = :dataClassname
   </query>
 
+  <query name="getExpiredTrackingByClassnameAndCreatedAt">
+    SELECT t
+    FROM org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking AS t
+    WHERE t.dataClassname = :dataClassname AND t.createdAt &lt;= :deadline
+  </query>
+
+  <query name="getExpiredTrackingByClassnameAndLastModifiedAt">
+    SELECT t
+    FROM org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking AS t
+    WHERE t.dataClassname = :dataClassname AND t.lastModifiedAt &lt;= :deadline
+  </query>
+
 </hibernate-mapping>

@@ -64,6 +64,38 @@ public interface DataRetentionBdmTrackingRepository {
     List<SDataRetentionBdmTracking> getByClassname(String dataClassname) throws SBonitaReadException;
 
     /**
+     * Returns all tracking records for the given BDM class name whose creation date
+     * is at or before the specified deadline.
+     *
+     * @param dataClassname the fully qualified class name of the BDM object type
+     * @param deadline epoch timestamp (milliseconds) — records with {@code createdAt <= deadline} are returned
+     * @return the list of expired tracking records, or an empty list if none found
+     * @throws SBonitaReadException if the read operation fails
+     */
+    List<SDataRetentionBdmTracking> getExpiredByCreatedDate(String dataClassname, long deadline)
+            throws SBonitaReadException;
+
+    /**
+     * Returns all tracking records for the given BDM class name whose last modification date
+     * is at or before the specified deadline.
+     *
+     * @param dataClassname the fully qualified class name of the BDM object type
+     * @param deadline epoch timestamp (milliseconds) — records with {@code lastModifiedAt <= deadline} are returned
+     * @return the list of expired tracking records, or an empty list if none found
+     * @throws SBonitaReadException if the read operation fails
+     */
+    List<SDataRetentionBdmTracking> getExpiredByLastModifiedDate(String dataClassname, long deadline)
+            throws SBonitaReadException;
+
+    /**
+     * Deletes a single tracking record.
+     *
+     * @param tracking the tracking record to delete
+     * @throws SPersistenceException if the delete operation fails
+     */
+    void delete(SDataRetentionBdmTracking tracking) throws SPersistenceException;
+
+    /**
      * Deletes all tracking records matching the given filter options.
      *
      * @param filterOptions the filter criteria to restrict the deletion.
