@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -136,6 +135,41 @@ class DataRetentionBdmTrackingServiceImplTest {
         assertThatThrownBy(() -> service.updateLastModifiedDate(5L))
                 .isInstanceOf(SDataRetentionBdmTrackingException.class)
                 .hasMessageContaining("Failed to update BDM tracking record")
+                .hasCauseInstanceOf(SPersistenceException.class);
+    }
+
+    @Test
+    void delete_should_delegate_to_repository() throws Exception {
+        //given
+        when(bdmTrackingRepository.delete(42L, "com.example.Invoice")).thenReturn(1);
+
+        //when
+        service.delete(42L, "com.example.Invoice");
+
+        //then
+        verify(bdmTrackingRepository).delete(42L, "com.example.Invoice");
+    }
+
+    @Test
+    void delete_should_not_fail_when_no_record_found() throws Exception {
+        //given
+        when(bdmTrackingRepository.delete(42L, "com.example.Invoice")).thenReturn(0);
+
+        //when-then — should not throw
+        assertThatNoException().isThrownBy(() -> service.delete(42L, "com.example.Invoice"));
+        verify(bdmTrackingRepository).delete(42L, "com.example.Invoice");
+    }
+
+    @Test
+    void delete_should_wrap_persistence_exception() throws Exception {
+        //given
+        when(bdmTrackingRepository.delete(42L, "com.example.Invoice"))
+                .thenThrow(new SPersistenceException("DB error"));
+
+        //when-then
+        assertThatThrownBy(() -> service.delete(42L, "com.example.Invoice"))
+                .isInstanceOf(SDataRetentionBdmTrackingException.class)
+                .hasMessageContaining("Failed to delete data retention tracking record")
                 .hasCauseInstanceOf(SPersistenceException.class);
     }
 

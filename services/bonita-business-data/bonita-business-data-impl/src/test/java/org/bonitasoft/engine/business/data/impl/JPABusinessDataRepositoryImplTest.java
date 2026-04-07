@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -407,6 +405,68 @@ class JPABusinessDataRepositoryImplTest {
         //when/then
         assertThatExceptionOfType(SRetryableException.class)
                 .isThrownBy(() -> repository.remove(new Address(12)));
+    }
+
+    @Test
+    void remove_should_delete_tracking_record() throws SBonitaException {
+        //given
+        var entity = new EntityPojo(42L);
+
+        //when
+        repository.remove(entity);
+
+        //then
+        verify(manager).remove(entity);
+        verify(bdmTrackingService).delete(42L, EntityPojo.class.getName());
+    }
+
+    @Test
+    void remove_null_entity_should_not_delete_tracking_record() throws SBonitaException {
+        //when
+        repository.remove(null);
+
+        //then
+        verify(manager, never()).remove(any());
+        verify(bdmTrackingService, never()).delete(anyLong(), anyString());
+    }
+
+    @Test
+    void remove_entity_without_id_should_not_delete_tracking_record() throws SBonitaException {
+        //given
+        var entity = new EntityPojo(); // persistenceId == null
+
+        //when
+        repository.remove(entity);
+
+        //then
+        verify(manager, never()).remove(any());
+        verify(bdmTrackingService, never()).delete(anyLong(), anyString());
+    }
+
+    @Test
+    void remove_should_not_fail_when_tracking_deletion_fails_with_checked_exception() throws SBonitaException {
+        //given
+        var entity = new EntityPojo(42L);
+        doThrow(new SDataRetentionBdmTrackingException("DB error"))
+                .when(bdmTrackingService).delete(anyLong(), anyString());
+
+        //when-then — should not throw
+        assertThatNoException().isThrownBy(() -> repository.remove(entity));
+        // entity was still removed
+        verify(manager).remove(entity);
+    }
+
+    @Test
+    void remove_should_not_fail_when_tracking_deletion_fails_with_runtime_exception() throws SBonitaException {
+        //given
+        var entity = new EntityPojo(42L);
+        doThrow(new RuntimeException("unexpected error"))
+                .when(bdmTrackingService).delete(anyLong(), anyString());
+
+        //when-then — should not throw
+        assertThatNoException().isThrownBy(() -> repository.remove(entity));
+        // entity was still removed
+        verify(manager).remove(entity);
     }
 
     @Test

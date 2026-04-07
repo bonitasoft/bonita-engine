@@ -58,6 +58,17 @@ public interface DataRetentionBdmTrackingService {
     void updateLastModifiedDate(long id) throws SDataRetentionBdmTrackingException;
 
     /**
+     * Deletes the tracking record for a specific BDM entity instance.
+     * If no tracking record exists (e.g. the entity was created before the tracking
+     * feature was deployed), this method does nothing.
+     *
+     * @param dataId the persistence ID of the BDM entity
+     * @param dataClassname the fully qualified Java class name of the BDM entity
+     * @throws SDataRetentionBdmTrackingException if the delete fails
+     */
+    void delete(long dataId, String dataClassname) throws SDataRetentionBdmTrackingException;
+
+    /**
      * Deletes <b>ALL</b> tracking records.
      *
      * @throws SDataRetentionBdmTrackingException if the delete operation fails

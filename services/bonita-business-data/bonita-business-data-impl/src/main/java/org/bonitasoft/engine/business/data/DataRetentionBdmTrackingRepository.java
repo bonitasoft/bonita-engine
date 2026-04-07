@@ -96,6 +96,16 @@ public interface DataRetentionBdmTrackingRepository {
     void delete(SDataRetentionBdmTracking tracking) throws SPersistenceException;
 
     /**
+     * Deletes the tracking record matching the unique key ({@code dataId}, {@code dataClassname}).
+     *
+     * @param dataId the persistence ID of the tracked BDM object instance
+     * @param dataClassname the fully qualified class name of the BDM object type
+     * @return the number of rows deleted (0 if no matching record was found, 1 otherwise)
+     * @throws SPersistenceException if the delete operation fails
+     */
+    int delete(long dataId, String dataClassname) throws SPersistenceException;
+
+    /**
      * Deletes all tracking records matching the given filter options.
      *
      * @param filterOptions the filter criteria to restrict the deletion.

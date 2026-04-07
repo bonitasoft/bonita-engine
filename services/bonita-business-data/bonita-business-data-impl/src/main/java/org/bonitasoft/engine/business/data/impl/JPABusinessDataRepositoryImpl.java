@@ -412,12 +412,36 @@ public class JPABusinessDataRepositoryImpl
     @Override
     public void remove(final Entity entity) {
         if (entity != null && entity.getPersistenceId() != null) {
+            log.trace("Removing entity of type {} with id {}", entity.getClass().getName(), entity.getPersistenceId());
             final EntityManager em = getEntityManager();
             try {
                 em.remove(entity);
+                // Delete the tracking record linked to the removed BDM entity in the Bonita DB
+                deleteTrackingRecord(entity.getPersistenceId(), entity.getClass().getName());
             } catch (final PersistenceException e) {
                 throw new SRetryableException(e);
             }
+        } else {
+            log.trace("Entity is null or has null id, nothing to remove");
+        }
+    }
+
+    /**
+     * Deletes the data retention tracking record associated with a removed BDM entity.
+     * <p>
+     * Unlike {@link #trackCreation} and {@link #trackUpdate}, failures are logged
+     * but do not roll back the transaction — the BDM entity removal takes priority.
+     * Any orphan tracking record will be cleaned up later by the data retention job.
+     */
+    private void deleteTrackingRecord(long entityId, String entityClassname) {
+        log.debug("Deleting data retention tracking record for removed BDM entity {}#{}", entityClassname, entityId);
+        try {
+            dataRetentionBdmTrackingService.delete(entityId, entityClassname);
+        } catch (Exception e) {
+            // Ignore exceptions because the BDM entity is already removed, and we don't want to roll back that
+            // removal if tracking deletion fails. The orphan tracking record will be cleaned up later by the data
+            // retention cleanup job.
+            log.warn("Failed to delete data retention tracking record for {}#{}", entityClassname, entityId, e);
         }
     }
 

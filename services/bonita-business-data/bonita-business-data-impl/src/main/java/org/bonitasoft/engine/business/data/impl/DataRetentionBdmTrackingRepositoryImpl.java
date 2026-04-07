@@ -99,6 +99,12 @@ public class DataRetentionBdmTrackingRepositoryImpl implements DataRetentionBdmT
     }
 
     @Override
+    public int delete(long dataId, String dataClassname) throws SPersistenceException {
+        return persistenceService.update("deleteDataRetentionBdmTrackingByDataIdAndClassname",
+                Map.of("dataId", dataId, "dataClassname", dataClassname));
+    }
+
+    @Override
     public void deleteAll(List<FilterOption> filterOptions) throws SPersistenceException {
         persistenceService.deleteAll(SDataRetentionBdmTracking.class, filterOptions);
     }

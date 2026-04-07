@@ -86,6 +86,19 @@ public class DataRetentionBdmTrackingServiceImpl implements DataRetentionBdmTrac
     }
 
     @Override
+    public void delete(long dataId, String dataClassname) throws SDataRetentionBdmTrackingException {
+        try {
+            int rowsDeleted = bdmTrackingRepository.delete(dataId, dataClassname);
+            if (rowsDeleted == 0) {
+                log.debug("No tracking record found for {}#{}, nothing to delete", dataClassname, dataId);
+            }
+        } catch (SPersistenceException e) {
+            throw new SDataRetentionBdmTrackingException(
+                    "Failed to delete data retention tracking record for " + dataClassname + "#" + dataId, e);
+        }
+    }
+
+    @Override
     public void deleteAll() throws SDataRetentionBdmTrackingException {
         try {
             bdmTrackingRepository.deleteAll(Collections.emptyList());
