@@ -1019,7 +1019,7 @@ CREATE TABLE data_retention_config (
     created_at          INT8 NOT NULL,
     updated_at          INT8 NOT NULL,
     CONSTRAINT pk_data_retention_config PRIMARY KEY (id),
-    CONSTRAINT uk_data_retention_config_classname UNIQUE (data_classname)
+    CONSTRAINT uk_data_retention_config_data_classname UNIQUE (data_classname)
 );
 
 CREATE TABLE data_retention_bdm_tracking (
