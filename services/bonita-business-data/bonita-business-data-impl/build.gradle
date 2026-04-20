@@ -24,7 +24,9 @@ dependencies {
     api libs.aspectjWeaver
 
     testImplementation libs.assertj
-    testImplementation libs.jsonUnit
+    testImplementation(libs.jsonUnit) {
+        exclude(group: "org.slf4j", module: "slf4j-api")
+    }
     testImplementation libs.mockitoCore
     testImplementation libs.mockitoJunitJupiter
     testImplementation libs.logback
