@@ -72,7 +72,7 @@ class Deps {
     // subscription/bpm/bonita-web-server-sp package org.bonitasoft.console.common.server.auth.impl
     public static String keycloakVersion = "21.1.2"
     public static String xmlsecVersion = "2.2.6"
-    public static String bouncyCastleVersion = "1.83"
+    public static String bouncyCastleVersion = "1.84"
     public static String spnegoVersion = "1.1.1"
     public static String owaspHTMLSanitizerVersion = "20260102.1"
 
