@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2026 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,26 +22,20 @@ import org.hibernate.proxy.HibernateProxy;
 import org.junit.Test;
 
 /**
- * Test class demonstrating the HibernateProxy serialization bug.
+ * Verifies JSON serialization behavior for BDM entities when Hibernate returns
+ * {@link HibernateProxy} instances for relationships or top-level entities.
  * <p>
- * When a BDM entity has a @OneToOne(optional=true, fetch=FetchType.EAGER) child relationship,
- * and Hibernate returns a proxy for the child entity, the JSON serialization produces
- * an empty object {} instead of the actual entity fields.
- * <p>
- * Root cause: {@link org.bonitasoft.engine.business.data.impl.jackson.EntityBeanSerializerModifier#changeProperties}
- * returns an empty property list when the bean is a HibernateProxy.
+ * Initialized proxies are unwrapped so their fields serialize as if they were real entities,
+ * while uninitialized proxies remain opaque to avoid triggering lazy loading.
  */
-public class HibernateProxySerializationBugTest {
+public class HibernateProxySerializationTest {
 
     private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
 
     private final JsonBusinessDataSerializerImpl serializer = new JsonBusinessDataSerializerImpl();
 
     /**
-     * When a child entity is a HibernateProxy, it should serialize with all its fields.
-     * <p>
-     * This test will FAIL until the bug is fixed, demonstrating that HibernateProxy
-     * child entities are incorrectly serialized as empty objects {}.
+     * An initialized {@link HibernateProxy} child entity serializes with all its fields.
      */
     @Test
     public void serializeEntity_should_include_child_fields_when_child_is_hibernate_proxy() throws Exception {
@@ -64,7 +58,7 @@ public class HibernateProxySerializationBugTest {
     }
 
     /**
-     * BASELINE: When a child entity is NOT a HibernateProxy, serialization works correctly.
+     * A non-proxy child entity serializes with all its fields.
      */
     @Test
     public void serializeEntity_should_include_all_fields_when_child_is_not_proxy() throws Exception {
@@ -86,9 +80,8 @@ public class HibernateProxySerializationBugTest {
     }
 
     /**
-     * WORKAROUND: If we unwrap the HibernateProxy before serialization, we get the correct result.
-     * <p>
-     * This demonstrates that the fix should unwrap proxies during serialization.
+     * Manually unwrapping a {@link HibernateProxy} before serialization produces the
+     * same result as letting the serializer unwrap it.
      */
     @Test
     public void serializeEntity_should_include_all_fields_when_proxy_is_manually_unwrapped() throws Exception {
@@ -114,10 +107,7 @@ public class HibernateProxySerializationBugTest {
     }
 
     /**
-     * Serializing a HibernateProxy entity directly should include all its fields.
-     * <p>
-     * This test will FAIL until the bug is fixed, demonstrating that HibernateProxy
-     * entities are incorrectly serialized as empty objects {}.
+     * A top-level {@link HibernateProxy} entity serializes with all its fields.
      */
     @Test
     public void serializeEntity_should_include_all_fields_when_entity_is_hibernate_proxy() throws Exception {
