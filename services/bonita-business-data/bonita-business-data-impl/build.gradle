@@ -26,6 +26,7 @@ dependencies {
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    testImplementation "net.javacrumbs.json-unit:json-unit-assertj:${Deps.jsonUnitVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testImplementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"

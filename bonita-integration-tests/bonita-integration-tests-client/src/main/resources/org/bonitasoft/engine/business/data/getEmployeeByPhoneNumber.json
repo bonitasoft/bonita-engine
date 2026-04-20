@@ -13,7 +13,20 @@
       "123456789"
     ],
     "addresses": [
-      {}
+      {
+        "persistenceId": 2,
+        "persistenceVersion": 0,
+        "persistenceId_string": "2",
+        "persistenceVersion_string": "0",
+        "street": "32, rue Gustave Eiffel",
+        "city": "Grenoble",
+        "links": [
+          {
+            "rel": "country",
+            "href": "/businessdata/com.company.model.Address/2/country"
+          }
+        ]
+      }
     ],
     "dog": null,
     "links": [
