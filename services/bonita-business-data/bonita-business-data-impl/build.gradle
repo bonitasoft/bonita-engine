@@ -21,6 +21,7 @@ dependencies {
 
     testImplementation libs.assertj
     testImplementation libs.jsonUnitFluent
+    testImplementation libs.jsonUnitAssertj
     testImplementation libs.mockitoCore
     testImplementation libs.mockitoJunitJupiter
     testImplementation libs.logback
