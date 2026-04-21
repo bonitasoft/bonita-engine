@@ -46,7 +46,6 @@ import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.server.login.LoginFailureTracker;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
