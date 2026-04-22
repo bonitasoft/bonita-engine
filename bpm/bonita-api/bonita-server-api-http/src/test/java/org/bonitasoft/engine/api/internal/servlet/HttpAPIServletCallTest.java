@@ -266,6 +266,55 @@ public class HttpAPIServletCallTest {
         assertThat(content).doesNotContain("Invalid request");
     }
 
+    @Test
+    public void should_write_empty_body_when_output_object_is_null() throws Exception {
+        // BPA-443 defence-in-depth: output(Object) is the sibling of output(String) and
+        // carries the same null hazard — object.toString() NPEs if object is null. Same guard.
+        // given:
+        MockHttpServletRequest request = MockMvcRequestBuilders
+                .post("http://localhost/serverAPI/org.bonitasoft.engine.api.LoginAPI/logout")
+                .buildRequest(new MockServletContext());
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HttpAPIServletCall httpAPIServletCall = new HttpAPIServletCall(request, response);
+
+        // when:
+        httpAPIServletCall.output((Object) null);
+
+        // then:
+        assertThat(response.getContentAsString())
+                .as("Null Object must produce empty body, not NPE or literal \"null\"")
+                .isEmpty();
+    }
+
+    @Test
+    public void should_write_empty_body_when_server_api_returns_null_for_void_method() throws Exception {
+        // BPA-443: when a void API method is invoked (e.g. logout, retryTask), the server-side
+        // invokeMethod returns null. Writing "null" via PrintWriter.print(null) yields an NPE
+        // inside response wrappers that track content length (e.g. Spring Session's
+        // SaveContextPrintWriter). Guard against this at the source: null → empty body.
+        // given:
+        MockHttpServletRequest request = MockMvcRequestBuilders
+                .post("http://localhost/serverAPI/com.bonitasoft.engine.api.LoginAPI/logout")
+                .param("options", "<object-stream><map/></object-stream>")
+                .buildRequest(new MockServletContext());
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        HttpAPIServletCall httpAPIServletCall = spy(new HttpAPIServletCall(request, response));
+        ServerAPI serverAPI = mock(ServerAPI.class);
+        doReturn(serverAPI).when(httpAPIServletCall).getServerAPI();
+        when(serverAPI.invokeMethod(any(), any(), any(), any(), any())).thenReturn(null);
+
+        // when:
+        httpAPIServletCall.doPost();
+
+        // then:
+        assertThat(response.getStatus()).as("Response status").isEqualTo(200);
+        assertThat(response.getContentAsString())
+                .as("Response body for void method must be empty, not the literal string \"null\"")
+                .isEmpty();
+    }
+
     // =================================================================================================================
     // UTILS
     // =================================================================================================================
