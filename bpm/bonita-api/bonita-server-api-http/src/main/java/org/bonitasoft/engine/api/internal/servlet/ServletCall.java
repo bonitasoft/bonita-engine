@@ -351,7 +351,12 @@ public abstract class ServletCall {
      */
     protected final void output(final String string) {
         final PrintWriter outputWriter = getOutputWriter();
-        outputWriter.print(string);
+        // Skip the write on null rather than letting PrintWriter.print(null) emit the literal "null":
+        // wrapping response writers that track content length (e.g. Spring Session's
+        // SaveContextPrintWriter via OnCommittedResponseWrapper.trackContentLength) NPE on that path (BPA-443)
+        if (string != null) {
+            outputWriter.print(string);
+        }
         outputWriter.flush();
         outputWriter.close();
     }
@@ -366,7 +371,10 @@ public abstract class ServletCall {
         final PrintWriter outputWriter = getOutputWriter();
         // FIXME use xstream
 
-        outputWriter.print(object.toString());
+        // Skip on null: object.toString() would NPE. Symmetric with output(String)
+        if (object != null) {
+            outputWriter.print(object.toString());
+        }
         outputWriter.flush();
         outputWriter.close();
     }
