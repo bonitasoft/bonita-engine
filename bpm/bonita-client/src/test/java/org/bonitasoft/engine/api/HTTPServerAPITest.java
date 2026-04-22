@@ -62,6 +62,22 @@ public class HTTPServerAPITest {
         httpServerAPI = new HTTPServerAPI(map);
     }
 
+    /**
+     * BPA-443: locks down the wire-format tolerance for void engine HTTP API methods.
+     * Both wire shapes produced by server versions past and present must deserialize to
+     * null on the client — otherwise a server change between "null" and "" would break
+     * the client silently.
+     */
+    @Test
+    public void should_return_null_for_empty_and_null_literal_response_body() throws Throwable {
+        assertThat(httpServerAPI.checkInvokeMethodReturn(""))
+                .as("Empty body (current server wire shape for void methods)").isNull();
+        assertThat(httpServerAPI.checkInvokeMethodReturn("null"))
+                .as("Literal \"null\" body (legacy server wire shape for void methods)").isNull();
+        assertThat(httpServerAPI.checkInvokeMethodReturn(null))
+                .as("Null response (defensive)").isNull();
+    }
+
     @Test
     public void should_have_max_connections_configured() throws Exception {
         Field httpclient = httpServerAPI.getClass().getDeclaredField("httpclient");
