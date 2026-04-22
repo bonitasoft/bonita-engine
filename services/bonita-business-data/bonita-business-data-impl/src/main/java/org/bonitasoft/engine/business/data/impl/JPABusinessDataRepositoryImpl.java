@@ -410,6 +410,20 @@ public class JPABusinessDataRepositoryImpl
     }
 
     @Override
+    public int executeUpdate(String jpqlQuery, Map<String, Object> parameters) {
+        final EntityManager em = getEntityManager();
+        try {
+            var query = em.createQuery(jpqlQuery);
+            for (var entry : parameters.entrySet()) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
+            return query.executeUpdate();
+        } catch (final PersistenceException e) {
+            throw new SRetryableException("Failed to execute JPQL update", e);
+        }
+    }
+
+    @Override
     public void remove(final Entity entity) {
         if (entity != null && entity.getPersistenceId() != null) {
             log.trace("Removing entity of type {} with id {}", entity.getClass().getName(), entity.getPersistenceId());

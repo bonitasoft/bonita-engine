@@ -32,4 +32,10 @@
     FROM org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking AS t
     WHERE t.dataId = :dataId AND t.dataClassname = :dataClassname
   </query>
+
+  <query name="deleteDataRetentionBdmTrackingByDataIdsAndClassname">
+    DELETE
+    FROM org.bonitasoft.engine.business.data.model.SDataRetentionBdmTracking AS t
+    WHERE t.dataId IN (:dataIds) AND t.dataClassname = :dataClassname
+  </query>
 </hibernate-mapping>
