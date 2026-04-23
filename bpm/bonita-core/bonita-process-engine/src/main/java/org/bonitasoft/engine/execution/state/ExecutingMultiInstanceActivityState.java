@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -41,6 +42,7 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class ExecutingMultiInstanceActivityState implements FlowNodeState {
 
@@ -100,12 +102,13 @@ public class ExecutingMultiInstanceActivityState implements FlowNodeState {
             }
 
             final SMultiInstanceActivityInstance parentMultiInstance = (SMultiInstanceActivityInstance) parentInstance;
+            final String stateCategory;
             if (childInstance.isAborting() || childInstance.isCanceling()) {
-                // TODO add synchronization
                 activityInstanceService.addMultiInstanceNumberOfTerminatedActivities(parentMultiInstance, 1);
+                stateCategory = "terminated";
             } else {
-                // TODO add synchronization
                 activityInstanceService.addMultiInstanceNumberOfCompletedActivities(parentMultiInstance, 1);
+                stateCategory = "completed";
                 // check the completionCondition
                 final SExpression completionCondition = loopCharacteristics.getCompletionCondition();
                 final Map<String, Object> input = new HashMap<>(1);
@@ -132,11 +135,15 @@ public class ExecutingMultiInstanceActivityState implements FlowNodeState {
                     }
                 }
             }
-
             final int numberOfActiveInstances = parentMultiInstance.getNumberOfActiveInstances();
             final int numberOfCompletedInstances = parentMultiInstance.getNumberOfCompletedInstances();
             final int numberOfTerminatedInstances = parentMultiInstance.getNumberOfTerminatedInstances();
             final int numberOfInstances = parentMultiInstance.getNumberOfInstances();
+            log.debug("Multi-instance {} after child '{}' (id={}) notification ({}): "
+                    + "active={}, completed+terminated={}/{}",
+                    parentMultiInstance, childInstance.getName(), childInstance.getId(),
+                    stateCategory, numberOfActiveInstances,
+                    numberOfCompletedInstances + numberOfTerminatedInstances, numberOfInstances);
             if (parentMultiInstance.isSequential()) {
                 // only instantiate when we are in sequence
                 List<SFlowNodeInstance> createInnerInstances = null;
@@ -149,7 +156,7 @@ public class ExecutingMultiInstanceActivityState implements FlowNodeState {
                     }
                 }
                 return numberOfActiveInstances == 0
-                        && (createInnerInstances == null || createInnerInstances.size() == 0);
+                        && (createInnerInstances == null || createInnerInstances.isEmpty());
             }
             return numberOfActiveInstances == 0
                     || numberOfInstances == numberOfCompletedInstances + numberOfTerminatedInstances;
