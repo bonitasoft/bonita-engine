@@ -15,7 +15,9 @@ package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -24,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
@@ -466,6 +469,66 @@ class JPABusinessDataRepositoryImplTest {
         //when-then — should not throw
         assertThatNoException().isThrownBy(() -> repository.remove(entity));
         // entity was still removed
+        verify(manager).remove(entity);
+    }
+
+    @Test
+    void removeById_should_remove_entity_and_delete_tracking_record() throws Exception {
+        //given
+        var entity = new EntityPojo(42L);
+        var entityGraph = mock(EntityGraph.class);
+        doReturn(entityGraph).when(manager).createEntityGraph(EntityPojo.class);
+        var expectedHints = Map.<String, Object> of("javax.persistence.fetchgraph", entityGraph);
+        when(manager.find(EntityPojo.class, 42L, expectedHints)).thenReturn(entity);
+
+        //when
+        var removed = repository.removeById(EntityPojo.class, 42L);
+
+        //then
+        assertThat(removed).isSameAs(entity);
+        verify(manager).find(EntityPojo.class, 42L, expectedHints);
+        verify(manager).remove(entity);
+        verify(bdmTrackingService).delete(42L, EntityPojo.class.getName());
+    }
+
+    @Test
+    void removeById_should_throw_when_entity_not_found() {
+        //given
+        var entityGraph = mock(EntityGraph.class);
+        doReturn(entityGraph).when(manager).createEntityGraph(EntityPojo.class);
+        when(manager.find(eq(EntityPojo.class), eq(999L), anyMap())).thenReturn(null);
+
+        //when-then
+        assertThatExceptionOfType(SBusinessDataNotFoundException.class)
+                .isThrownBy(() -> repository.removeById(EntityPojo.class, 999L));
+        verify(manager, never()).remove(any());
+    }
+
+    @Test
+    void removeById_should_throw_retryable_on_persistence_exception() {
+        //given
+        var entityGraph = mock(EntityGraph.class);
+        doReturn(entityGraph).when(manager).createEntityGraph(EntityPojo.class);
+        when(manager.find(eq(EntityPojo.class), eq(42L), anyMap()))
+                .thenThrow(new PersistenceException("db error"));
+
+        //when-then
+        assertThatExceptionOfType(SRetryableException.class)
+                .isThrownBy(() -> repository.removeById(EntityPojo.class, 42L));
+    }
+
+    @Test
+    void removeById_should_not_fail_when_tracking_deletion_fails() throws Exception {
+        //given
+        var entity = new EntityPojo(42L);
+        var entityGraph = mock(EntityGraph.class);
+        doReturn(entityGraph).when(manager).createEntityGraph(EntityPojo.class);
+        when(manager.find(eq(EntityPojo.class), eq(42L), anyMap())).thenReturn(entity);
+        doThrow(new SDataRetentionBdmTrackingException("DB error"))
+                .when(bdmTrackingService).delete(anyLong(), anyString());
+
+        //when-then — should not throw
+        assertThatNoException().isThrownBy(() -> repository.removeById(EntityPojo.class, 42L));
         verify(manager).remove(entity);
     }
 

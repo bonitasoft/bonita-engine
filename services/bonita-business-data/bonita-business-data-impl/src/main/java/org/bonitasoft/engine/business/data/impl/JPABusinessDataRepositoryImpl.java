@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
@@ -420,6 +421,50 @@ public class JPABusinessDataRepositoryImpl
             return query.executeUpdate();
         } catch (final PersistenceException e) {
             throw new SRetryableException("Failed to execute JPQL update", e);
+        }
+    }
+
+    /**
+     * Loads the root entity with an empty {@code EntityGraph} ({@code fetchgraph} hint) to
+     * override {@code FetchType.EAGER} associations, then calls {@code em.remove()}.
+     * <p>
+     * The effect on memory and query shape depends on the relationship type:
+     * <ul>
+     * <li><b>AGGREGATION</b> (no cascade REMOVE — e.g. Invoice → Customer): the referenced
+     * entity is <b>never loaded</b>, since cascade delete does not need it. This is the main
+     * win — without the fetchgraph, EAGER would force loading entities just to discard them.</li>
+     * <li><b>COMPOSITION</b> (cascade REMOVE — e.g. Invoice → InvoiceLine): children are still
+     * loaded into memory because cascade delete requires the collection contents. The benefit
+     * is that they are loaded via a separate SELECT per collection instead of a single wide
+     * JOIN, avoiding cartesian-product row explosion when multiple or deep compositions exist.</li>
+     * </ul>
+     * <p>
+     * The returned entity is used by {@link BusinessDataRepositoryEventAspect} to fire the
+     * {@code BUSINESS_DATA_DELETED} event.
+     */
+    @Override
+    public Entity removeById(Class<? extends Entity> entityClass, long persistenceId)
+            throws SBusinessDataNotFoundException {
+        log.trace("Removing entity of type {} with id {} using EntityGraph", entityClass.getName(), persistenceId);
+        final EntityManager em = getEntityManager();
+        try {
+            // Empty fetchgraph overrides EAGER to LAZY for all associations. Aggregations are
+            // then skipped entirely; compositions are still fetched at cascade time, but via
+            // per-collection SELECTs rather than a single wide JOIN.
+            EntityGraph<?> minimalGraph = em.createEntityGraph(entityClass);
+            Entity entity = em.find(entityClass, persistenceId,
+                    Map.of("javax.persistence.fetchgraph", minimalGraph));
+            if (entity == null) {
+                throw new SBusinessDataNotFoundException(
+                        "Impossible to get data of type " + entityClass.getName() + " with id: " + persistenceId);
+            }
+            em.remove(entity);
+            // Delete the tracking record linked to the removed BDM entity in the Bonita DB
+            deleteTrackingRecord(persistenceId, entityClass.getName());
+            return entity;
+        } catch (final PersistenceException e) {
+            throw new SRetryableException(
+                    "Failed to remove entity " + entityClass.getName() + " with id " + persistenceId, e);
         }
     }
 
