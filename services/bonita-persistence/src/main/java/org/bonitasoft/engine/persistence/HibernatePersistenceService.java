@@ -190,6 +190,18 @@ public class HibernatePersistenceService implements PersistenceService {
     }
 
     @Override
+    public void refresh(final PersistentObject entity) throws SPersistenceException {
+        if (entity != null) {
+            try {
+                getSession().refresh(entity);
+            } catch (final HibernateException e) {
+                throw new SPersistenceException("Failed to refresh entity "
+                        + entity.getClass().getSimpleName() + " (id=" + entity.getId() + ")", e);
+            }
+        }
+    }
+
+    @Override
     public void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
         final Query query = getSession().getNamedQuery("deleteAll" + mappedClass.getSimpleName());

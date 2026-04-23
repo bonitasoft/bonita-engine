@@ -541,50 +541,60 @@ public class ActivityInstanceServiceImplTest {
     public void should_addMultiInstanceNumberOfActiveActivities_update_lastUpdateDate() throws Exception {
         // Given
         SMultiInstanceActivityInstance multiInstance = mock(SMultiInstanceActivityInstance.class);
-        when(multiInstance.getNumberOfActiveInstances()).thenReturn(3);
+        when(recorder.recordUpdateWithQuery(any(UpdateRecord.class),
+                eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
+                eq("updateMultiInstanceActiveCounters"))).thenReturn(1);
 
         // When
         activityInstanceServiceImpl.addMultiInstanceNumberOfActiveActivities(multiInstance, 2);
 
         // Then
         ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder).recordUpdate(captor.capture(), anyString());
+        verify(recorder).recordUpdateWithQuery(captor.capture(),
+                eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
+                eq("updateMultiInstanceActiveCounters"));
         assertThat(captor.getValue().getFields().keySet())
-                .contains("numberOfActiveInstances", "lastUpdateDate");
+                .contains("id", "number", "lastUpdateDate");
     }
 
     @Test
     public void should_addMultiInstanceNumberOfTerminatedActivities_update_lastUpdateDate() throws Exception {
         // Given
         SMultiInstanceActivityInstance multiInstance = mock(SMultiInstanceActivityInstance.class);
-        when(multiInstance.getNumberOfActiveInstances()).thenReturn(3);
-        when(multiInstance.getNumberOfTerminatedInstances()).thenReturn(1);
+        when(recorder.recordUpdateWithQuery(any(UpdateRecord.class),
+                eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
+                eq("updateMultiInstanceTerminatedCounters"))).thenReturn(1);
 
         // When
         activityInstanceServiceImpl.addMultiInstanceNumberOfTerminatedActivities(multiInstance, 1);
 
         // Then
         ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder).recordUpdate(captor.capture(), anyString());
+        verify(recorder).recordUpdateWithQuery(captor.capture(),
+                eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
+                eq("updateMultiInstanceTerminatedCounters"));
         assertThat(captor.getValue().getFields().keySet())
-                .contains("numberOfActiveInstances", "numberOfTerminatedInstances", "lastUpdateDate");
+                .contains("id", "number", "lastUpdateDate");
     }
 
     @Test
     public void should_addMultiInstanceNumberOfCompletedActivities_update_lastUpdateDate() throws Exception {
         // Given
         SMultiInstanceActivityInstance multiInstance = mock(SMultiInstanceActivityInstance.class);
-        when(multiInstance.getNumberOfActiveInstances()).thenReturn(3);
-        when(multiInstance.getNumberOfCompletedInstances()).thenReturn(1);
+        when(recorder.recordUpdateWithQuery(any(UpdateRecord.class),
+                eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
+                eq("updateMultiInstanceCompletedCounters"))).thenReturn(1);
 
         // When
         activityInstanceServiceImpl.addMultiInstanceNumberOfCompletedActivities(multiInstance, 1);
 
         // Then
         ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder).recordUpdate(captor.capture(), anyString());
+        verify(recorder).recordUpdateWithQuery(captor.capture(),
+                eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
+                eq("updateMultiInstanceCompletedCounters"));
         assertThat(captor.getValue().getFields().keySet())
-                .contains("numberOfActiveInstances", "numberOfCompletedInstances", "lastUpdateDate");
+                .contains("id", "number", "lastUpdateDate");
     }
 
     @Test

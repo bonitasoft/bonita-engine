@@ -2227,4 +2227,40 @@
         WHERE ref.name = :name
         AND ref.processInstanceId = :processInstanceId
     </query>
+
+    <!-- Query to update the counters of a multi instance activity: increment the number of completed instances
+    and decrement the number of active instances.
+    Note: condition on `numberOfActiveInstances` is a safeguard to prevent the counter from being negative when
+    decrementing it.-->
+    <query name="updateMultiInstanceCompletedCounters">
+        UPDATE org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance
+        SET numberOfActiveInstances = numberOfActiveInstances - :number,
+            numberOfCompletedInstances = numberOfCompletedInstances + :number,
+            lastUpdateDate = :lastUpdateDate
+        WHERE id = :id
+        AND numberOfActiveInstances >= :number
+    </query>
+
+    <!-- Query to update the counters of a multi instance activity: increment the number of terminated instances
+    and decrement the number of active instances.
+    Note: condition on `numberOfActiveInstances` is a safeguard to prevent the counter from being negative when
+    decrementing it.-->
+    <query name="updateMultiInstanceTerminatedCounters">
+        UPDATE org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance
+        SET numberOfActiveInstances = numberOfActiveInstances - :number,
+            numberOfTerminatedInstances = numberOfTerminatedInstances + :number,
+            lastUpdateDate = :lastUpdateDate
+        WHERE id = :id
+        AND numberOfActiveInstances >= :number
+    </query>
+
+    <!-- Query to update the counters of a multi instance activity: increment the number of active instances.
+    Note: there is no safeguard because `numberOfActiveInstances` is only incremented, never decremented -->
+    <query name="updateMultiInstanceActiveCounters">
+        UPDATE org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance
+        SET numberOfActiveInstances = numberOfActiveInstances + :number,
+            lastUpdateDate = :lastUpdateDate
+        WHERE id = :id
+    </query>
+
 </hibernate-mapping>
