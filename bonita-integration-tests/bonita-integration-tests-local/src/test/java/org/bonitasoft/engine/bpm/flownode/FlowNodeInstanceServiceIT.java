@@ -344,16 +344,15 @@ public class FlowNodeInstanceServiceIT extends CommonBPMServicesTest {
             final CountDownLatch done = new CountDownLatch(threadCount);
             final ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             final long sessionId = getSessionAccessor().getSessionId();
-            final long tenantId = getDefaultTenantId();
 
             for (int i = 0; i < threadCount; i++) {
                 executor.submit(() -> {
                     try {
-                        getSessionAccessor().setSessionInfo(sessionId, tenantId);
+                        getSessionAccessor().setSessionId(sessionId);
                         barrier.await(30, TimeUnit.SECONDS);
 
                         final BonitaLock lock = useLock
-                                ? lockService.lock(processInstance.getId(), objectType, tenantId)
+                                ? lockService.lock(processInstance.getId(), objectType)
                                 : null;
                         try {
                             getTransactionService().begin();
@@ -369,7 +368,7 @@ public class FlowNodeInstanceServiceIT extends CommonBPMServicesTest {
                             }
                         } finally {
                             if (useLock) {
-                                lockService.unlock(lock, tenantId);
+                                lockService.unlock(lock);
                             }
                         }
                     } catch (final Throwable t) {
