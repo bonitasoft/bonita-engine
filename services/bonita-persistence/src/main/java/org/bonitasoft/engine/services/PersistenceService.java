@@ -89,6 +89,17 @@ public interface PersistenceService extends ReadPersistenceService {
     void flushStatements() throws SPersistenceException;
 
     /**
+     * Refresh a persistent object from the database, reloading its state.
+     * This is useful after executing bulk HQL updates (via named queries) to synchronize
+     * the in-memory managed entity with the actual database state, preventing Hibernate's
+     * dirty-checking from overwriting the atomic SQL update with stale values.
+     * The entity remains managed in the session after refresh.
+     *
+     * @param entity the entity to refresh from the database
+     */
+    void refresh(final PersistentObject entity) throws SPersistenceException;
+
+    /**
      * Delete a record from the table by id and its class type.
      *
      * @param id entity's id
