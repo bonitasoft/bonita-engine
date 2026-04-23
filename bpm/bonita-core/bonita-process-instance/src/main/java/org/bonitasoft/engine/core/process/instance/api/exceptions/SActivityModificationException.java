@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api.exceptions;
 
+import java.io.Serial;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
@@ -21,10 +23,15 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  */
 public class SActivityModificationException extends SBonitaException {
 
+    @Serial
     private static final long serialVersionUID = 976164513418178786L;
 
     public SActivityModificationException(final Throwable cause) {
         super(cause);
+    }
+
+    public SActivityModificationException(final String message) {
+        super(message);
     }
 
     public SActivityModificationException(final String message, final Throwable e) {
