@@ -285,6 +285,11 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         if (shouldContinueParent) {
             // it should never happen, because the terminal state never waits children to finish
             if (activityInstanceParent.isTerminal()) {
+                LOG.warn("Parent '{}' (id={}, processInstance={}, processDefinition={}) is already terminal "
+                        + "when child '{}' (id={}) finished — this should never happen",
+                        activityInstanceParent.getName(), activityInstanceParent.getId(),
+                        childFlowNode.getRootProcessInstanceId(), processDefinitionId,
+                        childFlowNode.getName(), childFlowNode.getId());
                 registerNotifyFinishWork(activityInstanceParent);
             } else {
                 stepForward(activityInstanceParent, null, null);

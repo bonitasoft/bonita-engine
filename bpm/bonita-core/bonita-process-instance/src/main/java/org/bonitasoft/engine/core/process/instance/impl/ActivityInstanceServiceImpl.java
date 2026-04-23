@@ -63,6 +63,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.SPersistenceException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -398,7 +399,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             SFlowNodeReadException, SActivityModificationException, SHumanTaskAlreadyAssignedException {
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance(userTaskId);
         if (flowNodeInstance instanceof SHumanTaskInstance) {
-            Long assigneeId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
+            long assigneeId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
             if (assigneeId > 0 && assigneeId != userId && userId > 0) {
                 throw new SHumanTaskAlreadyAssignedException(
                         "The task with id " + userTaskId + " is currently assigned to" +
@@ -577,7 +578,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public Map<Long, Long> getNumberOfOpenTasksForUsers(final List<Long> userIds) throws SBonitaReadException {
-        if (userIds == null || userIds.size() == 0) {
+        if (userIds == null || userIds.isEmpty()) {
             return Collections.emptyMap();
         }
         // get assigned tasks for each user
@@ -632,7 +633,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public Map<Long, Long> getNumberOfOverdueOpenTasksForUsers(final List<Long> userIds) throws SBonitaReadException {
-        if (userIds == null || userIds.size() == 0) {
+        if (userIds == null || userIds.isEmpty()) {
             return Collections.emptyMap();
         }
         // get assigned overdue open tasks for each user
@@ -702,46 +703,65 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public void addMultiInstanceNumberOfActiveActivities(final SMultiInstanceActivityInstance flowNodeInstance,
             final int number)
             throws SActivityModificationException {
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(),
-                flowNodeInstance.getNumberOfActiveInstances() + number);
-        try {
-            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (final SFlowNodeModificationException e) {
-            throw new SActivityModificationException(e);
-        }
+        updateMultiInstanceCounters(flowNodeInstance, number,
+                "updateMultiInstanceActiveCounters", "active");
     }
 
     @Override
     public void addMultiInstanceNumberOfTerminatedActivities(final SMultiInstanceActivityInstance flowNodeInstance,
             final int number)
             throws SActivityModificationException {
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(),
-                flowNodeInstance.getNumberOfActiveInstances() - number);
-        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfTerminatedInstancesKey(),
-                flowNodeInstance.getNumberOfTerminatedInstances()
-                        + number);
-        try {
-            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (final SFlowNodeModificationException e) {
-            throw new SActivityModificationException(e);
-        }
+        updateMultiInstanceCounters(flowNodeInstance, number,
+                "updateMultiInstanceTerminatedCounters", "terminated");
     }
 
     @Override
     public void addMultiInstanceNumberOfCompletedActivities(final SMultiInstanceActivityInstance flowNodeInstance,
             final int number)
             throws SActivityModificationException {
+        updateMultiInstanceCounters(flowNodeInstance, number,
+                "updateMultiInstanceCompletedCounters", "completed");
+    }
+
+    private void updateMultiInstanceCounters(final SMultiInstanceActivityInstance flowNodeInstance,
+            final int number, final String queryName, final String counterDescription)
+            throws SActivityModificationException {
+        final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(),
-                flowNodeInstance.getNumberOfActiveInstances() - number);
-        descriptor
-                .addField(sMultiInstanceActivityInstanceBuilder.getNumberOfCompletedInstancesKey(),
-                        flowNodeInstance.getNumberOfCompletedInstances() + number);
+        descriptor.addField("id", flowNodeInstance.getId());
+        descriptor.addField("number", number);
+        descriptor.addField("lastUpdateDate", now);
+        log.debug("Multi-instance '{}' (id={}, processInstance={}, processDefinition={}): "
+                + "updating {} counters (atomic SQL, number={})",
+                flowNodeInstance.getName(), flowNodeInstance.getId(),
+                flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                counterDescription, number);
         try {
-            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (final SFlowNodeModificationException e) {
+            final int updatedRows = getRecorder().recordUpdateWithQuery(
+                    UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
+                    MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, queryName);
+            if (updatedRows != 1) {
+                log.warn("Multi-instance '{}' (id={}, processInstance={}, processDefinition={}): "
+                        + "failed to update {} counters — entity not found or counter precondition failed "
+                        + "(expected 1 updated row but got {})",
+                        flowNodeInstance.getName(), flowNodeInstance.getId(),
+                        flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                        counterDescription, updatedRows);
+                throw new SActivityModificationException(
+                        String.format("Failed to update multi-instance %s counters for flow node %d: "
+                                + "entity not found or counter precondition failed (updated rows: %d)",
+                                counterDescription, flowNodeInstance.getId(), updatedRows));
+            }
+            // Refresh entity from DB to sync in-memory state with the atomic SQL update.
+            // This prevents Hibernate dirty-checking from overwriting the atomic values,
+            // and keeps the entity managed in the session for downstream operations.
+            getPersistenceService().refresh(flowNodeInstance);
+        } catch (final SRecorderException | SPersistenceException e) {
+            log.warn("Multi-instance '{}' (id={}, processInstance={}, processDefinition={}): "
+                    + "failed to update {} counters — {}",
+                    flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                    counterDescription, e.getMessage(), e);
             throw new SActivityModificationException(e);
         }
     }
