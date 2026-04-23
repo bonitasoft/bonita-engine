@@ -18,6 +18,7 @@ import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
@@ -38,6 +39,7 @@ import org.bonitasoft.engine.work.SWorkPreconditionException;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@Slf4j
 public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     private final long processDefinitionId;
@@ -71,6 +73,10 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
             ServiceAccessor serviceAccessor = getServiceAccessor(context);
             SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(serviceAccessor);
             context.put("flowNodeInstance", flowNodeInstance);
+            log.debug("Processing completion of flowNode '{}' (id={}, state='{}', "
+                    + "processInstance={}, processDefinition={})",
+                    flowNodeInstance.getName(), flowNodeInstance.getId(), flowNodeInstance.getStateName(),
+                    flowNodeInstance.getRootProcessInstanceId(), processDefinitionId);
             final ContainerRegistry containerRegistry = serviceAccessor.getContainerRegistry();
             containerRegistry.nodeReachedState(flowNodeInstance);
         } finally {
