@@ -108,6 +108,20 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     void remove(Entity entity);
 
     /**
+     * Removes the entity with the given persistence ID. Also deletes the associated data
+     * retention tracking record in the Bonita DB.
+     * <p>
+     * Fires a {@code BUSINESS_DATA_DELETED} AOP event on the removed entity, like
+     * {@link #remove(Entity)}.
+     *
+     * @param entityClass the class of the entity to remove
+     * @param persistenceId the persistence ID of the entity to remove
+     * @return the removed entity
+     * @throws SBusinessDataNotFoundException if no entity exists with the given ID
+     */
+    Entity removeById(Class<? extends Entity> entityClass, long persistenceId) throws SBusinessDataNotFoundException;
+
+    /**
      * Executes a single JPQL bulk UPDATE or DELETE statement.
      * <p>
      * This bypasses JPA cascades, lifecycle callbacks, and does <b>not</b> update or delete
