@@ -19,19 +19,30 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.ToIntFunction;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilderFactory;
+import org.bonitasoft.engine.lock.BonitaLock;
+import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -267,6 +278,152 @@ public class FlowNodeInstanceServiceIT extends CommonBPMServicesTest {
         getTransactionService().begin();
         activityInstanceService.deleteFlowNodeInstance(assignedTask);
         getTransactionService().complete();
+    }
+
+    // Thread-safety tests for the multi-instance counter updates. Verify that atomic SQL
+    // (SET counter = counter + :n) prevents lost updates both without the process instance
+    // lock and with it (the production Lock → Tx → Work pattern).
+
+    @Test
+    public void concurrent_addMultiInstanceNumberOfCompletedActivities_without_lock_should_not_lose_updates()
+            throws Exception {
+        runConcurrentMiCounterTest(
+                "miActivity", /* useLock */ false,
+                (svc, mi) -> svc.addMultiInstanceNumberOfCompletedActivities(mi, 1),
+                SMultiInstanceActivityInstance::getNumberOfCompletedInstances,
+                "completions");
+    }
+
+    @Test
+    public void concurrent_addMultiInstanceNumberOfTerminatedActivities_without_lock_should_not_lose_updates()
+            throws Exception {
+        runConcurrentMiCounterTest(
+                "miActivityTerminated", /* useLock */ false,
+                (svc, mi) -> svc.addMultiInstanceNumberOfTerminatedActivities(mi, 1),
+                SMultiInstanceActivityInstance::getNumberOfTerminatedInstances,
+                "terminations");
+    }
+
+    @Test
+    public void concurrent_addMultiInstanceNumberOfCompletedActivities_with_lock_should_not_lose_updates()
+            throws Exception {
+        runConcurrentMiCounterTest(
+                "miActivityLockedCompleted", /* useLock */ true,
+                (svc, mi) -> svc.addMultiInstanceNumberOfCompletedActivities(mi, 1),
+                SMultiInstanceActivityInstance::getNumberOfCompletedInstances,
+                "completions");
+    }
+
+    @Test
+    public void concurrent_addMultiInstanceNumberOfTerminatedActivities_with_lock_should_not_lose_updates()
+            throws Exception {
+        runConcurrentMiCounterTest(
+                "miActivityLockedTerminated", /* useLock */ true,
+                (svc, mi) -> svc.addMultiInstanceNumberOfTerminatedActivities(mi, 1),
+                SMultiInstanceActivityInstance::getNumberOfTerminatedInstances,
+                "terminations");
+    }
+
+    private void runConcurrentMiCounterTest(
+            final String activityName,
+            final boolean useLock,
+            final MiCounterOp op,
+            final ToIntFunction<SMultiInstanceActivityInstance> counterGetter,
+            final String counterLabel) throws Exception {
+        final int threadCount = 50;
+
+        final SProcessInstance processInstance = createSProcessInstance();
+        try {
+            final SMultiInstanceActivityInstance miActivity = createMultiInstanceActivity(
+                    activityName, processInstance, threadCount);
+
+            final LockService lockService = useLock ? getServiceAccessor().getLockService() : null;
+            final String objectType = SFlowElementsContainerType.PROCESS.name();
+            final List<Throwable> errors = new CopyOnWriteArrayList<>();
+            final CyclicBarrier barrier = new CyclicBarrier(threadCount);
+            final CountDownLatch done = new CountDownLatch(threadCount);
+            final ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            final long sessionId = getSessionAccessor().getSessionId();
+            final long tenantId = getDefaultTenantId();
+
+            for (int i = 0; i < threadCount; i++) {
+                executor.submit(() -> {
+                    try {
+                        getSessionAccessor().setSessionInfo(sessionId, tenantId);
+                        barrier.await(30, TimeUnit.SECONDS);
+
+                        final BonitaLock lock = useLock
+                                ? lockService.lock(processInstance.getId(), objectType, tenantId)
+                                : null;
+                        try {
+                            getTransactionService().begin();
+                            try {
+                                final SMultiInstanceActivityInstance freshMi = (SMultiInstanceActivityInstance) activityInstanceService
+                                        .getFlowNodeInstance(miActivity.getId());
+                                op.apply(activityInstanceService, freshMi);
+                                getTransactionService().complete();
+                            } catch (final Exception e) {
+                                getTransactionService().setRollbackOnly();
+                                getTransactionService().complete();
+                                throw e;
+                            }
+                        } finally {
+                            if (useLock) {
+                                lockService.unlock(lock, tenantId);
+                            }
+                        }
+                    } catch (final Throwable t) {
+                        errors.add(t);
+                    } finally {
+                        done.countDown();
+                    }
+                });
+            }
+
+            done.await(60, TimeUnit.SECONDS);
+            executor.shutdown();
+            executor.awaitTermination(10, TimeUnit.SECONDS);
+
+            assertThat(errors).as("Unexpected errors in worker threads").isEmpty();
+
+            getTransactionService().begin();
+            final SMultiInstanceActivityInstance result = (SMultiInstanceActivityInstance) activityInstanceService
+                    .getFlowNodeInstance(miActivity.getId());
+            getTransactionService().complete();
+
+            assertThat(counterGetter.applyAsInt(result))
+                    .as("All %d %s should be counted", threadCount, counterLabel)
+                    .isEqualTo(threadCount);
+            assertThat(result.getNumberOfActiveInstances())
+                    .as("Active instances should reach 0")
+                    .isEqualTo(0);
+        } finally {
+            deleteSProcessInstance(processInstance);
+        }
+    }
+
+    @FunctionalInterface
+    private interface MiCounterOp {
+
+        void apply(ActivityInstanceService svc, SMultiInstanceActivityInstance mi) throws SBonitaException;
+    }
+
+    private SMultiInstanceActivityInstance createMultiInstanceActivity(
+            final String name, final SProcessInstance processInstance, final int numberOfActiveInstances)
+            throws SBonitaException {
+        final SMultiInstanceActivityInstance miActivity = new SMultiInstanceActivityInstance(
+                name, 1L, processInstance.getId(), processInstance.getId(),
+                1L, processInstance.getId(), false);
+        miActivity.setNumberOfActiveInstances(numberOfActiveInstances);
+        miActivity.setLoopCardinality(numberOfActiveInstances);
+        miActivity.setStateId(28); // EXECUTING state
+        miActivity.setLogicalGroup(3, processInstance.getId()); // parent process instance
+
+        getTransactionService().begin();
+        activityInstanceService.createActivityInstance(miActivity);
+        getTransactionService().complete();
+
+        return miActivity;
     }
 
 }
