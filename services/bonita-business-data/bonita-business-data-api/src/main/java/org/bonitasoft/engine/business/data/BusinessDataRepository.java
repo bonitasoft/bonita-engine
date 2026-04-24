@@ -122,19 +122,6 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     Entity removeById(Class<? extends Entity> entityClass, long persistenceId) throws SBusinessDataNotFoundException;
 
     /**
-     * Executes a single JPQL bulk UPDATE or DELETE statement.
-     * <p>
-     * This bypasses JPA cascades, lifecycle callbacks, and does <b>not</b> update or delete
-     * the associated data retention tracking records — callers are responsible for
-     * managing tracking records separately.
-     *
-     * @param jpqlQuery the JPQL UPDATE or DELETE statement to execute
-     * @param parameters the parameters to bind to the query
-     * @return the number of entities affected
-     */
-    int executeUpdate(String jpqlQuery, Map<String, Object> parameters);
-
-    /**
      * Reconnect the given entity with the persistence unit.
      * <p>
      * This operation also inserts or updates a data retention tracking record in the Bonita DB

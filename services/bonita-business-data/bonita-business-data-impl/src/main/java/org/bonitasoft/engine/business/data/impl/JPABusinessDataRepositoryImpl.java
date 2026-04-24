@@ -410,20 +410,6 @@ public class JPABusinessDataRepositoryImpl
         return Collections.emptyList();
     }
 
-    @Override
-    public int executeUpdate(String jpqlQuery, Map<String, Object> parameters) {
-        final EntityManager em = getEntityManager();
-        try {
-            var query = em.createQuery(jpqlQuery);
-            for (var entry : parameters.entrySet()) {
-                query.setParameter(entry.getKey(), entry.getValue());
-            }
-            return query.executeUpdate();
-        } catch (final PersistenceException e) {
-            throw new SRetryableException("Failed to execute JPQL update", e);
-        }
-    }
-
     /**
      * Loads the root entity with an empty {@code EntityGraph} ({@code fetchgraph} hint) to
      * override {@code FetchType.EAGER} associations, then calls {@code em.remove()}.
