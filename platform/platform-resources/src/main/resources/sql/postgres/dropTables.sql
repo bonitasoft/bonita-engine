@@ -67,3 +67,5 @@ DROP TABLE IF EXISTS arch_bpm_failure;
 DROP TABLE IF EXISTS bpm_failure;
 DROP TABLE IF EXISTS data_retention_config;
 DROP TABLE IF EXISTS data_retention_bdm_tracking;
+DROP TABLE IF EXISTS delegation_rule_process;
+DROP TABLE IF EXISTS delegation_rule;

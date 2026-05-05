@@ -67,3 +67,5 @@ DROP TABLE arch_bpm_failure;
 DROP TABLE bpm_failure;
 DROP TABLE data_retention_config;
 DROP TABLE data_retention_bdm_tracking;
+DROP TABLE delegation_rule_process;
+DROP TABLE delegation_rule;

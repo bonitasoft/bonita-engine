@@ -1032,3 +1032,24 @@ CREATE TABLE data_retention_bdm_tracking (
     CONSTRAINT uk_data_retention_bdm_tracking_data_id_data_classname UNIQUE (data_id, data_classname)
 );
 CREATE INDEX idx_data_retention_bdm_tracking_data_classname ON data_retention_bdm_tracking (data_classname);
+
+CREATE TABLE delegation_rule (
+    id                  INT8 NOT NULL,
+    delegator_id        INT8 NOT NULL,
+    delegate_id         INT8 NOT NULL,
+    start_date          INT8 NOT NULL,
+    end_date            INT8 NOT NULL,
+    last_updated_by     INT8 NOT NULL,
+    last_updated_at     INT8 NOT NULL,
+    CONSTRAINT pk_delegation_rule PRIMARY KEY (id),
+    CONSTRAINT uk_delegation_rule_delegator_id UNIQUE (delegator_id)
+);
+
+CREATE TABLE delegation_rule_process (
+    id                  INT8 NOT NULL,
+    delegation_rule_id  INT8 NOT NULL,
+    process_name        VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_delegation_rule_process PRIMARY KEY (id),
+    CONSTRAINT uk_delegation_rule_process_delegation_rule_id_process_name UNIQUE (delegation_rule_id, process_name)
+);
+ALTER TABLE delegation_rule_process ADD CONSTRAINT fk_delegation_rule_process_delegation_rule_id FOREIGN KEY (delegation_rule_id) REFERENCES delegation_rule(id) ON DELETE CASCADE;
