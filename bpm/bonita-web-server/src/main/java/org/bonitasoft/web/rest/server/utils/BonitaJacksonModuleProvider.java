@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeDeserializer;
 import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeSerializer;
 import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeDeserializer;
 import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeSerializer;
+import org.bonitasoft.engine.identity.User;
 
 /**
  * Provides Jackson module configuration for Bonita REST APIs.
@@ -64,6 +65,9 @@ public final class BonitaJacksonModuleProvider {
         bonitaModule.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
         bonitaModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
         bonitaModule.addSerializer(OffsetDateTime.class, new CustomOffsetDateTimeSerializer());
+
+        // Until User extends BaseRestElement upstream, patch its id to serialize as a JSON string.
+        bonitaModule.setMixInAnnotation(User.class, UserMixIn.class);
 
         return bonitaModule;
     }
