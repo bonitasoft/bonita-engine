@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrganizationDetector extends XmlDetector implements ArtifactDetector {
 
-    private static final String ORGANIZATION_NAMESPACE = "http://documentation.bonitasoft.com/organization-xml-schema";
+    private static final String ORGANIZATION_NAMESPACE = "http://documentation.ofelia.com/organization-xml-schema";
 
     public OrganizationDetector() {
         super(ORGANIZATION_NAMESPACE);
