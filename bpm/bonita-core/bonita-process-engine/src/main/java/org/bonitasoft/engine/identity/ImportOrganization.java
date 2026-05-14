@@ -46,9 +46,9 @@ import org.bonitasoft.engine.service.ModelConvertor;
 @Slf4j
 public class ImportOrganization {
 
-    private static final String LEGACY_NS = "xmlns:organization=\"http://documentation.ofelia.com/organization-xml-schema\"";
+    private static final String LEGACY_NS = "xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema\"";
 
-    private static final String VERSIONED_NS = "xmlns:organization=\"http://documentation.ofelia.com/organization-xml-schema/1.1\"";
+    private static final String VERSIONED_NS = "xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema/1.1\"";
 
     final IdentityService identityService;
     private final String organizationContent;
