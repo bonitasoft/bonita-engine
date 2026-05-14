@@ -147,7 +147,7 @@ class SanitizerFilterTest {
         when(httpRequest.getContentType()).thenReturn("text/xml");
         when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
         final String body = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>%n" +
-                "<organization:Organization xmlns:organization=\"http://documentation.ofelia.com/organization-xml-schema/1.1\">%n"
+                "<organization:Organization xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema/1.1\">%n"
                 +
                 "  <users>%n" +
                 "  </users>%n" +
