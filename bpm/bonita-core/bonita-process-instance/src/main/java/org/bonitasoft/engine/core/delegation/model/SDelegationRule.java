@@ -26,7 +26,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * Task delegation rule defined by a user (the <i>delegator</i>) granting another user (the <i>delegate</i>)
- * visibility and execution rights on the delegator's human tasks during a bounded absence period.
+ * visibility and execution rights on the delegator's human tasks during a bounded delegation period.
  * <p>
  * Delegation is <b>not reassignment</b>: tasks remain assigned to the delegator, and the delegate simply gains the
  * ability to see and execute them through dedicated views. Original ownership and full audit trail are preserved

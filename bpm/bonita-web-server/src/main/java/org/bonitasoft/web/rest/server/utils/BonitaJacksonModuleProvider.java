@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeDeserializer;
 import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeSerializer;
 import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeDeserializer;
 import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeSerializer;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.identity.User;
 
 /**
@@ -68,6 +69,12 @@ public final class BonitaJacksonModuleProvider {
 
         // Until User extends BaseRestElement upstream, patch its id to serialize as a JSON string.
         bonitaModule.setMixInAnnotation(User.class, UserMixIn.class);
+
+        // Patch ProcessDeploymentInfo so its long ids (id, processId, deployedBy) serialize
+        // as JSON strings — same JS-precision-loss workaround as UserMixIn. Required at least
+        // for DelegatedTask.rootProcess but applies to every Jackson-serialized
+        // ProcessDeploymentInfo.
+        bonitaModule.setMixInAnnotation(ProcessDeploymentInfo.class, ProcessDeploymentInfoMixIn.class);
 
         return bonitaModule;
     }

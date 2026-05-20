@@ -1717,6 +1717,10 @@
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
+    <!-- Stub implementation; real CRUD/query behaviour is provided in follow-up PRs. -->
+    <bean id="delegationRuleService"
+          class="org.bonitasoft.engine.core.delegation.api.impl.DelegationRuleServiceStub" />
+
     <bean id="processInstanceService"
           class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />

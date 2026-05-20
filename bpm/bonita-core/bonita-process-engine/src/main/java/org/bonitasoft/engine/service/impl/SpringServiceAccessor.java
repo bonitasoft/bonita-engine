@@ -35,6 +35,7 @@ import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
+import org.bonitasoft.engine.core.delegation.api.DelegationRuleService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
@@ -178,6 +179,11 @@ public class SpringServiceAccessor implements ServiceAccessor {
     @Override
     public ActivityInstanceService getActivityInstanceService() {
         return beanAccessor.getService(ActivityInstanceService.class);
+    }
+
+    @Override
+    public DelegationRuleService getDelegationRuleService() {
+        return beanAccessor.getService(DelegationRuleService.class);
     }
 
     @Override
