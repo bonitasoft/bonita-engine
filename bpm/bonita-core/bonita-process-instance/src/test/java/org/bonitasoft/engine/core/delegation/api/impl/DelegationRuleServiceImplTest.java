@@ -1,0 +1,467 @@
+/**
+ * Copyright (C) 2026 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.core.delegation.api.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import org.bonitasoft.engine.core.delegation.api.SDelegationRuleCreationException;
+import org.bonitasoft.engine.core.delegation.api.SDelegationRuleNotFoundException;
+import org.bonitasoft.engine.core.delegation.api.SDelegationRuleUpdateException;
+import org.bonitasoft.engine.core.delegation.model.SDelegationRule;
+import org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class DelegationRuleServiceImplTest {
+
+    @Mock
+    private Recorder recorder;
+    @Mock
+    private ReadPersistenceService persistenceService;
+
+    private DelegationRuleServiceImpl service;
+
+    @BeforeEach
+    void setUp() {
+        service = new DelegationRuleServiceImpl(recorder, persistenceService);
+    }
+
+    @Test
+    void getRule_returns_entity_when_present() throws Exception {
+        //given
+        final SDelegationRule rule = SDelegationRule.builder().id(42L).delegatorId(1L).delegateId(2L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(rule);
+
+        //when
+        final SDelegationRule actual = service.getRule(42L);
+
+        //then
+        assertThat(actual).isSameAs(rule);
+    }
+
+    @Test
+    void getRule_throws_not_found_when_missing() throws Exception {
+        //given
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(null);
+
+        //when-then
+        assertThatThrownBy(() -> service.getRule(99L))
+                .isInstanceOf(SDelegationRuleNotFoundException.class)
+                .hasMessageContaining("99");
+    }
+
+    @Test
+    void getRuleForDelegator_returns_optional_with_rule_when_present() throws Exception {
+        //given
+        final SDelegationRule rule = SDelegationRule.builder().id(7L).delegatorId(11L).delegateId(12L).build();
+        when(persistenceService.selectOne(argThat(this::queryTargetsRuleByDelegatorId))).thenReturn(rule);
+
+        //when
+        final Optional<SDelegationRule> actual = service.getRuleForDelegator(11L);
+
+        //then
+        assertThat(actual).containsSame(rule);
+    }
+
+    @Test
+    void getRuleForDelegator_returns_empty_optional_when_none() throws Exception {
+        //given
+        when(persistenceService.selectOne(argThat(this::queryTargetsRuleByDelegatorId))).thenReturn(null);
+
+        //when
+        final Optional<SDelegationRule> actual = service.getRuleForDelegator(11L);
+
+        //then
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void createOrUpdateRule_inserts_new_rule_and_whitelist_when_delegator_has_no_existing_rule()
+            throws Exception {
+        //given
+        when(persistenceService.selectOne(argThat(this::queryTargetsRuleByDelegatorId))).thenReturn(null);
+        final SDelegationRule rule = SDelegationRule.builder()
+                .delegatorId(10L).delegateId(20L).startDate(100L).endDate(200L)
+                .lastUpdatedBy(10L).lastUpdatedAt(150L)
+                .build();
+        // Recorder is expected to set the id during insert (sequence manager side-effect in production)
+        doAnswer(inv -> {
+            ((InsertRecord) inv.getArgument(0)).getEntity().setId(777L);
+            return null;
+        }).when(recorder).recordInsert(argThat((InsertRecord r) -> r.getEntity() instanceof SDelegationRule),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+
+        //when
+        final SDelegationRule persisted = service.createOrUpdateRule(rule, Arrays.asList("ProcessA", "ProcessB"));
+
+        //then
+        assertThat(persisted.getId()).isEqualTo(777L);
+        verify(recorder).recordInsert(argThat((InsertRecord r) -> r.getEntity() == rule),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+
+        final ArgumentCaptor<InsertRecord> whitelistInserts = ArgumentCaptor.forClass(InsertRecord.class);
+        verify(recorder, times(2)).recordInsert(whitelistInserts.capture(),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE_PROCESS));
+        final List<InsertRecord> captured = whitelistInserts.getAllValues();
+        assertThat(captured).extracting(r -> (SDelegationRuleProcess) r.getEntity())
+                .extracting(SDelegationRuleProcess::getDelegationRuleId, SDelegationRuleProcess::getProcessName)
+                .containsExactly(
+                        org.assertj.core.groups.Tuple.tuple(777L, "ProcessA"),
+                        org.assertj.core.groups.Tuple.tuple(777L, "ProcessB"));
+        verify(recorder, never()).recordUpdate(any(UpdateRecord.class),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+        verify(recorder, never()).recordDeleteAll(any(DeleteAllRecord.class));
+    }
+
+    @Test
+    void createOrUpdateRule_replaces_existing_rule_and_whitelist_when_delegator_already_has_one() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(555L).delegatorId(10L).delegateId(99L).startDate(50L).endDate(150L)
+                .lastUpdatedBy(10L).lastUpdatedAt(80L)
+                .build();
+        when(persistenceService.selectOne(argThat(this::queryTargetsRuleByDelegatorId))).thenReturn(existing);
+        final SDelegationRule incoming = SDelegationRule.builder()
+                .delegatorId(10L).delegateId(20L).startDate(100L).endDate(200L)
+                .lastUpdatedBy(10L).lastUpdatedAt(170L)
+                .build();
+
+        //when
+        final SDelegationRule persisted = service.createOrUpdateRule(incoming, Arrays.asList("ProcessA"));
+
+        //then
+        // existing rule id is preserved
+        assertThat(persisted.getId()).isEqualTo(555L);
+
+        // rule fields are pushed through an UpdateRecord on the existing entity
+        final ArgumentCaptor<UpdateRecord> updateCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(updateCaptor.capture(),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+        final UpdateRecord update = updateCaptor.getValue();
+        assertThat(update.getEntity()).isSameAs(existing);
+        assertThat(update.getFields())
+                .containsEntry(SDelegationRule.DELEGATE_ID_KEY, 20L)
+                .containsEntry(SDelegationRule.START_DATE_KEY, 100L)
+                .containsEntry(SDelegationRule.END_DATE_KEY, 200L)
+                .containsEntry(SDelegationRule.LAST_UPDATED_BY_KEY, 10L)
+                .containsEntry(SDelegationRule.LAST_UPDATED_AT_KEY, 170L);
+
+        // whitelist is wholesale-replaced: delete-all by ruleId, then re-insert
+        final ArgumentCaptor<DeleteAllRecord> deleteAllCaptor = ArgumentCaptor.forClass(DeleteAllRecord.class);
+        verify(recorder).recordDeleteAll(deleteAllCaptor.capture());
+        final DeleteAllRecord deleteAll = deleteAllCaptor.getValue();
+        assertThat(deleteAll.entityClass()).isEqualTo(SDelegationRuleProcess.class);
+        assertThat(deleteAll.filters()).hasSize(1);
+        final FilterOption filter = deleteAll.filters().get(0);
+        assertThat(filter.getPersistentClass()).isEqualTo(SDelegationRuleProcess.class);
+        assertThat(filter.getFieldName()).isEqualTo(SDelegationRuleProcess.DELEGATION_RULE_ID_KEY);
+        assertThat(filter.getValue()).isEqualTo(555L);
+
+        verify(recorder).recordInsert(argThat((InsertRecord r) -> r.getEntity() instanceof SDelegationRuleProcess p
+                && p.getDelegationRuleId() == 555L && "ProcessA".equals(p.getProcessName())),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE_PROCESS));
+
+        // no top-level rule insert on the update path
+        verify(recorder, never()).recordInsert(argThat((InsertRecord r) -> r.getEntity() instanceof SDelegationRule),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+    }
+
+    @Test
+    void createOrUpdateRule_throws_when_delegate_equals_delegator() throws Exception {
+        //given
+        final SDelegationRule rule = SDelegationRule.builder()
+                .delegatorId(10L).delegateId(10L).startDate(100L).endDate(200L).build();
+
+        //when-then
+        assertThatExceptionOfType(SDelegationRuleCreationException.class)
+                .isThrownBy(() -> service.createOrUpdateRule(rule, Arrays.asList("ProcessA")))
+                .withMessageContaining("delegator and delegate must be different");
+        verify(recorder, never()).recordInsert(any(InsertRecord.class), any());
+        verify(recorder, never()).recordUpdate(any(UpdateRecord.class), any());
+    }
+
+    @Test
+    void createOrUpdateRule_throws_when_startDate_not_before_endDate() throws Exception {
+        //given - equal bounds → rejected (zero-duration window can never apply)
+        final SDelegationRule rule = SDelegationRule.builder()
+                .delegatorId(10L).delegateId(20L).startDate(150L).endDate(150L).build();
+
+        //when-then
+        assertThatExceptionOfType(SDelegationRuleCreationException.class)
+                .isThrownBy(() -> service.createOrUpdateRule(rule, Arrays.asList("ProcessA")))
+                .withMessageContaining("startDate must be strictly before endDate");
+        verify(recorder, never()).recordInsert(any(InsertRecord.class), any());
+        verify(recorder, never()).recordUpdate(any(UpdateRecord.class), any());
+    }
+
+    @Test
+    void updateRule_rejects_inverted_window_when_both_bounds_set_in_descriptor() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.START_DATE_KEY, 500L);
+        descriptor.addField(SDelegationRule.END_DATE_KEY, 400L); // < new startDate → inverted
+
+        //when-then
+        assertThatThrownBy(() -> service.updateRule(1L, descriptor, null))
+                .isInstanceOf(SDelegationRuleUpdateException.class)
+                .hasMessageContaining("startDate")
+                .hasMessageContaining("endDate");
+        verify(recorder, never()).recordUpdate(any(UpdateRecord.class), any());
+    }
+
+    @Test
+    void updateRule_throws_not_found_when_rule_id_missing() throws Exception {
+        //given
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(null);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.DELEGATE_ID_KEY, 99L);
+
+        //when-then
+        assertThatThrownBy(() -> service.updateRule(404L, descriptor, null))
+                .isInstanceOf(SDelegationRuleNotFoundException.class)
+                .hasMessageContaining("404");
+        verify(recorder, never()).recordUpdate(any(UpdateRecord.class), any());
+    }
+
+    @Test
+    void updateRule_rejects_inverted_partial_window_when_only_start_provided() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.START_DATE_KEY, 200L); // > existing endDate=150 → inverted
+
+        //when-then
+        assertThatThrownBy(() -> service.updateRule(1L, descriptor, null))
+                .isInstanceOf(SDelegationRuleUpdateException.class)
+                .hasMessageContaining("startDate")
+                .hasMessageContaining("endDate");
+        verify(recorder, never()).recordUpdate(any(UpdateRecord.class), any());
+    }
+
+    @Test
+    void updateRule_rejects_inverted_partial_window_when_only_end_provided() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.END_DATE_KEY, 50L); // < existing startDate=100 → inverted
+
+        //when-then
+        assertThatThrownBy(() -> service.updateRule(1L, descriptor, null))
+                .isInstanceOf(SDelegationRuleUpdateException.class)
+                .hasMessageContaining("startDate")
+                .hasMessageContaining("endDate");
+        verify(recorder, never()).recordUpdate(any(UpdateRecord.class), any());
+    }
+
+    @Test
+    void updateRule_accepts_partial_window_when_resulting_range_is_valid() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.END_DATE_KEY, 200L); // > existing startDate=100 → valid
+
+        //when
+        final SDelegationRule updated = service.updateRule(1L, descriptor, null);
+
+        //then
+        assertThat(updated).isSameAs(existing);
+        verify(recorder).recordUpdate(argThat((UpdateRecord r) -> r.getEntity() == existing),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+    }
+
+    @Test
+    void updateRule_rejects_when_descriptor_makes_delegate_equal_to_existing_delegator() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.DELEGATE_ID_KEY, 10L); // == existing.delegatorId → reject
+
+        //when-then
+        assertThatThrownBy(() -> service.updateRule(1L, descriptor, null))
+                .isInstanceOf(SDelegationRuleUpdateException.class)
+                .hasMessageContaining("delegator");
+        verify(recorder, never()).recordUpdate(any(UpdateRecord.class), any());
+    }
+
+    @Test
+    void updateRule_accepts_when_descriptor_changes_delegate_to_distinct_user() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.DELEGATE_ID_KEY, 30L); // != delegatorId → ok
+
+        //when
+        service.updateRule(1L, descriptor, null);
+
+        //then
+        verify(recorder).recordUpdate(argThat((UpdateRecord r) -> r.getEntity() == existing
+                && r.getFields().get(SDelegationRule.DELEGATE_ID_KEY).equals(30L)),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+    }
+
+    @Test
+    void updateRule_leaves_whitelist_untouched_when_newProcesses_is_null() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.LAST_UPDATED_AT_KEY, 999L);
+
+        //when
+        service.updateRule(1L, descriptor, null);
+
+        //then
+        verify(recorder, never()).recordDeleteAll(any(DeleteAllRecord.class));
+        verify(recorder, never()).recordInsert(any(InsertRecord.class),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE_PROCESS));
+    }
+
+    @Test
+    void updateRule_replaces_whitelist_when_newProcesses_provided() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.LAST_UPDATED_AT_KEY, 999L);
+
+        //when
+        service.updateRule(1L, descriptor, Arrays.asList("ProcessX", "ProcessY"));
+
+        //then
+        verify(recorder).recordDeleteAll(argThat((DeleteAllRecord r) -> r.entityClass() == SDelegationRuleProcess.class
+                && r.filters().size() == 1
+                && r.filters().get(0).getValue().equals(1L)));
+        final ArgumentCaptor<InsertRecord> whitelistInserts = ArgumentCaptor.forClass(InsertRecord.class);
+        verify(recorder, times(2)).recordInsert(whitelistInserts.capture(),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE_PROCESS));
+        assertThat(whitelistInserts.getAllValues())
+                .extracting(r -> (SDelegationRuleProcess) r.getEntity())
+                .extracting(SDelegationRuleProcess::getDelegationRuleId, SDelegationRuleProcess::getProcessName)
+                .containsExactly(
+                        org.assertj.core.groups.Tuple.tuple(1L, "ProcessX"),
+                        org.assertj.core.groups.Tuple.tuple(1L, "ProcessY"));
+    }
+
+    @Test
+    void updateRule_passes_only_descriptor_fields_to_recorder() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.DELEGATE_ID_KEY, 30L);
+        descriptor.addField(SDelegationRule.LAST_UPDATED_AT_KEY, 999L);
+
+        //when
+        service.updateRule(1L, descriptor, null);
+
+        //then
+        final ArgumentCaptor<UpdateRecord> updateCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdate(updateCaptor.capture(),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+        assertThat(updateCaptor.getValue().getFields())
+                .containsOnlyKeys(SDelegationRule.DELEGATE_ID_KEY, SDelegationRule.LAST_UPDATED_AT_KEY);
+    }
+
+    @Test
+    void deleteRule_deletes_existing_rule_via_recorder() throws Exception {
+        //given
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(42L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(150L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+
+        //when
+        service.deleteRule(42L);
+
+        //then
+        verify(recorder).recordDelete(argThat((DeleteRecord r) -> r.getEntity() == existing),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+    }
+
+    @Test
+    void deleteRule_throws_not_found_when_rule_does_not_exist() throws Exception {
+        //given
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(null);
+
+        //when-then
+        assertThatThrownBy(() -> service.deleteRule(404L))
+                .isInstanceOf(SDelegationRuleNotFoundException.class)
+                .hasMessageContaining("404");
+        verify(recorder, never()).recordDelete(any(DeleteRecord.class), any());
+    }
+
+    @Test
+    void deleteRule_does_not_explicitly_delete_whitelist_rows() throws Exception {
+        //given — DB ON DELETE CASCADE handles the whitelist; the service must not issue an extra delete
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(42L).delegatorId(10L).delegateId(20L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+
+        //when
+        service.deleteRule(42L);
+
+        //then
+        verify(recorder, never()).recordDeleteAll(any(DeleteAllRecord.class));
+    }
+
+    private boolean queryTargetsRuleByDelegatorId(final SelectOneDescriptor<?> descriptor) {
+        return descriptor != null
+                && DelegationRuleServiceImpl.QUERY_RULE_BY_DELEGATOR_ID.equals(descriptor.getQueryName())
+                && descriptor.getReturnType().equals(SDelegationRule.class);
+    }
+}

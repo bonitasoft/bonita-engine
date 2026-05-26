@@ -698,6 +698,8 @@
                 <value>org/bonitasoft/engine/parameter/parameter.queries.hbm.xml</value>
                 <!-- BPM Failures -->
                 <value>org/bonitasoft/engine/core/failure/model/impl/hibernate/failure.queries.hbm.xml</value>
+                <!-- delegation -->
+                <value>org/bonitasoft/engine/core/delegation/model/impl/hibernate/delegation.queries.hbm.xml</value>
                 <!-- data retention bdm tracking -->
                 <value>org/bonitasoft/engine/business/data/model/impl/hibernate/data-retention-bdm-tracking.queries.hbm.xml</value>
             </set>
@@ -1716,10 +1718,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
-
-    <!-- Stub implementation; real CRUD/query behaviour is provided in follow-up PRs. -->
-    <bean id="delegationRuleService"
-          class="org.bonitasoft.engine.core.delegation.api.impl.DelegationRuleServiceStub" />
 
     <bean id="processInstanceService"
           class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl">

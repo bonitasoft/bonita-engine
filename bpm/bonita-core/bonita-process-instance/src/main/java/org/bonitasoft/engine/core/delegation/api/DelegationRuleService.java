@@ -42,10 +42,17 @@ public interface DelegationRuleService {
      * Creates the rule for the delegator carried by {@code rule.delegatorId}, or replaces it
      * if one already exists. The associated process whitelist is replaced wholesale by the
      * provided list (an empty list is rejected by the API layer before reaching the service).
+     * <p>
+     * The caller is responsible for populating {@code rule.lastUpdatedBy}
+     * and {@code rule.lastUpdatedAt} on the incoming entity. The service does not stamp them —
+     * leaving them unset would persist zero values and silently break the audit trail.
      *
-     * @param rule the rule fields to persist (id is ignored on create, used on replace)
+     * @param rule the rule fields to persist (id is ignored on create, used on replace;
+     *        {@code lastUpdatedBy} and {@code lastUpdatedAt} must be set by the caller)
      * @param processes the process whitelist for this rule (at least one entry)
      * @return the persisted rule with server-assigned fields populated
+     * @throws SDelegationRuleCreationException if a cross-field invariant is violated
+     *         ({@code delegate == delegator} or {@code startDate >= endDate})
      */
     SDelegationRule createOrUpdateRule(SDelegationRule rule, List<String> processes) throws SBonitaException;
 
@@ -63,18 +70,16 @@ public interface DelegationRuleService {
      * @param descriptor the fields to modify (keys correspond to {@link SDelegationRule} attribute names)
      * @param newProcesses the replacement process whitelist, or {@code null} to leave it untouched
      * @return the updated rule
-     * @implSpec The API layer only validates {@code startDate < endDate} when both bounds are
-     *           present in the descriptor. When only one bound is supplied the persistence
-     *           layer must read the existing rule's other bound and reject the update if the
-     *           resulting window would be inverted.
+     * @throws SDelegationRuleNotFoundException if no rule with that id exists
+     * @throws SDelegationRuleUpdateException if a state-dependent invariant rejects the update
      */
     SDelegationRule updateRule(long ruleId, EntityUpdateDescriptor descriptor, List<String> newProcesses)
             throws SBonitaException;
 
     /**
      * Deletes the rule with the given id, cascading to its process whitelist entries.
-     * <p>
-     * Idempotent: deleting an already-deleted rule completes silently.
+     *
+     * @throws SDelegationRuleNotFoundException if no rule with that id exists
      */
     void deleteRule(long ruleId) throws SBonitaException;
 

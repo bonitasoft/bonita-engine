@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+    <query name="getDelegationRuleByDelegatorId">
+        SELECT r
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS r
+        WHERE r.delegatorId = :delegatorId
+    </query>
+
+</hibernate-mapping>
