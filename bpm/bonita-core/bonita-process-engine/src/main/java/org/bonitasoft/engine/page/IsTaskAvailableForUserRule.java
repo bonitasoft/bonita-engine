@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.core.delegation.api.DelegationRuleService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
@@ -38,11 +39,14 @@ public class IsTaskAvailableForUserRule implements AuthorizationRule {
 
     SessionAccessor sessionAccessor;
 
+    DelegationRuleService delegationRuleService;
+
     public IsTaskAvailableForUserRule(ActivityInstanceService activityInstanceService, SessionService sessionService,
-            SessionAccessor sessionAccessor) {
+            SessionAccessor sessionAccessor, DelegationRuleService delegationRuleService) {
         this.activityInstanceService = activityInstanceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
+        this.delegationRuleService = delegationRuleService;
     }
 
     @Override
@@ -75,10 +79,13 @@ public class IsTaskAvailableForUserRule implements AuthorizationRule {
             final SHumanTaskInstance humanTaskInstance = activityInstanceService.getHumanTaskInstance(taskInstanceId);
             long assigneeId = humanTaskInstance.getAssigneeId();
             if (assigneeId > 0) {
-                return userId == assigneeId;
-            } else {
-                return activityInstanceService.isTaskPendingForUser(taskInstanceId, userId);
+                if (userId == assigneeId) {
+                    return true;
+                }
+            } else if (activityInstanceService.isTaskPendingForUser(taskInstanceId, userId)) {
+                return true;
             }
+            return delegationRuleService.isActiveDelegate(userId, taskInstanceId);
         } catch (SActivityInstanceNotFoundException e) {
             final SAHumanTaskInstance archivedHumanTaskInstance = activityInstanceService
                     .getLastArchivedFlowNodeInstance(SAHumanTaskInstance.class, taskInstanceId);

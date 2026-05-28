@@ -2049,6 +2049,7 @@
     <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="delegationRuleService" ref="delegationRuleService" />
     </bean>
     <bean id="isActorInitiatorRule" class="org.bonitasoft.engine.page.IsActorInitiatorRule">
         <constructor-arg name="sessionService" ref="sessionService" />
