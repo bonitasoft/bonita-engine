@@ -3,9 +3,9 @@
 <hibernate-mapping auto-import="false">
 
     <query name="getDelegationRuleByDelegatorId">
-        SELECT r
-        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS r
-        WHERE r.delegatorId = :delegatorId
+        SELECT delegationRule
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule
+        WHERE delegationRule.delegatorId = :delegatorId
     </query>
 
     <query name="getProcessNamesByDelegationRuleId">
@@ -30,6 +30,325 @@
     <query name="searchSDelegationRule">
         SELECT delegationRule
         FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule
+    </query>
+
+    <query name="getActiveDelegationRulesForDelegate">
+        SELECT delegationRule
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule
+        WHERE delegationRule.delegateId = :delegateId
+          AND delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+        ORDER BY delegationRule.id ASC
+    </query>
+
+    <query name="existsActiveRuleForDelegate">
+        SELECT count(delegationRule.id)
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule
+        WHERE delegationRule.delegateId = :delegateId
+          AND delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+    </query>
+
+    <query name="isActiveDelegateForTask">
+        SELECT count(delegationRule.id)
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.delegateId = :delegateId
+          AND delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.id = :taskId
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <!--
+    SDelegatedHumanTask search-entity convention.
+    The search-entity engine derives the named-query name from the result entity simple
+    name and the filter classes referenced in the SearchOptions, in the form:
+    {search|getNumberOf}S{Entity}with{sorted-other-entity-simple-names}.
+    Filters on SDelegatedHumanTask itself collapse onto the base name (no "with" suffix).
+    Filters on SHumanTaskInstance / SDelegationRule / SProcessDefinitionDeployInfo each
+    add the corresponding simple class name, sorted alphabetically. Eight combinations
+    cover every possible filter shape on this descriptor; the body is identical because
+    the FROM clause always carries all five joined tables.
+    -->
+
+    <query name="getNumberOfSDelegatedHumanTask">
+        SELECT count(a.id)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="searchSDelegatedHumanTask">
+        SELECT new org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask(
+                   a, process_definition, delegationRule.delegatorId, delegationRule.delegateId,
+                   delegationRule.startDate, delegationRule.endDate)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="getNumberOfSDelegatedHumanTaskwithSDelegationRule">
+        SELECT count(a.id)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="searchSDelegatedHumanTaskwithSDelegationRule">
+        SELECT new org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask(
+                   a, process_definition, delegationRule.delegatorId, delegationRule.delegateId,
+                   delegationRule.startDate, delegationRule.endDate)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="getNumberOfSDelegatedHumanTaskwithSHumanTaskInstance">
+        SELECT count(a.id)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="searchSDelegatedHumanTaskwithSHumanTaskInstance">
+        SELECT new org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask(
+                   a, process_definition, delegationRule.delegatorId, delegationRule.delegateId,
+                   delegationRule.startDate, delegationRule.endDate)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="getNumberOfSDelegatedHumanTaskwithSProcessDefinitionDeployInfo">
+        SELECT count(a.id)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="searchSDelegatedHumanTaskwithSProcessDefinitionDeployInfo">
+        SELECT new org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask(
+                   a, process_definition, delegationRule.delegatorId, delegationRule.delegateId,
+                   delegationRule.startDate, delegationRule.endDate)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="getNumberOfSDelegatedHumanTaskwithSDelegationRuleSHumanTaskInstance">
+        SELECT count(a.id)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="searchSDelegatedHumanTaskwithSDelegationRuleSHumanTaskInstance">
+        SELECT new org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask(
+                   a, process_definition, delegationRule.delegatorId, delegationRule.delegateId,
+                   delegationRule.startDate, delegationRule.endDate)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="getNumberOfSDelegatedHumanTaskwithSDelegationRuleSProcessDefinitionDeployInfo">
+        SELECT count(a.id)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="searchSDelegatedHumanTaskwithSDelegationRuleSProcessDefinitionDeployInfo">
+        SELECT new org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask(
+                   a, process_definition, delegationRule.delegatorId, delegationRule.delegateId,
+                   delegationRule.startDate, delegationRule.endDate)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="getNumberOfSDelegatedHumanTaskwithSHumanTaskInstanceSProcessDefinitionDeployInfo">
+        SELECT count(a.id)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="searchSDelegatedHumanTaskwithSHumanTaskInstanceSProcessDefinitionDeployInfo">
+        SELECT new org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask(
+                   a, process_definition, delegationRule.delegatorId, delegationRule.delegateId,
+                   delegationRule.startDate, delegationRule.endDate)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="getNumberOfSDelegatedHumanTaskwithSDelegationRuleSHumanTaskInstanceSProcessDefinitionDeployInfo">
+        SELECT count(a.id)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
+    <query name="searchSDelegatedHumanTaskwithSDelegationRuleSHumanTaskInstanceSProcessDefinitionDeployInfo">
+        SELECT new org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask(
+                   a, process_definition, delegationRule.delegatorId, delegationRule.delegateId,
+                   delegationRule.startDate, delegationRule.endDate)
+        FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND a.assigneeId = delegationRule.delegatorId
+          AND p.id = a.logicalGroup2
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
     </query>
 
 </hibernate-mapping>

@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -38,6 +39,7 @@ import java.util.Optional;
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleCreationException;
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleNotFoundException;
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleUpdateException;
+import org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask;
 import org.bonitasoft.engine.core.delegation.model.SDelegationRule;
 import org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess;
 import org.bonitasoft.engine.delegation.DelegationRuleFilterKeys;
@@ -69,6 +71,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DelegationRuleServiceImplTest {
 
+    /** Fixed reference timestamp used by the date-window tests (STATUS-rewrite and active-rules-for-delegate). */
+    private static final long FIXED_NOW = 1_700_000_000_000L;
+
     @Mock
     private Recorder recorder;
     @Mock
@@ -78,12 +83,9 @@ class DelegationRuleServiceImplTest {
     @InjectMocks
     private DelegationRuleServiceImpl service;
 
-    /** Fixed reference timestamp used by the STATUS-rewrite tests. */
-    private static final long FIXED_NOW = 1_700_000_000_000L;
-
     @BeforeEach
     void setUp() {
-        // STATUS-rewrite tests pin "now" to FIXED_NOW; lenient() because most tests in this class
+        // Date-window tests pin "now" to FIXED_NOW; lenient() because most tests in this class
         // never reach the rewrite path and would otherwise trip Mockito's strict-stubs check.
         lenient().doReturn(FIXED_NOW).when(service).currentTimeMillis();
     }
@@ -769,6 +771,220 @@ class DelegationRuleServiceImplTest {
         return row;
     }
 
+    @Test
+    void getActiveDelegationRulesForDelegate_returns_rules_returned_by_persistence() throws Exception {
+        //given — date-window filtering is enforced DB-side by :now; the unit test asserts forwarding only
+        final SDelegationRule active = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L)
+                .startDate(FIXED_NOW - 1000L).endDate(FIXED_NOW + 1000L).build();
+        when(persistenceService.selectList(argThat(this::queryTargetsActiveRulesForDelegate20)))
+                .thenReturn(Collections.singletonList(active));
+
+        //when
+        final List<SDelegationRule> actual = service.getActiveDelegationRulesForDelegate(20L);
+
+        //then
+        assertThat(actual).containsExactly(active);
+    }
+
+    @Test
+    void getActiveDelegationRulesForDelegate_returns_empty_list_when_persistence_returns_nothing() throws Exception {
+        //given
+        when(persistenceService.selectList(argThat(this::queryTargetsActiveRulesForDelegate20)))
+                .thenReturn(Collections.emptyList());
+
+        //when
+        final List<SDelegationRule> actual = service.getActiveDelegationRulesForDelegate(20L);
+
+        //then
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void getActiveDelegationRulesForDelegate_builds_descriptor_with_delegateId_and_now_parameters()
+            throws Exception {
+        //given
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        final ArgumentCaptor<SelectListDescriptor<SDelegationRule>> captor = ArgumentCaptor
+                .forClass((Class) SelectListDescriptor.class);
+        when(persistenceService.selectList(captor.capture())).thenReturn(Collections.emptyList());
+
+        //when
+        service.getActiveDelegationRulesForDelegate(20L);
+
+        //then
+        final SelectListDescriptor<SDelegationRule> descriptor = captor.getValue();
+        assertThat(descriptor.getQueryName()).isEqualTo(DelegationRuleServiceImpl.QUERY_ACTIVE_RULES_FOR_DELEGATE);
+        assertThat(descriptor.getInputParameters())
+                .containsEntry("delegateId", 20L)
+                .containsEntry("now", FIXED_NOW);
+        assertThat(descriptor.getReturnType()).isEqualTo(SDelegationRule.class);
+    }
+
+    @Test
+    void isActiveDelegate_returns_false_when_persistence_count_is_zero() throws Exception {
+        //given — date-window, whitelist match, and root-process resolution are enforced DB-side
+        //       by the HQL; this unit test asserts only the count → boolean translation.
+        //       The EXISTS pre-check is stubbed positive so we reach the multi-join.
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100))).thenReturn(0L);
+
+        //when
+        final boolean actual = service.isActiveDelegate(20L, 100L);
+
+        //then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void isActiveDelegate_returns_true_when_persistence_count_is_positive() throws Exception {
+        //given
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100))).thenReturn(1L);
+
+        //when
+        final boolean actual = service.isActiveDelegate(20L, 100L);
+
+        //then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void isActiveDelegate_returns_false_when_persistence_returns_null() throws Exception {
+        //given — selectOne can return null on certain DB/dialect combinations; the impl
+        //guards with `count != null && count > 0L` to keep the boolean translation safe.
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100))).thenReturn(null);
+
+        //when
+        final boolean actual = service.isActiveDelegate(20L, 100L);
+
+        //then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void isActiveDelegate_builds_join_descriptor_with_delegateId_taskId_and_now_parameters() throws Exception {
+        //given — capture both selectOne calls in order: first the EXISTS pre-check (1L so we
+        //reach the join), then the multi-join we want to assert on.
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        final ArgumentCaptor<SelectOneDescriptor<Long>> captor = ArgumentCaptor
+                .forClass((Class) SelectOneDescriptor.class);
+        when(persistenceService.selectOne(captor.capture())).thenReturn(1L, 0L);
+
+        //when
+        service.isActiveDelegate(20L, 100L);
+
+        //then
+        final SelectOneDescriptor<Long> joinDescriptor = captor.getAllValues().stream()
+                .filter(d -> DelegationRuleServiceImpl.QUERY_IS_ACTIVE_DELEGATE_FOR_TASK.equals(d.getQueryName()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(joinDescriptor.getInputParameters())
+                .containsEntry("delegateId", 20L)
+                .containsEntry("taskId", 100L)
+                .containsEntry("now", FIXED_NOW);
+        assertThat(joinDescriptor.getReturnType()).isEqualTo(Long.class);
+    }
+
+    @Test
+    void isActiveDelegate_fast_exits_to_false_without_running_join_when_delegate_has_no_active_rule()
+            throws Exception {
+        //given — docstring promise: "non-delegate callers must not pay the cost of the full check"
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(0L);
+
+        //when
+        final boolean actual = service.isActiveDelegate(20L, 100L);
+
+        //then
+        assertThat(actual).isFalse();
+        verify(persistenceService, never()).selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100));
+    }
+
+    @Test
+    void isActiveDelegate_fast_exits_to_false_when_exists_pre_check_returns_null() throws Exception {
+        //given — same null-safety guard as the multi-join branch, applied to the fast-exit count
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(null);
+
+        //when
+        final boolean actual = service.isActiveDelegate(20L, 100L);
+
+        //then
+        assertThat(actual).isFalse();
+        verify(persistenceService, never()).selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100));
+    }
+
+    @Test
+    void isActiveDelegate_builds_exists_descriptor_with_delegateId_and_now_parameters() throws Exception {
+        //given — fast-exit returns 0 so only the EXISTS descriptor reaches persistenceService
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        final ArgumentCaptor<SelectOneDescriptor<Long>> captor = ArgumentCaptor
+                .forClass((Class) SelectOneDescriptor.class);
+        when(persistenceService.selectOne(captor.capture())).thenReturn(0L);
+
+        //when
+        service.isActiveDelegate(20L, 100L);
+
+        //then
+        final SelectOneDescriptor<Long> descriptor = captor.getValue();
+        assertThat(descriptor.getQueryName())
+                .isEqualTo(DelegationRuleServiceImpl.QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE);
+        assertThat(descriptor.getInputParameters())
+                .containsEntry("delegateId", 20L)
+                .containsEntry("now", FIXED_NOW)
+                .doesNotContainKey("taskId");
+        assertThat(descriptor.getReturnType()).isEqualTo(Long.class);
+    }
+
+    @Test
+    void searchDelegatedTasks_forwards_queryOptions_with_now_and_returns_persistence_result() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(5, 20);
+        final SDelegatedHumanTask task = SDelegatedHumanTask.builder().delegatorId(10L).delegateId(20L).build();
+        @SuppressWarnings("unchecked")
+        final ArgumentCaptor<Map<String, Object>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+        when(persistenceService.searchEntity(eq(SDelegatedHumanTask.class), eq(options), paramsCaptor.capture()))
+                .thenReturn(Collections.singletonList(task));
+
+        //when
+        final List<SDelegatedHumanTask> actual = service.searchDelegatedTasks(options);
+
+        //then
+        assertThat(actual).containsExactly(task);
+        assertThat(paramsCaptor.getValue()).containsEntry("now", FIXED_NOW);
+    }
+
+    @Test
+    void searchDelegatedTasks_returns_empty_list_when_persistence_returns_nothing() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 20);
+        when(persistenceService.searchEntity(eq(SDelegatedHumanTask.class), eq(options), anyMap()))
+                .thenReturn(Collections.emptyList());
+
+        //when
+        final List<SDelegatedHumanTask> actual = service.searchDelegatedTasks(options);
+
+        //then
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void getNumberOfDelegatedTasks_forwards_queryOptions_with_now_and_returns_persistence_count() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 20);
+        @SuppressWarnings("unchecked")
+        final ArgumentCaptor<Map<String, Object>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+        when(persistenceService.getNumberOfEntities(eq(SDelegatedHumanTask.class), eq(options),
+                paramsCaptor.capture())).thenReturn(7L);
+
+        //when
+        final long actual = service.getNumberOfDelegatedTasks(options);
+
+        //then
+        assertThat(actual).isEqualTo(7L);
+        assertThat(paramsCaptor.getValue()).containsEntry("now", FIXED_NOW);
+    }
+
     private boolean queryTargetsRuleByDelegatorId(final SelectOneDescriptor<?> descriptor) {
         return descriptor != null
                 && DelegationRuleServiceImpl.QUERY_RULE_BY_DELEGATOR_ID.equals(descriptor.getQueryName())
@@ -783,5 +999,30 @@ class DelegationRuleServiceImplTest {
     private boolean queryTargetsProcessNamesByRuleIds(final SelectListDescriptor<?> descriptor) {
         return descriptor != null
                 && DelegationRuleServiceImpl.QUERY_PROCESS_NAMES_BY_RULE_IDS.equals(descriptor.getQueryName());
+    }
+
+    private boolean queryTargetsActiveRulesForDelegate20(final SelectListDescriptor<?> descriptor) {
+        return descriptor != null
+                && DelegationRuleServiceImpl.QUERY_ACTIVE_RULES_FOR_DELEGATE.equals(descriptor.getQueryName())
+                && descriptor.getReturnType().equals(SDelegationRule.class)
+                && Long.valueOf(20L).equals(descriptor.getInputParameters().get("delegateId"))
+                && Long.valueOf(FIXED_NOW).equals(descriptor.getInputParameters().get("now"));
+    }
+
+    private boolean queryTargetsIsActiveDelegateFor20And100(final SelectOneDescriptor<?> descriptor) {
+        return descriptor != null
+                && DelegationRuleServiceImpl.QUERY_IS_ACTIVE_DELEGATE_FOR_TASK.equals(descriptor.getQueryName())
+                && descriptor.getReturnType().equals(Long.class)
+                && Long.valueOf(20L).equals(descriptor.getInputParameters().get("delegateId"))
+                && Long.valueOf(100L).equals(descriptor.getInputParameters().get("taskId"))
+                && Long.valueOf(FIXED_NOW).equals(descriptor.getInputParameters().get("now"));
+    }
+
+    private boolean queryTargetsExistsActiveRuleFor20(final SelectOneDescriptor<?> descriptor) {
+        return descriptor != null
+                && DelegationRuleServiceImpl.QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE.equals(descriptor.getQueryName())
+                && descriptor.getReturnType().equals(Long.class)
+                && Long.valueOf(20L).equals(descriptor.getInputParameters().get("delegateId"))
+                && Long.valueOf(FIXED_NOW).equals(descriptor.getInputParameters().get("now"));
     }
 }

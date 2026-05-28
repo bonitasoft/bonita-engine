@@ -53,14 +53,11 @@ import org.springframework.stereotype.Service;
 /**
  * Persistence-backed implementation of {@link DelegationRuleService}.
  * <p>
- * The write-side methods ({@code createOrUpdateRule}, {@code updateRule}, {@code deleteRule}),
- * the two read helpers they depend on ({@code getRule}, {@code getRuleForDelegator}), and the
- * rule-search / whitelist-projection reads ({@code searchRules}, {@code getNumberOfRules},
- * {@code getProcessNamesByRuleId}, {@code getProcessNamesByRuleIds}) are implemented here.
- * The remaining permission-layer reads — {@code searchDelegatedTasks},
- * {@code getNumberOfDelegatedTasks}, {@code isActiveDelegate} and
- * {@code getActiveDelegationRulesForDelegate} — currently throw
- * {@link UnsupportedOperationException} pending a follow-up.
+ * Date-window enforcement (active rules / active delegate / delegated tasks) is pushed
+ * DB-side via {@code :now} parameters on the HQL queries — see {@link #currentTimeMillis()}
+ * for the test seam. Root-process resolution uses the task's {@code logicalGroup2} column
+ * (the canonical root-process-instance-id field) rather than the immediate parent, so
+ * subprocess tasks resolve to the top-level process the rule's whitelist matched against.
  */
 @Slf4j
 @Service("delegationRuleService")
@@ -77,13 +74,17 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
 
     static final String QUERY_PROCESS_NAMES_BY_RULE_IDS = "getProcessNamesByDelegationRuleIds";
 
+    static final String QUERY_ACTIVE_RULES_FOR_DELEGATE = "getActiveDelegationRulesForDelegate";
+
+    static final String QUERY_IS_ACTIVE_DELEGATE_FOR_TASK = "isActiveDelegateForTask";
+
+    static final String QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE = "existsActiveRuleForDelegate";
+
     public static final String STATUS_SCHEDULED = "scheduled";
 
     public static final String STATUS_ACTIVE = "active";
 
     public static final String STATUS_EXPIRED = "expired";
-
-    private static final String QUERY_PENDING_MESSAGE = "DelegationRuleService query methods not yet implemented";
 
     private final Recorder recorder;
 
@@ -360,12 +361,21 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
 
     @Override
     public long getNumberOfDelegatedTasks(final QueryOptions options) throws SBonitaReadException {
-        throw new UnsupportedOperationException(QUERY_PENDING_MESSAGE);
+        return persistenceService.getNumberOfEntities(SDelegatedHumanTask.class, options,
+                Map.of("now", currentTimeMillis()));
     }
 
+    /**
+     * Search rows of {@link SDelegatedHumanTask} — the wrapper joining a human task with its
+     * delegator's active rule and the root process's deploy info. The HQL named query
+     * {@code searchSDelegatedHumanTask} (and its {@code getNumberOf} counterpart) carries the
+     * JOIN and date-window predicate; the {@code SearchDelegatedTaskDescriptor} on the
+     * subscription side maps the public filter / sort keys onto the participating columns.
+     */
     @Override
     public List<SDelegatedHumanTask> searchDelegatedTasks(final QueryOptions options) throws SBonitaReadException {
-        throw new UnsupportedOperationException(QUERY_PENDING_MESSAGE);
+        return persistenceService.searchEntity(SDelegatedHumanTask.class, options,
+                Map.of("now", currentTimeMillis()));
     }
 
     @Override
@@ -403,14 +413,49 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
         return result;
     }
 
+    /**
+     * Permission hot-path check executed in two stages:
+     * <ol>
+     * <li>A cheap fast-exit count on {@code SDelegationRule} alone — returns {@code false}
+     * immediately when the caller is not a delegate of any currently-active rule, sparing
+     * the multi-join cost on every form-display authorization check for users who aren't
+     * standing in for anyone right now.</li>
+     * <li>If at least one active rule exists, the full {@code isActiveDelegateForTask}
+     * named query joining rule + whitelist + human task + process instance +
+     * process-definition deploy info enforces the active-window, whitelist match,
+     * task-assignee match, and root-process resolution (via the task's
+     * {@code logicalGroup2}, the canonical "root process instance id" field used by
+     * the rest of the engine's task-to-root-process queries) DB-side. This method only
+     * translates the resulting count into a boolean.</li>
+     * </ol>
+     */
     @Override
     public boolean isActiveDelegate(final long delegateId, final long taskId) throws SBonitaReadException {
-        throw new UnsupportedOperationException(QUERY_PENDING_MESSAGE);
+        final long now = currentTimeMillis();
+        final Long activeRulesCount = persistenceService.selectOne(new SelectOneDescriptor<>(
+                QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE,
+                Map.of("delegateId", delegateId, "now", now),
+                SDelegationRule.class, Long.class));
+        if (activeRulesCount == null || activeRulesCount == 0L) {
+            return false;
+        }
+        final Long count = persistenceService.selectOne(new SelectOneDescriptor<>(QUERY_IS_ACTIVE_DELEGATE_FOR_TASK,
+                Map.of("delegateId", delegateId, "taskId", taskId, "now", now),
+                SDelegationRule.class, Long.class));
+        return count != null && count > 0L;
     }
 
     @Override
     public List<SDelegationRule> getActiveDelegationRulesForDelegate(final long delegateId)
             throws SBonitaReadException {
-        throw new UnsupportedOperationException(QUERY_PENDING_MESSAGE);
+        // Date-window predicates (startDate <= :now and endDate >= :now) live in the HQL named
+        // query, so scheduled/expired rules are filtered DB-side. Result set is bounded only
+        // by social structure: one user can be the delegate on N rules (one per delegator who
+        // delegated to them — the UNIQUE constraint on delegation_rule is on delegator_id, not
+        // delegate_id). In practice this is small, so we accept QueryOptions.ALL_RESULTS and
+        // keep the permission-layer hot path call-site free of pagination plumbing.
+        return persistenceService.selectList(new SelectListDescriptor<>(QUERY_ACTIVE_RULES_FOR_DELEGATE,
+                Map.of("delegateId", delegateId, "now", currentTimeMillis()),
+                SDelegationRule.class, QueryOptions.ALL_RESULTS));
     }
 }

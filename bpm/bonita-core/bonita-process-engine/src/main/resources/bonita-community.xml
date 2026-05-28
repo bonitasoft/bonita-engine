@@ -1050,6 +1050,7 @@
         <property name="sourceList">
             <list>
                 <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple</value>
+                <value>org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask</value>
             </list>
         </property>
     </bean>
