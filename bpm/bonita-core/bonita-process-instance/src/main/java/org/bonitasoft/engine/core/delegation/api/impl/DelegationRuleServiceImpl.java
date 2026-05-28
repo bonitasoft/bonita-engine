@@ -13,8 +13,12 @@
  **/
 package org.bonitasoft.engine.core.delegation.api.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,12 +32,15 @@ import org.bonitasoft.engine.core.delegation.api.SDelegationRuleUpdateException;
 import org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask;
 import org.bonitasoft.engine.core.delegation.model.SDelegationRule;
 import org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess;
+import org.bonitasoft.engine.delegation.DelegationRuleFilterKeys;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
@@ -46,12 +53,13 @@ import org.springframework.stereotype.Service;
 /**
  * Persistence-backed implementation of {@link DelegationRuleService}.
  * <p>
- * The write-side methods ({@code createOrUpdateRule}, {@code updateRule}, {@code deleteRule})
- * and the two read helpers they depend on ({@code getRule}, {@code getRuleForDelegator}) are
- * implemented here. The remaining query methods — {@code searchRules}, {@code getNumberOfRules},
- * {@code searchDelegatedTasks}, {@code getNumberOfDelegatedTasks},
- * {@code getProcessNamesByRuleId}, {@code getProcessNamesByRuleIds},
- * {@code isActiveDelegate} and {@code getActiveDelegationRulesForDelegate} — currently throw
+ * The write-side methods ({@code createOrUpdateRule}, {@code updateRule}, {@code deleteRule}),
+ * the two read helpers they depend on ({@code getRule}, {@code getRuleForDelegator}), and the
+ * rule-search / whitelist-projection reads ({@code searchRules}, {@code getNumberOfRules},
+ * {@code getProcessNamesByRuleId}, {@code getProcessNamesByRuleIds}) are implemented here.
+ * The remaining permission-layer reads — {@code searchDelegatedTasks},
+ * {@code getNumberOfDelegatedTasks}, {@code isActiveDelegate} and
+ * {@code getActiveDelegationRulesForDelegate} — currently throw
  * {@link UnsupportedOperationException} pending a follow-up.
  */
 @Slf4j
@@ -64,6 +72,16 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
     static final String RECORD_TYPE_DELEGATION_RULE_PROCESS = "DELEGATION_RULE_PROCESS";
 
     static final String QUERY_RULE_BY_DELEGATOR_ID = "getDelegationRuleByDelegatorId";
+
+    static final String QUERY_PROCESS_NAMES_BY_RULE_ID = "getProcessNamesByDelegationRuleId";
+
+    static final String QUERY_PROCESS_NAMES_BY_RULE_IDS = "getProcessNamesByDelegationRuleIds";
+
+    public static final String STATUS_SCHEDULED = "scheduled";
+
+    public static final String STATUS_ACTIVE = "active";
+
+    public static final String STATUS_EXPIRED = "expired";
 
     private static final String QUERY_PENDING_MESSAGE = "DelegationRuleService query methods not yet implemented";
 
@@ -237,12 +255,107 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
 
     @Override
     public long getNumberOfRules(final QueryOptions options) throws SBonitaReadException {
-        throw new UnsupportedOperationException(QUERY_PENDING_MESSAGE);
+        return persistenceService.getNumberOfEntities(SDelegationRule.class, rewriteStatusFilter(options), null);
     }
 
     @Override
     public List<SDelegationRule> searchRules(final QueryOptions options) throws SBonitaReadException {
-        throw new UnsupportedOperationException(QUERY_PENDING_MESSAGE);
+        return persistenceService.searchEntity(SDelegationRule.class, rewriteStatusFilter(options), null);
+    }
+
+    /**
+     * Package-private seam over {@link System#currentTimeMillis()} so unit tests can pin "now"
+     * by stubbing this method via Mockito (e.g. {@code doReturn(FIXED_NOW).when(spy).currentTimeMillis()}
+     * on a {@code @Spy} of the service). Production callers always see real wall-clock time.
+     */
+    // @VisibleForTesting
+    long currentTimeMillis() {
+        return System.currentTimeMillis();
+    }
+
+    /**
+     * Translates the virtual {@link DelegationRuleFilterKeys#STATUS STATUS} filter into date-range
+     * predicates against {@code startDate}/{@code endDate}. The public-API descriptor forwards
+     * {@code STATUS} as the {@link FilterOption} field name; this method strips it before forwarding
+     * to Hibernate, which would otherwise reject the unknown column.
+     */
+    private QueryOptions rewriteStatusFilter(final QueryOptions options) throws SBonitaReadException {
+        final List<FilterOption> filters = options.getFilters();
+        if (filters == null || filters.isEmpty()) {
+            return options;
+        }
+        final FilterOption statusFilter = findStatusFilter(filters);
+        if (statusFilter == null) {
+            return options;
+        }
+        // toString() + lowercase normalises both forms the public API contract accepts:
+        // strings (e.g. "active" from REST) and DelegationStatus enum values, whose
+        // Enum.toString() returns the uppercase name() form (e.g. "ACTIVE").
+        final String statusValue = statusFilter.getValue().toString().toLowerCase(Locale.ROOT);
+        final List<FilterOption> rewritten = new ArrayList<>(filters.size() + 1);
+        for (final FilterOption filter : filters) {
+            if (filter != statusFilter) {
+                rewritten.add(filter);
+            }
+        }
+        rewritten.addAll(dateFiltersForStatus(statusValue, currentTimeMillis()));
+        return new QueryOptions(options.getFromIndex(), options.getNumberOfResults(),
+                options.getOrderByOptions(), rewritten, options.getMultipleFilter());
+    }
+
+    /**
+     * Locates the single {@link DelegationRuleFilterKeys#STATUS STATUS} filter in {@code filters}
+     * and validates that it carries an {@code EQUALS} operation with a non-null value. Returns
+     * {@code null} when no STATUS filter is present (the caller short-circuits the rewrite).
+     *
+     * @throws SBonitaReadException when STATUS appears more than once, when its operation is not
+     *         {@code EQUALS}, or when its value is {@code null}
+     */
+    private FilterOption findStatusFilter(final List<FilterOption> filters) throws SBonitaReadException {
+        FilterOption statusFilter = null;
+        for (final FilterOption filter : filters) {
+            if (DelegationRuleFilterKeys.STATUS.equals(filter.getFieldName())) {
+                if (statusFilter != null) {
+                    throw new SBonitaReadException("STATUS filter must appear at most once");
+                }
+                statusFilter = filter;
+            }
+        }
+        if (statusFilter == null) {
+            return null;
+        }
+        if (statusFilter.getFilterOperationType() != FilterOperationType.EQUALS) {
+            throw new SBonitaReadException("STATUS filter supports only EQUALS (got "
+                    + statusFilter.getFilterOperationType() + ")");
+        }
+        if (statusFilter.getValue() == null) {
+            throw new SBonitaReadException("STATUS filter value must not be null");
+        }
+        return statusFilter;
+    }
+
+    /**
+     * Returns the {@link FilterOption} list that replaces the STATUS sentinel for the given
+     * lifecycle {@code statusValue}, computed against {@code now}.
+     *
+     * @throws SBonitaReadException when {@code statusValue} is not one of {@code scheduled},
+     *         {@code active}, {@code expired}
+     */
+    private List<FilterOption> dateFiltersForStatus(final String statusValue, final long now)
+            throws SBonitaReadException {
+        return switch (statusValue) {
+            case STATUS_SCHEDULED -> Collections.singletonList(new FilterOption(SDelegationRule.class,
+                    SDelegationRule.START_DATE_KEY, now, FilterOperationType.GREATER));
+            case STATUS_ACTIVE -> Arrays.asList(
+                    new FilterOption(SDelegationRule.class, SDelegationRule.START_DATE_KEY, now,
+                            FilterOperationType.LESS_OR_EQUALS),
+                    new FilterOption(SDelegationRule.class, SDelegationRule.END_DATE_KEY, now,
+                            FilterOperationType.GREATER_OR_EQUALS));
+            case STATUS_EXPIRED -> Collections.singletonList(new FilterOption(SDelegationRule.class,
+                    SDelegationRule.END_DATE_KEY, now, FilterOperationType.LESS));
+            default -> throw new SBonitaReadException("Unknown STATUS value '%s' (accepted: %s, %s, %s)"
+                    .formatted(statusValue, STATUS_SCHEDULED, STATUS_ACTIVE, STATUS_EXPIRED));
+        };
     }
 
     @Override
@@ -257,12 +370,37 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
 
     @Override
     public List<String> getProcessNamesByRuleId(final long ruleId) throws SBonitaReadException {
-        throw new UnsupportedOperationException(QUERY_PENDING_MESSAGE);
+        final SelectListDescriptor<String> descriptor = new SelectListDescriptor<>(QUERY_PROCESS_NAMES_BY_RULE_ID,
+                Collections.singletonMap("ruleId", ruleId), SDelegationRuleProcess.class, String.class,
+                QueryOptions.ALL_RESULTS);
+        return persistenceService.selectList(descriptor);
     }
 
     @Override
     public Map<Long, List<String>> getProcessNamesByRuleIds(final List<Long> ruleIds) throws SBonitaReadException {
-        throw new UnsupportedOperationException(QUERY_PENDING_MESSAGE);
+        if (ruleIds == null || ruleIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        final SelectListDescriptor<Map<String, Object>> descriptor = new SelectListDescriptor<>(
+                QUERY_PROCESS_NAMES_BY_RULE_IDS,
+                Collections.singletonMap("ruleIds", ruleIds),
+                SDelegationRuleProcess.class, QueryOptions.ALL_RESULTS);
+        // IN (:ruleIds) is not chunked — Oracle limits IN-lists to 1000 entries.
+        // Current callers stay well below that (per-page batch projection at page size ~100).
+        final List<Map<String, Object>> rows = persistenceService.selectList(descriptor);
+        final Map<Long, List<String>> result = new LinkedHashMap<>();
+        for (final Long ruleId : ruleIds) {
+            result.put(ruleId, new ArrayList<>());
+        }
+        for (final Map<String, Object> row : rows) {
+            // "ruleId" and "processName" are aliases declared in the
+            // "getProcessNamesByDelegationRuleIds" Hibernate named query (new map(... as ...)).
+            final Long ruleId = (Long) row.get("ruleId");
+            final String processName = (String) row.get("processName");
+            // The IN (:ruleIds) filter guarantees ruleId is one of the keys we seeded.
+            result.get(ruleId).add(processName);
+        }
+        return result;
     }
 
     @Override

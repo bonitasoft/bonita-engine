@@ -8,4 +8,28 @@
         WHERE r.delegatorId = :delegatorId
     </query>
 
+    <query name="getProcessNamesByDelegationRuleId">
+        SELECT p.processName
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS p
+        WHERE p.delegationRuleId = :ruleId
+        ORDER BY p.id
+    </query>
+
+    <query name="getProcessNamesByDelegationRuleIds">
+        SELECT new map(p.delegationRuleId as ruleId, p.processName as processName)
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS p
+        WHERE p.delegationRuleId IN (:ruleIds)
+        ORDER BY p.delegationRuleId, p.id
+    </query>
+
+    <query name="getNumberOfSDelegationRule">
+        SELECT COUNT(delegationRule.id)
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule
+    </query>
+
+    <query name="searchSDelegationRule">
+        SELECT delegationRule
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule
+    </query>
+
 </hibernate-mapping>

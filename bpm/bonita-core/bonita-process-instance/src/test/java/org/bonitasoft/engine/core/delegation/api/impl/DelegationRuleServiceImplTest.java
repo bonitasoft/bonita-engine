@@ -19,14 +19,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleCreationException;
@@ -34,10 +40,17 @@ import org.bonitasoft.engine.core.delegation.api.SDelegationRuleNotFoundExceptio
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleUpdateException;
 import org.bonitasoft.engine.core.delegation.model.SDelegationRule;
 import org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess;
+import org.bonitasoft.engine.delegation.DelegationRuleFilterKeys;
 import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -48,7 +61,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,11 +74,18 @@ class DelegationRuleServiceImplTest {
     @Mock
     private ReadPersistenceService persistenceService;
 
+    @Spy
+    @InjectMocks
     private DelegationRuleServiceImpl service;
+
+    /** Fixed reference timestamp used by the STATUS-rewrite tests. */
+    private static final long FIXED_NOW = 1_700_000_000_000L;
 
     @BeforeEach
     void setUp() {
-        service = new DelegationRuleServiceImpl(recorder, persistenceService);
+        // STATUS-rewrite tests pin "now" to FIXED_NOW; lenient() because most tests in this class
+        // never reach the rewrite path and would otherwise trip Mockito's strict-stubs check.
+        lenient().doReturn(FIXED_NOW).when(service).currentTimeMillis();
     }
 
     @Test
@@ -459,9 +481,307 @@ class DelegationRuleServiceImplTest {
         verify(recorder, never()).recordDeleteAll(any(DeleteAllRecord.class));
     }
 
+    @Test
+    void getProcessNamesByRuleId_returns_process_names_in_insertion_order() throws Exception {
+        //given
+        when(persistenceService.selectList(argThat(this::queryTargetsProcessNamesByRuleId)))
+                .thenReturn(Arrays.asList("alpha", "beta", "gamma"));
+
+        //when
+        final List<String> processes = service.getProcessNamesByRuleId(42L);
+
+        //then
+        assertThat(processes).containsExactly("alpha", "beta", "gamma");
+    }
+
+    @Test
+    void getProcessNamesByRuleId_returns_empty_list_when_no_whitelist_rows_match() throws Exception {
+        //given — covers both "rule has no whitelist" and "rule does not exist":
+        // the persistence layer cannot distinguish them at this projection.
+        when(persistenceService.selectList(argThat(this::queryTargetsProcessNamesByRuleId)))
+                .thenReturn(Collections.emptyList());
+
+        //when-then
+        assertThat(service.getProcessNamesByRuleId(42L)).isEmpty();
+    }
+
+    @Test
+    void getProcessNamesByRuleIds_returns_empty_map_for_empty_input() throws Exception {
+        //when
+        final Map<Long, List<String>> result = service.getProcessNamesByRuleIds(Collections.emptyList());
+
+        //then
+        assertThat(result).isEmpty();
+        verifyNoInteractions(persistenceService);
+    }
+
+    @Test
+    void getProcessNamesByRuleIds_groups_rows_by_rule_id_preserving_insertion_order() throws Exception {
+        //given
+        when(persistenceService.selectList(argThat(this::queryTargetsProcessNamesByRuleIds)))
+                .thenReturn(Arrays.asList(rowFor(1L, "a"), rowFor(1L, "b"), rowFor(2L, "x")));
+
+        //when
+        final Map<Long, List<String>> result = service.getProcessNamesByRuleIds(Arrays.asList(1L, 2L));
+
+        //then
+        assertThat(result).containsOnlyKeys(1L, 2L);
+        assertThat(result.get(1L)).containsExactly("a", "b");
+        assertThat(result.get(2L)).containsExactly("x");
+    }
+
+    @Test
+    void getProcessNamesByRuleIds_returns_empty_list_for_rule_with_no_whitelist_rows() throws Exception {
+        //given — rows only for rule 1; rule 2 has no whitelist
+        when(persistenceService.selectList(argThat(this::queryTargetsProcessNamesByRuleIds)))
+                .thenReturn(Arrays.asList(rowFor(1L, "a")));
+
+        //when
+        final Map<Long, List<String>> result = service.getProcessNamesByRuleIds(Arrays.asList(1L, 2L));
+
+        //then
+        assertThat(result.get(1L)).containsExactly("a");
+        assertThat(result.get(2L)).isEmpty();
+    }
+
+    @Test
+    void getProcessNamesByRuleIds_issues_a_single_persistence_call() throws Exception {
+        //given
+        when(persistenceService.selectList(argThat(this::queryTargetsProcessNamesByRuleIds)))
+                .thenReturn(Collections.emptyList());
+
+        //when
+        service.getProcessNamesByRuleIds(Arrays.asList(1L, 2L, 3L));
+
+        //then
+        verify(persistenceService, times(1)).selectList(any(SelectListDescriptor.class));
+    }
+
+    @Test
+    void searchRules_delegates_to_persistence_with_unchanged_options_when_no_status_filter() throws Exception {
+        //given — filters present but no STATUS among them
+        final FilterOption delegatorFilter = new FilterOption(SDelegationRule.class,
+                SDelegationRule.DELEGATOR_ID_KEY, 42L);
+        final QueryOptions options = new QueryOptions(0, 10, null,
+                Collections.singletonList(delegatorFilter), null);
+
+        //when
+        service.searchRules(options);
+
+        //then — same reference forwarded; no defensive copy
+        final ArgumentCaptor<QueryOptions> captor = ArgumentCaptor.forClass(QueryOptions.class);
+        verify(persistenceService).searchEntity(eq(SDelegationRule.class), captor.capture(), isNull());
+        assertThat(captor.getValue()).isSameAs(options);
+    }
+
+    @Test
+    void searchRules_rewrites_active_status_to_two_date_predicates() throws Exception {
+        //given
+        final QueryOptions options = statusFilterOnlyOptions("active", FilterOperationType.EQUALS);
+
+        //when
+        service.searchRules(options);
+
+        //then
+        final List<FilterOption> rewritten = captureRewrittenSearchFilters();
+        assertThat(rewritten)
+                .extracting(FilterOption::getFieldName, FilterOption::getFilterOperationType,
+                        FilterOption::getValue)
+                .containsExactlyInAnyOrder(
+                        org.assertj.core.groups.Tuple.tuple(SDelegationRule.START_DATE_KEY,
+                                FilterOperationType.LESS_OR_EQUALS, FIXED_NOW),
+                        org.assertj.core.groups.Tuple.tuple(SDelegationRule.END_DATE_KEY,
+                                FilterOperationType.GREATER_OR_EQUALS, FIXED_NOW));
+    }
+
+    @Test
+    void searchRules_rewrites_scheduled_status_to_start_date_after_now() throws Exception {
+        //given
+        final QueryOptions options = statusFilterOnlyOptions("scheduled", FilterOperationType.EQUALS);
+
+        //when
+        service.searchRules(options);
+
+        //then
+        final List<FilterOption> rewritten = captureRewrittenSearchFilters();
+        assertThat(rewritten)
+                .extracting(FilterOption::getFieldName, FilterOption::getFilterOperationType,
+                        FilterOption::getValue)
+                .containsExactly(org.assertj.core.groups.Tuple.tuple(SDelegationRule.START_DATE_KEY,
+                        FilterOperationType.GREATER, FIXED_NOW));
+    }
+
+    @Test
+    void searchRules_rewrites_expired_status_to_end_date_before_now() throws Exception {
+        //given
+        final QueryOptions options = statusFilterOnlyOptions("expired", FilterOperationType.EQUALS);
+
+        //when
+        service.searchRules(options);
+
+        //then
+        final List<FilterOption> rewritten = captureRewrittenSearchFilters();
+        assertThat(rewritten)
+                .extracting(FilterOption::getFieldName, FilterOption::getFilterOperationType,
+                        FilterOption::getValue)
+                .containsExactly(org.assertj.core.groups.Tuple.tuple(SDelegationRule.END_DATE_KEY,
+                        FilterOperationType.LESS, FIXED_NOW));
+    }
+
+    @Test
+    void searchRules_rejects_unknown_status_value() {
+        //given
+        final QueryOptions options = statusFilterOnlyOptions("completed", FilterOperationType.EQUALS);
+
+        //when-then
+        assertThatThrownBy(() -> service.searchRules(options))
+                .isInstanceOf(SBonitaReadException.class)
+                .hasMessageContaining("completed")
+                .hasMessageContaining("scheduled")
+                .hasMessageContaining("active")
+                .hasMessageContaining("expired");
+    }
+
+    @Test
+    void searchRules_rejects_status_filter_with_non_equals_operation() {
+        //given
+        final QueryOptions options = statusFilterOnlyOptions("active", FilterOperationType.DIFFERENT);
+
+        //when-then
+        assertThatThrownBy(() -> service.searchRules(options))
+                .isInstanceOf(SBonitaReadException.class)
+                .hasMessageContaining("EQUALS");
+    }
+
+    @Test
+    void searchRules_rejects_duplicate_status_filter() {
+        //given
+        final QueryOptions options = new QueryOptions(0, 10, null,
+                Arrays.asList(
+                        new FilterOption(SDelegationRule.class, DelegationRuleFilterKeys.STATUS, "active",
+                                FilterOperationType.EQUALS),
+                        new FilterOption(SDelegationRule.class, DelegationRuleFilterKeys.STATUS,
+                                "expired",
+                                FilterOperationType.EQUALS)),
+                null);
+
+        //when-then
+        assertThatThrownBy(() -> service.searchRules(options))
+                .isInstanceOf(SBonitaReadException.class)
+                .hasMessageContaining("at most once");
+    }
+
+    @Test
+    void searchRules_normalises_status_value_case_so_DelegationStatus_name_form_works() throws Exception {
+        //given — DelegationStatus.ACTIVE.toString() returns "ACTIVE" (Enum.name()). The rewrite
+        // lowercases so Java callers passing the enum directly converge with REST callers
+        // passing the lowercase JSON form.
+        final QueryOptions options = statusFilterOnlyOptions("ACTIVE", FilterOperationType.EQUALS);
+
+        //when
+        service.searchRules(options);
+
+        //then
+        assertThat(captureRewrittenSearchFilters())
+                .extracting(FilterOption::getFieldName)
+                .containsExactlyInAnyOrder(SDelegationRule.START_DATE_KEY, SDelegationRule.END_DATE_KEY);
+    }
+
+    @Test
+    void searchRules_rejects_status_filter_with_null_value() {
+        //given
+        final QueryOptions options = statusFilterOnlyOptions(null, FilterOperationType.EQUALS);
+
+        //when-then
+        assertThatThrownBy(() -> service.searchRules(options))
+                .isInstanceOf(SBonitaReadException.class)
+                .hasMessageContaining("STATUS")
+                .hasMessageContaining("null");
+    }
+
+    @Test
+    void getNumberOfRules_applies_same_status_rewrite() throws Exception {
+        //given
+        final QueryOptions options = statusFilterOnlyOptions("expired", FilterOperationType.EQUALS);
+        when(persistenceService.getNumberOfEntities(eq(SDelegationRule.class), any(QueryOptions.class),
+                isNull())).thenReturn(7L);
+
+        //when
+        final long count = service.getNumberOfRules(options);
+
+        //then
+        assertThat(count).isEqualTo(7L);
+        final ArgumentCaptor<QueryOptions> captor = ArgumentCaptor.forClass(QueryOptions.class);
+        verify(persistenceService).getNumberOfEntities(eq(SDelegationRule.class), captor.capture(), isNull());
+        assertThat(captor.getValue().getFilters())
+                .extracting(FilterOption::getFieldName)
+                .doesNotContain(DelegationRuleFilterKeys.STATUS)
+                .contains(SDelegationRule.END_DATE_KEY);
+    }
+
+    @Test
+    void searchRules_forwards_pagination_order_and_other_filters_through_status_rewrite() throws Exception {
+        //given
+        final OrderByOption order = new OrderByOption(SDelegationRule.class, SDelegationRule.ID_KEY,
+                OrderByType.DESC);
+        final FilterOption otherFilter = new FilterOption(SDelegationRule.class,
+                SDelegationRule.DELEGATOR_ID_KEY, 42L);
+        final QueryOptions options = new QueryOptions(5, 20, Collections.singletonList(order),
+                Arrays.asList(otherFilter,
+                        new FilterOption(SDelegationRule.class, DelegationRuleFilterKeys.STATUS,
+                                "scheduled",
+                                FilterOperationType.EQUALS)),
+                null);
+
+        //when
+        service.searchRules(options);
+
+        //then
+        final ArgumentCaptor<QueryOptions> captor = ArgumentCaptor.forClass(QueryOptions.class);
+        verify(persistenceService).searchEntity(eq(SDelegationRule.class), captor.capture(), isNull());
+        final QueryOptions rewritten = captor.getValue();
+        assertThat(rewritten.getFromIndex()).isEqualTo(5);
+        assertThat(rewritten.getNumberOfResults()).isEqualTo(20);
+        assertThat(rewritten.getOrderByOptions()).containsExactly(order);
+        assertThat(rewritten.getFilters())
+                .extracting(FilterOption::getFieldName)
+                .doesNotContain(DelegationRuleFilterKeys.STATUS)
+                .contains(SDelegationRule.DELEGATOR_ID_KEY, SDelegationRule.START_DATE_KEY);
+    }
+
+    private static QueryOptions statusFilterOnlyOptions(final String value, final FilterOperationType op) {
+        return new QueryOptions(0, 10, null,
+                Collections.singletonList(new FilterOption(SDelegationRule.class,
+                        DelegationRuleFilterKeys.STATUS, value, op)),
+                null);
+    }
+
+    private List<FilterOption> captureRewrittenSearchFilters() throws SBonitaReadException {
+        final ArgumentCaptor<QueryOptions> captor = ArgumentCaptor.forClass(QueryOptions.class);
+        verify(persistenceService).searchEntity(eq(SDelegationRule.class), captor.capture(), isNull());
+        return captor.getValue().getFilters();
+    }
+
+    private static Map<String, Object> rowFor(final Long ruleId, final String processName) {
+        final Map<String, Object> row = new HashMap<>();
+        row.put("ruleId", ruleId);
+        row.put("processName", processName);
+        return row;
+    }
+
     private boolean queryTargetsRuleByDelegatorId(final SelectOneDescriptor<?> descriptor) {
         return descriptor != null
                 && DelegationRuleServiceImpl.QUERY_RULE_BY_DELEGATOR_ID.equals(descriptor.getQueryName())
                 && descriptor.getReturnType().equals(SDelegationRule.class);
+    }
+
+    private boolean queryTargetsProcessNamesByRuleId(final SelectListDescriptor<?> descriptor) {
+        return descriptor != null
+                && DelegationRuleServiceImpl.QUERY_PROCESS_NAMES_BY_RULE_ID.equals(descriptor.getQueryName());
+    }
+
+    private boolean queryTargetsProcessNamesByRuleIds(final SelectListDescriptor<?> descriptor) {
+        return descriptor != null
+                && DelegationRuleServiceImpl.QUERY_PROCESS_NAMES_BY_RULE_IDS.equals(descriptor.getQueryName());
     }
 }
