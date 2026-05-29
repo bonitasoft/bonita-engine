@@ -937,6 +937,106 @@ class DelegationRuleServiceImplTest {
     }
 
     @Test
+    void isActiveDelegateForProcessInstance_returns_false_when_persistence_count_is_zero() throws Exception {
+        //given — case-scoped counterpart of isActiveDelegate; date-window, whitelist match, and
+        //       root-process resolution (via logicalGroup2) are enforced DB-side by the HQL.
+        //       The EXISTS pre-check is stubbed positive so we reach the multi-join.
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200)))
+                .thenReturn(0L);
+
+        //when
+        final boolean actual = service.isActiveDelegateForProcessInstance(20L, 200L);
+
+        //then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void isActiveDelegateForProcessInstance_returns_true_when_persistence_count_is_positive() throws Exception {
+        //given
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200)))
+                .thenReturn(1L);
+
+        //when
+        final boolean actual = service.isActiveDelegateForProcessInstance(20L, 200L);
+
+        //then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void isActiveDelegateForProcessInstance_returns_false_when_persistence_returns_null() throws Exception {
+        //given — selectOne can return null on certain DB/dialect combinations; the impl
+        //guards with `count != null && count > 0L` to keep the boolean translation safe.
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200)))
+                .thenReturn(null);
+
+        //when
+        final boolean actual = service.isActiveDelegateForProcessInstance(20L, 200L);
+
+        //then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void isActiveDelegateForProcessInstance_builds_join_descriptor_with_delegateId_processInstanceId_and_now_parameters()
+            throws Exception {
+        //given — capture both selectOne calls in order: first the EXISTS pre-check (1L so we
+        //reach the join), then the multi-join we want to assert on.
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        final ArgumentCaptor<SelectOneDescriptor<Long>> captor = ArgumentCaptor
+                .forClass((Class) SelectOneDescriptor.class);
+        when(persistenceService.selectOne(captor.capture())).thenReturn(1L, 0L);
+
+        //when
+        service.isActiveDelegateForProcessInstance(20L, 200L);
+
+        //then
+        final SelectOneDescriptor<Long> joinDescriptor = captor.getAllValues().stream()
+                .filter(d -> DelegationRuleServiceImpl.QUERY_IS_ACTIVE_DELEGATE_FOR_PROCESS_INSTANCE
+                        .equals(d.getQueryName()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(joinDescriptor.getInputParameters())
+                .containsEntry("delegateId", 20L)
+                .containsEntry("processInstanceId", 200L)
+                .containsEntry("now", FIXED_NOW);
+        assertThat(joinDescriptor.getReturnType()).isEqualTo(Long.class);
+    }
+
+    @Test
+    void isActiveDelegateForProcessInstance_fast_exits_to_false_without_running_join_when_delegate_has_no_active_rule()
+            throws Exception {
+        //given — docstring promise: "non-delegate callers must not pay the cost of the full check"
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(0L);
+
+        //when
+        final boolean actual = service.isActiveDelegateForProcessInstance(20L, 200L);
+
+        //then
+        assertThat(actual).isFalse();
+        verify(persistenceService, never())
+                .selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200));
+    }
+
+    @Test
+    void isActiveDelegateForProcessInstance_fast_exits_to_false_when_exists_pre_check_returns_null() throws Exception {
+        //given — same null-safety guard as the multi-join branch, applied to the fast-exit count
+        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(null);
+
+        //when
+        final boolean actual = service.isActiveDelegateForProcessInstance(20L, 200L);
+
+        //then
+        assertThat(actual).isFalse();
+        verify(persistenceService, never())
+                .selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200));
+    }
+
+    @Test
     void searchDelegatedTasks_forwards_queryOptions_with_now_and_returns_persistence_result() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(5, 20);
@@ -1023,6 +1123,16 @@ class DelegationRuleServiceImplTest {
                 && DelegationRuleServiceImpl.QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE.equals(descriptor.getQueryName())
                 && descriptor.getReturnType().equals(Long.class)
                 && Long.valueOf(20L).equals(descriptor.getInputParameters().get("delegateId"))
+                && Long.valueOf(FIXED_NOW).equals(descriptor.getInputParameters().get("now"));
+    }
+
+    private boolean queryTargetsIsActiveDelegateForProcessInstance20And200(final SelectOneDescriptor<?> descriptor) {
+        return descriptor != null
+                && DelegationRuleServiceImpl.QUERY_IS_ACTIVE_DELEGATE_FOR_PROCESS_INSTANCE
+                        .equals(descriptor.getQueryName())
+                && descriptor.getReturnType().equals(Long.class)
+                && Long.valueOf(20L).equals(descriptor.getInputParameters().get("delegateId"))
+                && Long.valueOf(200L).equals(descriptor.getInputParameters().get("processInstanceId"))
                 && Long.valueOf(FIXED_NOW).equals(descriptor.getInputParameters().get("now"));
     }
 }

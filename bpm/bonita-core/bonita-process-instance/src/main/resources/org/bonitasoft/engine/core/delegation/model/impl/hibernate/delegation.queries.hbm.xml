@@ -67,6 +67,24 @@
           AND delegationRuleProcess.processName = process_definition.name
     </query>
 
+    <query name="isActiveDelegateForProcessInstance">
+        SELECT count(delegationRule.id)
+        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,
+             org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess AS delegationRuleProcess,
+             org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+             org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+             org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+        WHERE delegationRule.delegateId = :delegateId
+          AND delegationRule.startDate &lt;= :now
+          AND delegationRule.endDate &gt;= :now
+          AND p.id = :processInstanceId
+          AND a.logicalGroup2 = p.id
+          AND a.assigneeId = delegationRule.delegatorId
+          AND process_definition.processId = p.processDefinitionId
+          AND delegationRuleProcess.delegationRuleId = delegationRule.id
+          AND delegationRuleProcess.processName = process_definition.name
+    </query>
+
     <!--
     SDelegatedHumanTask search-entity convention.
     The search-entity engine derives the named-query name from the result entity simple

@@ -78,6 +78,8 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
 
     static final String QUERY_IS_ACTIVE_DELEGATE_FOR_TASK = "isActiveDelegateForTask";
 
+    static final String QUERY_IS_ACTIVE_DELEGATE_FOR_PROCESS_INSTANCE = "isActiveDelegateForProcessInstance";
+
     static final String QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE = "existsActiveRuleForDelegate";
 
     public static final String STATUS_SCHEDULED = "scheduled";
@@ -457,5 +459,30 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
         return persistenceService.selectList(new SelectListDescriptor<>(QUERY_ACTIVE_RULES_FOR_DELEGATE,
                 Map.of("delegateId", delegateId, "now", currentTimeMillis()),
                 SDelegationRule.class, QueryOptions.ALL_RESULTS));
+    }
+
+    /**
+     * Case-scoped counterpart of {@link #isActiveDelegate(long, long)} with the same two-stage
+     * fast-exit: the cheap EXISTS pre-check spares non-delegate callers the multi-join cost
+     * on every case-resource permission check, and the full {@code isActiveDelegateForProcessInstance}
+     * named query enforces the active-window, whitelist match, root-process resolution (via
+     * {@code logicalGroup2}) and per-task assignee-equals-delegator predicate DB-side.
+     */
+    @Override
+    public boolean isActiveDelegateForProcessInstance(final long delegateId, final long processInstanceId)
+            throws SBonitaReadException {
+        final long now = currentTimeMillis();
+        final Long activeRulesCount = persistenceService.selectOne(new SelectOneDescriptor<>(
+                QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE,
+                Map.of("delegateId", delegateId, "now", now),
+                SDelegationRule.class, Long.class));
+        if (activeRulesCount == null || activeRulesCount == 0L) {
+            return false;
+        }
+        final Long count = persistenceService.selectOne(new SelectOneDescriptor<>(
+                QUERY_IS_ACTIVE_DELEGATE_FOR_PROCESS_INSTANCE,
+                Map.of("delegateId", delegateId, "processInstanceId", processInstanceId, "now", now),
+                SDelegationRule.class, Long.class));
+        return count != null && count > 0L;
     }
 }

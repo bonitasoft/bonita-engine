@@ -154,4 +154,29 @@ public interface DelegationRuleService {
      * @return the active rules where {@code delegateId} is the delegate (may be empty)
      */
     List<SDelegationRule> getActiveDelegationRulesForDelegate(long delegateId) throws SBonitaReadException;
+
+    /**
+     * Returns {@code true} if the requesting user is an active delegate authorised to act on
+     * any human task currently belonging to the given root process instance. Counterpart of
+     * {@link #isActiveDelegate(long, long)} for the case-scoped permission checks, where the
+     * resource id is a process-instance id rather than a task id.
+     * <p>
+     * Resolves in a single round-trip:
+     * <ol>
+     * <li>an active delegation rule exists for {@code delegateId} (the rule's
+     * {@code [startDate, endDate]} window contains "now");</li>
+     * <li>at least one human task in {@code processInstanceId} (matched via the task's
+     * {@code logicalGroup2}, the canonical root-process-instance-id field) has an
+     * assignee that equals the rule's {@code delegatorId};</li>
+     * <li>the process whose instance is {@code processInstanceId} is named in the rule's
+     * process whitelist.</li>
+     * </ol>
+     * Fast-exit if no active rule exists for the user - the permission path for non-delegate
+     * callers must not pay the cost of the full check.
+     *
+     * @param delegateId the Id of the user requesting access
+     * @param processInstanceId the root process instance the caller wants to act on
+     * @return {@code true} if the caller is an active delegate for at least one task in this process instance
+     */
+    boolean isActiveDelegateForProcessInstance(long delegateId, long processInstanceId) throws SBonitaReadException;
 }
