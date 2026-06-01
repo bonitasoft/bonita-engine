@@ -39,7 +39,7 @@ micrometerVersion = "1.16.5"
 # DB drivers:
 mysqlVersion = "8.4.0"
 msSqlServerVersion = "12.10.2.jre11"
-oracleVersion = "23.26.1.0.0"
+oracleVersion = "23.26.2.0.0"
 postgresqlVersion = "42.7.11"
 
 narayanaVersion = "5.10.6.Final"
