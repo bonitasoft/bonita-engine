@@ -41,14 +41,6 @@
         ORDER BY delegationRule.id ASC
     </query>
 
-    <query name="existsActiveRuleForDelegate">
-        SELECT count(delegationRule.id)
-        FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule
-        WHERE delegationRule.delegateId = :delegateId
-          AND delegationRule.startDate &lt;= :now
-          AND delegationRule.endDate &gt;= :now
-    </query>
-
     <query name="isActiveDelegateForTask">
         SELECT count(delegationRule.id)
         FROM org.bonitasoft.engine.core.delegation.model.SDelegationRule AS delegationRule,

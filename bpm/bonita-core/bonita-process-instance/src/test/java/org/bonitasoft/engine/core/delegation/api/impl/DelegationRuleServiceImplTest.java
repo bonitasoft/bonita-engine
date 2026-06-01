@@ -15,13 +15,17 @@ package org.bonitasoft.engine.core.delegation.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -36,6 +40,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.transaction.Status;
+import javax.transaction.Synchronization;
+
+import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleCreationException;
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleNotFoundException;
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleUpdateException;
@@ -59,6 +68,8 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,6 +89,12 @@ class DelegationRuleServiceImplTest {
     private Recorder recorder;
     @Mock
     private ReadPersistenceService persistenceService;
+    @Mock
+    private CacheService cacheService;
+    @Mock
+    private UserTransactionService userTransactionService;
+    @Mock
+    private BroadcastService broadcastService;
 
     @Spy
     @InjectMocks
@@ -822,11 +839,207 @@ class DelegationRuleServiceImplTest {
     }
 
     @Test
-    void isActiveDelegate_returns_false_when_persistence_count_is_zero() throws Exception {
+    void getActiveDelegationRulesForDelegate_returns_cached_value_without_querying_db() throws Exception {
+        //given — a warm cache entry for the delegate
+        final List<SDelegationRule> cached = List.of(activeRuleForDelegate20());
+        when(cacheService.get(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L)).thenReturn(cached);
+
+        //when
+        final List<SDelegationRule> actual = service.getActiveDelegationRulesForDelegate(20L);
+
+        //then
+        assertThat(actual).isEqualTo(cached);
+        verify(persistenceService, never()).selectList(any(SelectListDescriptor.class));
+        verify(cacheService, never()).store(any(), any(), any());
+    }
+
+    @Test
+    void getActiveDelegationRulesForDelegate_caches_db_result_on_miss() throws Exception {
+        //given — cache miss (get returns null by default), DB returns active rules
+        final List<SDelegationRule> dbRules = List.of(activeRuleForDelegate20());
+        doReturn(dbRules).when(persistenceService).selectList(argThat(this::queryTargetsActiveRulesForDelegate20));
+
+        //when
+        final List<SDelegationRule> actual = service.getActiveDelegationRulesForDelegate(20L);
+
+        //then
+        assertThat(actual).isEqualTo(dbRules);
+        verify(cacheService).store(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L, dbRules);
+    }
+
+    @Test
+    void getActiveDelegationRulesForDelegate_caches_empty_list_for_non_delegate() throws Exception {
+        //given — DB returns no active rule, so the empty list must still be cached to spare repeat hits
+        when(persistenceService.selectList(argThat(this::queryTargetsActiveRulesForDelegate20)))
+                .thenReturn(Collections.emptyList());
+
+        //when
+        final List<SDelegationRule> actual = service.getActiveDelegationRulesForDelegate(20L);
+
+        //then
+        assertThat(actual).isEmpty();
+        verify(cacheService).store(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L,
+                Collections.emptyList());
+    }
+
+    @Test
+    void getActiveDelegationRulesForDelegate_falls_back_to_db_when_cache_get_throws() throws Exception {
+        //given — a cache hiccup must never break a permission check
+        when(cacheService.get(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L))
+                .thenThrow(new SCacheException("boom"));
+        final List<SDelegationRule> dbRules = List.of(activeRuleForDelegate20());
+        doReturn(dbRules).when(persistenceService).selectList(argThat(this::queryTargetsActiveRulesForDelegate20));
+
+        //when
+        final List<SDelegationRule> actual = service.getActiveDelegationRulesForDelegate(20L);
+
+        //then
+        assertThat(actual).isEqualTo(dbRules);
+    }
+
+    @Test
+    void createOrUpdateRule_insert_invalidates_cache_for_new_delegate_on_commit() throws Exception {
+        //given — no existing rule for the delegator: insert path
+        when(persistenceService.selectOne(argThat(this::queryTargetsRuleByDelegatorId))).thenReturn(null);
+        final SDelegationRule rule = SDelegationRule.builder()
+                .delegatorId(10L).delegateId(20L).startDate(100L).endDate(200L).build();
+
+        //when
+        service.createOrUpdateRule(rule, Arrays.asList("ProcessA"));
+        runRegisteredSynchronization(Status.STATUS_COMMITTED);
+
+        //then — eviction happens after commit: local node directly + broadcast to the other nodes
+        verify(cacheService).remove(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L);
+        verify(broadcastService).executeOnOthers(isA(EvictActiveDelegationRulesCacheTask.class));
+    }
+
+    @Test
+    void createOrUpdateRule_replace_invalidates_cache_for_old_and_new_delegate_on_commit() throws Exception {
+        //given — the delegator already delegated to 99; the upsert re-delegates to 20
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(555L).delegatorId(10L).delegateId(99L).startDate(50L).endDate(150L).build();
+        when(persistenceService.selectOne(argThat(this::queryTargetsRuleByDelegatorId))).thenReturn(existing);
+        final SDelegationRule incoming = SDelegationRule.builder()
+                .delegatorId(10L).delegateId(20L).startDate(100L).endDate(200L).build();
+
+        //when
+        service.createOrUpdateRule(incoming, Arrays.asList("ProcessA"));
+        runRegisteredSynchronization(Status.STATUS_COMMITTED);
+
+        //then
+        verify(cacheService).remove(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 99L);
+        verify(cacheService).remove(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L);
+        verify(broadcastService).executeOnOthers(isA(EvictActiveDelegationRulesCacheTask.class));
+    }
+
+    @Test
+    void updateRule_invalidates_cache_for_delegate_on_commit() throws Exception {
+        //given — descriptor changes only the window, not the delegate
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(200L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.END_DATE_KEY, 300L);
+
+        //when
+        service.updateRule(1L, descriptor, null);
+        runRegisteredSynchronization(Status.STATUS_COMMITTED);
+
+        //then
+        verify(cacheService).remove(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L);
+        verify(broadcastService).executeOnOthers(isA(EvictActiveDelegationRulesCacheTask.class));
+    }
+
+    @Test
+    void updateRule_invalidates_old_and_new_delegate_when_descriptor_reassigns_delegate_on_commit() throws Exception {
+        //given — descriptor reassigns the delegate from 20 to 30
+        final SDelegationRule existing = SDelegationRule.builder()
+                .id(1L).delegatorId(10L).delegateId(20L).startDate(100L).endDate(200L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(existing);
+        // recorder is a mock here, so emulate the in-memory field mutation recordUpdate performs in production
+        doAnswer(inv -> {
+            existing.setDelegateId(30L);
+            return null;
+        }).when(recorder).recordUpdate(any(UpdateRecord.class),
+                eq(DelegationRuleServiceImpl.RECORD_TYPE_DELEGATION_RULE));
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SDelegationRule.DELEGATE_ID_KEY, 30L);
+
+        //when
+        service.updateRule(1L, descriptor, null);
+        runRegisteredSynchronization(Status.STATUS_COMMITTED);
+
+        //then
+        verify(cacheService).remove(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L);
+        verify(cacheService).remove(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 30L);
+    }
+
+    @Test
+    void deleteRule_invalidates_cache_for_delegate_on_commit() throws Exception {
+        //given
+        final SDelegationRule rule = SDelegationRule.builder()
+                .id(42L).delegatorId(10L).delegateId(20L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(rule);
+
+        //when
+        service.deleteRule(42L);
+        runRegisteredSynchronization(Status.STATUS_COMMITTED);
+
+        //then
+        verify(cacheService).remove(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L);
+        verify(broadcastService).executeOnOthers(isA(EvictActiveDelegationRulesCacheTask.class));
+    }
+
+    @Test
+    void rolled_back_write_does_not_evict_cache() throws Exception {
+        //given — insert path
+        when(persistenceService.selectOne(argThat(this::queryTargetsRuleByDelegatorId))).thenReturn(null);
+        final SDelegationRule rule = SDelegationRule.builder()
+                .delegatorId(10L).delegateId(20L).startDate(100L).endDate(200L).build();
+
+        //when — the transaction rolls back instead of committing
+        service.createOrUpdateRule(rule, Arrays.asList("ProcessA"));
+        runRegisteredSynchronization(Status.STATUS_ROLLEDBACK);
+
+        //then — nothing is evicted, locally or cluster-wide
+        verify(cacheService, never()).remove(any(), any());
+        verify(broadcastService, never()).executeOnOthers(any());
+    }
+
+    @Test
+    void write_swallows_local_cache_eviction_failure_and_still_broadcasts_on_commit() throws Exception {
+        //given — a delete whose local cache removal fails on commit
+        final SDelegationRule rule = SDelegationRule.builder()
+                .id(42L).delegatorId(10L).delegateId(20L).build();
+        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(rule);
+        doThrow(new SCacheException("boom")).when(cacheService)
+                .remove(DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE, 20L);
+        service.deleteRule(42L);
+
+        //when-then — the post-commit callback swallows the SCacheException (does not propagate) ...
+        assertThatNoException().isThrownBy(() -> runRegisteredSynchronization(Status.STATUS_COMMITTED));
+
+        //... and the cluster broadcast still runs so other nodes are not left stale
+        verify(broadcastService).executeOnOthers(isA(EvictActiveDelegationRulesCacheTask.class));
+    }
+
+    /**
+     * Captures the post-commit cache-eviction synchronization registered by the write methods and
+     * fires it with the given transaction outcome (a real {@code UserTransactionService} would invoke
+     * {@code afterCompletion} on transaction end).
+     */
+    private void runRegisteredSynchronization(final int txStatus) throws Exception {
+        final ArgumentCaptor<Synchronization> captor = ArgumentCaptor.forClass(Synchronization.class);
+        verify(userTransactionService).registerBonitaSynchronization(captor.capture());
+        captor.getValue().afterCompletion(txStatus);
+    }
+
+    @Test
+    void isActiveDelegate_returns_false_when_join_count_is_zero() throws Exception {
         //given — date-window, whitelist match, and root-process resolution are enforced DB-side
-        //       by the HQL; this unit test asserts only the count → boolean translation.
-        //       The EXISTS pre-check is stubbed positive so we reach the multi-join.
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        //       by the HQL; this unit test asserts only the count → boolean translation. Stage 1
+        //       (the cached active-rule set) is stubbed non-empty so we reach the multi-join.
+        doReturn(List.of(activeRuleForDelegate20())).when(service).getActiveDelegationRulesForDelegate(20L);
         when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100))).thenReturn(0L);
 
         //when
@@ -837,9 +1050,9 @@ class DelegationRuleServiceImplTest {
     }
 
     @Test
-    void isActiveDelegate_returns_true_when_persistence_count_is_positive() throws Exception {
+    void isActiveDelegate_returns_true_when_join_count_is_positive() throws Exception {
         //given
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        doReturn(List.of(activeRuleForDelegate20())).when(service).getActiveDelegationRulesForDelegate(20L);
         when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100))).thenReturn(1L);
 
         //when
@@ -850,10 +1063,10 @@ class DelegationRuleServiceImplTest {
     }
 
     @Test
-    void isActiveDelegate_returns_false_when_persistence_returns_null() throws Exception {
+    void isActiveDelegate_returns_false_when_join_count_is_null() throws Exception {
         //given — selectOne can return null on certain DB/dialect combinations; the impl
         //guards with `count != null && count > 0L` to keep the boolean translation safe.
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        doReturn(List.of(activeRuleForDelegate20())).when(service).getActiveDelegationRulesForDelegate(20L);
         when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100))).thenReturn(null);
 
         //when
@@ -865,21 +1078,20 @@ class DelegationRuleServiceImplTest {
 
     @Test
     void isActiveDelegate_builds_join_descriptor_with_delegateId_taskId_and_now_parameters() throws Exception {
-        //given — capture both selectOne calls in order: first the EXISTS pre-check (1L so we
-        //reach the join), then the multi-join we want to assert on.
+        //given — stage 1 stubbed non-empty so the multi-join runs; capture it to assert its parameters.
+        doReturn(List.of(activeRuleForDelegate20())).when(service).getActiveDelegationRulesForDelegate(20L);
         @SuppressWarnings({ "unchecked", "rawtypes" })
         final ArgumentCaptor<SelectOneDescriptor<Long>> captor = ArgumentCaptor
                 .forClass((Class) SelectOneDescriptor.class);
-        when(persistenceService.selectOne(captor.capture())).thenReturn(1L, 0L);
+        when(persistenceService.selectOne(captor.capture())).thenReturn(0L);
 
         //when
         service.isActiveDelegate(20L, 100L);
 
         //then
-        final SelectOneDescriptor<Long> joinDescriptor = captor.getAllValues().stream()
-                .filter(d -> DelegationRuleServiceImpl.QUERY_IS_ACTIVE_DELEGATE_FOR_TASK.equals(d.getQueryName()))
-                .findFirst()
-                .orElseThrow();
+        final SelectOneDescriptor<Long> joinDescriptor = captor.getValue();
+        assertThat(joinDescriptor.getQueryName())
+                .isEqualTo(DelegationRuleServiceImpl.QUERY_IS_ACTIVE_DELEGATE_FOR_TASK);
         assertThat(joinDescriptor.getInputParameters())
                 .containsEntry("delegateId", 20L)
                 .containsEntry("taskId", 100L)
@@ -890,8 +1102,8 @@ class DelegationRuleServiceImplTest {
     @Test
     void isActiveDelegate_fast_exits_to_false_without_running_join_when_delegate_has_no_active_rule()
             throws Exception {
-        //given — docstring promise: "non-delegate callers must not pay the cost of the full check"
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(0L);
+        //given — an empty cached rule set: non-delegate callers must not pay the cost of the full check.
+        doReturn(Collections.emptyList()).when(service).getActiveDelegationRulesForDelegate(20L);
 
         //when
         final boolean actual = service.isActiveDelegate(20L, 100L);
@@ -902,46 +1114,11 @@ class DelegationRuleServiceImplTest {
     }
 
     @Test
-    void isActiveDelegate_fast_exits_to_false_when_exists_pre_check_returns_null() throws Exception {
-        //given — same null-safety guard as the multi-join branch, applied to the fast-exit count
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(null);
-
-        //when
-        final boolean actual = service.isActiveDelegate(20L, 100L);
-
-        //then
-        assertThat(actual).isFalse();
-        verify(persistenceService, never()).selectOne(argThat(this::queryTargetsIsActiveDelegateFor20And100));
-    }
-
-    @Test
-    void isActiveDelegate_builds_exists_descriptor_with_delegateId_and_now_parameters() throws Exception {
-        //given — fast-exit returns 0 so only the EXISTS descriptor reaches persistenceService
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        final ArgumentCaptor<SelectOneDescriptor<Long>> captor = ArgumentCaptor
-                .forClass((Class) SelectOneDescriptor.class);
-        when(persistenceService.selectOne(captor.capture())).thenReturn(0L);
-
-        //when
-        service.isActiveDelegate(20L, 100L);
-
-        //then
-        final SelectOneDescriptor<Long> descriptor = captor.getValue();
-        assertThat(descriptor.getQueryName())
-                .isEqualTo(DelegationRuleServiceImpl.QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE);
-        assertThat(descriptor.getInputParameters())
-                .containsEntry("delegateId", 20L)
-                .containsEntry("now", FIXED_NOW)
-                .doesNotContainKey("taskId");
-        assertThat(descriptor.getReturnType()).isEqualTo(Long.class);
-    }
-
-    @Test
-    void isActiveDelegateForProcessInstance_returns_false_when_persistence_count_is_zero() throws Exception {
+    void isActiveDelegateForProcessInstance_returns_false_when_join_count_is_zero() throws Exception {
         //given — case-scoped counterpart of isActiveDelegate; date-window, whitelist match, and
-        //       root-process resolution (via logicalGroup2) are enforced DB-side by the HQL.
-        //       The EXISTS pre-check is stubbed positive so we reach the multi-join.
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        //       root-process resolution (via logicalGroup2) are enforced DB-side by the HQL. Stage 1
+        //       (the cached active-rule set) is stubbed non-empty so we reach the multi-join.
+        doReturn(List.of(activeRuleForDelegate20())).when(service).getActiveDelegationRulesForDelegate(20L);
         when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200)))
                 .thenReturn(0L);
 
@@ -953,9 +1130,9 @@ class DelegationRuleServiceImplTest {
     }
 
     @Test
-    void isActiveDelegateForProcessInstance_returns_true_when_persistence_count_is_positive() throws Exception {
+    void isActiveDelegateForProcessInstance_returns_true_when_join_count_is_positive() throws Exception {
         //given
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        doReturn(List.of(activeRuleForDelegate20())).when(service).getActiveDelegationRulesForDelegate(20L);
         when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200)))
                 .thenReturn(1L);
 
@@ -967,10 +1144,10 @@ class DelegationRuleServiceImplTest {
     }
 
     @Test
-    void isActiveDelegateForProcessInstance_returns_false_when_persistence_returns_null() throws Exception {
+    void isActiveDelegateForProcessInstance_returns_false_when_join_count_is_null() throws Exception {
         //given — selectOne can return null on certain DB/dialect combinations; the impl
         //guards with `count != null && count > 0L` to keep the boolean translation safe.
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(1L);
+        doReturn(List.of(activeRuleForDelegate20())).when(service).getActiveDelegationRulesForDelegate(20L);
         when(persistenceService.selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200)))
                 .thenReturn(null);
 
@@ -984,22 +1161,20 @@ class DelegationRuleServiceImplTest {
     @Test
     void isActiveDelegateForProcessInstance_builds_join_descriptor_with_delegateId_processInstanceId_and_now_parameters()
             throws Exception {
-        //given — capture both selectOne calls in order: first the EXISTS pre-check (1L so we
-        //reach the join), then the multi-join we want to assert on.
+        //given — stage 1 stubbed non-empty so the multi-join runs; capture it to assert its parameters.
+        doReturn(List.of(activeRuleForDelegate20())).when(service).getActiveDelegationRulesForDelegate(20L);
         @SuppressWarnings({ "unchecked", "rawtypes" })
         final ArgumentCaptor<SelectOneDescriptor<Long>> captor = ArgumentCaptor
                 .forClass((Class) SelectOneDescriptor.class);
-        when(persistenceService.selectOne(captor.capture())).thenReturn(1L, 0L);
+        when(persistenceService.selectOne(captor.capture())).thenReturn(0L);
 
         //when
         service.isActiveDelegateForProcessInstance(20L, 200L);
 
         //then
-        final SelectOneDescriptor<Long> joinDescriptor = captor.getAllValues().stream()
-                .filter(d -> DelegationRuleServiceImpl.QUERY_IS_ACTIVE_DELEGATE_FOR_PROCESS_INSTANCE
-                        .equals(d.getQueryName()))
-                .findFirst()
-                .orElseThrow();
+        final SelectOneDescriptor<Long> joinDescriptor = captor.getValue();
+        assertThat(joinDescriptor.getQueryName())
+                .isEqualTo(DelegationRuleServiceImpl.QUERY_IS_ACTIVE_DELEGATE_FOR_PROCESS_INSTANCE);
         assertThat(joinDescriptor.getInputParameters())
                 .containsEntry("delegateId", 20L)
                 .containsEntry("processInstanceId", 200L)
@@ -1010,22 +1185,8 @@ class DelegationRuleServiceImplTest {
     @Test
     void isActiveDelegateForProcessInstance_fast_exits_to_false_without_running_join_when_delegate_has_no_active_rule()
             throws Exception {
-        //given — docstring promise: "non-delegate callers must not pay the cost of the full check"
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(0L);
-
-        //when
-        final boolean actual = service.isActiveDelegateForProcessInstance(20L, 200L);
-
-        //then
-        assertThat(actual).isFalse();
-        verify(persistenceService, never())
-                .selectOne(argThat(this::queryTargetsIsActiveDelegateForProcessInstance20And200));
-    }
-
-    @Test
-    void isActiveDelegateForProcessInstance_fast_exits_to_false_when_exists_pre_check_returns_null() throws Exception {
-        //given — same null-safety guard as the multi-join branch, applied to the fast-exit count
-        when(persistenceService.selectOne(argThat(this::queryTargetsExistsActiveRuleFor20))).thenReturn(null);
+        //given — an empty cached rule set: non-delegate callers must not pay the cost of the full check.
+        doReturn(Collections.emptyList()).when(service).getActiveDelegationRulesForDelegate(20L);
 
         //when
         final boolean actual = service.isActiveDelegateForProcessInstance(20L, 200L);
@@ -1118,12 +1279,9 @@ class DelegationRuleServiceImplTest {
                 && Long.valueOf(FIXED_NOW).equals(descriptor.getInputParameters().get("now"));
     }
 
-    private boolean queryTargetsExistsActiveRuleFor20(final SelectOneDescriptor<?> descriptor) {
-        return descriptor != null
-                && DelegationRuleServiceImpl.QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE.equals(descriptor.getQueryName())
-                && descriptor.getReturnType().equals(Long.class)
-                && Long.valueOf(20L).equals(descriptor.getInputParameters().get("delegateId"))
-                && Long.valueOf(FIXED_NOW).equals(descriptor.getInputParameters().get("now"));
+    private SDelegationRule activeRuleForDelegate20() {
+        return SDelegationRule.builder().id(1L).delegatorId(10L).delegateId(20L)
+                .startDate(FIXED_NOW - 1000L).endDate(FIXED_NOW + 1000L).build();
     }
 
     private boolean queryTargetsIsActiveDelegateForProcessInstance20And200(final SelectOneDescriptor<?> descriptor) {

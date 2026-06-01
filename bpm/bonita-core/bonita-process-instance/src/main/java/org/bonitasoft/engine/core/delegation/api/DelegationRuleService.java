@@ -149,6 +149,10 @@ public interface DelegationRuleService {
      * Returns every active rule (today within {@code [startDate, endDate]}) where the given
      * user is the delegate, each carrying its process whitelist. Used by the permission cache
      * to seed per-delegate state.
+     * <p>
+     * The returned list and its elements are shared cache state: callers must not mutate either
+     * the list or the {@link SDelegationRule} entities it contains, as the same instances are
+     * handed to every reader of this delegate's cached entry.
      *
      * @param delegateId the Id of the user receiving access
      * @return the active rules where {@code delegateId} is the delegate (may be empty)

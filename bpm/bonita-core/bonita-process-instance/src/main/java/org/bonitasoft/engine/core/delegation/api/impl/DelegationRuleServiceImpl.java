@@ -16,14 +16,20 @@ package org.bonitasoft.engine.core.delegation.api.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.transaction.Status;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.delegation.api.DelegationRuleService;
 import org.bonitasoft.engine.core.delegation.api.SDelegationRuleCreationException;
@@ -48,6 +54,10 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -80,7 +90,13 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
 
     static final String QUERY_IS_ACTIVE_DELEGATE_FOR_PROCESS_INSTANCE = "isActiveDelegateForProcessInstance";
 
-    static final String QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE = "existsActiveRuleForDelegate";
+    /**
+     * Cache region holding, per delegate user id, the list of that user's currently-active
+     * delegation rules. Used to short-circuit the permission hot-path existence check
+     * (see {@link #isActiveDelegate(long, long)}). Registered as a local-only cache in cluster
+     * mode (see {@code EngineClusterConfiguration}) so the hot read path stays in-JVM.
+     */
+    public static final String ACTIVE_DELEGATION_RULES_CACHE = "active_delegation_rules";
 
     public static final String STATUS_SCHEDULED = "scheduled";
 
@@ -91,6 +107,12 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
     private final Recorder recorder;
 
     private final ReadPersistenceService persistenceService;
+
+    private final CacheService cacheService;
+
+    private final UserTransactionService userTransactionService;
+
+    private final BroadcastService broadcastService;
 
     @Override
     public SDelegationRule createOrUpdateRule(final SDelegationRule rule, final List<String> processes)
@@ -110,6 +132,7 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
         // Check-then-insert is non-atomic; the UNIQUE(delegator_id) constraint enforces correctness
         // under concurrent inserts (loser's insert fails and bubbles up as SRecorderException).
         final Optional<SDelegationRule> existing = getRuleForDelegator(rule.getDelegatorId());
+        final Set<Long> affectedDelegates = new HashSet<>();
         final SDelegationRule persisted;
         if (existing.isEmpty()) {
             recorder.recordInsert(new InsertRecord(rule), RECORD_TYPE_DELEGATION_RULE);
@@ -117,6 +140,9 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
             log.debug("Inserted delegation rule <{}> for delegator <{}>", persisted.getId(), rule.getDelegatorId());
         } else {
             final SDelegationRule existingRule = existing.get();
+            // Capture the previous delegate before recordUpdate mutates the row in-memory: re-delegating
+            // to a different user must invalidate both the old and the new delegate's cache entries.
+            affectedDelegates.add(existingRule.getDelegateId());
             // recordUpdate applies the descriptor in-memory via ClassReflector.setField, so
             // existingRule now carries the new field values and can be returned as the persisted view.
             recorder.recordUpdate(UpdateRecord.buildSetFields(existingRule, buildUpsertDescriptor(rule)),
@@ -126,6 +152,8 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
             log.debug("Replaced delegation rule <{}> for delegator <{}>", persisted.getId(), rule.getDelegatorId());
         }
         insertRuleProcesses(persisted.getId(), processes);
+        affectedDelegates.add(rule.getDelegateId());
+        scheduleCacheEviction(affectedDelegates);
         return persisted;
     }
 
@@ -159,6 +187,8 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
         final SDelegationRule existing = getRule(ruleId);
         validateWindow(existing, descriptor);
         validateDelegateDistinctFromDelegator(existing, descriptor);
+        // Capture the previous delegate before recordUpdate mutates the row in-memory.
+        final long previousDelegateId = existing.getDelegateId();
         // recordUpdate applies the descriptor in-memory via ClassReflector.setField, so
         // existing now carries the new field values and can be returned as the persisted view.
         recorder.recordUpdate(UpdateRecord.buildSetFields(existing, descriptor), RECORD_TYPE_DELEGATION_RULE);
@@ -166,6 +196,12 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
             deleteRuleProcessesByRuleId(existing.getId());
             insertRuleProcesses(existing.getId(), newProcesses);
         }
+        // Invalidate the previous delegate and, if the descriptor reassigned the delegate, the new one too
+        // (the set dedups when the delegate is unchanged).
+        final Set<Long> affectedDelegates = new HashSet<>();
+        affectedDelegates.add(previousDelegateId);
+        affectedDelegates.add(existing.getDelegateId());
+        scheduleCacheEviction(affectedDelegates);
         log.debug("Updated delegation rule <{}>", ruleId);
         return existing;
     }
@@ -219,6 +255,7 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
         // Whitelist rows are removed by the delegation_rule_process foreign-key ON DELETE CASCADE
         // declared in the DDL — no explicit recordDeleteAll needed here.
         recorder.recordDelete(new DeleteRecord(rule), RECORD_TYPE_DELEGATION_RULE);
+        scheduleCacheEviction(Set.of(rule.getDelegateId()));
         log.debug("Deleted delegation rule <{}>", ruleId);
     }
 
@@ -418,9 +455,10 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
     /**
      * Permission hot-path check executed in two stages:
      * <ol>
-     * <li>A cheap fast-exit count on {@code SDelegationRule} alone — returns {@code false}
-     * immediately when the caller is not a delegate of any currently-active rule, sparing
-     * the multi-join cost on every form-display authorization check for users who aren't
+     * <li>A cached fast-exit on the caller's active rule set (see
+     * {@link #getActiveDelegationRulesForDelegate(long)}) — returns {@code false} immediately,
+     * without touching the DB, when the caller is not a delegate of any currently-active rule,
+     * sparing the multi-join cost on every form-display authorization check for users who aren't
      * standing in for anyone right now.</li>
      * <li>If at least one active rule exists, the full {@code isActiveDelegateForTask}
      * named query joining rule + whitelist + human task + process instance +
@@ -433,16 +471,15 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
      */
     @Override
     public boolean isActiveDelegate(final long delegateId, final long taskId) throws SBonitaReadException {
-        final long now = currentTimeMillis();
-        final Long activeRulesCount = persistenceService.selectOne(new SelectOneDescriptor<>(
-                QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE,
-                Map.of("delegateId", delegateId, "now", now),
-                SDelegationRule.class, Long.class));
-        if (activeRulesCount == null || activeRulesCount == 0L) {
+        // Stage 1: cached fast-exit. Non-delegates (the overwhelming majority of callers) return here
+        // without touching the DB once their empty rule set is cached.
+        if (getActiveDelegationRulesForDelegate(delegateId).isEmpty()) {
             return false;
         }
+        // Stage 2: the task-specific match stays a DB query and remains the source of truth, so a
+        // cached-but-now-expired rule, or one that no longer matches the task, still resolves correctly.
         final Long count = persistenceService.selectOne(new SelectOneDescriptor<>(QUERY_IS_ACTIVE_DELEGATE_FOR_TASK,
-                Map.of("delegateId", delegateId, "taskId", taskId, "now", now),
+                Map.of("delegateId", delegateId, "taskId", taskId, "now", currentTimeMillis()),
                 SDelegationRule.class, Long.class));
         return count != null && count > 0L;
     }
@@ -450,6 +487,26 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
     @Override
     public List<SDelegationRule> getActiveDelegationRulesForDelegate(final long delegateId)
             throws SBonitaReadException {
+        // Permission hot path: the portal fires a burst of REST calls per task-form display, each
+        // re-checking involvement. Serve the per-delegate active-rule set from an in-memory cache to
+        // avoid a DB round-trip on every call. The empty list is cached too, so repeated checks for
+        // a non-delegate (the common case) also cost zero DB. The cache is invalidated on every rule
+        // write (see createOrUpdateRule/updateRule/deleteRule); a future-dated rule that activates
+        // while a stale entry is warm is only reflected after the region TTL elapses.
+        final List<SDelegationRule> cached = getCachedActiveRules(delegateId);
+        if (cached != null) {
+            return cached;
+        }
+        // Copy before caching so the shared cached instance cannot be mutated by a caller: the
+        // same reference is handed to every reader of this delegate's entry. List.copyOf gives an
+        // immutable defensive copy, so it stays safe even if queryActiveRulesForDelegate is later
+        // refactored to reuse or share the underlying list.
+        final List<SDelegationRule> rules = List.copyOf(queryActiveRulesForDelegate(delegateId));
+        putCachedActiveRules(delegateId, rules);
+        return rules;
+    }
+
+    private List<SDelegationRule> queryActiveRulesForDelegate(final long delegateId) throws SBonitaReadException {
         // Date-window predicates (startDate <= :now and endDate >= :now) live in the HQL named
         // query, so scheduled/expired rules are filtered DB-side. Result set is bounded only
         // by social structure: one user can be the delegate on N rules (one per delegator who
@@ -461,27 +518,111 @@ public class DelegationRuleServiceImpl implements DelegationRuleService {
                 SDelegationRule.class, QueryOptions.ALL_RESULTS));
     }
 
+    @SuppressWarnings("unchecked")
+    private List<SDelegationRule> getCachedActiveRules(final long delegateId) {
+        try {
+            return (List<SDelegationRule>) cacheService.get(ACTIVE_DELEGATION_RULES_CACHE, delegateId);
+        } catch (final SCacheException e) {
+            // Never fail a permission check because of a cache hiccup: fall back to the DB.
+            log.debug("Could not read delegation-rule cache for delegate <{}>, falling back to DB", delegateId, e);
+            return null;
+        }
+    }
+
+    private void putCachedActiveRules(final long delegateId, final List<SDelegationRule> rules) {
+        try {
+            cacheService.store(ACTIVE_DELEGATION_RULES_CACHE, delegateId, rules);
+        } catch (final SCacheException e) {
+            // A persistent store failure means every read falls back to the DB: surface it so the
+            // cache-tier degradation does not go unnoticed in production.
+            log.warn("Could not store delegation-rule cache for delegate <{}>", delegateId, e);
+        }
+    }
+
+    /**
+     * Evicts the given delegates' cached active-rule sets once the current transaction commits.
+     * <p>
+     * Eviction is deferred to after-commit on purpose: doing it inline (pre-commit) is racy even on a
+     * single node, because a concurrent read in another transaction could observe the not-yet-committed
+     * state and re-cache a stale set that then survives until the region TTL. After commit we evict the
+     * local node directly and broadcast an {@link EvictActiveDelegationRulesCacheTask} to the other
+     * cluster nodes (whose caches are node-local), so no node keeps serving a stale set. The broadcast
+     * is a no-op in single-node deployments. The after-commit + cluster-broadcast invalidation shape
+     * follows {@code ClassLoaderServiceImpl}, with one deliberate difference: that service waits on
+     * the broadcast and propagates per-node errors, whereas this one fire-and-forgets (see
+     * {@link #broadcastRemoteEviction(Set)}), since the region TTL bounds any missed eviction.
+     * <p>
+     * After-commit eviction does not make the cache strictly coherent: a reader that loaded the
+     * active-rule set <em>before</em> a concurrent write can still re-cache its now-stale result
+     * <em>after</em> this eviction fires (its cache-put in {@link #getActiveDelegationRulesForDelegate(long)}
+     * races behind the eviction), and that entry then lives until the region TTL elapses. The cache is
+     * therefore eventually consistent, bounded by {@code timeToLiveSeconds}; this residual staleness is
+     * accepted. The permission decision stays correct regardless, because the task/case match is always
+     * re-checked against the DB (see {@link #isActiveDelegate(long, long)} stage 2).
+     */
+    private void scheduleCacheEviction(final Set<Long> delegateIds) {
+        final Set<Long> ids = new HashSet<>(delegateIds);
+        try {
+            userTransactionService.registerBonitaSynchronization((BonitaTransactionSynchronization) txState -> {
+                if (txState == Status.STATUS_COMMITTED) {
+                    ids.forEach(this::evictFromLocalCache);
+                    broadcastRemoteEviction(ids);
+                }
+            });
+        } catch (final STransactionNotFoundException e) {
+            // Writes always run inside a transaction; if somehow none is active, evict the local node
+            // now as a best effort and let the other nodes refresh on TTL expiry.
+            ids.forEach(this::evictFromLocalCache);
+            log.debug("No active transaction; evicted delegation cache locally only for {}", ids, e);
+        }
+    }
+
+    private void evictFromLocalCache(final long delegateId) {
+        try {
+            cacheService.remove(ACTIVE_DELEGATION_RULES_CACHE, delegateId);
+        } catch (final SCacheException e) {
+            // A failed eviction leaves a stale active-rule set served until the region TTL elapses:
+            // surface it so the cache-tier degradation does not go unnoticed in production.
+            log.warn("Could not invalidate delegation-rule cache for delegate <{}>", delegateId, e);
+        }
+    }
+
+    private void broadcastRemoteEviction(final Set<Long> delegateIds) {
+        // Unlike ClassLoaderServiceImpl, which waits on the broadcast (executeOnOthersAndWait) and
+        // propagates per-node errors, this path deliberately fire-and-forgets: it runs in
+        // afterCompletion (the transaction has already committed), where blocking or throwing must
+        // not escape the completion callback. A missed broadcast just leaves the other nodes to
+        // refresh on TTL expiry. The submission failure is logged at warn so the cache-tier
+        // degradation is still visible to operators.
+        // The Future returned by executeOnOthers is deliberately ignored: each target node logs its
+        // own per-id eviction failures (see EvictActiveDelegationRulesCacheTask), so a remote
+        // SCacheException does not surface here, and a missed eviction falls back to TTL.
+        try {
+            broadcastService.executeOnOthers(new EvictActiveDelegationRulesCacheTask(delegateIds));
+        } catch (final RuntimeException e) {
+            log.warn("Could not broadcast delegation-cache eviction to other nodes for {}", delegateIds, e);
+        }
+    }
+
     /**
      * Case-scoped counterpart of {@link #isActiveDelegate(long, long)} with the same two-stage
-     * fast-exit: the cheap EXISTS pre-check spares non-delegate callers the multi-join cost
-     * on every case-resource permission check, and the full {@code isActiveDelegateForProcessInstance}
-     * named query enforces the active-window, whitelist match, root-process resolution (via
-     * {@code logicalGroup2}) and per-task assignee-equals-delegator predicate DB-side.
+     * fast-exit: the cached active-rule set (see {@link #getActiveDelegationRulesForDelegate(long)})
+     * spares non-delegate callers the multi-join cost on every case-resource permission check, and
+     * the full {@code isActiveDelegateForProcessInstance} named query enforces the active-window,
+     * whitelist match, root-process resolution (via {@code logicalGroup2}) and per-task
+     * assignee-equals-delegator predicate DB-side.
      */
     @Override
     public boolean isActiveDelegateForProcessInstance(final long delegateId, final long processInstanceId)
             throws SBonitaReadException {
-        final long now = currentTimeMillis();
-        final Long activeRulesCount = persistenceService.selectOne(new SelectOneDescriptor<>(
-                QUERY_EXISTS_ACTIVE_RULE_FOR_DELEGATE,
-                Map.of("delegateId", delegateId, "now", now),
-                SDelegationRule.class, Long.class));
-        if (activeRulesCount == null || activeRulesCount == 0L) {
+        // Stage 1: cached fast-exit (see isActiveDelegate for the rationale).
+        if (getActiveDelegationRulesForDelegate(delegateId).isEmpty()) {
             return false;
         }
+        // Stage 2: the case-specific match stays a DB query and remains the source of truth.
         final Long count = persistenceService.selectOne(new SelectOneDescriptor<>(
                 QUERY_IS_ACTIVE_DELEGATE_FOR_PROCESS_INSTANCE,
-                Map.of("delegateId", delegateId, "processInstanceId", processInstanceId, "now", now),
+                Map.of("delegateId", delegateId, "processInstanceId", processInstanceId, "now", currentTimeMillis()),
                 SDelegationRule.class, Long.class));
         return count != null && count > 0L;
     }
