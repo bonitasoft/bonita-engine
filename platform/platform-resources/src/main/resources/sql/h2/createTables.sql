@@ -1023,6 +1023,7 @@ CREATE TABLE delegation_rule (
     CONSTRAINT pk_delegation_rule PRIMARY KEY (id),
     CONSTRAINT uk_delegation_rule_delegator_id UNIQUE (delegator_id)
 );
+CREATE INDEX idx_delegation_rule_delegate_id ON delegation_rule (delegate_id);
 
 CREATE TABLE delegation_rule_process (
     id                  BIGINT NOT NULL,
