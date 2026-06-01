@@ -62,6 +62,8 @@ import org.bonitasoft.engine.session.APISession
  */
 class TaskPermissionRule implements PermissionRule {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         long currentUserId = apiSession.getUserId()
@@ -86,8 +88,7 @@ class TaskPermissionRule implements PermissionRule {
 
     private User getAssignedUser(APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         if (apiCallContext.getBody() != null) {
-            ObjectMapper mapper = new ObjectMapper()
-            def map = mapper.readValue(apiCallContext.getBody(), Map.class)
+            def map = MAPPER.readValue(apiCallContext.getBody(), Map.class)
             if (map != null) {
                 def assignedId = map.get("assigned_id")
                 if (assignedId != null && !assignedId.toString().isEmpty()) {
@@ -130,8 +131,7 @@ class TaskPermissionRule implements PermissionRule {
 
     private boolean checkPostMethod(APICallContext apiCallContext, long currentUserId, ProcessAPI processAPI, String userName, Logger logger) {
         if ("manualTask".equals(apiCallContext.getResourceName())) {
-            ObjectMapper mapper = new ObjectMapper()
-            def map = mapper.readValue(apiCallContext.getBody(), Map.class)
+            def map = MAPPER.readValue(apiCallContext.getBody(), Map.class)
 
             def string = map.get("parentTaskId").toString()
             if (string == null || string.isEmpty()) {
