@@ -785,6 +785,10 @@
                 <!-- delegation -->
                 <entry key="org.bonitasoft.engine.core.delegation.model.SDelegationRule" value="delegationRule" />
                 <entry key="org.bonitasoft.engine.core.delegation.model.SDelegationRuleProcess" value="delegationRuleProcess" />
+                <!-- SDelegatedHumanTask is a search-result wrapper, not a JPA entity: its id and
+                     sort fields resolve to the joined SHumanTaskInstance (aliased 'a' in
+                     searchSDelegatedHumanTask), so the ORDER BY tiebreaker must use that alias. -->
+                <entry key="org.bonitasoft.engine.core.delegation.model.SDelegatedHumanTask" value="a" />
                 <!-- platform command -->
                 <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="platformCommand" />
                 <!-- page -->
