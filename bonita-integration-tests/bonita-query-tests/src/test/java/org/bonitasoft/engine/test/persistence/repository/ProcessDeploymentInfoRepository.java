@@ -15,6 +15,8 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameKey;
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameVersion;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -75,6 +77,52 @@ public class ProcessDeploymentInfoRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("getProcessDefinitionDeployInfosByName");
         namedQuery.setParameter("name", processName);
         return namedQuery.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ProcessNameKey> searchProcessNameGroups(final String activationState, final String term,
+            final boolean sortByName, final boolean ascending) {
+        final boolean filtered = filtersOnActivationState(activationState);
+        final Query namedQuery = getNamedQuery(
+                filtered ? "searchProcessNameGroupsWithActivationState" : "searchProcessNameGroups");
+        if (filtered) {
+            namedQuery.setParameter("activationState", activationState);
+        }
+        namedQuery.setParameter("term", term);
+        namedQuery.setParameter("sortByName", sortByName);
+        namedQuery.setParameter("ascending", ascending);
+        return namedQuery.list();
+    }
+
+    public long getNumberOfProcessNameGroups(final String activationState, final String term) {
+        final boolean filtered = filtersOnActivationState(activationState);
+        final Query namedQuery = getNamedQuery(
+                filtered ? "getNumberOfProcessNameGroupsWithActivationState" : "getNumberOfProcessNameGroups");
+        if (filtered) {
+            namedQuery.setParameter("activationState", activationState);
+        }
+        namedQuery.setParameter("term", term);
+        // ASCII Unit Separator, matching ProcessDefinitionServiceImpl.GROUP_KEY_SEPARATOR
+        namedQuery.setParameter("sep", "\u001F");
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ProcessNameVersion> getVersionsForProcessNames(final List<String> names, final String activationState) {
+        final boolean filtered = filtersOnActivationState(activationState);
+        final Query namedQuery = getNamedQuery(
+                filtered ? "getProcessVersionsByNamesWithActivationState" : "getProcessVersionsByNames");
+        namedQuery.setParameterList("names", names);
+        if (filtered) {
+            namedQuery.setParameter("activationState", activationState);
+        }
+        return namedQuery.list();
+    }
+
+    // Mirrors ProcessDefinitionServiceImpl: a null/blank state selects the base query, a real state selects the
+    // *WithActivationState variant.
+    private static boolean filtersOnActivationState(final String activationState) {
+        return activationState != null && !activationState.isBlank();
     }
 
 }

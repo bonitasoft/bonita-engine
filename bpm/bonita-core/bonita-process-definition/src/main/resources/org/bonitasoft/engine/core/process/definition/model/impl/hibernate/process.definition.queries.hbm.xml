@@ -217,6 +217,88 @@
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 	</query>
 
+	<!--
+		Grouped search by (name, displayName). The ordering is parameterized in a single static CASE-based ORDER BY
+		(:sortByName, :ascending), but the OPTIONAL activationState filter is handled by two named queries - a base query
+		and a *WithActivationState variant - rather than an inline OR-sentinel. This follows the engine's convention for
+		optional restrictions (cf. the *SupervisedBy / *ManagedBy named-query pairs): the service binds :activationState
+		and picks the variant only when a real state is requested; a null/blank state selects the base (unfiltered)
+		query. The static ORDER BY lets the persistence layer paginate at the database level (the
+		framework only appends dynamic clauses, which would force an ORDER BY on the entity id that a grouped projection
+		cannot carry).
+
+		GROUP BY (rather than SELECT DISTINCT) collapses each group's versions into one row AND keeps the CASE-based
+		ORDER BY portable: PostgreSQL rejects ORDER BY expressions that are not in the select list under SELECT DISTINCT,
+		but allows them over GROUP BY columns. Each ORDER BY line maps to exactly one (sort column, direction) case; the
+		inactive CASE branches evaluate to NULL for every row and so contribute nothing to the ordering. (name,
+		displayName) is unique per group, so the final always-ASC tiebreaker on the non-primary column yields a total,
+		deterministic order. term = '%' matches all.
+	-->
+	<query name="searchProcessNameGroups">
+		SELECT new org.bonitasoft.engine.core.process.definition.model.ProcessNameKey(process_definition.name, process_definition.displayName)
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+		WHERE (process_definition.name LIKE :term ESCAPE '#' OR process_definition.displayName LIKE :term ESCAPE '#')
+		GROUP BY process_definition.name, process_definition.displayName
+		ORDER BY
+			CASE WHEN :sortByName = false AND :ascending = true  THEN process_definition.displayName END ASC,
+			CASE WHEN :sortByName = false AND :ascending = false THEN process_definition.displayName END DESC,
+			CASE WHEN :sortByName = true  AND :ascending = true  THEN process_definition.name        END ASC,
+			CASE WHEN :sortByName = true  AND :ascending = false THEN process_definition.name        END DESC,
+			CASE WHEN :sortByName = true THEN process_definition.displayName ELSE process_definition.name END ASC
+	</query>
+
+	<query name="searchProcessNameGroupsWithActivationState">
+		SELECT new org.bonitasoft.engine.core.process.definition.model.ProcessNameKey(process_definition.name, process_definition.displayName)
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+		WHERE process_definition.activationState = :activationState
+		AND (process_definition.name LIKE :term ESCAPE '#' OR process_definition.displayName LIKE :term ESCAPE '#')
+		GROUP BY process_definition.name, process_definition.displayName
+		ORDER BY
+			CASE WHEN :sortByName = false AND :ascending = true  THEN process_definition.displayName END ASC,
+			CASE WHEN :sortByName = false AND :ascending = false THEN process_definition.displayName END DESC,
+			CASE WHEN :sortByName = true  AND :ascending = true  THEN process_definition.name        END ASC,
+			CASE WHEN :sortByName = true  AND :ascending = false THEN process_definition.name        END DESC,
+			CASE WHEN :sortByName = true THEN process_definition.displayName ELSE process_definition.name END ASC
+	</query>
+
+	<!--
+		Count of distinct (name, displayName) groups matching the search term, with the same base / *WithActivationState
+		split as searchProcessNameGroups above for the optional activationState filter.
+		COALESCE(displayName, '') keeps the count identical across vendors: MySQL's CONCAT returns NULL if any argument
+		is NULL (so a null displayName would be dropped from the DISTINCT count), whereas H2/PostgreSQL/SQL Server treat
+		NULL as ''. displayName is non-null in practice (defaulted to the process name at deployment), so this is a
+		portability safeguard rather than a live case.
+	-->
+	<query name="getNumberOfProcessNameGroups">
+		SELECT COUNT(DISTINCT CONCAT(process_definition.name, :sep, COALESCE(process_definition.displayName, '')))
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+		WHERE (process_definition.name LIKE :term ESCAPE '#' OR process_definition.displayName LIKE :term ESCAPE '#')
+	</query>
+
+	<query name="getNumberOfProcessNameGroupsWithActivationState">
+		SELECT COUNT(DISTINCT CONCAT(process_definition.name, :sep, COALESCE(process_definition.displayName, '')))
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+		WHERE process_definition.activationState = :activationState
+		AND (process_definition.name LIKE :term ESCAPE '#' OR process_definition.displayName LIKE :term ESCAPE '#')
+	</query>
+
+	<!-- Versions of the given process names; grouped by (name, displayName) on the engine side. Same base /
+		*WithActivationState split as above for the optional activationState restriction. -->
+	<query name="getProcessVersionsByNames">
+		SELECT DISTINCT new org.bonitasoft.engine.core.process.definition.model.ProcessNameVersion(process_definition.name, process_definition.displayName, process_definition.version)
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+		WHERE process_definition.name IN (:names)
+		ORDER BY process_definition.name ASC, process_definition.displayName ASC, process_definition.version ASC
+	</query>
+
+	<query name="getProcessVersionsByNamesWithActivationState">
+		SELECT DISTINCT new org.bonitasoft.engine.core.process.definition.model.ProcessNameVersion(process_definition.name, process_definition.displayName, process_definition.version)
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
+		WHERE process_definition.name IN (:names)
+		AND process_definition.activationState = :activationState
+		ORDER BY process_definition.name ASC, process_definition.displayName ASC, process_definition.version ASC
+	</query>
+
 	<query name="getNumberOfSProcessDefinitionDeployInfoUncategorized">
 		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition

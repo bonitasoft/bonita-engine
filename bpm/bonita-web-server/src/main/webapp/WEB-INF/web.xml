@@ -729,6 +729,7 @@
         <url-pattern>/API/bpm/archivedCaseVariable/*</url-pattern>
         <url-pattern>/API/bpm/message</url-pattern>
         <url-pattern>/API/bpm/processInfo/*</url-pattern>
+        <url-pattern>/API/bpm/processName</url-pattern>
         <url-pattern>/API/bpm/signal</url-pattern>
         <url-pattern>/API/bpm/timerEventTrigger/*</url-pattern>
         <url-pattern>/API/extension/*</url-pattern>

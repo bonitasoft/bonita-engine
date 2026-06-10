@@ -3825,6 +3825,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public SearchResult<ProcessNameInfo> searchProcessNames(final SearchOptions searchOptions)
+            throws SearchException {
+        final ProcessDefinitionService processDefinitionService = getServiceAccessor().getProcessDefinitionService();
+        return new SearchProcessNames(processDefinitionService, searchOptions).search();
+    }
+
+    @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedBy(final long userId,
             final SearchOptions searchOptions)
             throws RetrieveException, SearchException {
