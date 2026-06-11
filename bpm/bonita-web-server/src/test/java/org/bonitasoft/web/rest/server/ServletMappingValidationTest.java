@@ -34,7 +34,7 @@ import org.w3c.dom.NodeList;
  * - ✅ /API/bpm/process/* (wildcard at end)
  * - ✅ *.jsp (extension mapping)
  * When wildcards in the middle are needed, use URL rewriting with /APISpringInternal
- * (see doc/RESTLET_TO_SPRING_MVC_CONVERSION_GUIDE.md section on URL rewriting)
+ * (see doc/LEGACY_API_TO_SPRING_MVC_GUIDE.md - "Wildcard in the MIDDLE" box in Step 5)
  */
 class ServletMappingValidationTest {
 
@@ -68,7 +68,7 @@ class ServletMappingValidationTest {
                                 "  - Extension mappings: *.jsp\n" +
                                 "\nFor patterns like /API/path/*/operation, use URL rewriting with /APISpringInternal\n"
                                 +
-                                "See: doc/RESTLET_TO_SPRING_MVC_CONVERSION_GUIDE.md")
+                                "See: doc/LEGACY_API_TO_SPRING_MVC_GUIDE.md (Wildcard in the MIDDLE box, Step 5)")
                 .isEmpty();
     }
 

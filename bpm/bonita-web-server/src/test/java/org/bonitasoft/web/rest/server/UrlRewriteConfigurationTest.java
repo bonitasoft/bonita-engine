@@ -67,7 +67,7 @@ class UrlRewriteConfigurationTest {
                                 This rule is required because Tomcat servlet mappings don't support
                                 wildcards in the middle of paths (/API/bpm/process/*/design).
 
-                                See: doc/RESTLET_TO_SPRING_MVC_CONVERSION_GUIDE.md - Pattern 5: URL Rewriting""")
+                                See: doc/LEGACY_API_TO_SPRING_MVC_GUIDE.md - "Wildcard in the MIDDLE" box in Step 5""")
                 .isTrue();
     }
 
