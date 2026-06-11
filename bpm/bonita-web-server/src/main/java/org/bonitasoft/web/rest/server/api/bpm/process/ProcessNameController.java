@@ -71,8 +71,8 @@ public class ProcessNameController extends AbstractRESTController {
      */
     @GetMapping
     public ResponseEntity<List<ProcessNameResponse>> searchProcessNames(
-            @RequestParam(value = "p", defaultValue = "0") int page,
-            @RequestParam(value = "c", defaultValue = "10") int count,
+            @RequestParam(value = "p") int page,
+            @RequestParam(value = "c") int count,
             @RequestParam(value = "s", required = false) String search,
             @RequestParam(value = "o", required = false) String order,
             @RequestParam(value = "f", required = false) List<String> filters,

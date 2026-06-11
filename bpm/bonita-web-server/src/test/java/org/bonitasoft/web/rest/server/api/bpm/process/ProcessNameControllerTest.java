@@ -85,6 +85,8 @@ class ProcessNameControllerTest extends AbstractControllerTest<ProcessNameContro
         // when
         mockMvc.perform(get("/API/bpm/processName")
                 .sessionAttrs(sessionAttributes)
+                .param("p", "0")
+                .param("c", "10")
                 .param("f", "activationState=ENABLED")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -104,6 +106,8 @@ class ProcessNameControllerTest extends AbstractControllerTest<ProcessNameContro
         // when - then: ordering on version is not supported for the grouped resource
         mockMvc.perform(get("/API/bpm/processName")
                 .sessionAttrs(sessionAttributes)
+                .param("p", "0")
+                .param("c", "10")
                 .param("o", "version ASC")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -114,6 +118,8 @@ class ProcessNameControllerTest extends AbstractControllerTest<ProcessNameContro
         // when - then: only a single sort clause is applied, so a compound order is rejected rather than half-honored
         mockMvc.perform(get("/API/bpm/processName")
                 .sessionAttrs(sessionAttributes)
+                .param("p", "0")
+                .param("c", "10")
                 .param("o", "displayName ASC, name DESC")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -124,7 +130,29 @@ class ProcessNameControllerTest extends AbstractControllerTest<ProcessNameContro
         // when - then: a value that is not a real ActivationState (incl. the engine sentinel '*') is rejected
         mockMvc.perform(get("/API/bpm/processName")
                 .sessionAttrs(sessionAttributes)
+                .param("p", "0")
+                .param("c", "10")
                 .param("f", "activationState=NOPE")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_reject_request_when_page_param_is_missing() throws Exception {
+        // when - then
+        mockMvc.perform(get("/API/bpm/processName")
+                .sessionAttrs(sessionAttributes)
+                .param("c", "10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_reject_request_when_count_param_is_missing() throws Exception {
+        // when - then
+        mockMvc.perform(get("/API/bpm/processName")
+                .sessionAttrs(sessionAttributes)
+                .param("p", "0")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
