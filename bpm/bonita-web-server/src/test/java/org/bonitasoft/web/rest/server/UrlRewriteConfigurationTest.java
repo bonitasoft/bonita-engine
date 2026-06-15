@@ -50,10 +50,10 @@ class UrlRewriteConfigurationTest {
 
         // Then - Should have rule for process design endpoint
         boolean hasProcessDesignRule = rules.stream()
-                .anyMatch(rule -> rule.from.contains("/API/bpm/process/")
-                        && rule.from.contains("/design")
-                        && rule.to.contains("/APISpringInternal/bpm/process/")
-                        && rule.to.contains("/design"));
+                .anyMatch(rule -> rule.from().contains("/API/bpm/process/")
+                        && rule.from().contains("/design")
+                        && rule.to().contains("/APISpringInternal/bpm/process/")
+                        && rule.to().contains("/design"));
 
         assertThat(hasProcessDesignRule)
                 .withFailMessage(

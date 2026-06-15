@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.bonitasoft.web.rest.server.framework.utils.RestRequestURIParser;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -49,7 +50,7 @@ class ServletMappingValidationTest {
                 .exists();
 
         // When
-        List<String> springRestPatterns = parseUrlPatternsForServlet(webXmlFile, "SpringRest");
+        List<String> springRestPatterns = parseUrlPatternsForServlet(webXmlFile);
 
         // Then
         List<String> invalidPatterns = new ArrayList<>();
@@ -60,15 +61,17 @@ class ServletMappingValidationTest {
         }
 
         assertThat(invalidPatterns)
-                .withFailMessage(
-                        "Found servlet URL patterns with wildcards in the middle (not supported by Tomcat):\n" +
-                                String.join("\n", invalidPatterns) +
-                                "\n\nTomcat only supports:\n" +
-                                "  - Wildcards at the end: /API/path/*\n" +
-                                "  - Extension mappings: *.jsp\n" +
-                                "\nFor patterns like /API/path/*/operation, use URL rewriting with /APISpringInternal\n"
-                                +
-                                "See: doc/LEGACY_API_TO_SPRING_MVC_GUIDE.md (Wildcard in the MIDDLE box, Step 5)")
+                .withFailMessage("""
+                        Found servlet URL patterns with wildcards in the middle (not supported by Tomcat):
+                        %s
+
+                        Tomcat only supports:
+                          - Wildcards at the end: /API/path/*
+                          - Extension mappings: *.jsp
+
+                        For patterns like /API/path/*/operation, use URL rewriting with /APISpringInternal
+                        See: doc/LEGACY_API_TO_SPRING_MVC_GUIDE.md (Wildcard in the MIDDLE box, Step 5)"""
+                        .formatted(String.join("\n", invalidPatterns)))
                 .isEmpty();
     }
 
@@ -92,13 +95,11 @@ class ServletMappingValidationTest {
             return false;
         }
 
-        // Wildcard at the end (/path/*) is valid
+        // Wildcard at the end (/path/*) is valid; otherwise it is somewhere in the middle
         return !pattern.endsWith("/*");
-
-        // Wildcard anywhere else is in the middle
     }
 
-    private List<String> parseUrlPatternsForServlet(File webXml, String servletName) throws Exception {
+    private List<String> parseUrlPatternsForServlet(File webXml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(webXml);
@@ -112,8 +113,8 @@ class ServletMappingValidationTest {
             Element mapping = (Element) servletMappings.item(i);
 
             // Check if this mapping is for the target servlet
-            String mappingServletName = getTextContent(mapping, "servlet-name");
-            if (servletName.equals(mappingServletName)) {
+            String mappingServletName = getServletName(mapping);
+            if (RestRequestURIParser.SPRING_REST_SERVLET_NAME.equals(mappingServletName)) {
                 // Get all url-pattern elements for this servlet
                 NodeList urlPatterns = mapping.getElementsByTagName("url-pattern");
                 for (int j = 0; j < urlPatterns.getLength(); j++) {
@@ -126,8 +127,8 @@ class ServletMappingValidationTest {
         return patterns;
     }
 
-    private String getTextContent(Element parent, String tagName) {
-        NodeList nodes = parent.getElementsByTagName(tagName);
+    private String getServletName(Element mapping) {
+        NodeList nodes = mapping.getElementsByTagName("servlet-name");
         if (nodes.getLength() > 0) {
             return nodes.item(0).getTextContent().trim();
         }
