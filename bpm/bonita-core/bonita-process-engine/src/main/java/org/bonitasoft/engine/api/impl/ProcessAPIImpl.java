@@ -206,6 +206,10 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.SBARResource;
@@ -272,6 +276,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     private static final String PENDING_OR_ASSIGNED = "PendingOrAssigned";
 
     private static final String PENDING_OR_ASSIGNED_OR_ASSIGNED_TO_OTHERS = "PendingOrAssignedOrAssignedToOthers";
+
+    private static final String ACTION_TYPE_USERTASK_EXECUTED = "USERTASK_" + ActionType.EXECUTED.name();
 
     protected final ProcessConfigurationAPIImpl processConfigurationAPI;
     private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
@@ -6237,32 +6243,59 @@ public class ProcessAPIImpl implements ProcessAPI {
                 activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId.orElse(0L));
                 WorkDescriptor work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
                 workService.registerWork(work);
-                if (log.isInfoEnabled() && !isFirstState /*
-                                                          * don't log when create
-                                                          * subtask
-                                                          */) {
+                if (log.isInfoEnabled() && !isFirstState) { // don't log when create subtask
                     final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance,
                             session.getUserName(), executerUserId.orElse(0L),
                             executerSubstituteUserId.orElse(0L), inputs);
                     log.info(message);
                 } else if (log.isDebugEnabled()) {
-                    log.debug("Executing state " + flowNodeInstance.getStateName() + " ("
-                            + flowNodeInstance.getStateId()
-                            + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
+                    log.debug("Executing state {} ({}) for flownode {}", flowNodeInstance.getStateName(),
+                            flowNodeInstance.getStateId(),
+                            LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
                 }
                 if (!executerUserId.equals(executerSubstituteUserId)) {
                     try {
                         final SUser executorUser = identityService.getUser(executerUserId.orElse(0L));
-                        String stb = "The user " + session.getUserName() + " " + "acting as delegate of the user "
-                                + executorUser.getUserName() + " "
-                                + "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
+                        String stb = "The user %s acting as delegate of the user %s has done the task \"%s\"."
+                                .formatted(session.getUserName(), executorUser.getUserName(),
+                                        flowNodeInstance.getDisplayName());
                         commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb);
+                        logDelegatedExecution(flowNodeInstance, session.getUserName(), executorUser.getUserName(),
+                                executerUserId.orElse(0L), executerSubstituteUserId.orElse(0L));
                     } catch (final SBonitaException e) {
                         log.error(
                                 "Error when adding a comment on the process instance.", e);
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Records a queriable (audit) log of the delegated execution so it can be searched via the Log API:
+     * numericIndex1=flow node id, numericIndex2=executer (delegating user), numericIndex3=substitute (the user
+     * who actually performed the execution).
+     */
+    private void logDelegatedExecution(final SFlowNodeInstance flowNodeInstance, final String substituteUserName,
+            final String executerUserName, final long executerUserId, final long executerSubstituteUserId) {
+        try {
+            final SQueriableLog delegatedExecutionLog = new SQueriableLogBuilder()
+                    .severity(SQueriableLogSeverity.INTERNAL)
+                    .actionType(ACTION_TYPE_USERTASK_EXECUTED)
+                    .actionScope(String.valueOf(flowNodeInstance.getId()))
+                    .actionStatus(SQueriableLog.STATUS_OK)
+                    .rawMessage("Task %s executed by user %s on behalf of %s"
+                            .formatted(flowNodeInstance.getDisplayName(), substituteUserName, executerUserName))
+                    .numericIndex(0, flowNodeInstance.getId())
+                    .numericIndex(1, executerUserId)
+                    .numericIndex(2, executerSubstituteUserId)
+                    .build();
+            getServiceAccessor().getQueriableLoggerService()
+                    .log(ProcessAPIImpl.class.getName(), "executeFlowNode", delegatedExecutionLog);
+        } catch (final RuntimeException e) {
+            // Audit logging must never abort the task execution itself; fail soft, as the system comment does.
+            log.error("Failed to insert delegated-execution queriable log for flow node {}",
+                    flowNodeInstance.getId(), e);
         }
     }
 
