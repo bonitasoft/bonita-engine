@@ -18,7 +18,7 @@ class Deps {
     public static String semver4jVersion = '3.1.0'
     public static String slf4jVersion = "1.7.36"
     public static String h2Version = "1.4.199"
-    public static String tomcatVersion = "9.0.118"
+    public static String tomcatVersion = "9.0.119"
 
     // Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
     public static String hibernateVersion = "5.4.32.Final"
