@@ -34,6 +34,11 @@ public class APIItemNotFoundException extends APIItemException {
         this.id = id;
     }
 
+    public APIItemNotFoundException(final String itemType, final APIID id, final Throwable cause) {
+        super(itemType, cause);
+        this.id = id;
+    }
+
     /**
      * @return the id
      */
