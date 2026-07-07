@@ -49,7 +49,7 @@ public class GroupEngineClient {
         try {
             return groupAPI.getGroup(groupId);
         } catch (GroupNotFoundException e) {
-            throw new APIItemNotFoundException(GroupDefinition.TOKEN, APIID.makeAPIID(groupId));
+            throw new APIItemNotFoundException(GroupDefinition.TOKEN, APIID.makeAPIID(groupId), e);
         }
     }
 
@@ -57,7 +57,7 @@ public class GroupEngineClient {
         try {
             return groupAPI.getGroupByPath(groupPath);
         } catch (GroupNotFoundException e) {
-            throw new APIItemNotFoundException(GroupDefinition.TOKEN, APIID.makeAPIID(groupPath));
+            throw new APIItemNotFoundException(GroupDefinition.TOKEN, APIID.makeAPIID(groupPath), e);
         }
     }
 
@@ -65,7 +65,7 @@ public class GroupEngineClient {
         try {
             return groupAPI.getGroup(parseId(groupId)).getPath();
         } catch (GroupNotFoundException e) {
-            throw new APINotFoundException(new T_("Unable to get group path, group not found"));
+            throw new APINotFoundException(new T_("Unable to get group path, group not found"), e);
         }
     }
 
@@ -82,7 +82,7 @@ public class GroupEngineClient {
             groupAPI.deleteGroups(groupIds);
         } catch (DeletionException e) {
             if (e.getCause() instanceof GroupNotFoundException) {
-                throw new APIItemNotFoundException(GroupDefinition.TOKEN);
+                throw new APIItemNotFoundException(GroupDefinition.TOKEN, null, e);
             } else {
                 throw new APIException(new T_("Error when deleting groups"), e);
             }
@@ -93,7 +93,7 @@ public class GroupEngineClient {
         try {
             return groupAPI.updateGroup(groupId, groupUpdater);
         } catch (GroupNotFoundException e) {
-            throw new APIItemNotFoundException(GroupDefinition.TOKEN, APIID.makeAPIID(groupId));
+            throw new APIItemNotFoundException(GroupDefinition.TOKEN, APIID.makeAPIID(groupId), e);
         } catch (UpdateException e) {
             throw new APIException(new T_("Error when updating group"), e);
         } catch (AlreadyExistsException e) {

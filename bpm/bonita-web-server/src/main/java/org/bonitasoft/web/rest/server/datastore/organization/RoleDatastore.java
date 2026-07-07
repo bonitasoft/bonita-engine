@@ -96,7 +96,7 @@ public class RoleDatastore extends CommonDatastore<RoleItem, Role> implements
 
             return convertEngineToConsoleItem(getIdentityAPI().updateRole(id.toLong(), updater));
         } catch (final RoleNotFoundException e) {
-            throw new APINotFoundException(new T_("Unable to find role %roleId%", new Arg("roleId", id)));
+            throw new APINotFoundException(new T_("Unable to find role %roleId%", new Arg("roleId", id)), e);
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
@@ -164,7 +164,7 @@ public class RoleDatastore extends CommonDatastore<RoleItem, Role> implements
         try {
             return convertEngineToConsoleItem(getIdentityAPI().getRole(id.toLong()));
         } catch (final RoleNotFoundException e) {
-            throw new APINotFoundException(new T_("Unable to find role %roleId%", new Arg("roleId", id)));
+            throw new APINotFoundException(new T_("Unable to find role %roleId%", new Arg("roleId", id)), e);
         } catch (final BonitaException e) {
             throw new APIException(e);
         }
