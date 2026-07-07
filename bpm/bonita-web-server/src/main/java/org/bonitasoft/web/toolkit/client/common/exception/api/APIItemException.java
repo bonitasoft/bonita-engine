@@ -33,6 +33,11 @@ public class APIItemException extends APIException {
         this.itemType = itemType.toLowerCase();
     }
 
+    public APIItemException(final String itemType, final Throwable cause) {
+        super(cause);
+        this.itemType = itemType.toLowerCase();
+    }
+
     public String getItemType() {
         return this.itemType;
     }

@@ -85,25 +85,22 @@ public class APICase extends ConsoleAPI<CaseItem>
 
     private void fillStartedBy(final CaseItem item, final List<String> deploys) {
         if (isDeployable(CaseItem.ATTRIBUTE_STARTED_BY_USER_ID, deploys, item)) {
-            item.setDeploy(
-                    CaseItem.ATTRIBUTE_STARTED_BY_USER_ID,
-                    getUserDatastore().get(item.getStartedByUserId()));
+            deploySafely(item, CaseItem.ATTRIBUTE_STARTED_BY_USER_ID, item.getStartedByUserId(),
+                    id -> getUserDatastore().get(id));
         }
     }
 
     private void fillStartedBySubstitute(final CaseItem item, final List<String> deploys) {
         if (isDeployable(CaseItem.ATTRIBUTE_STARTED_BY_SUBSTITUTE_USER_ID, deploys, item)) {
-            item.setDeploy(
-                    CaseItem.ATTRIBUTE_STARTED_BY_SUBSTITUTE_USER_ID,
-                    getUserDatastore().get(item.getStartedBySubstituteUserId()));
+            deploySafely(item, CaseItem.ATTRIBUTE_STARTED_BY_SUBSTITUTE_USER_ID,
+                    item.getStartedBySubstituteUserId(), id -> getUserDatastore().get(id));
         }
     }
 
     private void fillProcess(final CaseItem item, final List<String> deploys) {
         if (isDeployable(CaseItem.ATTRIBUTE_PROCESS_ID, deploys, item)) {
-            item.setDeploy(
-                    CaseItem.ATTRIBUTE_PROCESS_ID,
-                    getProcessDatastore().get(item.getProcessId()));
+            deploySafely(item, CaseItem.ATTRIBUTE_PROCESS_ID, item.getProcessId(),
+                    id -> getProcessDatastore().get(id));
         }
     }
 

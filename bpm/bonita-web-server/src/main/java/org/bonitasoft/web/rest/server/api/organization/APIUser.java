@@ -165,13 +165,13 @@ public class APIUser extends ConsoleAPI<UserItem> implements APIHasAdd<UserItem>
     @Override
     protected void fillDeploys(final UserItem item, final List<String> deploys) {
         if (isDeployable(UserItem.ATTRIBUTE_MANAGER_ID, deploys, item)) {
-            item.setDeploy(UserItem.ATTRIBUTE_MANAGER_ID,
-                    ((UserDatastore) getDefaultDatastore()).get(item.getManagerId()));
+            deploySafely(item, UserItem.ATTRIBUTE_MANAGER_ID, item.getManagerId(),
+                    id -> ((UserDatastore) getDefaultDatastore()).get(id));
         }
 
         if (isDeployable(UserItem.ATTRIBUTE_CREATED_BY_USER_ID, deploys, item)) {
-            item.setDeploy(UserItem.ATTRIBUTE_CREATED_BY_USER_ID,
-                    ((UserDatastore) getDefaultDatastore()).get(item.getCreatedByUserId()));
+            deploySafely(item, UserItem.ATTRIBUTE_CREATED_BY_USER_ID, item.getCreatedByUserId(),
+                    id -> ((UserDatastore) getDefaultDatastore()).get(id));
         }
 
         if (deploys.contains(UserItem.DEPLOY_PERSONAL_DATA)) {

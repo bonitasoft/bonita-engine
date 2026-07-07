@@ -112,8 +112,8 @@ public class AbstractAPIFlowNode<ITEM extends IFlowNodeItem> extends ConsoleAPI<
     protected void fillDeploys(final ITEM item, final List<String> deploys) {
         /** TODO Refactor to an oriented object (cf. WEB-1637 ) */
         if (isDeployable(FlowNodeItem.ATTRIBUTE_PROCESS_ID, deploys, item)) {
-            item.setDeploy(FlowNodeItem.ATTRIBUTE_PROCESS_ID,
-                    new ProcessDatastore(getEngineSession()).get(item.getProcessId()));
+            deploySafely(item, FlowNodeItem.ATTRIBUTE_PROCESS_ID, item.getProcessId(),
+                    id -> getProcessDatastore().get(id));
         }
 
         if (isDeployable(FlowNodeItem.ATTRIBUTE_CASE_ID, deploys, item)
@@ -150,31 +150,32 @@ public class AbstractAPIFlowNode<ITEM extends IFlowNodeItem> extends ConsoleAPI<
                 rootContainerCase = getArchivedCase(item.getAttributeValue(HumanTaskItem.ATTRIBUTE_ROOT_CONTAINER_ID));
             }
             if (rootContainerCase != null) {
-                item.setDeploy(FlowNodeItem.ATTRIBUTE_ROOT_CONTAINER_ID,
-                        new ProcessDatastore(getEngineSession()).get(rootContainerCase.getProcessId()));
+                deploySafely(item, FlowNodeItem.ATTRIBUTE_ROOT_CONTAINER_ID, rootContainerCase.getProcessId(),
+                        id -> getProcessDatastore().get(id));
             }
         }
 
         if (isDeployable(FlowNodeItem.ATTRIBUTE_EXECUTED_BY_USER_ID, deploys, item)) {
-            item.setDeploy(FlowNodeItem.ATTRIBUTE_EXECUTED_BY_USER_ID,
-                    new UserDatastore(getEngineSession()).get(item.getExecutedByUserId()));
+            deploySafely(item, FlowNodeItem.ATTRIBUTE_EXECUTED_BY_USER_ID, item.getExecutedByUserId(),
+                    id -> getUserDatastore().get(id));
         }
 
         if (isDeployable(FlowNodeItem.ATTRIBUTE_EXECUTED_BY_SUBSTITUTE_USER_ID, deploys, item)) {
-            item.setDeploy(FlowNodeItem.ATTRIBUTE_EXECUTED_BY_SUBSTITUTE_USER_ID,
-                    new UserDatastore(getEngineSession()).get(item.getExecutedBySubstituteUserId()));
+            deploySafely(item, FlowNodeItem.ATTRIBUTE_EXECUTED_BY_SUBSTITUTE_USER_ID,
+                    item.getExecutedBySubstituteUserId(),
+                    id -> getUserDatastore().get(id));
         }
 
         if (isDeployable(HumanTaskItem.ATTRIBUTE_ACTOR_ID, deploys, item)) {
-            item.setDeploy(HumanTaskItem.ATTRIBUTE_ACTOR_ID,
-                    new ActorDatastore(getEngineSession())
-                            .get(item.getAttributeValueAsAPIID(HumanTaskItem.ATTRIBUTE_ACTOR_ID)));
+            deploySafely(item, HumanTaskItem.ATTRIBUTE_ACTOR_ID,
+                    item.getAttributeValueAsAPIID(HumanTaskItem.ATTRIBUTE_ACTOR_ID),
+                    id -> getActorDatastore().get(id));
         }
 
         if (isDeployable(HumanTaskItem.ATTRIBUTE_ASSIGNED_USER_ID, deploys, item)) {
-            item.setDeploy(HumanTaskItem.ATTRIBUTE_ASSIGNED_USER_ID,
-                    new UserDatastore(getEngineSession())
-                            .get(item.getAttributeValueAsAPIID(HumanTaskItem.ATTRIBUTE_ASSIGNED_USER_ID)));
+            deploySafely(item, HumanTaskItem.ATTRIBUTE_ASSIGNED_USER_ID,
+                    item.getAttributeValueAsAPIID(HumanTaskItem.ATTRIBUTE_ASSIGNED_USER_ID),
+                    id -> getUserDatastore().get(id));
         }
 
         addDeployer(new GenericDeployer<>(id -> new TaskFinder(
@@ -187,6 +188,18 @@ public class AbstractAPIFlowNode<ITEM extends IFlowNodeItem> extends ConsoleAPI<
 
     protected CaseDatastore getCaseDatastore() {
         return new CaseDatastore(getEngineSession());
+    }
+
+    ProcessDatastore getProcessDatastore() {
+        return new ProcessDatastore(getEngineSession());
+    }
+
+    UserDatastore getUserDatastore() {
+        return new UserDatastore(getEngineSession());
+    }
+
+    ActorDatastore getActorDatastore() {
+        return new ActorDatastore(getEngineSession());
     }
 
     private CaseItem getArchivedCase(final String id) {
