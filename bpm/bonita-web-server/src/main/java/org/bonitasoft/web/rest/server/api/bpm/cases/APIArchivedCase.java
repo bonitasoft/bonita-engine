@@ -77,21 +77,18 @@ public class APIArchivedCase extends ConsoleAPI<ArchivedCaseItem>
     @Override
     protected void fillDeploys(final ArchivedCaseItem item, final List<String> deploys) {
         if (isDeployable(ArchivedCaseItem.ATTRIBUTE_STARTED_BY_USER_ID, deploys, item)) {
-            item.setDeploy(
-                    ArchivedCaseItem.ATTRIBUTE_STARTED_BY_USER_ID,
-                    getUserDatastore().get(item.getStartedByUserId()));
+            deploySafely(item, ArchivedCaseItem.ATTRIBUTE_STARTED_BY_USER_ID, item.getStartedByUserId(),
+                    id -> getUserDatastore().get(id));
         }
 
         if (isDeployable(ArchivedCaseItem.ATTRIBUTE_STARTED_BY_SUBSTITUTE_USER_ID, deploys, item)) {
-            item.setDeploy(
-                    ArchivedCaseItem.ATTRIBUTE_STARTED_BY_SUBSTITUTE_USER_ID,
-                    getUserDatastore().get(item.getStartedBySubstituteUserId()));
+            deploySafely(item, ArchivedCaseItem.ATTRIBUTE_STARTED_BY_SUBSTITUTE_USER_ID,
+                    item.getStartedBySubstituteUserId(), id -> getUserDatastore().get(id));
         }
 
         if (isDeployable(ArchivedCaseItem.ATTRIBUTE_PROCESS_ID, deploys, item)) {
-            item.setDeploy(
-                    ArchivedCaseItem.ATTRIBUTE_PROCESS_ID,
-                    getProcessDatastore().get(item.getProcessId()));
+            deploySafely(item, ArchivedCaseItem.ATTRIBUTE_PROCESS_ID, item.getProcessId(),
+                    id -> getProcessDatastore().get(id));
         }
     }
 

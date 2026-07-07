@@ -13,30 +13,25 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.process;
 
-import static java.util.Collections.EMPTY_MAP;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.console.common.server.i18n.I18n;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.web.rest.model.bpm.process.ProcessConnectorItem;
-import org.bonitasoft.web.rest.server.BonitaRestAPIServlet;
-import org.bonitasoft.web.rest.server.datastore.bpm.process.ProcessConnectorDatastore;
+import org.bonitasoft.web.rest.model.ModelFactory;
+import org.bonitasoft.web.rest.model.bpm.process.ActorItem;
+import org.bonitasoft.web.rest.model.bpm.process.ProcessItem;
 import org.bonitasoft.web.rest.server.datastore.bpm.process.ProcessDatastore;
-import org.bonitasoft.web.rest.server.framework.exception.APIFilterMandatoryException;
+import org.bonitasoft.web.toolkit.client.ItemDefinitionFactory;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemNotFoundException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.Item;
@@ -47,68 +42,65 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * @author Colin PUY
- */
-@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
-class APIProcessConnectorTest {
+class APIActorTest {
 
     @Mock
-    private ProcessConnectorDatastore processConnectorDatastore;
+    private ProcessDatastore processDatastore;
 
-    private APIProcessConnector apiProcessConnector;
+    private APIActor apiActor;
 
     @BeforeAll
     static void initEnvironment() {
-        new BonitaRestAPIServlet();
         I18n.getInstance();
     }
 
     @BeforeEach
-    void initializeMocks() {
-        apiProcessConnector = spy(new APIProcessConnector());
-        // lenient: only the search-with-valid-filter test reaches the default datastore;
-        // the mandatory-filter test throws before resolving it.
-        lenient().doReturn(processConnectorDatastore).when(apiProcessConnector).defineDefaultDatastore();
+    void before() {
+        ItemDefinitionFactory.setDefaultFactory(new ModelFactory());
+        apiActor = spy(new APIActor());
     }
 
     @Test
-    void search_should_require_process_id_filter() {
-        assertThatExceptionOfType(APIFilterMandatoryException.class)
-                .isThrownBy(() -> apiProcessConnector.search(0, 10, null, null, EMPTY_MAP));
-    }
+    void fillDeploys_should_fill_process_when_process_is_active() {
+        // Given an actor whose process definition still exists
+        doReturn(processDatastore).when(apiActor).getProcessDatastore();
+        final APIID processId = APIID.makeAPIID(7L);
+        final ActorItem item = mock(ActorItem.class);
+        doReturn("7").when(item).getAttributeValue(ActorItem.ATTRIBUTE_PROCESS_ID);
+        doReturn(processId).when(item).getProcessId();
 
-    @Test
-    void search_should_delegate_to_datastore_when_process_id_filter_is_set() {
-        final Map<String, String> filters = new HashMap<>();
-        filters.put(ProcessConnectorItem.ATTRIBUTE_PROCESS_ID, "1");
+        final List<String> deploys = List.of(ActorItem.ATTRIBUTE_PROCESS_ID);
 
-        apiProcessConnector.search(0, 10, null, null, filters);
+        final ProcessItem processItem = new ProcessItem();
+        doReturn(processItem).when(processDatastore).get(processId);
 
-        verify(processConnectorDatastore).search(0, 10, null, null, filters);
+        // When
+        apiActor.fillDeploys(item, deploys);
+
+        // Then
+        verify(item).setDeploy(ActorItem.ATTRIBUTE_PROCESS_ID, processItem);
     }
 
     @Test
     void fillDeploys_should_skip_process_deploy_when_process_no_longer_exists() {
-        // Given a connector whose process definition was deleted
-        final ProcessDatastore processDatastore = mock(ProcessDatastore.class);
-        doReturn(processDatastore).when(apiProcessConnector).getProcessDatastore();
+        // Given an actor whose process definition was deleted
+        doReturn(processDatastore).when(apiActor).getProcessDatastore();
         final APIID deletedProcessId = APIID.makeAPIID(7L);
-        final ProcessConnectorItem item = mock(ProcessConnectorItem.class);
-        doReturn("7").when(item).getAttributeValue(ProcessConnectorItem.ATTRIBUTE_PROCESS_ID);
+        final ActorItem item = mock(ActorItem.class);
+        doReturn("7").when(item).getAttributeValue(ActorItem.ATTRIBUTE_PROCESS_ID);
         doReturn(deletedProcessId).when(item).getProcessId();
 
-        final List<String> deploys = List.of(ProcessConnectorItem.ATTRIBUTE_PROCESS_ID);
+        final List<String> deploys = List.of(ActorItem.ATTRIBUTE_PROCESS_ID);
 
         doThrow(new APIItemNotFoundException("process", deletedProcessId,
                 new ProcessDefinitionNotFoundException("process deleted")))
                 .when(processDatastore).get(deletedProcessId);
 
-        // When the unresolvable process must not fail the whole connector list
-        assertThatCode(() -> apiProcessConnector.fillDeploys(item, deploys)).doesNotThrowAnyException();
+        // When the unresolvable process must not fail the whole actor list
+        assertThatCode(() -> apiActor.fillDeploys(item, deploys)).doesNotThrowAnyException();
 
         // Then the process deploy is skipped (left empty)
-        verify(item, never()).setDeploy(eq(ProcessConnectorItem.ATTRIBUTE_PROCESS_ID), any(Item.class));
+        verify(item, never()).setDeploy(eq(ActorItem.ATTRIBUTE_PROCESS_ID), any(Item.class));
     }
 }

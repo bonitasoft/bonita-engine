@@ -99,14 +99,29 @@ public abstract class AbstractAPIMember<T extends AbstractMemberItem> extends Co
     @Override
     protected void fillDeploys(final T item, final List<String> deploys) {
         if (isDeployable(ATTRIBUTE_USER_ID, deploys, item)) {
-            item.setDeploy(ATTRIBUTE_USER_ID, new UserDatastore(getEngineSession()).get(item.getUserId()));
+            deploySafely(item, ATTRIBUTE_USER_ID, item.getUserId(),
+                    id -> getUserDatastore().get(id));
         }
         if (isDeployable(ATTRIBUTE_ROLE_ID, deploys, item)) {
-            item.setDeploy(ATTRIBUTE_ROLE_ID, new RoleDatastore(getEngineSession()).get(item.getRoleId()));
+            deploySafely(item, ATTRIBUTE_ROLE_ID, item.getRoleId(),
+                    id -> getRoleDatastore().get(id));
         }
         if (isDeployable(ATTRIBUTE_GROUP_ID, deploys, item)) {
-            item.setDeploy(ATTRIBUTE_GROUP_ID, new GroupDatastore(getEngineSession()).get(item.getGroupId()));
+            deploySafely(item, ATTRIBUTE_GROUP_ID, item.getGroupId(),
+                    id -> getGroupDatastore().get(id));
         }
+    }
+
+    UserDatastore getUserDatastore() {
+        return new UserDatastore(getEngineSession());
+    }
+
+    RoleDatastore getRoleDatastore() {
+        return new RoleDatastore(getEngineSession());
+    }
+
+    GroupDatastore getGroupDatastore() {
+        return new GroupDatastore(getEngineSession());
     }
 
 }
