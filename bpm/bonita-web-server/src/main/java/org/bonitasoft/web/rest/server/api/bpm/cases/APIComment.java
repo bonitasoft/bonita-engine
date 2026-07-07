@@ -76,8 +76,8 @@ public class APIComment extends ConsoleAPI<CommentItem> implements APIHasAdd<Com
     @Override
     protected void fillDeploys(final CommentItem item, final List<String> deploys) {
         if (isDeployable(CommentItem.ATTRIBUTE_USER_ID, deploys, item)) {
-            item.setDeploy(CommentItem.ATTRIBUTE_USER_ID,
-                    new UserDatastore(getEngineSession()).get(item.getUserId()));
+            deploySafely(item, CommentItem.ATTRIBUTE_USER_ID, item.getUserId(),
+                    id -> getUserDatastore().get(id));
         } else {
             item.setDeploy(CommentItem.ATTRIBUTE_USER_ID, getSystemUser());
         }
@@ -90,6 +90,10 @@ public class APIComment extends ConsoleAPI<CommentItem> implements APIHasAdd<Com
         systemUser.setUserName("System");
         systemUser.setIcon(UserItem.DEFAULT_USER_ICON);
         return systemUser;
+    }
+
+    UserDatastore getUserDatastore() {
+        return new UserDatastore(getEngineSession());
     }
 
     /*
