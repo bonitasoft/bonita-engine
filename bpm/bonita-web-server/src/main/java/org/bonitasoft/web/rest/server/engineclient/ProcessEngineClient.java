@@ -60,9 +60,9 @@ public class ProcessEngineClient {
         try {
             return getProcessApi().getProcessDeploymentInfo(processId);
         } catch (final ProcessDefinitionNotFoundException e) {
-            LOGGER.debug("Unable to find process with id " + processId);
+            LOGGER.debug("Unable to find process with id {}", processId);
             throw new APIItemNotFoundException(org.bonitasoft.web.rest.model.bpm.process.ProcessDefinition.TOKEN,
-                    APIID.makeAPIID(processId));
+                    APIID.makeAPIID(processId), e);
         }
     }
 

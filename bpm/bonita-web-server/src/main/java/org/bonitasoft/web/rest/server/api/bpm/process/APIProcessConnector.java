@@ -70,8 +70,12 @@ public class APIProcessConnector extends ConsoleAPI<ProcessConnectorItem> implem
     protected void fillDeploys(final ProcessConnectorItem item, final List<String> deploys) {
 
         if (isDeployable(ATTRIBUTE_PROCESS_ID, deploys, item)) {
-            item.setDeploy(ATTRIBUTE_PROCESS_ID,
-                    new ProcessDatastore(getEngineSession()).get(item.getProcessId()));
+            deploySafely(item, ATTRIBUTE_PROCESS_ID, item.getProcessId(),
+                    id -> getProcessDatastore().get(id));
         }
+    }
+
+    ProcessDatastore getProcessDatastore() {
+        return new ProcessDatastore(getEngineSession());
     }
 }
