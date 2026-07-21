@@ -44,7 +44,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.business.data.ClassloaderRefresher;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -149,10 +148,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         final byte[] zip = converter.zip(buildCustomBOM());
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("Tenant is paused?").isFalse();
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().updateBusinessDataModel(zip);
-        getTenantAdministrationAPI().resume();
+        installBusinessDataModel(zip);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
@@ -174,7 +170,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     }
 
     @After
-    public void cleanClassLoader_and_uninstall_bdm() throws BonitaException {
+    public void cleanClassLoader_and_uninstall_bdm() throws Exception {
         // reset previous classloader:
         if (contextClassLoader != null) {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -182,11 +178,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
         logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        if (!getTenantAdministrationAPI().isPaused()) {
-            getTenantAdministrationAPI().pause();
-            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-            getTenantAdministrationAPI().resume();
-        }
+        cleanAndUninstallBusinessDataModel();
         deleteUser(businessUser);
         logoutOnTenant();
     }
