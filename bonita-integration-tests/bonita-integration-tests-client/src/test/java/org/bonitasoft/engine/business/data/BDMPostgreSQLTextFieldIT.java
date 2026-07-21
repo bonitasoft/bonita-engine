@@ -24,13 +24,11 @@ import javax.naming.Context;
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.CommonAPIIT;
-import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,23 +43,17 @@ public class BDMPostgreSQLTextFieldIT extends CommonAPIIT {
 
     private static final String BDM_PACKAGE_PREFIX = "com.company.model";
     private static final String DOCUMENT_BO = "Document";
-    private TenantAdministrationAPI tenantAdministrationAPI;
 
     @Before
     public void setUp() throws Exception {
         loginWithTechnicalUser();
-        tenantAdministrationAPI = getTenantAdministrationAPI();
 
         // Only run this test on PostgreSQL
         String dbVendor = System.getProperty("sysprop.bonita.bdm.db.vendor", "h2");
         assumeTrue("This test only runs on PostgreSQL", dbVendor.toLowerCase().contains("postgres"));
     }
 
-    @After
-    public void cleanup() throws Exception {
-        cleanAndUninstallBusinessDataModel();
-        logout();
-    }
+    // No @After needed: CommonAPIIT.clean() handles BDM and logout
 
     @Test
     public void should_create_TEXT_column_for_TEXT_fields_in_postgresql() throws Exception {
@@ -86,10 +78,7 @@ public class BDMPostgreSQLTextFieldIT extends CommonAPIIT {
 
         // when: deploy the BDM
         final byte[] zip = new BusinessObjectModelConverter().zip(businessObjectModel);
-        pauseTenantIfNeeded();
-        tenantAdministrationAPI.cleanAndUninstallBusinessDataModel();
-        final String businessDataModelVersion = tenantAdministrationAPI.updateBusinessDataModel(zip);
-        resumeTenant();
+        final String businessDataModelVersion = installBusinessDataModel(zip);
 
         assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
 
@@ -117,28 +106,6 @@ public class BDMPostgreSQLTextFieldIT extends CommonAPIIT {
                         .as("Column " + columnName + " should be of type TEXT, not OID")
                         .isEqualTo(expectedType);
             }
-        }
-    }
-
-    private void cleanAndUninstallBusinessDataModel() throws Exception {
-        pauseTenantIfNeeded();
-        final String version = tenantAdministrationAPI.getBusinessDataModelVersion();
-        if (version != null) {
-            tenantAdministrationAPI.cleanAndUninstallBusinessDataModel();
-        }
-        resumeTenant();
-        assertThat(tenantAdministrationAPI.getBusinessDataModelVersion()).as("should remove BDM").isNull();
-    }
-
-    private void pauseTenantIfNeeded() throws Exception {
-        if (!tenantAdministrationAPI.isPaused()) {
-            tenantAdministrationAPI.pause();
-        }
-    }
-
-    private void resumeTenant() throws Exception {
-        if (tenantAdministrationAPI.isPaused()) {
-            tenantAdministrationAPI.resume();
         }
     }
 }
