@@ -157,11 +157,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         } catch (final Exception e) {
             clientFolder.deleteOnExit();
         }
-        if (!getTenantAdministrationAPI().isPaused()) {
-            getTenantAdministrationAPI().pause();
-        }
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().resume();
+        cleanAndUninstallBusinessDataModel();
 
         deleteUser(testUser);
         logout();
@@ -170,10 +166,14 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void deploying_bdm_with_invalid_query_should_throw_a_BDM_deployment_exception() throws Exception {
         getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        assertThatThrownBy(
-                () -> getTenantAdministrationAPI().updateBusinessDataModel(getZip(buildBOMWithInvalidQuery())))
-                .isInstanceOf(BusinessDataRepositoryDeploymentException.class);
+        try {
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            assertThatThrownBy(
+                    () -> getTenantAdministrationAPI().updateBusinessDataModel(getZip(buildBOMWithInvalidQuery())))
+                    .isInstanceOf(BusinessDataRepositoryDeploymentException.class);
+        } finally {
+            getTenantAdministrationAPI().resume();
+        }
     }
 
     @Test
@@ -195,18 +195,21 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         //test sequence - install should fail (Invalid BDM)
         getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        // the exception should be InvalidBusinessDataModelException
-        assertThatThrownBy(() -> getTenantAdministrationAPI().updateBusinessDataModel(getZip(bom)))
-                .isInstanceOf(BusinessDataRepositoryDeploymentException.class)
-                .hasMessageContaining("Unable to create unique key constraint");
-        assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNull();
+        try {
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            // the exception should be InvalidBusinessDataModelException
+            assertThatThrownBy(() -> getTenantAdministrationAPI().updateBusinessDataModel(getZip(bom)))
+                    .isInstanceOf(BusinessDataRepositoryDeploymentException.class)
+                    .hasMessageContaining("Unable to create unique key constraint");
+            assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNull();
 
-        // remove unique constraint & try to re-install - should work
-        countryBO.setUniqueConstraints(Collections.emptyList());
-        getTenantAdministrationAPI().updateBusinessDataModel(getZip(bom));
-        assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNotNull();
-        getTenantAdministrationAPI().resume();
+            // remove unique constraint & try to re-install - should work
+            countryBO.setUniqueConstraints(Collections.emptyList());
+            getTenantAdministrationAPI().updateBusinessDataModel(getZip(bom));
+            assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNotNull();
+        } finally {
+            getTenantAdministrationAPI().resume();
+        }
     }
 
     @Test
@@ -272,32 +275,33 @@ public class BDRepositoryIT extends CommonAPIIT {
         Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(1);
 
         getTenantAdministrationAPI().pause();
-
-        final String modelVersionInDatabase = getTenantAdministrationAPI().getBusinessDataModelVersion();
-
-        final BusinessObject countryBO = model.getBusinessObjects().stream()
-                .filter(bo -> bo.getQualifiedName().equals(COUNTRY_QUALIFIED_NAME)).findFirst().get();
-
-        final SimpleField population = new SimpleField();
-        population.setName("population");
-        population.setType(FieldType.STRING);
-        countryBO.addField(population);
-
-        final BusinessObject employeeBO = model.getBusinessObjects().stream()
-                .filter(bo -> bo.getQualifiedName().equals(EMPLOYEE_QUALIFIED_NAME)).findFirst().get();
-
-        ((RelationField) employeeBO.getField("addresses")).setType(RelationField.Type.COMPOSITION);
-
         try {
-            getTenantAdministrationAPI().updateBusinessDataModel(businessObjectConverter.zip(model));
-            fail("should not be able to update the bdm");
-        } catch (BusinessDataRepositoryDeploymentException ignored) {
-            log.error("ignored ", ignored);
+            final String modelVersionInDatabase = getTenantAdministrationAPI().getBusinessDataModelVersion();
+
+            final BusinessObject countryBO = model.getBusinessObjects().stream()
+                    .filter(bo -> bo.getQualifiedName().equals(COUNTRY_QUALIFIED_NAME)).findFirst().get();
+
+            final SimpleField population = new SimpleField();
+            population.setName("population");
+            population.setType(FieldType.STRING);
+            countryBO.addField(population);
+
+            final BusinessObject employeeBO = model.getBusinessObjects().stream()
+                    .filter(bo -> bo.getQualifiedName().equals(EMPLOYEE_QUALIFIED_NAME)).findFirst().get();
+
+            ((RelationField) employeeBO.getField("addresses")).setType(RelationField.Type.COMPOSITION);
+
+            try {
+                getTenantAdministrationAPI().updateBusinessDataModel(businessObjectConverter.zip(model));
+                fail("should not be able to update the bdm");
+            } catch (BusinessDataRepositoryDeploymentException ignored) {
+                log.error("ignored ", ignored);
+            }
+
+            assertThat(modelVersionInDatabase).isEqualTo(getTenantAdministrationAPI().getBusinessDataModelVersion());
+        } finally {
+            getTenantAdministrationAPI().resume();
         }
-
-        assertThat(modelVersionInDatabase).isEqualTo(getTenantAdministrationAPI().getBusinessDataModelVersion());
-
-        getTenantAdministrationAPI().resume();
 
         final String expressionPopulation = "bizDataExprName";
         expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionPopulation,
@@ -702,9 +706,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void should_undeploy_delete_generate_client_bdm_zip() throws Exception {
         loginWithTechnicalUser();
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().resume();
+        cleanAndUninstallBusinessDataModel();
         expectedException.expect(BusinessDataRepositoryException.class);
         getTenantAdministrationAPI().getClientBDMZip();
     }
@@ -2244,9 +2246,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     @Test
     public void should_install_bdm_reevaluate_process_resolutions() throws Exception {
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().resume();
+        cleanAndUninstallBusinessDataModel();
 
         ProcessDefinition deploy = getProcessAPI()
                 .deploy(new ProcessDefinitionBuilder().createNewInstance("catClinicProcess", "1.0")
@@ -2278,9 +2278,7 @@ public class BDRepositoryIT extends CommonAPIIT {
      */
     @Test
     public void should_handle_consecutive_calls() throws Exception {
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().resume();
+        cleanAndUninstallBusinessDataModel();
 
         final byte[] zip = getZip(businessObjectModel(bom -> {
             IntStream.range(1, 8).forEach(i -> {
@@ -2315,12 +2313,15 @@ public class BDRepositoryIT extends CommonAPIIT {
                 secondException.set(e);
             }
         });
-        first.start();
-        second.start();
-        first.join();
-        second.join();
-        // resume and check deployment
-        getTenantAdministrationAPI().resume();
+        try {
+            first.start();
+            second.start();
+            first.join();
+            second.join();
+        } finally {
+            // resume and check deployment
+            getTenantAdministrationAPI().resume();
+        }
         verifyBdmIsWellDeployed();
         Exception e1 = firstException.get();
         if (e1 != null) {

@@ -38,13 +38,14 @@ public class TenantMaintenanceIT extends TestWithUser {
         //when
         logoutThenlogin();
         pauseTenant();
-
-        //then
-        assertCanLoginOnTenant();
-
-        //when
-        loginWithTechnicalUser();
-        resumeTenant();
+        try {
+            //then
+            assertCanLoginOnTenant();
+        } finally {
+            //when
+            loginWithTechnicalUser();
+            resumeTenant();
+        }
 
         // then
         assertCanLoginOnTenantAndStartProcess(processDefinition);
