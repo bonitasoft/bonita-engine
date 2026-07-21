@@ -24,7 +24,6 @@ import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
-import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,6 +80,9 @@ public class BDMUpdateIT extends CommonAPIIT {
 
         // when
         uninstallBusinessDataModel();
+        assertThat(tenantAdministrationAPI.getBusinessDataModelVersion())
+                .as("should uninstall BusinessDataModel")
+                .isNull();
         final BusinessObject newBusinessObject = getBusinessObject(PARENT_BO);
         newBusinessObject.addField(getSingleRelationField(getBusinessObject(OTHER_CHILD_BO), relationType));
         final String newVersion = installBusinessDataModel(getBusinessObjectModel(newBusinessObject));
@@ -98,6 +100,9 @@ public class BDMUpdateIT extends CommonAPIIT {
 
         // when
         uninstallBusinessDataModel();
+        assertThat(tenantAdministrationAPI.getBusinessDataModelVersion())
+                .as("should uninstall BusinessDataModel")
+                .isNull();
 
         final BusinessObject newBusinessObject = getBusinessObject(PARENT_BO);
         newBusinessObject.addField(getMultipleRelationField(getBusinessObject(OTHER_CHILD_BO), relationType));
@@ -105,12 +110,6 @@ public class BDMUpdateIT extends CommonAPIIT {
 
         // then
         assertThat(newVersion).isNotNull().isNotEqualTo(version);
-    }
-
-    protected void resumeTenant() throws Exception {
-        if (tenantAdministrationAPI.isPaused()) {
-            tenantAdministrationAPI.resume();
-        }
     }
 
     protected BusinessObjectModel getBusinessObjectModel(BusinessObject parentBusinessObject) {
@@ -157,25 +156,6 @@ public class BDMUpdateIT extends CommonAPIIT {
         simpleField.setName("name");
         simpleField.setType(FieldType.STRING);
         return simpleField;
-    }
-
-    private void uninstallBusinessDataModel() throws Exception {
-        loginWithTechnicalUser();
-        pauseTenantIfNeeded();
-        final String version = tenantAdministrationAPI.getBusinessDataModelVersion();
-        if (version != null) {
-            tenantAdministrationAPI.uninstallBusinessDataModel();
-        }
-        resumeTenant();
-        assertThat(tenantAdministrationAPI.getBusinessDataModelVersion()).as("should uninstall BusinessDataModel")
-                .isNull();
-
-    }
-
-    private void pauseTenantIfNeeded() throws UpdateException {
-        if (!tenantAdministrationAPI.isPaused()) {
-            tenantAdministrationAPI.pause();
-        }
     }
 
     private void ensureBDMIsInstalled(String bdmVersion) {
