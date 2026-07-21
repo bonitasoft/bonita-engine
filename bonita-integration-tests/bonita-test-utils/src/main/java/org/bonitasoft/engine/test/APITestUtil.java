@@ -49,6 +49,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
+import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.Query;
@@ -1467,6 +1468,70 @@ public class APITestUtil extends PlatformTestUtil {
             for (final CommandDescriptor command : commands) {
                 getCommandAPI().unregister(command.getName());
             }
+        }
+    }
+
+    /**
+     * Deploys a Business Data Model, replacing any previously installed one.
+     * Handles pausing/resuming the tenant around the installation.
+     *
+     * @param bom the business object model to deploy
+     */
+    protected String installBusinessDataModel(BusinessObjectModel bom) throws Exception {
+        return installBusinessDataModel(new BusinessObjectModelConverter().zip(bom));
+    }
+
+    /**
+     * Deploys a Business Data Model (already zipped), replacing any previously installed one.
+     * Pauses the tenant around the installation and always resumes it, even if the deployment fails.
+     *
+     * @param bdmZip the zipped business object model to deploy
+     */
+    protected String installBusinessDataModel(byte[] bdmZip) throws Exception {
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+        }
+        try {
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            return getTenantAdministrationAPI().updateBusinessDataModel(bdmZip);
+        } finally {
+            getTenantAdministrationAPI().resume();
+        }
+    }
+
+    /**
+     * Uninstalls the currently deployed Business Data Model, if any.
+     * Pauses the tenant (if not already paused) around the uninstall and always resumes it afterwards,
+     * even if the uninstall fails. Does nothing if no Business Data Model is deployed.
+     */
+    protected void uninstallBusinessDataModel() throws Exception {
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+        }
+        try {
+            if (getTenantAdministrationAPI().getBusinessDataModelVersion() != null) {
+                getTenantAdministrationAPI().uninstallBusinessDataModel();
+            }
+        } finally {
+            getTenantAdministrationAPI().resume();
+        }
+    }
+
+    /**
+     * Cleans and uninstalls the currently deployed Business Data Model, if any.
+     * Pauses the tenant (if not already paused) around the uninstall and always resumes it afterwards,
+     * even if the uninstall fails. Does nothing if no Business Data Model is deployed.
+     */
+    protected void cleanAndUninstallBusinessDataModel() throws Exception {
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+        }
+        try {
+            if (getTenantAdministrationAPI().getBusinessDataModelVersion() != null) {
+                getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            }
+        } finally {
+            getTenantAdministrationAPI().resume();
         }
     }
 
