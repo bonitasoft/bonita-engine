@@ -57,27 +57,29 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         logoutThenlogin();
 
         getTenantAdministrationAPI().pause();
-        assertTrue(workService.isStopped());
-        logoutOnTenant();
+        try {
+            assertTrue(workService.isStopped());
+            logoutOnTenant();
 
-        // clear logs before restarting the node
-        systemOutRule.clearLog();
+            // clear logs before restarting the node
+            systemOutRule.clearLog();
 
-        // when: we stop and start the node
-        stopAndStartPlatform();
+            // when: we stop and start the node
+            stopAndStartPlatform();
 
-        // assert that provided mandatory pages have re-imported again even though the tenant is paused
-        assertTrue(systemOutRule.getLog().contains("Import of Bonita mandatory pages completed"));
-        // then: work service is not running
-        workService = getServiceAccessor().getWorkService();
-        assertTrue(workService.isStopped());
+            // assert that provided mandatory pages have re-imported again even though the tenant is paused
+            assertTrue(systemOutRule.getLog().contains("Import of Bonita mandatory pages completed"));
+            // then: work service is not running
+            workService = getServiceAccessor().getWorkService();
+            assertTrue(workService.isStopped());
+        } finally {
+            // cleanup
+            loginOnDefaultTenantWithDefaultTechnicalUser();
+            getTenantAdministrationAPI().resume();
 
-        // cleanup
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        getTenantAdministrationAPI().resume();
-
-        waitForProcessToFinish(processInstance);
-        disableAndDeleteProcess(pd);
+            waitForProcessToFinish(processInstance);
+            disableAndDeleteProcess(pd);
+        }
     }
 
     protected ServiceAccessor getServiceAccessor() {
