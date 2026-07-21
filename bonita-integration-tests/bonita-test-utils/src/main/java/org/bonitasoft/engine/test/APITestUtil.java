@@ -212,9 +212,7 @@ public class APITestUtil extends PlatformTestUtil {
     public void clearSynchroRepository() {
         try {
             loginOnDefaultTenantWithDefaultTechnicalUser();
-            if (getTenantAdministrationAPI().isPaused()) {
-                getTenantAdministrationAPI().resume();
-            }
+            resumeTenantIfPaused();
             ClientEventUtil.clearRepo(getCommandAPI());
             logoutOnTenant();
         } catch (final Exception e) {
@@ -1530,6 +1528,17 @@ public class APITestUtil extends PlatformTestUtil {
                 getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
             }
         } finally {
+            getTenantAdministrationAPI().resume();
+        }
+    }
+
+    /**
+     * Resumes the tenant if it is paused (in maintenance mode). Safe to call when the tenant is already running.
+     * Used as a cleanup safety net so that a test which paused the tenant and failed to resume it does not leave
+     * the platform in maintenance mode and pollute subsequent tests running in the same engine.
+     */
+    protected void resumeTenantIfPaused() throws UpdateException {
+        if (getTenantAdministrationAPI().isPaused()) {
             getTenantAdministrationAPI().resume();
         }
     }
