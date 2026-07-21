@@ -111,11 +111,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         matti = createUser("matti", "bpm");
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(buildCustomBOM());
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().updateBusinessDataModel(zip);
-        getTenantAdministrationAPI().resume();
+        installBusinessDataModel(converter.zip(buildCustomBOM()));
 
         // needed for remote testing
         addClientBDMZipToClassLoader();
@@ -129,11 +125,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         } catch (final Exception e) {
             clientFolder.deleteOnExit();
         }
-        if (!getTenantAdministrationAPI().isPaused()) {
-            getTenantAdministrationAPI().pause();
-            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-            getTenantAdministrationAPI().resume();
-        }
+        cleanAndUninstallBusinessDataModel();
         resumeClassloader();
 
         deleteUser(matti);

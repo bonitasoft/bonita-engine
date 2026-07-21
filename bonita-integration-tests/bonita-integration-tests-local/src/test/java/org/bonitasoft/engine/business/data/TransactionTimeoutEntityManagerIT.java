@@ -56,11 +56,7 @@ public class TransactionTimeoutEntityManagerIT extends CommonAPIIT {
 
         // Deploy a minimal BDM so the EntityManagerFactory is created
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(buildMinimalBOM());
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().updateBusinessDataModel(zip);
-        getTenantAdministrationAPI().resume();
+        installBusinessDataModel(converter.zip(buildMinimalBOM()));
 
         // Get the real JPABusinessDataRepositoryImpl from the engine
         ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
@@ -73,11 +69,7 @@ public class TransactionTimeoutEntityManagerIT extends CommonAPIIT {
         // Clean up ThreadLocal to avoid leaking to the next test
         clearManagersThreadLocal();
 
-        if (!getTenantAdministrationAPI().isPaused()) {
-            getTenantAdministrationAPI().pause();
-            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-            getTenantAdministrationAPI().resume();
-        }
+        cleanAndUninstallBusinessDataModel();
         logoutOnTenant();
     }
 

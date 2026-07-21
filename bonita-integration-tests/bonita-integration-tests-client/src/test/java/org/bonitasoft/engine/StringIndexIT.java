@@ -21,7 +21,6 @@ import java.io.IOException;
 import javax.xml.bind.JAXBException;
 
 import org.assertj.core.api.Assertions;
-import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
@@ -137,7 +136,8 @@ public class StringIndexIT extends CommonAPIIT {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         final String qualifiedName = "com.company.test.Bo";
         final BusinessObjectModel bom = buildSimpleBom(qualifiedName);
-        installBusinessDataModel(bom);
+        var businessDataModelVersion = installBusinessDataModel(bom);
+        assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("test", "1.2-alpha");
@@ -181,16 +181,6 @@ public class StringIndexIT extends CommonAPIIT {
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
         return model;
-    }
-
-    private void installBusinessDataModel(final BusinessObjectModel bom) throws Exception {
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(bom);
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        final String businessDataModelVersion = getTenantAdministrationAPI().updateBusinessDataModel(zip);
-        getTenantAdministrationAPI().resume();
-        assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
     }
 
 }
