@@ -66,6 +66,7 @@ public abstract class CommonAPIIT extends APITestUtil {
      */
     private void clean() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
+        resumeTenantIfPaused();
         cleanCommands();
         cleanProcessInstances();
         cleanApplications();

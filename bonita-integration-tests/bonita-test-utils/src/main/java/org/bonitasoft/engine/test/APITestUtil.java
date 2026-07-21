@@ -1528,6 +1528,17 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
+    /**
+     * Resumes the tenant if it is paused (in maintenance mode). Safe to call when the tenant is already running.
+     * Used as a cleanup safety net so that a test which paused the tenant and failed to resume it does not leave
+     * the platform in maintenance mode and pollute subsequent tests running in the same engine.
+     */
+    protected void resumeTenantIfPaused() throws UpdateException {
+        if (getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().resume();
+        }
+    }
+
     public ProcessAPI getProcessAPI() {
         return getApiClient().getProcessAPI();
     }
