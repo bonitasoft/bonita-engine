@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import javax.persistence.EntityManager;
-import javax.transaction.Status;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Status;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.slf4j.Logger;

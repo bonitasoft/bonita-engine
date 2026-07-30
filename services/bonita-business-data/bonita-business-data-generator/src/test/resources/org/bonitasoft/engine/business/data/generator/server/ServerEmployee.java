@@ -13,25 +13,25 @@
  **/
 package org.bonitasoft.engine.bdm.server;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Version;
 import org.hibernate.annotations.Index;
 
 
 /**
  * 
  */
-@javax.persistence.Entity(name = "Employee")
+@jakarta.persistence.Entity(name = "Employee")
 @org.hibernate.annotations.Table(appliesTo = "EMPLOYEE", indexes = {
     @Index(name = "IDX_1", columnNames = {
         "FIRSTNAME, LASTNAME"
     })
 })
-@javax.persistence.Table(name = "EMPLOYEE")
+@jakarta.persistence.Table(name = "EMPLOYEE")
 @NamedQueries({
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")

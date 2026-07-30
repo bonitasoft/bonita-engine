@@ -16,21 +16,21 @@ package com.company.pojo;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import org.bonitasoft.engine.bdm.Entity;
 
 /**
  *
  */
-@javax.persistence.Entity(name = "Person")
+@jakarta.persistence.Entity(name = "Person")
 @Table(name = "PERSON")
 public class Person implements Entity {
 

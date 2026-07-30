@@ -21,8 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
+
+import jakarta.transaction.Transaction;
 
 import com.arjuna.ats.internal.jta.xa.TxInfo;
 import org.junit.Test;

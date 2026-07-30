@@ -246,7 +246,14 @@ class ShadePlugin implements Plugin<Project> {
         }
         // remove all dependencies that are in the configuration "platform-runtime". it's used by gradle to resolve versions (like a bom)
         // those dependencies should be imported in the dependency management instead. It is manually done right now (see `bonita-engine` bom)
-        allDependencies.findAll { it.configuration != PLATFORM_CONFIGURATION_NAME }
+        // also remove BOM dependencies (e.g. org.apache.groovy:groovy-bom referenced by the Groovy 4
+        // module poms): they resolve to no jar artifact, and writing them as plain <dependency> entries
+        // would make Maven consumers of the published pom fail to resolve a nonexistent jar
+        allDependencies.findAll {
+            it.configuration != PLATFORM_CONFIGURATION_NAME &&
+                    !it.moduleArtifacts.isEmpty() &&
+                    it.moduleArtifacts.any { artifact -> artifact.type != 'pom' }
+        }
     }
 
     /**

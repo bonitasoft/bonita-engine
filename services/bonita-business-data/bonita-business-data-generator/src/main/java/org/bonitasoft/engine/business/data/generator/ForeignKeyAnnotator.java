@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.business.data.generator;
 
-import javax.persistence.ForeignKey;
+import jakarta.persistence.ForeignKey;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;

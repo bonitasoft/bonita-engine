@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

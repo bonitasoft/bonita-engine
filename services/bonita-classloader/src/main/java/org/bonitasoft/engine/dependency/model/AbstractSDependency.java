@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

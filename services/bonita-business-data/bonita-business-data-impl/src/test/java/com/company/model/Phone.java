@@ -14,18 +14,18 @@
 
 package com.company.model;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 /**
  *
  */
-@javax.persistence.Entity(name = "Phone")
+@jakarta.persistence.Entity(name = "Phone")
 @Table(name = "PHONE")
 @NamedQueries({
         @NamedQuery(name = "Phone.findByNumber", query = "SELECT p\nFROM Phone p\nWHERE p.number= :number\nORDER BY p.persistenceId"),

@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 /**
  * Interface to be implemented by classes that need access to the {@link EntityManagerFactory}.

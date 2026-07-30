@@ -2,6 +2,8 @@ plugins { id 'bonita-docker-database' }
 
 dependencies {
     testAnnotationProcessor libs.lombok
+    testImplementation project(":bpm:bonita-server")
+    testImplementation project(":bpm:bonita-common")
     testImplementation libs.lombok
     testImplementation libs.assertj
     testImplementation libs.h2
@@ -10,9 +12,9 @@ dependencies {
     testImplementation libs.springTest
     testImplementation libs.springJdbc
     testImplementation libs.springOrm
-    testImplementation project(":bpm:bonita-server")
-    testImplementation project(":bpm:bonita-common")
-
+    // javax API filler for spring-orm 5.3 class initialization; see catalog comment
+    testRuntimeOnly libs.javaxPersistenceApiLegacy
+    testRuntimeOnly libs.javaxTransactionApiLegacy
     testRuntimeOnly libs.tomcatDbcp
 }
 

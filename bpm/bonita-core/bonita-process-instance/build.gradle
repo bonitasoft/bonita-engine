@@ -29,5 +29,7 @@ dependencies {
     testRuntimeOnly libs.logback
 
     annotationProcessor libs.lombok
+    // direct jakarta.xml.bind imports in this module, do not rely on transitive resolution
+    implementation libs.jakartaXmlBind
     compileOnly libs.lombok
 }

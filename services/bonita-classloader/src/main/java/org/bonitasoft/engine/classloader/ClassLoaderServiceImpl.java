@@ -28,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import javax.transaction.Status;
+import jakarta.transaction.Status;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.NullCheckingUtil;

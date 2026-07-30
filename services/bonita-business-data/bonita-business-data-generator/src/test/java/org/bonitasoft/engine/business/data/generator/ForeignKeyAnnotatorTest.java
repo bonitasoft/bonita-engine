@@ -21,7 +21,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.persistence.JoinColumn;
+import jakarta.persistence.JoinColumn;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;

@@ -5,6 +5,14 @@ allprojects {
 
     group = 'org.bonitasoft.engine'
 
+    // bonita-artifacts-model 2.x pulls slf4j-api 2.0 transitively, but Spring Boot 2.7's
+    // LogbackLoggingSystem requires the slf4j 1.7 binding (StaticLoggerBinder) with logback 1.2.
+    // TODO BPA-230: keep slf4j on 1.7 until the Spring Boot 3 upgrade, which brings slf4j 2 + logback 1.5,
+    // then remove this force.
+    configurations.configureEach {
+        resolutionStrategy.force(libs.slf4jApi.get())
+    }
+
     tasks.withType(Copy).configureEach {
         setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
     }

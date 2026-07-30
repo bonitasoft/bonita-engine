@@ -13,18 +13,18 @@
  **/
 package org.bonita.pojo;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 /**
  *
  */
-@javax.persistence.Entity(name = "Address")
+@jakarta.persistence.Entity(name = "Address")
 @Table(name = "ADDRESS")
 @NamedQueries({
         @NamedQuery(name = "Address.findByStreet", query = "SELECT a\nFROM Address a\nWHERE a.street= :street\nORDER BY a.persistenceId"),

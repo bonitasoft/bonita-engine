@@ -53,7 +53,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -61,6 +60,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import jakarta.activation.MimetypesFileTypeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.ClassDataUtil;

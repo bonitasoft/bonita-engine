@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.transaction.*;
+import jakarta.transaction.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.ExceptionUtils;

@@ -24,17 +24,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.persistence.EntityGraph;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.EntityType;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.EntityType;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bdm.Entity;
@@ -313,7 +313,7 @@ public class JPABusinessDataRepositoryImpl
         }
         try {
             return query.getSingleResult();
-        } catch (final javax.persistence.NonUniqueResultException nure) {
+        } catch (final jakarta.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);
         } catch (final NoResultException e) {
             return null;
@@ -439,7 +439,7 @@ public class JPABusinessDataRepositoryImpl
             // per-collection SELECTs rather than a single wide JOIN.
             EntityGraph<?> minimalGraph = em.createEntityGraph(entityClass);
             Entity entity = em.find(entityClass, persistenceId,
-                    Map.of("javax.persistence.fetchgraph", minimalGraph));
+                    Map.of("jakarta.persistence.fetchgraph", minimalGraph));
             if (entity == null) {
                 throw new SBusinessDataNotFoundException(
                         "Impossible to get data of type " + entityClass.getName() + " with id: " + persistenceId);

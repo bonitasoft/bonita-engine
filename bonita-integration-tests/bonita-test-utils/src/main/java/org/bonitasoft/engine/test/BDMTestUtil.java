@@ -16,7 +16,7 @@ package org.bonitasoft.engine.test;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;

@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

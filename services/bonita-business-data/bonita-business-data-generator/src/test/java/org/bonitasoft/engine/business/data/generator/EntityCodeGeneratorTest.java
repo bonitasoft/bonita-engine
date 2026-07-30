@@ -26,16 +26,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.Version;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
@@ -192,7 +192,7 @@ public class EntityCodeGeneratorTest {
         iterator.next();
         JAnnotationUse annotationUse = iterator.next();
         assertThat(getAnnotationParamValue(annotationUse, "strategy"))
-                .isEqualTo("javax.persistence.GenerationType.IDENTITY");
+                .isEqualTo("jakarta.persistence.GenerationType.IDENTITY");
     }
 
     @Test
@@ -208,7 +208,7 @@ public class EntityCodeGeneratorTest {
         iterator.next();
         JAnnotationUse annotationUse = iterator.next();
         assertThat(getAnnotationParamValue(annotationUse, "strategy"))
-                .isEqualTo("javax.persistence.GenerationType.IDENTITY");
+                .isEqualTo("jakarta.persistence.GenerationType.IDENTITY");
     }
 
     @Test
@@ -259,7 +259,7 @@ public class EntityCodeGeneratorTest {
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Temporal.class.getName());
         assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
         final String value = getAnnotationParamValue(annotationUse, "value");
-        assertThat(value).isNotNull().isEqualTo("javax.persistence.TemporalType.TIMESTAMP");
+        assertThat(value).isNotNull().isEqualTo("jakarta.persistence.TemporalType.TIMESTAMP");
     }
 
     private String getAnnotationParamValue(final JAnnotationUse annotationUse, final String paramName) {
@@ -441,8 +441,9 @@ public class EntityCodeGeneratorTest {
         tableAnnotation.generate(new JFormatter(writer));
         final String EOL = System.getProperty("line.separator");
         assertThat(writer.toString()).as("should rename relation field to real column name")
-                .isEqualTo("@javax.persistence.Table(name = \"EMPLOYEE\", uniqueConstraints = {" + EOL +
-                        "    @javax.persistence.UniqueConstraint(name = \"UNIQUE_CONSTRAINT\", columnNames = {" + EOL +
+                .isEqualTo("@jakarta.persistence.Table(name = \"EMPLOYEE\", uniqueConstraints = {" + EOL +
+                        "    @jakarta.persistence.UniqueConstraint(name = \"UNIQUE_CONSTRAINT\", columnNames = {" + EOL
+                        +
                         "        \"UNIQUERELATION_PID\"" + EOL +
                         "    })" + EOL +
                         "})");

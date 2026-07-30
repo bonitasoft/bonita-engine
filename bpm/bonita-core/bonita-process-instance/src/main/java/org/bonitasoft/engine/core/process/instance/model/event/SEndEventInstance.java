@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

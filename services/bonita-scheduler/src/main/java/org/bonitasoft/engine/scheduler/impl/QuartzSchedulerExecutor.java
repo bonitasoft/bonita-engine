@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.transaction.Status;
+import jakarta.transaction.Status;
 
 import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;

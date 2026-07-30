@@ -6,6 +6,8 @@ dependencies {
     api libs.xmlunit
     api libs.assertj
 
+    // direct jakarta.xml.bind imports in this module, do not rely on transitive resolution
+    implementation libs.jakartaXmlBind
     implementation project(':bpm:bonita-core:bonita-process-engine')
     implementation libs.junit4
     implementation libs.springTest

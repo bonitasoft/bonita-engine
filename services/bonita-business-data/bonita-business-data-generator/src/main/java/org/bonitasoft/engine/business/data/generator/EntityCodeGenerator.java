@@ -15,7 +15,7 @@ package org.bonitasoft.engine.business.data.generator;
 
 import java.util.List;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
@@ -122,7 +122,7 @@ public class EntityCodeGenerator {
             final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
             for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
                 final JAnnotationUse uniqueConstraintAnnotation = uniqueConstraintsArray
-                        .annotate(javax.persistence.UniqueConstraint.class);
+                        .annotate(jakarta.persistence.UniqueConstraint.class);
                 uniqueConstraintAnnotation.param("name", uniqueConstraint.getName().toUpperCase());
                 final JAnnotationArrayMember columnNamesParamArray = uniqueConstraintAnnotation
                         .paramArray("columnNames");

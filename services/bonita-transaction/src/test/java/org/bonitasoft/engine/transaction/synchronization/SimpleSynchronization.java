@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.transaction.synchronization;
 
-import javax.transaction.Status;
+import jakarta.transaction.Status;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 

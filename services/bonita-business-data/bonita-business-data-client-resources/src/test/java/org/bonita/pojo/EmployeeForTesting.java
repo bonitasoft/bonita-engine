@@ -16,20 +16,20 @@ package org.bonita.pojo;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OrderColumn;
-import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
@@ -38,13 +38,13 @@ import org.hibernate.annotations.Index;
 /**
  * Describe a simple employee
  */
-@javax.persistence.Entity(name = "Employee")
+@jakarta.persistence.Entity(name = "Employee")
 @org.hibernate.annotations.Table(appliesTo = "EMPLOYEE", indexes = {
         @Index(name = "IDX_LSTNM", columnNames = {
                 "LASTNAME"
         })
 })
-@javax.persistence.Table(name = "EMPLOYEE", uniqueConstraints = {
+@jakarta.persistence.Table(name = "EMPLOYEE", uniqueConstraints = {
         @UniqueConstraint(name = "UK_FL", columnNames = {
                 "FIRSTNAME",
                 "LASTNAME"

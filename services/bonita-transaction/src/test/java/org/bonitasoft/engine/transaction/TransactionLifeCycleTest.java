@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import static javax.transaction.Status.STATUS_COMMITTED;
-import static javax.transaction.Status.STATUS_ROLLEDBACK;
+import static jakarta.transaction.Status.STATUS_COMMITTED;
+import static jakarta.transaction.Status.STATUS_ROLLEDBACK;
 import static org.junit.Assert.*;
 
-import javax.transaction.Status;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.TransactionManager;
 
 import org.junit.After;
 import org.junit.Before;

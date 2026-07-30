@@ -16,7 +16,7 @@ package org.bonitasoft.engine.transaction;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import javax.transaction.Synchronization;
+import jakarta.transaction.Synchronization;
 
 public interface UserTransactionService {
 

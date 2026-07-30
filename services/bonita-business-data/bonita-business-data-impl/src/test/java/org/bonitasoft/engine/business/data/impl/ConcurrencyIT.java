@@ -25,7 +25,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
-import javax.transaction.UserTransaction;
+
+import jakarta.transaction.UserTransaction;
 
 import com.company.pojo.Employee;
 import org.bonitasoft.engine.business.data.DataRetentionBdmTrackingService;

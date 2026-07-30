@@ -16,7 +16,7 @@ package org.bonitasoft.engine.temporary.content;
 import java.sql.Blob;
 import java.util.UUID;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

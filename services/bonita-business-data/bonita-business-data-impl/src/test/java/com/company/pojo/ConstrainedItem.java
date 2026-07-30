@@ -15,14 +15,14 @@ package com.company.pojo;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
-@Table(uniqueConstraints = @javax.persistence.UniqueConstraint(columnNames = { "bonito", "string" }))
+@Table(uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = { "bonito", "string" }))
 public class ConstrainedItem implements org.bonitasoft.engine.bdm.Entity {
 
     private static final long serialVersionUID = -230L;

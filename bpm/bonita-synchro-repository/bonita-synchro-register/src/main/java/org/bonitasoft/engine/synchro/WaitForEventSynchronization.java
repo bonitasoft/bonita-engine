@@ -16,7 +16,7 @@ package org.bonitasoft.engine.synchro;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.transaction.Status;
+import jakarta.transaction.Status;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 

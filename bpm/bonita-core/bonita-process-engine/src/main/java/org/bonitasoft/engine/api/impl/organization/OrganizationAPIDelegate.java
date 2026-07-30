@@ -15,7 +15,7 @@ package org.bonitasoft.engine.api.impl.organization;
 
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
 import org.bonitasoft.engine.builder.BuilderFactory;

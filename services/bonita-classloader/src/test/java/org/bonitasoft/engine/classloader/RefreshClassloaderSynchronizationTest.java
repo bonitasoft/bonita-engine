@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.classloader;
 
+import static jakarta.transaction.Status.*;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
-import static javax.transaction.Status.*;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;

@@ -13,10 +13,10 @@
  **/
 package com.company.pojo;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 
 @Entity
 public class Employee implements org.bonitasoft.engine.bdm.Entity {

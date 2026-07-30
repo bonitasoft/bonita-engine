@@ -51,8 +51,8 @@ public class BonitaEngine {
     private BasicManagedDataSource businessDataDataSource;
     private BasicDataSource bonitaSequenceManagerDataSource;
     private BasicDataSource notManagedBizDataSource;
-    private javax.transaction.UserTransaction userTransaction;
-    private javax.transaction.TransactionManager arjunaTransactionManager;
+    private jakarta.transaction.UserTransaction userTransaction;
+    private jakarta.transaction.TransactionManager arjunaTransactionManager;
     public static final String BONITA_BDM_DB_VENDOR = PlatformSetup.BONITA_BDM_DB_VENDOR_PROPERTY;
     public static final String BONITA_DB_VENDOR = PlatformSetup.BONITA_DB_VENDOR_PROPERTY;
 

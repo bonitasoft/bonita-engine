@@ -39,7 +39,7 @@ public abstract class CompilableCode {
         final Iterable<? extends JavaFileObject> compUnits = fileManager.getJavaFileObjects(sourceFileToCompile);
         final List<String> optionList = new ArrayList<String>();
 
-        String javaxPersistencefilePath = findJarPath(javax.persistence.Basic.class);
+        String javaxPersistencefilePath = findJarPath(jakarta.persistence.Basic.class);
         String bdmEntityfilePath = findJarPath(Entity.class);
         optionList
                 .addAll(Arrays.asList("-classpath", javaxPersistencefilePath + File.pathSeparator + bdmEntityfilePath));

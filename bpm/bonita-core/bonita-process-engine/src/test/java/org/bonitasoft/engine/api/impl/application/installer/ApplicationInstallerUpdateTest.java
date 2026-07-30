@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.api.ImportStatus;

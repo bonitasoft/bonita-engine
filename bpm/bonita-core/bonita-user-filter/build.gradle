@@ -11,6 +11,8 @@ dependencies {
     api project(':bpm:bonita-core:bonita-process-instance')
     api project(':bpm:bonita-core:bonita-home-server')
     api project(':services:bonita-commons')
+    // direct jakarta.xml.bind imports in this module, do not rely on transitive resolution
+    implementation libs.jakartaXmlBind
     testImplementation libs.assertj
     testImplementation libs.mockitoCore
 }

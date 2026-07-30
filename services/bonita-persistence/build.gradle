@@ -15,6 +15,10 @@ dependencies {
 
     compileOnly libs.jakartaTransactionApi
 
+    // jakarta JAXB provider for Hibernate's hbm.xml binding and the engine's jakarta.xml.bind
+    // users (organization/profile import-export, BDM): hibernate-core (javax) used to provide the
+    // JAXB runtime transitively, its jakarta variant does not resolve one at runtime
+    runtimeOnly(libs.jaxbRuntime)
     annotationProcessor libs.lombok
     compileOnly libs.lombok
 

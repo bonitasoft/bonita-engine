@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import javax.transaction.TransactionManager;
+import jakarta.transaction.TransactionManager;
 
 import org.hibernate.engine.transaction.jta.platform.internal.BitronixJtaPlatform;
 

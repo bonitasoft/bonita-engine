@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import javax.transaction.Synchronization;
+import jakarta.transaction.Synchronization;
 
 @FunctionalInterface
 public interface BonitaTransactionSynchronization extends Synchronization {

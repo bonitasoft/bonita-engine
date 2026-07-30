@@ -15,8 +15,8 @@ package org.bonitasoft.engine.transaction;
 
 import static org.junit.Assert.*;
 
-import javax.transaction.Status;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.TransactionManager;
 
 import org.bonitasoft.engine.transaction.synchronization.SimpleSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronization;

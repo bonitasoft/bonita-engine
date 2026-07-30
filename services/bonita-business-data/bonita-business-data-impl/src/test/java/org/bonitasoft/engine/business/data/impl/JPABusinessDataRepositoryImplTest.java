@@ -26,16 +26,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.persistence.EntityGraph;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -478,7 +478,7 @@ class JPABusinessDataRepositoryImplTest {
         var entity = new EntityPojo(42L);
         var entityGraph = mock(EntityGraph.class);
         doReturn(entityGraph).when(manager).createEntityGraph(EntityPojo.class);
-        var expectedHints = Map.<String, Object> of("javax.persistence.fetchgraph", entityGraph);
+        var expectedHints = Map.<String, Object> of("jakarta.persistence.fetchgraph", entityGraph);
         when(manager.find(EntityPojo.class, 42L, expectedHints)).thenReturn(entity);
 
         //when
@@ -734,7 +734,7 @@ class JPABusinessDataRepositoryImplTest {
         //given
         EntityManager freshEM = mock(EntityManager.class);
         doReturn(true).when(freshEM).isOpen();
-        doThrow(new javax.persistence.TransactionRequiredException("TX is rollback-only"))
+        doThrow(new jakarta.persistence.TransactionRequiredException("TX is rollback-only"))
                 .when(freshEM).joinTransaction();
         EntityManagerFactory emf = mock(EntityManagerFactory.class);
         doReturn(freshEM).when(emf).createEntityManager();
@@ -745,7 +745,7 @@ class JPABusinessDataRepositoryImplTest {
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         //when + then
-        assertThatExceptionOfType(javax.persistence.TransactionRequiredException.class)
+        assertThatExceptionOfType(jakarta.persistence.TransactionRequiredException.class)
                 .isThrownBy(repo::getEntityManager)
                 .withMessageContaining("TX is rollback-only");
 

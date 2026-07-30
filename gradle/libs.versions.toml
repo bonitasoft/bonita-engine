@@ -1,17 +1,23 @@
 [versions]
 # The groovy version must be in synch with the bonita-project-parent POM (bonita-project repository):
-groovyVersion = "3.0.25"
+# Groovy 4 decision (2026-07, see ADR-0016): coordinates moved from org.codehaus.groovy to org.apache.groovy
+groovyVersion = "4.0.32"
 springVersion = "5.3.39"
 springSessionVersion = "2.7.4"
 springBootVersion = "2.7.18"
 commonsLangVersion = "3.20.0"
-bonitaArtifactsModelVersion = "1.2.2"
+bonitaArtifactsModelVersion = "2.0.0"
 bonitaSecurityVersion = "1.31.1"
 commonsIOVersion = "2.22.0"
 commonsFileUploadVersion = "1.6.0"
 commonsBeanutilsVersion = "1.11.0"
 commonsCollectionsVersion = "4.5.0"
 tomcatVersion = "9.0.120"
+# tomcat-dbcp diverges from the embedded Tomcat until the container migration: the 10.1 line is the
+# first whose BasicManagedDataSource uses the jakarta.transaction TransactionManager signature,
+# required since the switch to narayana-jta-jakarta (see ADR-0016 execution finding).
+# TODO BPA-230: re-unify with tomcatVersion at the Tomcat 10.1 wave:
+tomcatDbcpVersion = "10.1.57"
 commonsCLIVersion = "1.11.0"
 commonsTextVersion = "1.15.0"
 commonsValidatorVersion = "1.10.1"
@@ -19,12 +25,17 @@ semver4jVersion = "3.1.0"
 slf4jVersion = "1.7.36"
 # Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
 hibernateVersion = "5.6.15.Final"
-# version used by hibernate 5.6.15 (also used by BDM proxy generation):
+# Bonita's own dependency for BDM proxy generation (business-data modules); NOT pulled by
+# Hibernate anymore - hibernate-core(-jakarta) 5.6 uses byte-buddy, javassist was dropped in 5.5:
 javassistVersion = "3.29.2-GA"
-# javax.persistence-api is used by hibernate:
-javaxPersistenceApiVersion = "2.2"
+# jakarta.persistence-api 3.0 is the JPA level implemented by hibernate-core-jakarta 5.6:
+jakartaPersistenceApiVersion = "3.0.0"
+# JAXB 4 line: forced by bonita-artifacts-model 2.x (conflict resolution upgrades the API to 4.x
+# anyway); the 4.0.x runtime binds the hibernate hbm model compiled against 3.0 annotations:
+jakartaXmlBindVersion = "4.0.4"
 jacksonBomVersion = "2.22.0"
-jakartaTransactionVersion = "1.3.3"
+# 2.0.x provides the jakarta.transaction.* namespace (1.3.x shipped javax.transaction.* despite the artifact name):
+jakartaTransactionVersion = "2.0.1"
 jakartaServletVersion = "4.0.4"
 # Keep this until all client projects have migrated to jakarta or it will break their builds !
 javaxServletVersion = "4.0.1"
@@ -32,9 +43,9 @@ httpComponentsVersion = "4.5.14"
 xstreamVersion = "1.4.21"
 ehCacheVersion = "3.11.1"
 eclipseCompilerVersion = "3.46.0"
-jakartaActivationVersion = "1.2.2"
+jakartaActivationVersion = "2.0.1"
 jakartaValidationApiVersion = "3.1.1"
-quartzVersion = "2.3.2"
+quartzVersion = "2.5.2"
 micrometerVersion = "1.16.5"
 # DB drivers:
 mysqlVersion = "8.4.0"
@@ -42,7 +53,7 @@ msSqlServerVersion = "12.10.2.jre11"
 oracleVersion = "23.26.2.0.0"
 postgresqlVersion = "42.7.13"
 
-narayanaVersion = "5.10.6.Final"
+narayanaVersion = "5.13.1.Final"
 logbackVersion = "1.2.13"
 jaxbVersion = "2.3.9"
 javaxAnnotationsVersion = "1.3.2"
@@ -112,21 +123,20 @@ springBootStarterJdbc = { module = "org.springframework.boot:spring-boot-starter
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBootVersion" }
 springBootStarterWeb = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBootVersion" }
 
-groovyBom = { module = "org.codehaus.groovy:groovy-bom", version.ref = "groovyVersion" }
-groovyCore = { module = "org.codehaus.groovy:groovy", version.ref = "groovyVersion" }
-groovyServlet = { module = "org.codehaus.groovy:groovy-servlet", version.ref = "groovyVersion" }
-groovyXml = { module = "org.codehaus.groovy:groovy-xml", version.ref = "groovyVersion" }
-groovyJson = { module = "org.codehaus.groovy:groovy-json", version.ref = "groovyVersion" }
-groovyJmx = { module = "org.codehaus.groovy:groovy-jmx", version.ref = "groovyVersion" }
-groovyNio = { module = "org.codehaus.groovy:groovy-nio", version.ref = "groovyVersion" }
-groovyGroovysh = { module = "org.codehaus.groovy:groovy-groovysh", version.ref = "groovyVersion" }
-groovyDatetime = { module = "org.codehaus.groovy:groovy-datetime", version.ref = "groovyVersion" }
-groovyDateutil = { module = "org.codehaus.groovy:groovy-dateutil", version.ref = "groovyVersion" }
-groovyDocgenerator = { module = "org.codehaus.groovy:groovy-docgenerator", version.ref = "groovyVersion" }
-groovyJsr223 = { module = "org.codehaus.groovy:groovy-jsr223", version.ref = "groovyVersion" }
-groovySql = { module = "org.codehaus.groovy:groovy-sql", version.ref = "groovyVersion" }
-groovyTemplates = { module = "org.codehaus.groovy:groovy-templates", version.ref = "groovyVersion" }
-groovyYaml = { module = "org.codehaus.groovy:groovy-yaml", version.ref = "groovyVersion" }
+groovyBom = { module = "org.apache.groovy:groovy-bom", version.ref = "groovyVersion" }
+groovyCore = { module = "org.apache.groovy:groovy", version.ref = "groovyVersion" }
+groovyXml = { module = "org.apache.groovy:groovy-xml", version.ref = "groovyVersion" }
+groovyJson = { module = "org.apache.groovy:groovy-json", version.ref = "groovyVersion" }
+groovyJmx = { module = "org.apache.groovy:groovy-jmx", version.ref = "groovyVersion" }
+groovyNio = { module = "org.apache.groovy:groovy-nio", version.ref = "groovyVersion" }
+groovyGroovysh = { module = "org.apache.groovy:groovy-groovysh", version.ref = "groovyVersion" }
+groovyDatetime = { module = "org.apache.groovy:groovy-datetime", version.ref = "groovyVersion" }
+groovyDateutil = { module = "org.apache.groovy:groovy-dateutil", version.ref = "groovyVersion" }
+groovyDocgenerator = { module = "org.apache.groovy:groovy-docgenerator", version.ref = "groovyVersion" }
+groovyJsr223 = { module = "org.apache.groovy:groovy-jsr223", version.ref = "groovyVersion" }
+groovySql = { module = "org.apache.groovy:groovy-sql", version.ref = "groovyVersion" }
+groovyTemplates = { module = "org.apache.groovy:groovy-templates", version.ref = "groovyVersion" }
+groovyYaml = { module = "org.apache.groovy:groovy-yaml", version.ref = "groovyVersion" }
 
 
 bonitaArtifactsModelBom = { module = "org.bonitasoft.engine:bonita-artifacts-model-dependencies", version.ref = "bonitaArtifactsModelVersion" }
@@ -152,7 +162,7 @@ commonsIO = { group = "commons-io", name = "commons-io", version.ref = "commonsI
 commonsFileUpload = { group = "commons-fileupload", name = "commons-fileupload", version.ref = "commonsFileUploadVersion" }
 commonsBeanUtils = { group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutilsVersion" }
 commonsCollections = { group = "org.apache.commons", name = "commons-collections4", version.ref = "commonsCollectionsVersion" }
-tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatVersion" }
+tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatDbcpVersion" }
 tomcatEmbedCore = { group = "org.apache.tomcat.embed", name = "tomcat-embed-core", version.ref = "tomcatVersion"}
 commonsCLI = { group = "commons-cli", name = "commons-cli", version.ref = "commonsCLIVersion" }
 commonsText = { group = "org.apache.commons", name = "commons-text", version.ref = "commonsTextVersion" }
@@ -160,8 +170,16 @@ commonsValidator = { group = "commons-validator", name = "commons-validator", ve
 semver4j = { group = "com.vdurmont", name = "semver4j", version.ref = "semver4jVersion" }
 slf4jApi = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jVersion" }
 
-hibernateCore = { group = "org.hibernate", name = "hibernate-core", version.ref = "hibernateVersion" }
-javaxPersistenceApi = { group = "javax.persistence", name = "javax.persistence-api", version.ref = "javaxPersistenceApiVersion" }
+hibernateCore = { group = "org.hibernate", name = "hibernate-core-jakarta", version.ref = "hibernateVersion" }
+jakartaPersistenceApi = { group = "jakarta.persistence", name = "jakarta.persistence-api", version.ref = "jakartaPersistenceApiVersion" }
+jakartaXmlBind = { group = "jakarta.xml.bind", name = "jakarta.xml.bind-api", version.ref = "jakartaXmlBindVersion" }
+jaxbRuntime = { group = "org.glassfish.jaxb", name = "jaxb-runtime", version = "4.0.9" }
+# Test-only filler for Spring 5.3's spring-orm hibernate5 classes, whose static initializers
+# reference javax.persistence types (entity metadata itself is read by hibernate-core-jakarta
+# from the explicit annotatedClasses list). TODO BPA-230: remove with the Spring 6 upgrade, whose
+# orm.hibernate5 officially supports hibernate-core-jakarta:
+javaxPersistenceApiLegacy = { group = "javax.persistence", name = "javax.persistence-api", version = "2.2" }
+javaxTransactionApiLegacy = { group = "javax.transaction", name = "javax.transaction-api", version = "1.3" }
 hibernateJCache = { group = "org.hibernate", name = "hibernate-jcache", version.ref = "hibernateVersion" }
 jcache = { group = "javax.cache", name = "cache-api", version.ref = "jcacheVersion" }
 javassist = { group = "org.javassist", name = "javassist", version.ref = "javassistVersion" }
@@ -190,7 +208,7 @@ micrometerCore = { group = "io.micrometer", name = "micrometer-core", version.re
 micrometerRegistryJmx = { group = "io.micrometer", name = "micrometer-registry-jmx", version.ref = "micrometerVersion" }
 micrometerRegistryPrometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "micrometerVersion" }
 
-narayanaJta = { group = "org.jboss.narayana.jta", name = "narayana-jta", version.ref = "narayanaVersion" }
+narayanaJta = { group = "org.jboss.narayana.jta", name = "narayana-jta-jakarta", version.ref = "narayanaVersion" }
 jaxbCodeModel = { group = "org.glassfish.jaxb", name = "codemodel", version.ref = "jaxbVersion" }
 
 h2 = "com.h2database:h2:1.4.200"
@@ -257,11 +275,14 @@ mockServerJunit = { group = "org.mock-server", name = "mockserver-junit-jupiter"
 jsonassert = { group = "org.skyscreamer", name = "jsonassert", version.ref = "jsonassertVersion" }
 
 [bundles]
-groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx", "groovyNio", "groovyGroovysh", "groovyDatetime",
+# groovy-servlet removed from the bundle: compiled against javax.servlet, no jakarta variant in
+# Groovy 3.x/4.x - breaking change for customers using GroovyServlet/TemplateServlet from the
+# runtime classpath (documented in the migration release notes; see ADR-0016 Phase 5)
+groovy = ["groovyCore", "groovyXml", "groovyJson", "groovyJmx", "groovyNio", "groovyGroovysh", "groovyDatetime",
     "groovyDateutil", "groovyDocgenerator", "groovyJsr223", "groovySql", "groovyTemplates", "groovyYaml"]
 
 [plugins]
-bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "1.0.1" }
+bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "1.1.0" }
 dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.54.0" } # used by "List out-of-date dependencies" script
 taskInfo = { id = "org.barfuin.gradle.taskinfo", version = "3.0.2" } # Adds a 'tiTree' task to display Gradle task-graph
 testRetry = { id = "org.gradle.test-retry", version = "1.6.5" } # used to retry flaky tests automatically

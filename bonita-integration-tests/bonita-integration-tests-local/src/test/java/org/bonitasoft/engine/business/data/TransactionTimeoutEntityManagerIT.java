@@ -17,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Field;
 
-import javax.persistence.EntityManager;
-import javax.transaction.Status;
-import javax.transaction.TransactionManager;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.TransactionManager;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.CommonAPIIT;

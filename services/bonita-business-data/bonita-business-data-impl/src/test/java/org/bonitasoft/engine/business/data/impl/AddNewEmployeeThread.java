@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import javax.transaction.UserTransaction;
+import jakarta.transaction.UserTransaction;
 
 import com.company.pojo.Employee;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;

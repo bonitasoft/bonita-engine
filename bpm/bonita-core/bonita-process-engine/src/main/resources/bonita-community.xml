@@ -1044,7 +1044,7 @@
                 <entry key="hibernate.connection.shutdown" value="${bonita.platform.persistence.connection.shutdown}" />
                 <entry key="hibernate.validator.autoregister_listeners" value="${bonita.platform.persistence.validator.autoregister_listeners}" />
                 <entry key="hibernate.validator.apply_to_ddl" value="${bonita.platform.persistence.validator.apply_to_ddl}" />
-                <entry key="javax.persistence.validation.mode" value="${bonita.platform.persistence.javax.persistence.validation.mode}" />
+                <entry key="jakarta.persistence.validation.mode" value="${bonita.platform.persistence.javax.persistence.validation.mode}" />
                 <entry key="hibernate.query.plan_cache_max_size" value="${bonita.platform.persistence.query.cache.max_size}" />
             </map>
         </property>
@@ -1562,9 +1562,9 @@
                 <!-- Related to concurrent updates -->
                 <value>org.hibernate.StaleStateException</value>
                 <value>org.hibernate.exception.LockAcquisitionException</value>
-                <value>javax.persistence.LockTimeoutException</value>
-                <value>javax.persistence.PessimisticLockException</value>
-                <value>javax.persistence.OptimisticLockException</value>
+                <value>jakarta.persistence.LockTimeoutException</value>
+                <value>jakarta.persistence.PessimisticLockException</value>
+                <value>jakarta.persistence.OptimisticLockException</value>
                 <value>org.hibernate.dialect.lock.LockingStrategyException</value>
                 <value>java.sql.SQLRecoverableException</value>
                 <value>java.sql.SQLTransientException</value>
@@ -1918,7 +1918,7 @@
                        value="${bonita.tenant.bdm.repository.validator.autoregister_listeners}" />
                 <entry key="hibernate.validator.apply_to_ddl"
                        value="${bonita.tenant.bdm.repository.validator.apply_to_ddl}" />
-                <entry key="javax.persistence.validation.mode"
+                <entry key="jakarta.persistence.validation.mode"
                        value="${bonita.tenant.bdm.repository.javax.persistence.validation.mode}" />
                 <entry key="hibernate.current_session_context_class" value="thread" />
                 <entry key="hibernate.cache.use_second_level_cache" value="false" />
@@ -1948,7 +1948,7 @@
                        value="${bonita.tenant.bdm.schemamanager.validator.autoregister_listeners}" />
                 <entry key="hibernate.validator.apply_to_ddl"
                        value="${bonita.tenant.bdm.schemamanager.validator.apply_to_ddl}" />
-                <entry key="javax.persistence.validation.mode"
+                <entry key="jakarta.persistence.validation.mode"
                        value="${bonita.tenant.bdm.schemamanager.javax.persistence.validation.mode}" />
             </map>
         </constructor-arg>

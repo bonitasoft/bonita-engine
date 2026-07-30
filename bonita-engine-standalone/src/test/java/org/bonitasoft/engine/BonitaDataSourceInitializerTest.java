@@ -15,7 +15,10 @@ package org.bonitasoft.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.transaction.TransactionManager;
+
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
+import org.apache.tomcat.dbcp.dbcp2.managed.BasicManagedDataSource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -107,6 +110,23 @@ public class BonitaDataSourceInitializerTest {
 
         assertThat(dataSource.getMaxTotal()).isEqualTo(5);
         assertThat(managedDataSource.getMaxTotal()).isEqualTo(10);
+    }
+
+    @Test
+    public void should_wire_transaction_manager_into_managed_datasource() throws Exception {
+        // guards the tomcat-dbcp 10.1 divergence: BasicManagedDataSource#setTransactionManager
+        // takes the jakarta TransactionManager expected by the Narayana wiring
+        BonitaDatabaseConfiguration configuration = BonitaDatabaseConfiguration.builder()
+                .dbVendor("mysql")
+                .url("jdbc::localhost")
+                .user("myUser")
+                .build();
+        TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+
+        BasicManagedDataSource managedDataSource = bonitaDataSourceInitializer.createManagedDataSource(configuration,
+                transactionManager);
+
+        assertThat(managedDataSource.getTransactionManager()).isSameAs(transactionManager);
     }
 
 }

@@ -22,8 +22,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
+
+import jakarta.transaction.Transaction;
 
 import lombok.extern.slf4j.Slf4j;
 

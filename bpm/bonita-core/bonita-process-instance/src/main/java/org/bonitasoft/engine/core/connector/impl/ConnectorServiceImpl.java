@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.cache.CacheService;

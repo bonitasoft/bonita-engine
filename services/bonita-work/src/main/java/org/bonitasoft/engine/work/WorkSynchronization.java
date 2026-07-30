@@ -15,7 +15,7 @@ package org.bonitasoft.engine.work;
 
 import java.time.Instant;
 
-import javax.transaction.Status;
+import jakarta.transaction.Status;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.UserTransactionService;
