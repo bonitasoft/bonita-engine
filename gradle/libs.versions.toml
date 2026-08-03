@@ -28,7 +28,7 @@ jakartaPersistenceApiVersion = "3.0.0"
 # JAXB 4 line: forced by bonita-artifacts-model 2.x (conflict resolution upgrades the API to 4.x
 # anyway); the 4.0.x runtime binds the hibernate hbm model compiled against 3.0 annotations:
 jakartaXmlBindVersion = "4.0.4"
-jacksonBomVersion = "2.22.0"
+jacksonBomVersion = "2.22.1"
 # 2.0.x provides the jakarta.transaction.* namespace (1.3.x shipped javax.transaction.* despite the artifact name):
 jakartaTransactionVersion = "2.0.1"
 jakartaServletVersion = "6.0.0"
