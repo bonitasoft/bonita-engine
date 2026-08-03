@@ -16,7 +16,7 @@ package org.bonitasoft.console.common.server.auth;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.credentials.Credentials;

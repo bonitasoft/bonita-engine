@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 
@@ -86,7 +86,7 @@ public class RestApiResponseBuilder {
     /**
      * Adds a cookie to the HTTP response
      *
-     * @param cookie the {@link javax.servlet.http.Cookie} to add to the response
+     * @param cookie the {@link jakarta.servlet.http.Cookie} to add to the response
      */
     public RestApiResponseBuilder withAdditionalCookie(Cookie cookie) {
         additionalCookies.add(cookie);

@@ -15,7 +15,7 @@ package org.bonitasoft.web.rest.server.framework.utils.converter;
 
 import static org.junit.Assert.assertTrue;
 
-import javax.servlet.Servlet;
+import jakarta.servlet.Servlet;
 
 import org.bonitasoft.web.rest.server.framework.utils.converter.typed.BooleanConverter;
 import org.bonitasoft.web.rest.server.framework.utils.converter.typed.DoubleConverter;

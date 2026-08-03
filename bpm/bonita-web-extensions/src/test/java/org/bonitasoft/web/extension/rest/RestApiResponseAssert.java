@@ -18,7 +18,7 @@ import static java.lang.String.format;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;

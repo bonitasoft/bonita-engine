@@ -22,7 +22,7 @@ import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

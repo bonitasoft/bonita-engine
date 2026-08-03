@@ -11,7 +11,7 @@ dependencies {
     api project(':services:bonita-lock')
     api libs.slf4jApi
 
-    implementation(libs.javaxAnnotations)
+    implementation(libs.jakartaAnnotations)
 
     compileOnly libs.jakartaTransactionApi
 

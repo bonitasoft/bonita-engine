@@ -19,7 +19,7 @@ import static org.bonitasoft.web.rest.server.APIPaginationUtils.buildSearchOptio
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.exception.BonitaException;

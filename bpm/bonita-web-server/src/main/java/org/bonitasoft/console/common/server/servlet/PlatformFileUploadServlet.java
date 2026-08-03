@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.console.common.server.servlet;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 
 /**
@@ -36,7 +38,8 @@ public class PlatformFileUploadServlet extends FileUploadServlet {
     }
 
     @Override
-    protected void setUploadMaxSize(final ServletFileUpload serviceFileUpload, final HttpServletRequest request) {
+    protected void setUploadMaxSize(final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload,
+            final HttpServletRequest request) {
         //currently no limit check on the platform
     }
 

@@ -18,7 +18,7 @@ import static org.bonitasoft.web.rest.server.api.AbstractRESTController.API_SPRI
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.server.login;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;

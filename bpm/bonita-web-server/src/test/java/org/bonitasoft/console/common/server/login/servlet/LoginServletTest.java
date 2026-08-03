@@ -29,12 +29,12 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
@@ -375,7 +375,7 @@ public class LoginServletTest {
         // After normalization: /login.jsp/../serverAPI -> /serverAPI
         // The HttpAPIServlet FORWARD does not happen if it does not start with context path + login.jsp
         verify(servletContext, never()).getRequestDispatcher(anyString());
-        verify(resp).setStatus(HttpServletResponse.SC_UNAUTHORIZED, "loginFailMessage");
+        verify(resp).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -441,7 +441,7 @@ public class LoginServletTest {
         final LoginFailureTracker tracker = mock(LoginFailureTracker.class);
 
         // Mock the ServletConfig to return our mock ServletContext
-        javax.servlet.ServletConfig servletConfig = mock(javax.servlet.ServletConfig.class);
+        jakarta.servlet.ServletConfig servletConfig = mock(jakarta.servlet.ServletConfig.class);
         doReturn(servletContext).when(servletConfig).getServletContext();
 
         // Mock Spring context lookup

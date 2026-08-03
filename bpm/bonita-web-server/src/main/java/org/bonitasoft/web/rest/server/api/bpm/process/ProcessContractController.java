@@ -16,7 +16,7 @@ package org.bonitasoft.web.rest.server.api.bpm.process;
 import static org.bonitasoft.console.common.server.utils.ContractTypeConverter.ISO_8601_DATE_PATTERNS;
 import static org.bonitasoft.web.rest.server.api.AbstractRESTController.API_SPRING_INTERNAL;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.utils.ContractTypeConverter;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;

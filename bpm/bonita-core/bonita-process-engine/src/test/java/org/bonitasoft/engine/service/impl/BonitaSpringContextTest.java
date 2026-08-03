@@ -62,7 +62,7 @@ public class BonitaSpringContextTest implements ApplicationContextAware {
     public void should_clear_cache_on_destroy() throws Exception {
         bonitaSpringContext.getBean("ThisIsMyService", MyService.class);
 
-        bonitaSpringContext.destroy();
+        bonitaSpringContext.close();
 
         bonitaSpringContext.getBean("ThisIsMyService", MyService.class);
     }

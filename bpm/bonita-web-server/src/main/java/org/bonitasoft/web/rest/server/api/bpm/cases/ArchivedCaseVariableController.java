@@ -17,7 +17,7 @@ import static org.bonitasoft.web.rest.server.APIPaginationUtils.buildContentRang
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.web.rest.model.bpm.cases.ArchivedCaseVariable;

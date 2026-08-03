@@ -1,7 +1,7 @@
 import org.bonitasoft.engine.gradle.PomUtils
 
 dependencies {
-    api(libs.javaxServletApi)
+    api(libs.jakartaServletApi)
     api(project(":bpm:bonita-client"))
     api(project(":bpm:bonita-common"))
     testImplementation libs.assertj

@@ -13,16 +13,16 @@
  **/
 package org.bonitasoft.engine.api.internal.servlet;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload2.core.FileUploadException;
 import org.bonitasoft.engine.properties.BooleanProperty;
 
 /**
@@ -50,7 +50,7 @@ public class HttpAPIServlet extends HttpServlet {
         // security-constraint, but security-constraints only apply to REQUEST dispatches
         // (Servlet 3.0 spec). A path traversal attack could forward requests here from
         // the /apps/* or /API/* namespaces, bypassing the security-constraint entirely.
-        if (req.getDispatcherType() == javax.servlet.DispatcherType.FORWARD) {
+        if (req.getDispatcherType() == jakarta.servlet.DispatcherType.FORWARD) {
             resp.sendError(SC_FORBIDDEN);
             return;
         }

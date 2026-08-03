@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.signal;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;

@@ -14,8 +14,9 @@
 package org.bonitasoft.engine.api.internal.servlet;
 
 import javax.naming.NamingException;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 import org.bonitasoft.engine.EngineInitializer;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;

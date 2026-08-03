@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.i18n.I18n;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;

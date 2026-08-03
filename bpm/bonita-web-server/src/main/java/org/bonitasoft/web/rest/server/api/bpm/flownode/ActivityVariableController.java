@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;

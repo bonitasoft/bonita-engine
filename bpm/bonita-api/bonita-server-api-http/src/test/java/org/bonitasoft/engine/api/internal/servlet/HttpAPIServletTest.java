@@ -16,8 +16,8 @@ package org.bonitasoft.engine.api.internal.servlet;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -90,7 +90,7 @@ public class HttpAPIServletTest {
     @Test
     public void should_send_403_when_dispatch_type_is_forward() throws Exception {
         HttpAPIServlet httpAPIServlet = spy(new HttpAPIServlet());
-        doReturn(javax.servlet.DispatcherType.FORWARD).when(request).getDispatcherType();
+        doReturn(jakarta.servlet.DispatcherType.FORWARD).when(request).getDispatcherType();
 
         httpAPIServlet.init();
         httpAPIServlet.doPost(request, response);
@@ -102,7 +102,7 @@ public class HttpAPIServletTest {
     @Test
     public void should_allow_request_dispatch_type() throws Exception {
         HttpAPIServlet httpAPIServlet = spy(new HttpAPIServlet());
-        doReturn(javax.servlet.DispatcherType.REQUEST).when(request).getDispatcherType();
+        doReturn(jakarta.servlet.DispatcherType.REQUEST).when(request).getDispatcherType();
         doNothing().when(httpAPIServlet).callHttpApi(any(), any());
 
         httpAPIServlet.init();

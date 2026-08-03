@@ -21,15 +21,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import jakarta.activation.FileTypeMap;
 import jakarta.activation.MimetypesFileTypeMap;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.console.common.server.page.CustomPageService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -107,7 +106,7 @@ public class PageUploadServlet extends TenantFileUploadServlet {
     }
 
     @Override
-    protected String storeTempFile(final String fileName, final FileItem item)
+    protected String storeTempFile(final String fileName, final DiskFileItem item)
             throws Exception {
         pageTmp = File.createTempFile("tmp_page", ".tmp");
         FileUtils.copyToFile(item.getInputStream(), pageTmp);

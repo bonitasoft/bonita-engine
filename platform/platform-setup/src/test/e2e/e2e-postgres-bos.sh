@@ -29,6 +29,23 @@ echo "Start the Postgres database docker container"
 echo "============================================="
 docker run --rm -p 5432:5432 --name bonita-postgres -d bonitasoft/bonita-postgres:16.4
 
+echo "==================================================="
+echo "Wait for the database to accept TCP connections"
+echo "(the docker-entrypoint init phase runs a temporary"
+echo "server that only listens on the unix socket, so a"
+echo "TCP check cannot return a false positive)"
+echo "==================================================="
+i=0
+until docker exec bonita-postgres pg_isready -h 127.0.0.1 -U bonita -d bonita > /dev/null 2>&1; do
+  i=$((i+1))
+  if [ ${i} -ge 60 ]; then
+    break
+  fi
+  sleep 1
+done
+docker exec bonita-postgres pg_isready -h 127.0.0.1 -U bonita -d bonita
+testReturnCode $? "waiting for the postgres database to accept connections"
+
 export VERSION="$(cat ../platform-resources/build/resources/main/PLATFORM_ENGINE_VERSION)"
 
 echo "========================================"

@@ -12,9 +12,6 @@ dependencies {
     testImplementation libs.springTest
     testImplementation libs.springJdbc
     testImplementation libs.springOrm
-    // javax API filler for spring-orm 5.3 class initialization; see catalog comment
-    testRuntimeOnly libs.javaxPersistenceApiLegacy
-    testRuntimeOnly libs.javaxTransactionApiLegacy
     testRuntimeOnly libs.tomcatDbcp
 }
 

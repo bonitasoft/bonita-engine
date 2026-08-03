@@ -66,7 +66,7 @@ dependencies {
     api libs.micrometerCore
 
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
-    api(libs.javaxAnnotations)
+    api(libs.jakartaAnnotations)
 
     annotationProcessor libs.lombok
     // direct jakarta.xml.bind imports in this module, do not rely on transitive resolution

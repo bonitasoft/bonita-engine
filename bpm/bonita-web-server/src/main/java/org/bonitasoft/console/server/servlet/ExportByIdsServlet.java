@@ -15,7 +15,7 @@ package org.bonitasoft.console.server.servlet;
 
 import java.io.FileNotFoundException;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;

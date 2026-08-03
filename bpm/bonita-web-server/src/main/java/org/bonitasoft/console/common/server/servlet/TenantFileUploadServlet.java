@@ -13,10 +13,12 @@
  **/
 package org.bonitasoft.console.common.server.servlet;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.console.common.server.preferences.properties.ConsoleProperties;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
@@ -45,14 +47,15 @@ public class TenantFileUploadServlet extends FileUploadServlet {
     }
 
     @Override
-    protected void setUploadMaxSize(final ServletFileUpload serviceFileUpload, final HttpServletRequest request) {
+    protected void setUploadMaxSize(final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload,
+            final HttpServletRequest request) {
         if (checkUploadedImageSize) {
-            serviceFileUpload.setFileSizeMax(getConsoleProperties().getImageMaxSizeInKB() * KILOBYTE);
+            serviceFileUpload.setMaxFileSize(getConsoleProperties().getImageMaxSizeInKB() * KILOBYTE);
         } else if (checkUploadedFileSize) {
-            serviceFileUpload.setFileSizeMax(getConsoleProperties().getMaxSize() * MEGABYTE);
+            serviceFileUpload.setMaxFileSize(getConsoleProperties().getMaxSize() * MEGABYTE);
         } else {
             //Some db vendor do not support more than 2GB Blobs
-            serviceFileUpload.setFileSizeMax(Integer.MAX_VALUE);
+            serviceFileUpload.setMaxFileSize(Integer.MAX_VALUE);
         }
     }
 

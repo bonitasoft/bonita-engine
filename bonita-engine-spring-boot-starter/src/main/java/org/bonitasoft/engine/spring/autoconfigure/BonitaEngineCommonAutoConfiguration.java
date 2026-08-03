@@ -14,11 +14,11 @@
 package org.bonitasoft.engine.spring.autoconfigure;
 
 import org.bonitasoft.engine.spring.autoconfigure.properties.BonitaEngineProperties;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@AutoConfiguration
 @ComponentScan
 @EnableConfigurationProperties(BonitaEngineProperties.class)
 public class BonitaEngineCommonAutoConfiguration {

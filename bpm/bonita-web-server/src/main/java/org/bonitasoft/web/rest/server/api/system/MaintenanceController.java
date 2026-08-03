@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api.system;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.MaintenanceAPI;

@@ -16,7 +16,7 @@ package org.bonitasoft.console.common.server.login.utils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.junit.Test;

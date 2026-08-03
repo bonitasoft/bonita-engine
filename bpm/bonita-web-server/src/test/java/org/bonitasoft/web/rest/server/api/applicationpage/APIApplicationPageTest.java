@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.i18n.I18n;
 import org.bonitasoft.engine.session.APISession;

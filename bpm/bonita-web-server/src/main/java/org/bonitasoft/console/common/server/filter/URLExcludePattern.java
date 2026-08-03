@@ -16,7 +16,7 @@ package org.bonitasoft.console.common.server.filter;
 import java.net.URI;
 import java.util.regex.Pattern;
 
-import javax.servlet.FilterConfig;
+import jakarta.servlet.FilterConfig;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

@@ -21,9 +21,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import org.springframework.orm.hibernate5.SessionHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Test Repository
@@ -39,18 +37,7 @@ public class TestRepository {
     }
 
     public Session getSession() {
-        // Read the session bound by Spring's HibernateTransactionManager directly: Spring 5.3's
-        // SpringSessionContext cannot be instantiated against hibernate-core-jakarta (JtaPlatform
-        // signature mismatch), so sessionFactory.getCurrentSession() is unusable until the
-        // Spring 6 upgrade. TODO BPA-230: revert to getCurrentSession() with Spring 6
-        SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager
-                .getResource(sessionFactory);
-        if (sessionHolder == null) {
-            throw new IllegalStateException(
-                    "No Spring-managed Hibernate session bound to the current thread: "
-                            + TestRepository.class.getSimpleName() + " must be used in a transactional context");
-        }
-        return sessionHolder.getSession();
+        return sessionFactory.getCurrentSession();
     }
 
     protected Query getNamedQuery(final String queryName) {

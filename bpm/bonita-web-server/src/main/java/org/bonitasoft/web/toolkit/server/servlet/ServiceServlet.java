@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.web.toolkit.server.servlet;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.bonitasoft.web.toolkit.server.ServiceFactory;
 import org.bonitasoft.web.toolkit.server.ServiceServletCall;

@@ -5,14 +5,6 @@ allprojects {
 
     group = 'org.bonitasoft.engine'
 
-    // bonita-artifacts-model 2.x pulls slf4j-api 2.0 transitively, but Spring Boot 2.7's
-    // LogbackLoggingSystem requires the slf4j 1.7 binding (StaticLoggerBinder) with logback 1.2.
-    // TODO BPA-230: keep slf4j on 1.7 until the Spring Boot 3 upgrade, which brings slf4j 2 + logback 1.5,
-    // then remove this force.
-    configurations.configureEach {
-        resolutionStrategy.force(libs.slf4jApi.get())
-    }
-
     tasks.withType(Copy).configureEach {
         setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
     }
@@ -85,6 +77,9 @@ subprojects {
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
         options.fork = true
+        // Spring 6 resolves @RequestParam/@PathVariable names via reflection and no longer
+        // falls back to bytecode debug symbols, so parameter names must be compiled in
+        options.compilerArgs << '-parameters'
     }
     tasks.withType(Javadoc).configureEach {
         options.addStringOption('Xdoclint:none', '-quiet')

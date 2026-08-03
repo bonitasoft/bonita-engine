@@ -28,14 +28,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
@@ -48,6 +48,8 @@ import org.springframework.mock.web.MockMultipartHttpServletRequest;
 public class TokenValidatorFilterTest {
 
     public static final String SESSION_CSRF_TOKEN = "csrftoken";
+
+    private static final String MULTIPART_BOUNDARY = "----WebKitFormBoundaryRmUZEc9hkTjU1FKc";
 
     @Mock
     private FilterChain chain;
@@ -185,6 +187,62 @@ public class TokenValidatorFilterTest {
     }
 
     @Test
+    public void should_check_csrf_token_from_form_data_placed_after_a_file_part() throws Exception {
+        // realistic browser ordering: the file part comes BEFORE the CSRFToken field, so the
+        // iterator has to stream past the file part to reach the token
+        MockHttpServletRequest request = mockMultipartRequestWithParts(
+                filePart("x".repeat(64 * 1024)),
+                csrfTokenPart(SESSION_CSRF_TOKEN));
+
+        filter.proceedWithFiltering(request, httpResponse, chain);
+
+        verify(chain).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+    }
+
+    @Test
+    public void should_set_401_status_when_request_encoding_is_unsupported() throws Exception {
+        // fileupload2 validates the request charset before parsing: an unsupported encoding
+        // makes the parser throw, and token extraction fails closed (no token -> 401) before
+        // the getFormFieldEncoding UTF-8 fallback is ever consulted
+        MockHttpServletRequest multipartRequest = mockMultipartRequestFor(SESSION_CSRF_TOKEN);
+        multipartRequest.setCharacterEncoding("not-a-real-charset");
+
+        filter.proceedWithFiltering(multipartRequest, httpResponse, chain);
+
+        verify(chain, never()).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+        verify(httpResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Test
+    public void should_set_401_status_when_csrf_form_data_is_oversized() throws Exception {
+        // a crafted CSRFToken form field way beyond the buffering cap must be rejected
+        // (truncated read -> token mismatch -> 401) without buffering it fully in memory
+        String oversizedToken = SESSION_CSRF_TOKEN + "x".repeat(1024 * 1024);
+        MockHttpServletRequest multipartRequest = mockMultipartRequestFor(oversizedToken);
+
+        filter.proceedWithFiltering(multipartRequest, httpResponse, chain);
+
+        verify(chain, never()).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+        verify(httpResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Test
+    public void should_set_401_status_when_multipart_body_is_not_parseable() throws Exception {
+        // a request advertising multipart/form-data whose body contains no boundary at all:
+        // token extraction must fail closed (no token -> 401), not propagate the parse error
+        MockMultipartHttpServletRequest request = new MockMultipartHttpServletRequest();
+        request.setMethod("POST");
+        request.getSession().setAttribute("api_token", SESSION_CSRF_TOKEN);
+        request.setContentType("multipart/form-data; boundary=----expectedBoundary");
+        request.setContent("this is not a valid multipart body".getBytes(StandardCharsets.UTF_8));
+
+        filter.proceedWithFiltering(request, httpResponse, chain);
+
+        verify(chain, never()).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+        verify(httpResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Test
     public void testFilterWithExcludedURL() throws Exception {
         final String url = "test";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(url));
@@ -271,23 +329,31 @@ public class TokenValidatorFilterTest {
     }
 
     private MockHttpServletRequest mockMultipartRequestFor(String csrfToken) {
+        return mockMultipartRequestWithParts(csrfTokenPart(csrfToken));
+    }
+
+    private MockHttpServletRequest mockMultipartRequestWithParts(String... parts) {
         MockMultipartHttpServletRequest request = new MockMultipartHttpServletRequest();
         request.setMethod("POST");
         request.getSession().setAttribute("api_token", SESSION_CSRF_TOKEN);
-
-        String boundary = "----WebKitFormBoundaryRmUZEc9hkTjU1FKc";
-        request.setContentType(format("multipart/form-data; boundary=%s", boundary));
-        request.setContent(multipartContent(boundary, csrfToken));
+        request.setContentType(format("multipart/form-data; boundary=%s", MULTIPART_BOUNDARY));
+        request.setContent((String.join("", parts) + "--" + MULTIPART_BOUNDARY + "--")
+                .getBytes(StandardCharsets.UTF_8));
         return request;
     }
 
-    private byte[] multipartContent(String boundary, String csrfToken) {
-        return new StringBuilder()
-                .append("--").append(boundary).append("\r\n")
-                .append("Content-Disposition: form-data; name=\"CSRFToken\"").append("\r\n")
-                .append("\r\n")
-                .append(csrfToken).append("\r\n")
-                .append("--").append(boundary).append("--")
-                .toString().getBytes(StandardCharsets.UTF_8);
+    private String csrfTokenPart(String csrfToken) {
+        return "--" + MULTIPART_BOUNDARY + "\r\n"
+                + "Content-Disposition: form-data; name=\"CSRFToken\"\r\n"
+                + "\r\n"
+                + csrfToken + "\r\n";
+    }
+
+    private String filePart(String content) {
+        return "--" + MULTIPART_BOUNDARY + "\r\n"
+                + "Content-Disposition: form-data; name=\"file\"; filename=\"data.bin\"\r\n"
+                + "Content-Type: application/octet-stream\r\n"
+                + "\r\n"
+                + content + "\r\n";
     }
 }

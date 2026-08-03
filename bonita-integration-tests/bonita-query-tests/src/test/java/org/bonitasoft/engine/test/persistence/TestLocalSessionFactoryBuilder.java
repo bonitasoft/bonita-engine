@@ -48,11 +48,6 @@ public class TestLocalSessionFactoryBuilder extends LocalSessionFactoryBean {
         if (interceptor != null) {
             sfb.setInterceptor(interceptor);
         }
-        // Spring 5.3's SpringSessionContext cannot be instantiated against hibernate-core-jakarta
-        // (JtaPlatform signature mismatch); sessions are obtained through the Spring-bound
-        // SessionHolder instead (see TestRepository#getSession), so no CurrentSessionContext is
-        // needed. Remove the property to avoid a misleading startup error. TODO BPA-230: revert with Spring 6.
-        sfb.getProperties().remove(org.hibernate.cfg.AvailableSettings.CURRENT_SESSION_CONTEXT_CLASS);
         return super.buildSessionFactory(sfb);
     }
 

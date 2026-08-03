@@ -16,7 +16,7 @@ package org.bonitasoft.web.rest.server.framework.utils;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIMalformedUrlException;

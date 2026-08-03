@@ -16,7 +16,7 @@ package org.bonitasoft.web.extension.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.apache.http.HttpHeaders;
 import org.junit.Before;

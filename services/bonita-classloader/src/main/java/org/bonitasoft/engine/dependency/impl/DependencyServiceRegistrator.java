@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.dependency.impl;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.springframework.stereotype.Component;

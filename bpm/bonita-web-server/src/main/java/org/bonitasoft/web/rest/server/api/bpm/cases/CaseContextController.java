@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceConverter;

@@ -19,10 +19,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
@@ -158,7 +158,9 @@ public class LoginServlet extends HttpServlet {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("No profiles for user");
                         }
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED, "noProfileForUser");
+                        // Servlet 6 removed setStatus(int, String); the reason phrase was already
+                        // dropped from responses by modern containers anyway
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     }
                 }
             } else {
@@ -227,7 +229,7 @@ public class LoginServlet extends HttpServlet {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug(exception.getMessage());
                     }
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED, LOGIN_FAIL_MESSAGE);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 }
             } catch (final Exception e) {
                 LOGGER.error(e.getMessage());

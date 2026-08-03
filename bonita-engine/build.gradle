@@ -34,7 +34,8 @@ dependencyManagement {
         dependency(libs.jcache.get() as String)
         dependency(libs.jakartaPersistenceApi.get() as String)
         dependency libs.commonsIO.get() as String
-        dependency libs.commonsFileUpload.get() as String
+        dependency libs.commonsFileUpload2JakartaServlet6.get() as String
+        dependency libs.commonsFileUpload2Core.get() as String
         dependency(libs.commonsBeanUtils.get() as String) {
             exclude 'commons-collections:commons-collections'
         }
@@ -60,7 +61,7 @@ dependencyManagement {
         dependency libs.jakartaActivation.get() as String
         dependency(libs.quartz.get() as String)
         dependency(libs.eclipseCompiler.get() as String)
-        dependency(libs.javaxAnnotations.get() as String)
+        dependency(libs.jakartaAnnotations.get() as String)
         dependency(libs.micrometerCore.get() as String)
         dependency(libs.micrometerRegistryJmx.get() as String)
         dependency(libs.micrometerRegistryPrometheus.get() as String)
@@ -68,9 +69,6 @@ dependencyManagement {
         dependency(libs.hazelcastSpring.get() as String)
         // declared here because it is used by web-extension and by distrib
         dependency(libs.jakartaServletApi.get() as String)
-        // To be removed only when client projects (rest api extension) have all moved their deps to jakarta
-        // Just keep a version managed to prevent client build breaks
-        dependency(libs.javaxServletApi.get() as String)
 
         // Bonita engine dependencies:
         dependency "org.bonitasoft.engine:bonita-common:${project.version}"
@@ -89,8 +87,6 @@ dependencyManagement {
 
         // Web layer specific dependencies:
         dependency(libs.xbeanClassloader.get() as String)
-        dependency(libs.jakartaJstl.get() as String)
-        dependency(libs.jakartaJstlApi.get() as String)
         dependency(libs.jgettext.get() as String)
         dependency(libs.urlrewritefilter.get() as String)
         dependency(libs.woodstoxCore.get() as String)

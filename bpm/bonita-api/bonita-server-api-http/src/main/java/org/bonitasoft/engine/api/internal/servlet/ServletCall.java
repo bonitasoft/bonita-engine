@@ -34,14 +34,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.FileItemInput;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
+import org.apache.commons.fileupload2.core.FileUploadException;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -104,14 +104,14 @@ public abstract class ServletCall {
         this.response = response;
         parameters = new HashMap<>();
         binaryParameters = new ArrayList<>();
-        if (ServletFileUpload.isMultipartContent(request)) {
-            final ServletFileUpload upload = new ServletFileUpload();
+        if (JakartaServletFileUpload.isMultipartContent(request)) {
+            final JakartaServletFileUpload<?, ?> upload = new JakartaServletFileUpload<>();
             // Parse the request
-            final FileItemIterator iter = upload.getItemIterator(request);
+            final FileItemInputIterator iter = upload.getItemIterator(request);
             while (iter.hasNext()) {
                 try {
-                    final FileItemStream item = iter.next();
-                    try (var stream = item.openStream()) {
+                    final FileItemInput item = iter.next();
+                    try (var stream = item.getInputStream()) {
                         String fieldName = item.getFieldName();
                         if (fieldName.startsWith(BINARY_PARAMETER)) {
                             binaryParameters.add(stream.readAllBytes());
@@ -169,7 +169,7 @@ public abstract class ServletCall {
     }
 
     /**
-     * @see javax.servlet.http.HttpServletRequest#getQueryString()
+     * @see jakarta.servlet.http.HttpServletRequest#getQueryString()
      */
     public String getQueryString() {
         return request.getQueryString();

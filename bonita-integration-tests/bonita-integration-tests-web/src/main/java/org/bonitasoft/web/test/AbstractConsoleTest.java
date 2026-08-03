@@ -15,7 +15,7 @@ package org.bonitasoft.web.test;
 
 import static junit.framework.Assert.assertTrue;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.test.toolkit.organization.TestUser;

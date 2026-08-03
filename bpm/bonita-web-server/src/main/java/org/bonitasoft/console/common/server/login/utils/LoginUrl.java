@@ -16,7 +16,7 @@ package org.bonitasoft.console.common.server.login.utils;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;

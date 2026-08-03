@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.web.extension.page;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * The interface to implement for a Custom Page in Bonita.

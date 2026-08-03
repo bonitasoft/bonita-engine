@@ -15,7 +15,7 @@ package org.bonitasoft.console.common.server.servlet;
 
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.api.IdentityAPI;

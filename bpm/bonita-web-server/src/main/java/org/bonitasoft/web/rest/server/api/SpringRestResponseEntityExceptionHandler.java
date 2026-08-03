@@ -19,8 +19,8 @@ import static org.bonitasoft.web.rest.server.api.SpringResponseEntityUtils.gener
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
@@ -35,6 +35,7 @@ import org.bonitasoft.engine.exception.UnavailableLockException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.ClassUtils;
@@ -72,8 +73,9 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return generateErrorResponse(ex.getClass().getName(), HttpStatus.BAD_REQUEST, getRootCause(ex).getMessage());
     }
 
@@ -191,14 +193,14 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException exception,
-            HttpHeaders headers, HttpStatus status, WebRequest request) {
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return generateErrorResponse(exception.getClass().getName(), HttpStatus.BAD_REQUEST,
                 "Unable to parse the JSON body");
     }
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
-            MissingServletRequestParameterException exception, HttpHeaders headers, HttpStatus status,
+            MissingServletRequestParameterException exception, HttpHeaders headers, HttpStatusCode status,
             WebRequest request) {
         String parameterName = exception.getParameterName();
 

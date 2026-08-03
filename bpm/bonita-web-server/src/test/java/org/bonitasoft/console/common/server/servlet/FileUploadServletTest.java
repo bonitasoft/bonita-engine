@@ -27,14 +27,14 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.bonitasoft.engine.api.TemporaryContentAPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -126,6 +126,81 @@ public class FileUploadServletTest {
     }
 
     @Test
+    public void doPost_should_delete_multipart_temp_files_after_processing() throws Exception {
+        // given a form field and a file item (fileupload2 has no finalizer deleting
+        // the disk-buffered content anymore, the servlet must delete items explicitly)
+        final DiskFileItem formFieldItem = mock(DiskFileItem.class);
+        when(formFieldItem.isFormField()).thenReturn(true);
+        final DiskFileItem fileItem = mock(DiskFileItem.class);
+        when(fileItem.getName()).thenReturn("data.txt");
+        @SuppressWarnings("unchecked")
+        final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
+                JakartaServletFileUpload.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final PrintWriter printer = mock(PrintWriter.class);
+        final File tempFolder = File.createTempFile("upload", "");
+        tempFolder.mkdir();
+
+        fileUploadServlet.uploadDirectoryPath = tempFolder.getAbsolutePath();
+        doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(DiskFileItemFactory.class));
+        doReturn("key").when(fileUploadServlet).storeTempFile(anyString(), any());
+        doReturn(mock(TemporaryContentAPI.class)).when(fileUploadServlet).getTemporaryContentAPI();
+        when(serviceFileUpload.parseRequest(request)).thenReturn(List.of(formFieldItem, fileItem));
+        when(request.getMethod()).thenReturn("post");
+        when(request.getContentType()).thenReturn("multipart/");
+        when(response.getWriter()).thenReturn(printer);
+        when(fileUploadServlet.getServletConfig()).thenReturn(mock(ServletConfig.class));
+        when(fileUploadServlet.getInitParameter(FileUploadServlet.RESPONSE_CONTENT_TYPE_PARAM))
+                .thenReturn(FileUploadServlet.TEXT_CONTENT_TYPE);
+        when(fileUploadServlet.getInitParameter(FileUploadServlet.SUPPORTED_EXTENSIONS_PARAM))
+                .thenReturn("txt");
+
+        // when
+        fileUploadServlet.init();
+        fileUploadServlet.doPost(request, response);
+
+        // then
+        verify(fileItem).delete();
+        verify(formFieldItem).delete();
+    }
+
+    @Test
+    public void doPost_should_delete_multipart_temp_files_when_extension_is_not_supported() throws Exception {
+        // given a file item whose extension is refused (the processing loop returns early)
+        final DiskFileItem fileItem = mock(DiskFileItem.class);
+        when(fileItem.getName()).thenReturn("evil.exe");
+        @SuppressWarnings("unchecked")
+        final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
+                JakartaServletFileUpload.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final PrintWriter printer = mock(PrintWriter.class);
+        final File tempFolder = File.createTempFile("upload", "");
+        tempFolder.mkdir();
+
+        fileUploadServlet.uploadDirectoryPath = tempFolder.getAbsolutePath();
+        doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(DiskFileItemFactory.class));
+        doReturn(mock(TemporaryContentAPI.class)).when(fileUploadServlet).getTemporaryContentAPI();
+        when(serviceFileUpload.parseRequest(request)).thenReturn(List.of(fileItem));
+        when(request.getMethod()).thenReturn("post");
+        when(request.getContentType()).thenReturn("multipart/");
+        when(response.getWriter()).thenReturn(printer);
+        when(fileUploadServlet.getServletConfig()).thenReturn(mock(ServletConfig.class));
+        when(fileUploadServlet.getInitParameter(FileUploadServlet.RESPONSE_CONTENT_TYPE_PARAM))
+                .thenReturn(FileUploadServlet.TEXT_CONTENT_TYPE);
+        when(fileUploadServlet.getInitParameter(FileUploadServlet.SUPPORTED_EXTENSIONS_PARAM))
+                .thenReturn("txt");
+
+        // when
+        fileUploadServlet.init();
+        fileUploadServlet.doPost(request, response);
+
+        // then the early return must not leak the disk-buffered content
+        verify(fileItem).delete();
+    }
+
+    @Test
     public void doPost_should_return_jarlessBar_indicator() throws Exception {
         // given
         // a bar zip file with a .jarless file inside
@@ -136,8 +211,10 @@ public class FileUploadServletTest {
             zos.closeEntry();
         }
 
-        final FileItem fileItem = mock(FileItem.class);
-        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        final DiskFileItem fileItem = mock(DiskFileItem.class);
+        @SuppressWarnings("unchecked")
+        final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
+                JakartaServletFileUpload.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final PrintWriter printer = mock(PrintWriter.class);
         final File tempFolder = File.createTempFile("upload", "");
@@ -146,7 +223,7 @@ public class FileUploadServletTest {
         //manage spy
         fileUploadServlet.uploadDirectoryPath = tempFolder.getAbsolutePath();
         doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
-        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(FileItemFactory.class));
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(DiskFileItemFactory.class));
         TemporaryContentAPI tempContentApi = mock(TemporaryContentAPI.class);
         doReturn("key").when(fileUploadServlet).storeTempFile(anyString(), any());
         doReturn(tempContentApi).when(fileUploadServlet).getTemporaryContentAPI();

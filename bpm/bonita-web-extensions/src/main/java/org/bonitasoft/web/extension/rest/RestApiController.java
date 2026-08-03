@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.extension.rest;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * The interface to implement for Rest API extension in Bonita.

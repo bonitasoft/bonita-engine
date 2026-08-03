@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.MaintenanceAPI;
@@ -188,19 +188,19 @@ class MaintenanceControllerTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> maintenanceController.getApiSession(session));
         //then
-        assertThat(exception.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
         //when
         exception = assertThrows(ResponseStatusException.class,
                 () -> maintenanceController.getMaintenanceDetails(session));
         //then
-        assertThat(exception.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
         //when
         exception = assertThrows(ResponseStatusException.class,
                 () -> maintenanceController.changeMaintenanceState(null, session));
         //then
-        assertThat(exception.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test

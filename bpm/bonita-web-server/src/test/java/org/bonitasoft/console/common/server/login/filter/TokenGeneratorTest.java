@@ -16,8 +16,8 @@ package org.bonitasoft.console.common.server.login.filter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.login.PortalCookies;
 import org.junit.Before;

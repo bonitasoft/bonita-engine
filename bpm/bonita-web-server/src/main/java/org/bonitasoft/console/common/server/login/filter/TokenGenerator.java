@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.console.common.server.login.filter;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.api.token.APIToken;
 import org.slf4j.Logger;

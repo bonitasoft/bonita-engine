@@ -16,7 +16,7 @@ package org.bonitasoft.web.rest.server.api.bdm;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;

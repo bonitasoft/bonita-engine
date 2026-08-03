@@ -1,0 +1,18 @@
+<configuration debug="false" scan="false">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>|%d{HH:mm:ss.SSS}|%thread|%-5level|%logger{16}| %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Some tests assert debug-level engine behavior (debug log content, isDebugEnabled guards).
+         Keep org.bonitasoft at DEBUG: since Spring Boot 3 the spring-boot jar registers a logback
+         Configurator service that would otherwise default the root level to INFO. -->
+    <logger name="org.bonitasoft" level="DEBUG" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>

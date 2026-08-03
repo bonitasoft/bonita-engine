@@ -18,9 +18,9 @@ import static org.mockito.Mockito.doReturn;
 
 import java.util.Locale;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.utils.LocaleUtils;
 import org.bonitasoft.engine.session.APISession;

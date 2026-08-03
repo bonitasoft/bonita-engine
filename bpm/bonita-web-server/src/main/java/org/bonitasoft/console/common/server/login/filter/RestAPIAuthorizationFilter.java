@@ -16,16 +16,16 @@ package org.bonitasoft.console.common.server.login.filter;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.filter.ExcludingPatternFilter;
 import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
@@ -70,7 +70,7 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         try {
             // body of multi-parts requests is not needed when checking permissions
-            if (!ServletFileUpload.isMultipartContent(httpServletRequest)) {
+            if (!JakartaServletFileUpload.isMultipartContent(httpServletRequest)) {
                 //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the input stream twice (in the filter and in the API servlet)
                 httpServletRequest = new MultiReadHttpServletRequest(httpServletRequest);
             }
@@ -200,7 +200,7 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
     protected String getRequestBody(final HttpServletRequest request) throws ServletException {
         try {
             // body of multi-parts requests is not needed when checking permissions
-            if (ServletFileUpload.isMultipartContent(request)) {
+            if (JakartaServletFileUpload.isMultipartContent(request)) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("[Multi-Part Request] not adding body to APIContext");
                 }

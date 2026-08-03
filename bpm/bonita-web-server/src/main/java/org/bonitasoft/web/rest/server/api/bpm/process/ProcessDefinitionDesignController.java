@@ -17,7 +17,7 @@ import static org.bonitasoft.web.rest.server.api.AbstractRESTController.API_SPRI
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

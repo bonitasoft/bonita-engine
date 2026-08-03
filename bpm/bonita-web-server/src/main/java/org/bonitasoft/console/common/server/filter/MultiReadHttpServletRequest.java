@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 
@@ -40,7 +40,7 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
 
     public MultiReadHttpServletRequest(final HttpServletRequest request) {
         super(request);
-        isMultipart = ServletFileUpload.isMultipartContent(request);
+        isMultipart = JakartaServletFileUpload.isMultipartContent(request);
     }
 
     @Override

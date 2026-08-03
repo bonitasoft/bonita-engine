@@ -18,9 +18,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * @author Ruiheng Fan
@@ -33,7 +32,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getCreationTime()
+     * @see jakarta.servlet.http.HttpSession#getCreationTime()
      */
     @Override
     public long getCreationTime() {
@@ -43,7 +42,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getId()
+     * @see jakarta.servlet.http.HttpSession#getId()
      */
     @Override
     public String getId() {
@@ -52,7 +51,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getLastAccessedTime()
+     * @see jakarta.servlet.http.HttpSession#getLastAccessedTime()
      */
     @Override
     public long getLastAccessedTime() {
@@ -62,7 +61,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getServletContext()
+     * @see jakarta.servlet.http.HttpSession#getServletContext()
      */
     @Override
     public ServletContext getServletContext() {
@@ -72,7 +71,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#setMaxInactiveInterval(int)
+     * @see jakarta.servlet.http.HttpSession#setMaxInactiveInterval(int)
      */
     @Override
     public void setMaxInactiveInterval(final int interval) {
@@ -82,7 +81,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getMaxInactiveInterval()
+     * @see jakarta.servlet.http.HttpSession#getMaxInactiveInterval()
      */
     @Override
     public int getMaxInactiveInterval() {
@@ -92,17 +91,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getSessionContext()
-     */
-    @Override
-    public HttpSessionContext getSessionContext() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getAttribute(java.lang.String)
+     * @see jakarta.servlet.http.HttpSession#getAttribute(java.lang.String)
      */
     @Override
     public Object getAttribute(final String name) {
@@ -111,17 +100,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getValue(java.lang.String)
-     */
-    @Override
-    public Object getValue(final String name) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getAttributeNames()
+     * @see jakarta.servlet.http.HttpSession#getAttributeNames()
      */
     @Override
     public Enumeration getAttributeNames() {
@@ -131,17 +110,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#getValueNames()
-     */
-    @Override
-    public String[] getValueNames() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#setAttribute(java.lang.String, java.lang.Object)
+     * @see jakarta.servlet.http.HttpSession#setAttribute(java.lang.String, java.lang.Object)
      */
     @Override
     public void setAttribute(final String name, final Object value) {
@@ -150,17 +119,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#putValue(java.lang.String, java.lang.Object)
-     */
-    @Override
-    public void putValue(final String name, final Object value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#removeAttribute(java.lang.String)
+     * @see jakarta.servlet.http.HttpSession#removeAttribute(java.lang.String)
      */
     @Override
     public void removeAttribute(final String name) {
@@ -170,17 +129,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#removeValue(java.lang.String)
-     */
-    @Override
-    public void removeValue(final String name) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#invalidate()
+     * @see jakarta.servlet.http.HttpSession#invalidate()
      */
     @Override
     public void invalidate() {
@@ -190,7 +139,7 @@ public class MockHttpSession implements HttpSession {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.http.HttpSession#isNew()
+     * @see jakarta.servlet.http.HttpSession#isNew()
      */
     @Override
     public boolean isNew() {

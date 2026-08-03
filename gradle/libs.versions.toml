@@ -2,27 +2,22 @@
 # The groovy version must be in synch with the bonita-project-parent POM (bonita-project repository):
 # Groovy 4 decision (2026-07, see ADR-0016): coordinates moved from org.codehaus.groovy to org.apache.groovy
 groovyVersion = "4.0.32"
-springVersion = "5.3.39"
-springSessionVersion = "2.7.4"
-springBootVersion = "2.7.18"
+springVersion = "6.2.19"
+springSessionVersion = "3.5.7"
+springBootVersion = "3.5.16"
 commonsLangVersion = "3.20.0"
 bonitaArtifactsModelVersion = "2.0.0"
 bonitaSecurityVersion = "1.31.1"
 commonsIOVersion = "2.22.0"
-commonsFileUploadVersion = "1.6.0"
+commonsFileUpload2Version = "2.0.0-M5"
 commonsBeanutilsVersion = "1.11.0"
 commonsCollectionsVersion = "4.5.0"
-tomcatVersion = "9.0.120"
-# tomcat-dbcp diverges from the embedded Tomcat until the container migration: the 10.1 line is the
-# first whose BasicManagedDataSource uses the jakarta.transaction TransactionManager signature,
-# required since the switch to narayana-jta-jakarta (see ADR-0016 execution finding).
-# TODO BPA-230: re-unify with tomcatVersion at the Tomcat 10.1 wave:
-tomcatDbcpVersion = "10.1.57"
+tomcatVersion = "10.1.57"
 commonsCLIVersion = "1.11.0"
 commonsTextVersion = "1.15.0"
 commonsValidatorVersion = "1.10.1"
 semver4jVersion = "3.1.0"
-slf4jVersion = "1.7.36"
+slf4jVersion = "2.0.18"
 # Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
 hibernateVersion = "5.6.15.Final"
 # Bonita's own dependency for BDM proxy generation (business-data modules); NOT pulled by
@@ -36,9 +31,7 @@ jakartaXmlBindVersion = "4.0.4"
 jacksonBomVersion = "2.22.0"
 # 2.0.x provides the jakarta.transaction.* namespace (1.3.x shipped javax.transaction.* despite the artifact name):
 jakartaTransactionVersion = "2.0.1"
-jakartaServletVersion = "4.0.4"
-# Keep this until all client projects have migrated to jakarta or it will break their builds !
-javaxServletVersion = "4.0.1"
+jakartaServletVersion = "6.0.0"
 httpComponentsVersion = "4.5.14"
 xstreamVersion = "1.4.21"
 ehCacheVersion = "3.11.1"
@@ -54,13 +47,14 @@ oracleVersion = "23.26.2.0.0"
 postgresqlVersion = "42.7.13"
 
 narayanaVersion = "5.13.1.Final"
-logbackVersion = "1.2.13"
+logbackVersion = "1.5.38"
 jaxbVersion = "2.3.9"
-javaxAnnotationsVersion = "1.3.2"
+jakartaAnnotationApiVersion = "2.1.1"
 hazelcastVersion = "5.4.0" # Also update http://www.hazelcast.com/schema/config/hazelcast-config-<VERSION>.xsd if needed
 jcacheVersion = "1.1.1"
 guavaVersion = "33.6.0-jre"
 antlr4RuntimeVersion = "4.7.2"
+# 4.1.x targets Java 21 bytecode (class file 65); stay on the 4.0.x line while the build toolchain is Java 17
 casClientCoreVersion = "4.0.4"
 jtidyVersion = "r938"
 squigglyFilterJacksonVersion = "1.3.18"
@@ -68,19 +62,17 @@ aspectjVersion = "1.9.25.1"
 
 # bonita-web specific dependencies:
 jsonSimpleVersion = "1.1.1"
-urlrewritefilterVersion = "4.0.4"
-jakartaJstlVersion = "1.2.6"
-jakartaJstlApiVersion = "1.2.7"
+urlrewritefilterVersion = "5.1.3"
 xbeanClassloaderVersion = "4.31"
 jgettextVersion = "0.15.1"
 hamcrestVersion = "3.0"
 woodstoxCoreVersion = "7.2.1"
 # When updating Keycloak version, if necessary, make sure to update the code in
 # subscription/bpm/bonita-web-server-sp package org.bonitasoft.console.common.server.auth.impl
-keycloakVersion = "21.1.2"
+keycloakVersion = "24.0.5"
 xmlsecVersion = "2.3.5"
 bouncyCastleVersion = "1.85"
-spnegoVersion = "1.1.1"
+spnegoVersion = "1.2.1"
 owaspHtmlSanitizerVersion = "20260313.1"
 
 # Test dependency versions
@@ -94,7 +86,7 @@ jsonUnitVersion = "6.0.1"
 systemRulesVersion = "1.19.0"
 systemLambdaVersion = "1.2.1"
 concurrentUnitVersion = "0.4.6"
-jettyVersion = "9.4.58.v20250814"
+jettyVersion = "12.0.37"
 jbossLoggingVersion = "3.6.3.Final"
 jsonassertVersion = "1.5.3"
 commonsExecVersion = "1.6.0"
@@ -159,10 +151,11 @@ guava = { group = "com.google.guava", name = "guava", version.ref = "guavaVersio
 antlr4Runtime = { group = "org.antlr", name = "antlr4-runtime", version.ref = "antlr4RuntimeVersion" }
 commonsLang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLangVersion" }
 commonsIO = { group = "commons-io", name = "commons-io", version.ref = "commonsIOVersion" }
-commonsFileUpload = { group = "commons-fileupload", name = "commons-fileupload", version.ref = "commonsFileUploadVersion" }
+commonsFileUpload2JakartaServlet6 = { group = "org.apache.commons", name = "commons-fileupload2-jakarta-servlet6", version.ref = "commonsFileUpload2Version" }
+commonsFileUpload2Core = { group = "org.apache.commons", name = "commons-fileupload2-core", version.ref = "commonsFileUpload2Version" }
 commonsBeanUtils = { group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutilsVersion" }
 commonsCollections = { group = "org.apache.commons", name = "commons-collections4", version.ref = "commonsCollectionsVersion" }
-tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatDbcpVersion" }
+tomcatDbcp = { group = "org.apache.tomcat", name = "tomcat-dbcp", version.ref = "tomcatVersion" }
 tomcatEmbedCore = { group = "org.apache.tomcat.embed", name = "tomcat-embed-core", version.ref = "tomcatVersion"}
 commonsCLI = { group = "commons-cli", name = "commons-cli", version.ref = "commonsCLIVersion" }
 commonsText = { group = "org.apache.commons", name = "commons-text", version.ref = "commonsTextVersion" }
@@ -174,12 +167,6 @@ hibernateCore = { group = "org.hibernate", name = "hibernate-core-jakarta", vers
 jakartaPersistenceApi = { group = "jakarta.persistence", name = "jakarta.persistence-api", version.ref = "jakartaPersistenceApiVersion" }
 jakartaXmlBind = { group = "jakarta.xml.bind", name = "jakarta.xml.bind-api", version.ref = "jakartaXmlBindVersion" }
 jaxbRuntime = { group = "org.glassfish.jaxb", name = "jaxb-runtime", version = "4.0.9" }
-# Test-only filler for Spring 5.3's spring-orm hibernate5 classes, whose static initializers
-# reference javax.persistence types (entity metadata itself is read by hibernate-core-jakarta
-# from the explicit annotatedClasses list). TODO BPA-230: remove with the Spring 6 upgrade, whose
-# orm.hibernate5 officially supports hibernate-core-jakarta:
-javaxPersistenceApiLegacy = { group = "javax.persistence", name = "javax.persistence-api", version = "2.2" }
-javaxTransactionApiLegacy = { group = "javax.transaction", name = "javax.transaction-api", version = "1.3" }
 hibernateJCache = { group = "org.hibernate", name = "hibernate-jcache", version.ref = "hibernateVersion" }
 jcache = { group = "javax.cache", name = "cache-api", version.ref = "jcacheVersion" }
 javassist = { group = "org.javassist", name = "javassist", version.ref = "javassistVersion" }
@@ -188,7 +175,6 @@ jacksonBom = { group = "com.fasterxml.jackson", name = "jackson-bom", version.re
 
 jakartaTransactionApi = { group = "jakarta.transaction", name = "jakarta.transaction-api", version.ref = "jakartaTransactionVersion" }
 jakartaServletApi = { group = "jakarta.servlet", name = "jakarta.servlet-api", version.ref = "jakartaServletVersion" }
-javaxServletApi = { group = "javax.servlet", name = "javax.servlet-api", version.ref = "javaxServletVersion" }
 
 httpComponentsClient = { group = "org.apache.httpcomponents", name = "httpclient", version.ref = "httpComponentsVersion" }
 httpComponentsMime = { group = "org.apache.httpcomponents", name = "httpmime", version.ref = "httpComponentsVersion" }
@@ -198,7 +184,11 @@ ehCache = { group = "org.ehcache", name = "ehcache", version.ref = "ehCacheVersi
 eclipseCompiler = { group = "org.eclipse.jdt", name = "ecj", version.ref = "eclipseCompilerVersion" }
 jakartaActivation = { group = "com.sun.activation", name = "jakarta.activation", version.ref = "jakartaActivationVersion" }
 jakartaValidationApi = { group = "jakarta.validation", name = "jakarta.validation-api", version.ref = "jakartaValidationApiVersion" }
-javaxAnnotations = { group = "javax.annotation", name = "javax.annotation-api", version.ref = "javaxAnnotationsVersion" }
+hibernateValidator = { group = "org.hibernate.validator", name = "hibernate-validator", version = "8.0.5.Final" }
+# jakarta.el implementation for hibernate-validator message interpolation in unit tests
+# (provided by the Tomcat container at runtime):
+expressly = { group = "org.glassfish.expressly", name = "expressly", version = "5.0.0" }
+jakartaAnnotations = { group = "jakarta.annotation", name = "jakarta.annotation-api", version.ref = "jakartaAnnotationApiVersion" }
 
 hazelcast = { group = "com.hazelcast", name = "hazelcast", version.ref = "hazelcastVersion" }
 hazelcastSpring = { group = "com.hazelcast", name = "hazelcast-spring", version.ref = "hazelcastVersion" }
@@ -232,16 +222,14 @@ aspectjWeaver = { module = "org.aspectj:aspectjweaver", version.ref = "aspectjVe
 # bonita-web specific dependencies:
 jsonSimple = { group = "com.googlecode.json-simple", name = "json-simple", version.ref = "jsonSimpleVersion" }
 urlrewritefilter = { group = "org.tuckey", name = "urlrewritefilter", version.ref = "urlrewritefilterVersion" }
-jakartaJstl = { group = "org.glassfish.web", name = "jakarta.servlet.jsp.jstl", version.ref = "jakartaJstlVersion" }
-jakartaJstlApi = { group = "jakarta.servlet.jsp.jstl", name = "jakarta.servlet.jsp.jstl-api", version.ref = "jakartaJstlApiVersion" }
 xbeanClassloader = { group = "org.apache.xbean", name = "xbean-classloader", version.ref = "xbeanClassloaderVersion" }
 jgettext = { group = "org.fedorahosted.tennera", name = "jgettext", version.ref = "jgettextVersion" }
 hamcrest = { group = "org.hamcrest", name = "hamcrest", version.ref = "hamcrestVersion" }
 woodstoxCore = { group = "com.fasterxml.woodstox", name = "woodstox-core", version.ref = "woodstoxCoreVersion" }
 keycloakSamlAdapterApiPublic = { group = "org.keycloak", name = "keycloak-saml-adapter-api-public", version.ref = "keycloakVersion" }
-keycloakSamlServletFilterAdapter = { group = "org.keycloak", name = "keycloak-saml-servlet-filter-adapter", version.ref = "keycloakVersion" }
+keycloakSamlServletFilterAdapter = { group = "org.keycloak", name = "keycloak-saml-jakarta-servlet-filter-adapter", version.ref = "keycloakVersion" }
 keycloakAdapterCore = { group = "org.keycloak", name = "keycloak-adapter-core", version.ref = "keycloakVersion" }
-keycloakServletFilterAdapter = { group = "org.keycloak", name = "keycloak-servlet-filter-adapter", version.ref = "keycloakVersion" }
+keycloakServletFilterAdapter = { group = "org.keycloak", name = "keycloak-jakarta-servlet-filter-adapter", version.ref = "keycloakVersion" }
 xmlsec = { group = "org.apache.santuario", name = "xmlsec", version.ref = "xmlsecVersion" }
 bouncyCastleBcprov = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncyCastleVersion" }
 bouncyCastleBcpkix = { group = "org.bouncycastle", name = "bcpkix-jdk18on", version.ref = "bouncyCastleVersion" }
@@ -266,7 +254,7 @@ systemRules = { group = "com.github.stefanbirkner", name = "system-rules", versi
 systemLambda = { group = "com.github.stefanbirkner", name = "system-lambda", version.ref = "systemLambdaVersion" }
 concurrentUnit = { group = "net.jodah", name = "concurrentunit", version.ref = "concurrentUnitVersion" }
 jettyServer = { group = "org.eclipse.jetty", name = "jetty-server", version.ref = "jettyVersion" }
-jettyServlet = { group = "org.eclipse.jetty", name = "jetty-servlet", version.ref = "jettyVersion" }
+jettyServlet = { group = "org.eclipse.jetty.ee10", name = "jetty-ee10-servlet", version.ref = "jettyVersion" }
 jettySecurity = { group = "org.eclipse.jetty", name = "jetty-security", version.ref = "jettyVersion" }
 jbossLogging = { group = "org.jboss.logging", name = "jboss-logging", version.ref = "jbossLoggingVersion" }
 commonsExec = { group = "org.apache.commons", name = "commons-exec", version.ref = "commonsExecVersion" }

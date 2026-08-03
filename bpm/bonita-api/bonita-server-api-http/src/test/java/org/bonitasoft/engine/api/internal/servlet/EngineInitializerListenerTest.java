@@ -15,8 +15,8 @@ package org.bonitasoft.engine.api.internal.servlet;
 
 import static org.mockito.Mockito.*;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
 
 import org.bonitasoft.engine.EngineInitializer;
 import org.junit.jupiter.api.BeforeEach;

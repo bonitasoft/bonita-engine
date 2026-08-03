@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.net.URISyntaxException;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.page.extension.PageResourceProviderImpl;
 import org.bonitasoft.engine.api.PageAPI;

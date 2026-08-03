@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.bonitasoft.engine.spring.autoconfigure.BonitaEngineServerAutoConfiguration,\
-  org.bonitasoft.engine.spring.autoconfigure.BonitaEngineCommonAutoConfiguration

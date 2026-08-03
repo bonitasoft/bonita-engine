@@ -10,14 +10,14 @@ dependencies {
     implementation libs.commonsIO
     implementation libs.slf4jApi
     implementation libs.ehCache
-    implementation libs.commonsFileUpload
+    implementation libs.commonsFileUpload2JakartaServlet6
+    // fileupload2-core classes (DiskFileItemFactory, FileItemInput...) are imported directly
+    implementation libs.commonsFileUpload2Core
     implementation libs.commonsBeanUtils
     implementation libs.commonsCollections
     implementation libs.commonsLang
     implementation libs.jsonSimple
     implementation libs.urlrewritefilter
-    implementation libs.jakartaJstl
-    implementation libs.jakartaJstlApi
     implementation libs.woodstoxCore
     implementation libs.groovyCore
     implementation libs.xbeanClassloader

@@ -15,8 +15,8 @@ package org.bonitasoft.console.common.server.page;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.utils.LocaleUtils;
 import org.bonitasoft.engine.session.APISession;

@@ -21,12 +21,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.bonitasoft.console.common.server.utils.LocaleUtils;
 import org.bonitasoft.web.rest.server.framework.json.JSonSimpleDeserializer;
@@ -79,7 +79,7 @@ public abstract class ToolkitHttpServlet extends HttpServlet {
     /**
      * Initialize
      *
-     * @see HttpServlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
+     * @see HttpServlet#service(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse)
      */
     @Override
     protected final void service(final HttpServletRequest req, final HttpServletResponse resp)

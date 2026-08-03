@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.api.platform.PlatformInformationAPI;
 import org.bonitasoft.engine.session.APISession;

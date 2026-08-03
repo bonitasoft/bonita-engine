@@ -15,8 +15,8 @@ package org.bonitasoft.engine.test.http;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.internal.servlet.HttpAPIServlet;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletHandler;
 
 /**
  * Handles a jetty HTTP server and registers Bonita APIs in HTTP mode,
@@ -37,9 +37,9 @@ public class JettyServer {
     public Server startJettyServer() throws Exception {
         // Running our HttpAPIServlet in a Jetty server:
         Server jettyServer = new Server(0);// 0=random port
-        ServletHandler handler = new ServletHandler();
-        jettyServer.setHandler(handler);
-        handler.addServletWithMapping(HttpAPIServlet.class, "/bonita/serverAPI/*");
+        ServletContextHandler contextHandler = new ServletContextHandler("/");
+        jettyServer.setHandler(contextHandler);
+        contextHandler.addServlet(HttpAPIServlet.class, "/bonita/serverAPI/*");
         jettyServer.start();
         return jettyServer;
     }

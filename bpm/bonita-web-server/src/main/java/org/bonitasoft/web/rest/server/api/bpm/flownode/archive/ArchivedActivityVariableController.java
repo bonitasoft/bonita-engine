@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.flownode.archive;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.web.rest.model.bpm.cases.ArchivedActivityVariable;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;

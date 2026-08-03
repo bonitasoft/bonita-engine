@@ -5,7 +5,9 @@ dependencies {
     api project(':services:bonita-session')
     api project(':bpm:bonita-common')
     api libs.xstream
-    api libs.commonsFileUpload
+    api libs.commonsFileUpload2JakartaServlet6
+    // fileupload2-core types are used directly (FileItemInput, FileUploadException in signatures)
+    api libs.commonsFileUpload2Core
     api libs.commonsIO
     testImplementation libs.springTest
     testImplementation libs.assertj

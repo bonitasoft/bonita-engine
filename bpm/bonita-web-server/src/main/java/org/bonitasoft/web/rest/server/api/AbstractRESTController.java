@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.BusinessDataAPI;

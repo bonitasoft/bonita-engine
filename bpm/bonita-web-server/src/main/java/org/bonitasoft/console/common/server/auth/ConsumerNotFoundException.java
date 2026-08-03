@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.console.common.server.auth;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 /**
  * This class cannot be removed without the risk of breaking

@@ -15,7 +15,7 @@ package org.bonitasoft.web.rest.server.api.platform;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.TenantAPIAccessor;

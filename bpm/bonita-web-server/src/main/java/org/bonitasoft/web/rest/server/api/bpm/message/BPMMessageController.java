@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;

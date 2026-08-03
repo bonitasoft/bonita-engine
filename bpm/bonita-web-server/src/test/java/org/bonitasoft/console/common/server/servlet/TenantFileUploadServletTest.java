@@ -22,12 +22,13 @@ import static org.mockito.Mockito.*;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileUploadByteCountLimitException;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.bonitasoft.console.common.server.preferences.properties.ConsoleProperties;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,27 +62,33 @@ public class TenantFileUploadServletTest {
 
     @Test
     public void should_set_maxFileSize_with_conf_value() throws Exception {
-        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        @SuppressWarnings("unchecked")
+        final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
+                JakartaServletFileUpload.class);
         fileUploadServlet.checkUploadedFileSize = true;
 
         when(consoleProperties.getMaxSize()).thenReturn(1L); // 1Mb
         fileUploadServlet.setUploadMaxSize(serviceFileUpload, request);
-        verify(serviceFileUpload).setFileSizeMax(FileUploadServlet.MEGABYTE);
+        verify(serviceFileUpload).setMaxFileSize(FileUploadServlet.MEGABYTE);
     }
 
     @Test
     public void should_set_maxImageSize_with_conf_value() throws Exception {
-        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        @SuppressWarnings("unchecked")
+        final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
+                JakartaServletFileUpload.class);
         fileUploadServlet.checkUploadedImageSize = true;
 
         when(consoleProperties.getImageMaxSizeInKB()).thenReturn(100L); // 1Mb
         fileUploadServlet.setUploadMaxSize(serviceFileUpload, request);
-        verify(serviceFileUpload).setFileSizeMax(100 * FileUploadServlet.KILOBYTE);
+        verify(serviceFileUpload).setMaxFileSize(100 * FileUploadServlet.KILOBYTE);
     }
 
     @Test
     public void should_set_413_status_code_with_empty_body_when_file_creates_OOMError() throws Exception {
-        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        @SuppressWarnings("unchecked")
+        final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
+                JakartaServletFileUpload.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final PrintWriter printer = mock(PrintWriter.class);
 
@@ -89,7 +96,7 @@ public class TenantFileUploadServletTest {
         fileUploadServlet.uploadDirectoryPath = tempFolder.getRoot().getAbsolutePath();
         fileUploadServlet.checkUploadedFileSize = true;
         doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
-        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(FileItemFactory.class));
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(DiskFileItemFactory.class));
 
         when(serviceFileUpload.parseRequest(request)).thenThrow(new OutOfMemoryError());
         when(request.getMethod()).thenReturn("post");
@@ -105,20 +112,21 @@ public class TenantFileUploadServletTest {
 
     @Test
     public void should_set_413_status_code_with_empty_body_when_file_is_too_big() throws Exception {
-        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        @SuppressWarnings("unchecked")
+        final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
+                JakartaServletFileUpload.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final PrintWriter printer = mock(PrintWriter.class);
 
         //manage spy
         fileUploadServlet.uploadDirectoryPath = tempFolder.getRoot().getAbsolutePath();
         doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
-        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(FileItemFactory.class));
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(DiskFileItemFactory.class));
 
-        final FileSizeLimitExceededException exception = new FileSizeLimitExceededException(
+        final FileUploadByteCountLimitException exception = new FileUploadByteCountLimitException(
                 format("The field %s exceeds its maximum permitted size of %s bytes.",
                         "uploadedFile.zip", Long.valueOf(0)),
-                20 * FileUploadServlet.MEGABYTE, 0);
-        exception.setFileName("uploadedFile.zip");
+                20 * FileUploadServlet.MEGABYTE, 0, "uploadedFile.zip", "uploadedFile");
         when(serviceFileUpload.parseRequest(request)).thenThrow(exception);
         when(request.getMethod()).thenReturn("post");
         when(request.getContentType()).thenReturn("multipart/");
@@ -134,7 +142,9 @@ public class TenantFileUploadServletTest {
     @Test
     public void should_set_413_status_code_with_json_body_when_file_is_too_big_and_json_is_supported()
             throws Exception {
-        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        @SuppressWarnings("unchecked")
+        final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
+                JakartaServletFileUpload.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final PrintWriter printer = mock(PrintWriter.class);
 
@@ -143,13 +153,12 @@ public class TenantFileUploadServletTest {
         fileUploadServlet.checkUploadedFileSize = true;
         fileUploadServlet.responseContentType = "json";
         doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
-        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(FileItemFactory.class));
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(DiskFileItemFactory.class));
 
-        final FileSizeLimitExceededException exception = new FileSizeLimitExceededException(
+        final FileUploadByteCountLimitException exception = new FileUploadByteCountLimitException(
                 format("The field %s exceeds its maximum permitted size of %s bytes.",
                         "uploadedFile.zip", Long.valueOf(0)),
-                20 * FileUploadServlet.MEGABYTE, 0);
-        exception.setFileName("uploadedFile.zip");
+                20 * FileUploadServlet.MEGABYTE, 0, "uploadedFile.zip", "uploadedFile");
         when(serviceFileUpload.parseRequest(request)).thenThrow(exception);
         when(request.getMethod()).thenReturn("post");
         when(request.getContentType()).thenReturn("multipart/");

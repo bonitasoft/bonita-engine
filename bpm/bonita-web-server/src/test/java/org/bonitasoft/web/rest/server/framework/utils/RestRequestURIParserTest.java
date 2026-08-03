@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
-import javax.servlet.http.HttpServletMapping;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIMalformedUrlException;
 import org.junit.Before;

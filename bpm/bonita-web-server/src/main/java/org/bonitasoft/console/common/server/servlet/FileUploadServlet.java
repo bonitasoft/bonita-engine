@@ -25,19 +25,18 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
-import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileUploadByteCountLimitException;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
 import org.bonitasoft.console.common.server.utils.DocumentUtil;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
@@ -132,7 +131,9 @@ public abstract class FileUploadServlet extends HttpServlet {
 
     protected abstract void defineUploadDirectoryPath(final HttpServletRequest request) throws SessionNotFoundException;
 
-    protected abstract void setUploadMaxSize(ServletFileUpload serviceFileUpload, final HttpServletRequest request);
+    protected abstract void setUploadMaxSize(
+            JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload,
+            final HttpServletRequest request);
 
     protected void setUploadDirectoryPath(final String uploadDirectoryPath) {
         this.uploadDirectoryPath = uploadDirectoryPath;
@@ -145,7 +146,7 @@ public abstract class FileUploadServlet extends HttpServlet {
      * @param item the file item
      * @return true when file is a bar file without jar dependency files and check is relevant, false otherwise
      */
-    private boolean isJarLessBar(String fileName, FileItem item) {
+    private boolean isJarLessBar(String fileName, DiskFileItem item) {
         if (Arrays.equals(supportedExtensionsList, new String[] { "bar" }) && fileName.endsWith(".bar")) {
             ZipEntry zipEntry = null;
             try (ZipInputStream zipInputstream = new ZipInputStream(item.getInputStream());) {
@@ -168,7 +169,7 @@ public abstract class FileUploadServlet extends HttpServlet {
         PrintWriter responsePW = null;
         try {
             defineUploadDirectoryPath(request);
-            if (!ServletFileUpload.isMultipartContent(request)) {
+            if (!JakartaServletFileUpload.isMultipartContent(request)) {
                 return;
             }
 
@@ -179,66 +180,74 @@ public abstract class FileUploadServlet extends HttpServlet {
 
             responsePW = response.getWriter();
 
-            final FileItemFactory fileItemFactory = new DiskFileItemFactory();
-            final ServletFileUpload serviceFileUpload = createServletFileUpload(fileItemFactory);
+            final DiskFileItemFactory fileItemFactory = DiskFileItemFactory.builder().get();
+            final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = createServletFileUpload(
+                    fileItemFactory);
             setUploadMaxSize(serviceFileUpload, request);
-            List<FileItem> items;
+            List<DiskFileItem> items;
             try {
+                // on any parse failure (including this OutOfMemoryError), parseRequest deletes the
+                // items it already spilled to disk itself (internal finally on !successful)
                 items = serviceFileUpload.parseRequest(request);
             } catch (final OutOfMemoryError e) {
-                throw new SizeLimitExceededException("The file exceeds its maximum permitted size.", 0L, 0);
+                throw new FileUploadSizeException("The file exceeds its maximum permitted size.", 0L, 0L);
             }
 
-            for (final FileItem item : items) {
-                if (item.isFormField()) {
-                    continue;
+            try {
+                for (final DiskFileItem item : items) {
+                    if (item.isFormField()) {
+                        continue;
+                    }
+
+                    final String fileName = DocumentUtil.sanitizeFilename(item.getName());
+
+                    // Check if extension is allowed
+                    if (!isSupportedExtension(fileName)) {
+                        outputMediaTypeError(response, responsePW);
+                        return;
+                    }
+
+                    // Make unique file name
+                    final String uploadedFileKey = storeTempFile(fileName, item);
+
+                    //Clean multiread wrapper temp file if it exists
+                    if (request instanceof MultiReadHttpServletRequest) {
+                        ((MultiReadHttpServletRequest) request).cleanMultipartTempContent();
+                    }
+
+                    // Response
+                    final String responseString;
+                    if (JSON_CONTENT_TYPE.equals(responseContentType)) {
+                        // just check whether it's a jarless bar to display a warning
+                        boolean isJarlessBar = isJarLessBar(fileName, item);
+                        responseString = generateResponseJson(request, fileName, item.getContentType(),
+                                uploadedFileKey,
+                                isJarlessBar);
+                    } else if (TEXT_CONTENT_TYPE.equals(responseContentType)) {
+                        responseString = generateResponseString(request, fileName, uploadedFileKey);
+                    } else {
+                        throw new ServletException(
+                                "Unsupported content type in servlet configuration : " + responseContentType);
+                    }
+                    responsePW.print(responseString);
+                    responsePW.flush();
+                    break;
                 }
-
-                final String fileName = DocumentUtil.sanitizeFilename(item.getName());
-
-                // Check if extension is allowed
-                if (!isSupportedExtension(fileName)) {
-                    outputMediaTypeError(response, responsePW);
-                    return;
-                }
-
-                // Make unique file name
-                final String uploadedFileKey = storeTempFile(fileName, item);
-
-                //Clean multiread wrapper temp file if it exists
-                if (request instanceof MultiReadHttpServletRequest) {
-                    ((MultiReadHttpServletRequest) request).cleanMultipartTempContent();
-                }
-
-                // Response
-                final String responseString;
-                if (JSON_CONTENT_TYPE.equals(responseContentType)) {
-                    // just check whether it's a jarless bar to display a warning
-                    boolean isJarlessBar = isJarLessBar(fileName, item);
-                    responseString = generateResponseJson(request, fileName, item.getContentType(), uploadedFileKey,
-                            isJarlessBar);
-                } else if (TEXT_CONTENT_TYPE.equals(responseContentType)) {
-                    responseString = generateResponseString(request, fileName, uploadedFileKey);
-                } else {
-                    throw new ServletException(
-                            "Unsupported content type in servlet configuration : " + responseContentType);
-                }
-                responsePW.print(responseString);
-                responsePW.flush();
-                break;
+            } finally {
+                deleteTempFiles(items);
             }
         } catch (SessionNotFoundException e) {
             final String message = "Session expired";
             LOGGER.debug(message);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, message);
-        } catch (final SizeLimitExceededException e) {
-            LOGGER.error("File is Too Big", e);
-            generateFileTooBigError(response, responsePW, "Uploaded file is too large, server is unable to process it");
-        } catch (final FileSizeLimitExceededException e) {
+        } catch (final FileUploadByteCountLimitException e) {
             LOGGER.error("File is Too Big", e);
             generateFileTooBigError(response, responsePW,
-                    e.getFileName() + " is " + e.getActualSize() + " large, limit is set to " + e.getPermittedSize()
+                    e.getFileName() + " is " + e.getActualSize() + " large, limit is set to " + e.getPermitted()
                             / FileUploadServlet.MEGABYTE + "Mb");
+        } catch (final FileUploadSizeException e) {
+            LOGGER.error("File is Too Big", e);
+            generateFileTooBigError(response, responsePW, "Uploaded file is too large, server is unable to process it");
         } catch (final Exception e) {
             final String theErrorMessage = "Exception while uploading file.";
             if (LOGGER.isErrorEnabled()) {
@@ -252,11 +261,29 @@ public abstract class FileUploadServlet extends HttpServlet {
         }
     }
 
-    protected String storeTempFile(final String fileName, final FileItem item)
+    protected String storeTempFile(final String fileName, final DiskFileItem item)
             throws Exception {
         temporaryContentAPI = PlatformAPIAccessor.getTemporaryContentAPI();
         return temporaryContentAPI
                 .storeTempFile(new FileContent(fileName, item.getInputStream(), item.getContentType()));
+    }
+
+    /**
+     * fileupload2 has no finalizer deleting the disk-buffered content of a DiskFileItem on GC
+     * (commons-fileupload dropped it in the 1.5 line already) and no FileCleaningTracker is
+     * configured: items spilled beyond the in-memory threshold must be deleted explicitly, or
+     * their backing files accumulate in the temp directory until JVM exit.
+     */
+    private void deleteTempFiles(final List<DiskFileItem> items) {
+        for (final DiskFileItem item : items) {
+            try {
+                item.delete();
+            } catch (final IOException e) {
+                // warn: nothing else reclaims these files (no finalizer, no deleteOnExit), a failed
+                // delete grows the temp directory until JVM exit
+                LOGGER.warn("Could not delete the temporary content of the multipart item {}", item.getName(), e);
+            }
+        }
     }
 
     private void generateFileTooBigError(final HttpServletResponse response, final PrintWriter responsePW,
@@ -273,8 +300,9 @@ public abstract class FileUploadServlet extends HttpServlet {
     }
 
     //for test purpose
-    protected ServletFileUpload createServletFileUpload(final FileItemFactory fileItemFactory) {
-        return new ServletFileUpload(fileItemFactory);
+    protected JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> createServletFileUpload(
+            final DiskFileItemFactory fileItemFactory) {
+        return new JakartaServletFileUpload<>(fileItemFactory);
     }
 
     protected String generateResponseString(final HttpServletRequest request, final String fileName,

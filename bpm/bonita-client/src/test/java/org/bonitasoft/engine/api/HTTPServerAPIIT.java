@@ -18,26 +18,27 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.security.AuthenticationState;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -69,26 +70,18 @@ public class HTTPServerAPIIT {
 
         // Simple login service
         URL realmPropertyURL = HTTPServerAPIIT.class.getClassLoader().getResource("myRealm.properties");
-        LoginService loginService = new HashLoginService("MyRealm", realmPropertyURL.toString());
+        LoginService loginService = new HashLoginService("MyRealm",
+                ResourceFactory.of(server).newResource(realmPropertyURL));
         server.addBean(loginService);
 
         // Security handler.
-        ConstraintSecurityHandler security = new ConstraintSecurityHandler();
+        SecurityHandler.PathMapped security = new SecurityHandler.PathMapped();
         server.setHandler(security);
 
         // Add security constraint
-        Constraint constraint = new Constraint();
-        constraint.setName("auth");
-        constraint.setAuthenticate(true);
-        constraint.setRoles(new String[] { "user", "admin" });
-
-        // Bind constraint
-        ConstraintMapping mapping = new ConstraintMapping();
-        mapping.setPathSpec("/*");
-        mapping.setConstraint(constraint);
+        security.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "user", "admin"));
 
         // Configure the security handler
-        security.setConstraintMappings(Collections.singletonList(mapping));
         security.setAuthenticator(new BasicAuthenticator());
         security.setLoginService(loginService);
 
@@ -140,15 +133,17 @@ public class HTTPServerAPIIT {
                 .hasMessageStartingWith("Error while executing POST request (http code: 401)");
     }
 
-    private static final class BonitaHandler extends AbstractHandler {
+    private static final class BonitaHandler extends Handler.Abstract {
 
         @Override
-        public void handle(final String s, final Request baseRequest, final HttpServletRequest request,
-                final HttpServletResponse response) {
-            assertThat(request.getUserPrincipal().getName()).isEqualTo("john");
-            response.setContentType("text/html;charset=utf-8");
-            response.setStatus(HttpServletResponse.SC_OK);
-            baseRequest.setHandled(true);
+        public boolean handle(final Request request, final Response response, final Callback callback) {
+            Principal userPrincipal = AuthenticationState.getUserPrincipal(request);
+            assertThat(userPrincipal).isNotNull();
+            assertThat(userPrincipal.getName()).isEqualTo("john");
+            response.getHeaders().put(HttpHeader.CONTENT_TYPE, "text/html;charset=utf-8");
+            response.setStatus(200);
+            callback.succeeded();
+            return true;
         }
     }
 
