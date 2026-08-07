@@ -26,11 +26,11 @@ public class AddressDAOImpl
     public Address findByPersistenceId(Long persistenceId) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
-            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> commandParameters = new HashMap<>();
             commandParameters.put("queryName", "Address.findByPersistenceId");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "Address");
-            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> queryParameters = new HashMap<>();
             queryParameters.put("persistenceId", persistenceId);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
             return proxyfier.proxify(deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class));
@@ -42,11 +42,11 @@ public class AddressDAOImpl
     public Address findByCity(String city) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
-            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> commandParameters = new HashMap<>();
             commandParameters.put("queryName", "Address.findByCity");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "Address");
-            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> queryParameters = new HashMap<>();
             queryParameters.put("city", city);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
             return proxyfier.proxify(deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class));
@@ -58,13 +58,13 @@ public class AddressDAOImpl
     public List<Address> findByStreet(String street, int startIndex, int maxResults) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
-            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> commandParameters = new HashMap<>();
             commandParameters.put("queryName", "Address.findByStreet");
             commandParameters.put("returnsList", true);
             commandParameters.put("returnType", "Address");
             commandParameters.put("startIndex", startIndex);
             commandParameters.put("maxResults", maxResults);
-            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> queryParameters = new HashMap<>();
             queryParameters.put("street", street);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
             return proxyfier.proxify(deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class));
@@ -76,13 +76,13 @@ public class AddressDAOImpl
     public List<Address> find(int startIndex, int maxResults) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
-            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> commandParameters = new HashMap<>();
             commandParameters.put("queryName", "Address.find");
             commandParameters.put("returnsList", true);
             commandParameters.put("returnType", "Address");
             commandParameters.put("startIndex", startIndex);
             commandParameters.put("maxResults", maxResults);
-            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> queryParameters = new HashMap<>();
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
             return proxyfier.proxify(deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class));
         } catch (Exception e) {
@@ -93,11 +93,11 @@ public class AddressDAOImpl
     public Long countForFindByStreet(String street) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
-            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> commandParameters = new HashMap<>();
             commandParameters.put("queryName", "Address.countForFindByStreet");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");
-            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> queryParameters = new HashMap<>();
             queryParameters.put("street", street);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
             return ((Long) deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Long.class));
@@ -109,7 +109,7 @@ public class AddressDAOImpl
     public Long countForFind() {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
-            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            Map<String, Serializable> commandParameters = new HashMap<>();
             commandParameters.put("queryName", "Address.countForFind");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");

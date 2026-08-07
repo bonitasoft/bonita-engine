@@ -46,12 +46,12 @@ public class Employee implements org.bonitasoft.engine.bdm.Entity
     @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
     @OrderColumn
-    private List<Address> addresses = new ArrayList<Address>(10);
+    private List<Address> addresses = new ArrayList<>(10);
     @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
     @OrderColumn
     @JsonIgnore
-    private List<Skill> skills = new ArrayList<Skill>(10);
+    private List<Skill> skills = new ArrayList<>(10);
 
     public Employee() {
     }

@@ -38,7 +38,7 @@ public class Forecast implements org.bonitasoft.engine.bdm.Entity
     @ElementCollection(fetch = FetchType.EAGER)
     @OrderColumn
     @Column(name = "TEMPERATURES", nullable = true)
-    private List<Double> temperatures = new ArrayList<Double>(10);
+    private List<Double> temperatures = new ArrayList<>(10);
 
     public Forecast() {
     }

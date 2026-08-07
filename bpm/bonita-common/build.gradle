@@ -15,7 +15,7 @@ dependencies {
     api libs.slf4jApi
     api "com.fasterxml.jackson.core:jackson-annotations"
 
-    runtimeOnly "com.sun.activation:jakarta.activation"
+    runtimeOnly libs.jakartaActivation
 
     compileOnly project(':bpm:bonita-sap-jco-connector-api')
     compileOnly libs.lombok
