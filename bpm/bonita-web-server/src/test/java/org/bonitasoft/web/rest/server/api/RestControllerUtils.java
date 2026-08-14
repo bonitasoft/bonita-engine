@@ -55,7 +55,15 @@ public class RestControllerUtils {
                 // Match the production SpringWebConfiguration: default to JSON content type
                 // /!\ Make sure that both use the same configuration /!\
                 .setContentNegotiationManager(new ContentNegotiationManager(
-                        new FixedContentNegotiationStrategy(MediaType.APPLICATION_JSON)));
+                        new FixedContentNegotiationStrategy(MediaType.APPLICATION_JSON)))
+                // Match the production path-matching MODE: a null pattern parser selects the legacy
+                // AntPathMatcher, as SpringWebConfiguration#configurePathMatch does. Its full-path
+                // setting is not mirrored, and does not need to be: the mock request has an empty
+                // servlet path, so the lookup path is the whole URI either way.
+                // Without this, controller tests would route with parsed patterns while production
+                // routes with the matcher - and the mock request carries no servlet mapping, so the
+                // discrepancy would stay invisible here (it is how the /API/form/mapping 404 escaped).
+                .setPatternParser(null);
 
         builder.setMessageConverters(MESSAGE_CONVERTERS.toArray(new HttpMessageConverter<?>[0]));
 

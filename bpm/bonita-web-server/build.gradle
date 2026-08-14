@@ -85,6 +85,12 @@ tasks.register('testsJar', Jar) {
 
 test {
     dependsOn tasks.named("testsJar")
+    // ServletMappingValidationTest and UrlRewriteConfigurationTest read these descriptors from the
+    // module directory at runtime: without declaring them, a descriptor-only change leaves the test
+    // task UP-TO-DATE and the routing guards silently do not run.
+    inputs.files('src/main/webapp/WEB-INF/web.xml', 'src/main/webapp/WEB-INF/urlrewrite.xml')
+            .withPropertyName('webDescriptors')
+            .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 artifacts {

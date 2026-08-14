@@ -75,6 +75,16 @@ class ServletMappingValidationTest {
                 .isEmpty();
     }
 
+    @Test
+    void should_declare_a_SpringRest_servlet_pattern_for_every_controller_base_path() throws Exception {
+        //given
+        List<String> springRestPatterns = parseUrlPatternsForServlet(new File(WEB_XML_PATH));
+
+        //when-then
+        SpringRestControllerPaths.assertServletPatternsDeclared(WEB_XML_PATH, springRestPatterns,
+                SpringRestControllerPaths.COMMUNITY_CONTROLLERS_PACKAGE);
+    }
+
     /**
      * Checks if a URL pattern has a wildcard in the middle of the path.
      * Valid patterns:
