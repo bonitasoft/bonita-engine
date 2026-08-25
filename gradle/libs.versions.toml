@@ -69,7 +69,7 @@ woodstoxCoreVersion = "6.4.0"
 # subscription/bpm/bonita-web-server-sp package org.bonitasoft.console.common.server.auth.impl
 keycloakVersion = "21.1.2"
 xmlsecVersion = "2.2.6"
-bouncyCastleVersion = "1.84"
+bouncyCastleVersion = "1.85"
 spnegoVersion = "1.1.1"
 owaspHtmlSanitizerVersion = "20260102.1"
 
