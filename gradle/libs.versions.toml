@@ -53,7 +53,7 @@ jaxbVersion = "4.0.9"
 jakartaAnnotationApiVersion = "2.1.1"
 hazelcastVersion = "5.4.0" # Also update http://www.hazelcast.com/schema/config/hazelcast-config-<VERSION>.xsd if needed
 jcacheVersion = "1.1.1"
-guavaVersion = "33.6.0-jre"
+guavaVersion = "33.7.1-jre"
 antlr4RuntimeVersion = "4.7.2"
 # 4.1.x targets Java 21 bytecode (class file 65); stay on the 4.0.x line while the build toolchain is Java 17
 casClientCoreVersion = "4.0.4"
