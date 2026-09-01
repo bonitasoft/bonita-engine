@@ -232,11 +232,56 @@ public class CodeGenerator {
         return method;
     }
 
+    /**
+     * Adds the read accessor named after the field type: <code>getX()</code>, or <code>isX()</code> for a wrapper
+     * <code>Boolean</code>.
+     * <p>
+     * Annotations applied to the returned method do not reach the <code>getX()</code> alias that
+     * {@link #addBooleanGetterAlias(JDefinedClass, JFieldVar)} adds in a later pass, so that a wrapper
+     * <code>Boolean</code> stays readable as a Groovy property. None does today, {@code LazyLoaded} on lazy
+     * relation getters being the only annotation any caller applies.
+     */
     public JMethod addGetter(final JDefinedClass definedClass, final JFieldVar field) {
         final JMethod method = definedClass.method(JMod.PUBLIC, field.type(), getGetterName(field));
         final JBlock block = method.body();
         block._return(field);
         return method;
+    }
+
+    /**
+     * Adds a <code>getX()</code> alias next to the <code>isX()</code> accessor of a wrapper <code>Boolean</code>
+     * field, so that the <code>entity.x</code> shorthand used in process expressions resolves under Groovy 4, which
+     * accepts <code>isX()</code> as a property getter only for a primitive <code>boolean</code> (BPA-833). The
+     * <code>isX()</code> accessor is left untouched.
+     * <p>
+     * Call it only after every other accessor of the class exists, and only when
+     * {@link #canAddBooleanGetterAlias(JDefinedClass, JFieldVar)} holds. For example, a BOOLEAN
+     * <code>hungry</code> and any other attribute named <code>Hungry</code> both yield <code>getHungry()</code>,
+     * and the alias is the accessor that must give way.
+     */
+    JMethod addBooleanGetterAlias(final JDefinedClass definedClass, final JFieldVar field) {
+        final JMethod alias = definedClass.method(JMod.PUBLIC, field.type(), getGetterName(false, field.name()));
+        alias.body()._return(field);
+        return alias;
+    }
+
+    /**
+     * Whether the <code>getX()</code> alias name is free on the given class. Asked separately from
+     * {@link #addBooleanGetterAlias(JDefinedClass, JFieldVar)} so that the caller can tell this skip apart from its
+     * other one, a name clashing with a lazy relation only in case, and give each its own remedy.
+     * <p>
+     * No type check is needed: for any other field type the alias name is the field's own accessor name, already
+     * declared by the time the alias pass runs.
+     */
+    boolean canAddBooleanGetterAlias(final JDefinedClass definedClass, final JFieldVar field) {
+        final String aliasName = getGetterName(false, field.name());
+        // getClass() is the only inherited method a get-prefixed alias can collide with, and it is final: emitting it
+        // would fail to compile. A BOOLEAN attribute named Class passes the BDM validator, so the alias gives way.
+        return !declaresMethod(definedClass, aliasName) && !"getClass".equals(aliasName);
+    }
+
+    private boolean declaresMethod(final JDefinedClass definedClass, final String methodName) {
+        return definedClass.methods().stream().anyMatch(method -> methodName.equals(method.name()));
     }
 
     public JMethod addMethodSignature(final JDefinedClass definedClass, final String methodName,
@@ -266,18 +311,37 @@ public class CodeGenerator {
     }
 
     private String getGetterName(final JVar field) {
+        return getGetterName(usesIsAccessor(field), field.name());
+    }
+
+    private boolean usesIsAccessor(final JVar field) {
         final JType type = field.type();
-        final boolean bool = Boolean.class.getName().equals(type.fullName());
-        return getGetterName(bool, field.name());
+        return Boolean.class.getName().equals(type.fullName());
     }
 
     private String getGetterName(final Field field) {
-        final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType())
-                && !field.isCollection();
-        return getGetterName(bool, field.getName());
+        return getGetterName(usesIsAccessor(field), field.getName());
     }
 
-    private String getGetterName(final boolean bool, final String fieldName) {
+    /**
+     * Whether the model field is generated with an <code>isX()</code> accessor rather than <code>getX()</code>: a
+     * non-collection BOOLEAN, and nothing else. Package-private because the alias pass needs the same predicate.
+     * <p>
+     * {@code Field.isCollection()} returns a {@code Boolean}, so the comparison avoids unboxing it.
+     */
+    boolean usesIsAccessor(final Field field) {
+        return field instanceof SimpleField simpleField
+                && FieldType.BOOLEAN == simpleField.getType()
+                && !Boolean.TRUE.equals(field.isCollection());
+    }
+
+    /**
+     * Builds the accessor name for a field: <code>isX()</code> when {@code bool}, <code>getX()</code> otherwise.
+     * <p>
+     * Package-private so that {@code EntityCodeGenerator} builds the accessor names it reports to administrators
+     * from the same place they are generated.
+     */
+    String getGetterName(final boolean bool, final String fieldName) {
         final StringBuilder builder = new StringBuilder();
         if (bool) {
             builder.append("is");

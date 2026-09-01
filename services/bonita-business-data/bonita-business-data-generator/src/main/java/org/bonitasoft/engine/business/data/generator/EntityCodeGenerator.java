@@ -91,6 +91,92 @@ public class EntityCodeGenerator {
             addAccessors(entityClass, fieldVar, field);
             addModifiers(entityClass, field);
         }
+        addBooleanGetterAliases(bo, entityClass);
+    }
+
+    /**
+     * Adds the <code>getX()</code> alias of every BOOLEAN attribute (BPA-833), in a second pass so that an accessor
+     * generated for any other attribute always wins over the alias and the generated source keeps compiling,
+     * whatever order the attributes come in.
+     * <p>
+     * The two skip reasons are tested in order of severity: a name clash would fail to compile, a case clash with a
+     * lazy relation would compile but silently make that relation read as null.
+     */
+    private void addBooleanGetterAliases(final BusinessObject bo, final JDefinedClass entityClass) {
+        for (final Field field : bo.getFields()) {
+            if (!codeGenerator.usesIsAccessor(field)) {
+                continue;
+            }
+            final JFieldVar fieldVar = entityClass.fields().get(field.getName());
+            if (fieldVar == null) {
+                // Unreachable from any model, since addField names the generated field after the model field: this
+                // guards a programming error in an override of it, and stays loud rather than restoring the defect.
+                throw new IllegalStateException("No generated field named '" + field.getName() + "' on "
+                        + bo.getQualifiedName()
+                        + ", so no getX() alias could be generated for this BOOLEAN attribute (see BPA-833)");
+            }
+            if (!codeGenerator.canAddBooleanGetterAlias(entityClass, fieldVar)) {
+                warnNoAlias(bo, fieldVar,
+                        "the name " + codeGenerator.getGetterName(false, fieldVar.name())
+                                + " is already taken by an inherited method such as Object.getClass(), or by"
+                                + " another attribute of the same object. Rename this attribute.");
+            } else if (collidesCaseInsensitivelyWithALazyRelation(bo, fieldVar.name())) {
+                warnNoAlias(bo, fieldVar,
+                        "a lazily loaded relation of the same object has the same name in a different case, and"
+                                + " the alias would make that relation read as null instead of loading."
+                                + " Rename either attribute so that the two names differ by more than case.");
+            } else {
+                codeGenerator.addBooleanGetterAlias(entityClass, fieldVar);
+            }
+        }
+    }
+
+    /**
+     * Whether a lazily loaded relation of the same object has a name that matches the given one
+     * case-insensitively without being identical to it. The alias must be skipped when one does.
+     * <p>
+     * The client-side lazy-loading proxy ({@code Proxyfier}) keys the accessors it has already called on
+     * {@code methodName.substring(3).toLowerCase()}, so two accessors whose names match case-insensitively share
+     * one key. For example, the <code>getHungry()</code> alias of a BOOLEAN <code>hungry</code> shares its key with
+     * the <code>getHUNGRY()</code> of a lazy relation <code>HUNGRY</code>, and generating it would mark that
+     * relation as already loaded and make the DAO return null for it. Such a model deploys today, its columns
+     * being HUNGRY and HUNGRY_PID.
+     * <p>
+     * Restricted to lazy relations, which is the whole hazard: {@code Proxyfier} only lazy-loads getters carrying
+     * {@code LazyLoaded}, and two simple fields whose names match case-insensitively would map to the same column
+     * and could not deploy at all.
+     * <p>
+     * Accepted trade-off: the hazard is client-side only ({@code ServerProxyfier} keys on the {@code LazyLoaded}
+     * annotation alone), but this pass is shared, so for this model shape the alias is withheld from the server jar
+     * too, where the <code>entity.x</code> shorthand therefore keeps failing (BPA-833). That keeps the entity
+     * classes of both jars identical. The skip only narrows an existing hole, {@code Proxyfier} recording setters
+     * under the same key as getters, so <code>setHungry(true)</code> then <code>getHUNGRY()</code> already
+     * suppresses the lazy load with no alias involved.
+     */
+    private boolean collidesCaseInsensitivelyWithALazyRelation(final BusinessObject bo, final String fieldName) {
+        return bo.getFields().stream()
+                .filter(field -> field instanceof RelationField relation && relation.isLazy())
+                .map(Field::getName)
+                .anyMatch(otherName -> !otherName.equals(fieldName) && otherName.equalsIgnoreCase(fieldName));
+    }
+
+    /**
+     * Warns that a BOOLEAN attribute keeps the BPA-833 defect, and how to read it in the meantime.
+     * <p>
+     * Known limitation: this reaches the engine log only, never the {@code ValidationStatus} returned by
+     * {@code BusinessObjectModelValidator}, so Bonita Studio stays silent and the user who can rename the
+     * attribute may never see it.
+     *
+     * @param reasonAndRemedy why the alias was skipped <em>and</em> what to do about it. Each skip reason has its
+     *        own remedy, there being no other attribute to rename when the clash is with an inherited method
+     */
+    private void warnNoAlias(final BusinessObject bo, final JFieldVar fieldVar, final String reasonAndRemedy) {
+        LOGGER.warn(
+                "Business object {}: no getter alias was generated for the BOOLEAN attribute '{}', because {}"
+                        + " Process expressions must read it as <yourVariable>.{}()."
+                        + " The '<yourVariable>.{}' property shorthand will fail at runtime.",
+                bo.getQualifiedName(), fieldVar.name(), reasonAndRemedy,
+                codeGenerator.getGetterName(true, fieldVar.name()), fieldVar.name());
     }
 
     private void addQueriesAnnotation(final BusinessObject bo, final JDefinedClass entityClass) {
@@ -282,10 +368,21 @@ public class EntityCodeGenerator {
         }
     }
 
+    /**
+     * @see #addAccessors(JDefinedClass, JFieldVar, Field)
+     */
     public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) {
         addAccessors(entityClass, fieldVar, null);
     }
 
+    /**
+     * Adds the setter and the read accessor named after the field type: <code>getX()</code>, or <code>isX()</code>
+     * for a BOOLEAN attribute.
+     * <p>
+     * Not sufficient on its own for a BOOLEAN attribute: the <code>getX()</code> alias that makes
+     * <code>entity.x</code> resolve is emitted by {@link #addEntity(BusinessObject)} in a second pass (BPA-833), so
+     * callers generating a BDM jar should go through that rather than composing an entity field by field here.
+     */
     public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar, final Field field) {
         if (isCollectionField(field)) {
             codeGenerator.addListSetter(entityClass, fieldVar);

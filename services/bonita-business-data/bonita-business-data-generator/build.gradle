@@ -15,11 +15,12 @@ dependencies {
     api libs.commonsLang
     api libs.commonsText
     api libs.jaxbCodeModel
+    testImplementation testFixtures(project(':bpm:bonita-common'))
+    testImplementation project(':services:bonita-business-data:bonita-business-data-api')
     testImplementation libs.assertj
     testImplementation libs.mockitoCore
     testImplementation libs.logback
-    testImplementation testFixtures(project(':bpm:bonita-common'))
-    testImplementation project(':services:bonita-business-data:bonita-business-data-api')
+    testImplementation libs.groovyCore
 }
 
 group = 'org.bonitasoft.engine.data'

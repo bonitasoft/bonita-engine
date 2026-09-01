@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.business.data.generator;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -37,6 +39,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.Version;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
@@ -52,8 +58,10 @@ import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.hibernate.annotations.GenericGenerator;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 public class EntityCodeGeneratorTest {
 
@@ -66,10 +74,27 @@ public class EntityCodeGeneratorTest {
 
     private BusinessObjectModel bom = new BusinessObjectModel();
 
+    private ListAppender<ILoggingEvent> warnings;
+
     @Before
     public void setUp() {
         codeGenerator = new CodeGenerator();
         entityCodeGenerator = new EntityCodeGenerator(codeGenerator, bom);
+        warnings = new ListAppender<>();
+        warnings.start();
+        ((Logger) LoggerFactory.getLogger(EntityCodeGenerator.class)).addAppender(warnings);
+    }
+
+    @After
+    public void tearDown() {
+        ((Logger) LoggerFactory.getLogger(EntityCodeGenerator.class)).detachAppender(warnings);
+    }
+
+    private List<String> warnMessages() {
+        return warnings.list.stream()
+                .filter(event -> Level.WARN == event.getLevel())
+                .map(ILoggingEvent::getFormattedMessage)
+                .toList();
     }
 
     @Test
@@ -282,12 +307,352 @@ public class EntityCodeGeneratorTest {
 
         entityCodeGenerator.addAccessors(definedClass, basicField);
 
-        assertThat(definedClass.methods()).hasSize(2);
-        final JMethod setter = (JMethod) definedClass.methods().toArray()[0];
-        assertThat(setter.name()).isEqualTo("setFound");
+        assertThat(definedClass.methods()).extracting(JMethod::name)
+                .containsExactly("setFound", "isFound");
+    }
 
-        final JMethod getter = (JMethod) definedClass.methods().toArray()[1];
-        assertThat(getter.name()).isEqualTo("isFound");
+    /**
+     * BPA-833: Groovy 4 does not accept an <code>isX()</code> accessor returning the wrapper <code>Boolean</code>
+     * as a property getter, so the <code>entity.found</code> shorthand used in process expressions needs the
+     * <code>getFound()</code> alias. Driven through {@link EntityCodeGenerator#addEntity}, the alias being added in
+     * a second pass.
+     */
+    @Test
+    public void shouldAddEntity_AddAGetterAliasReadableAsAGroovyProperty_ForABooleanAttribute() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField foundField = new SimpleField();
+        foundField.setName("found");
+        foundField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(foundField);
+
+        //when
+        final JDefinedClass entityClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then
+        final JClass booleanType = codeGenerator.getModel().ref(Boolean.class.getName());
+        assertThat(entityClass.methods()).extracting(JMethod::name).contains("isFound", "getFound");
+        assertThat(entityClass.methods()).filteredOn(method -> "getFound".equals(method.name()))
+                .singleElement()
+                .satisfies(alias -> assertThat(alias.type()).isEqualTo(booleanType));
+    }
+
+    /**
+     * BPA-833: two attributes whose names differ only in the case of their first letter both yield
+     * <code>getHungry()</code>, and such a model deploys today (columns HUNGRY and HUNGRY_PID), so the alias must
+     * give way rather than emit a duplicate method the entity could not compile with. The BOOLEAN is declared
+     * first, the order in which a single-pass implementation would emit the alias before the colliding accessor.
+     */
+    @Test
+    public void shouldAddEntity_NotAddAGetterAliasCollidingWithAnotherAttributeAccessor() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField hungryField = new SimpleField();
+        hungryField.setName("hungry");
+        hungryField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(hungryField);
+
+        final BusinessObject relatedBO = new BusinessObject();
+        relatedBO.setQualifiedName(UNIQUE_RELATION_QUALIFIED_NAME);
+        final RelationField hungryRelation = new RelationField();
+        hungryRelation.setName("Hungry");
+        // EAGER stated rather than left to the default: both skip guards give the same outcome on this model, so a
+        // change to that default upstream would silently move the test onto the other branch and it would still pass
+        hungryRelation.setFetchType(RelationField.FetchType.EAGER);
+        hungryRelation.setReference(relatedBO);
+        employeeBO.addField(hungryRelation);
+
+        //when
+        final JDefinedClass entityClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then the relation keeps its accessor and the BOOLEAN alias is skipped, so the source still compiles
+        assertThat(entityClass.methods()).filteredOn(method -> "getHungry".equals(method.name()))
+                .singleElement()
+                .satisfies(getter -> assertThat(getter.type().fullName()).isEqualTo(UNIQUE_RELATION_QUALIFIED_NAME));
+        assertThat(entityClass.methods()).extracting(JMethod::name).contains("isHungry");
+    }
+
+    /**
+     * BPA-833: the alias must also give way to an inherited method. A BOOLEAN attribute named <code>Class</code>
+     * yields <code>getClass()</code>, which cannot override the final {@link Object#getClass()}, so emitting it
+     * breaks compilation of a model that installs today.
+     */
+    @Test
+    public void shouldAddEntity_NotAddAGetterAliasNamedAfterAnInheritedMethod() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField clazzField = new SimpleField();
+        clazzField.setName("Class");
+        clazzField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(clazzField);
+
+        //when
+        final JDefinedClass entityClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then
+        assertThat(entityClass.methods()).extracting(JMethod::name)
+                .contains("isClass")
+                .doesNotContain("getClass");
+    }
+
+    /**
+     * BPA-833: the client lazy-loading proxy keys accessors on the lower-cased name, so <code>getHungry()</code> and
+     * <code>getHUNGRY()</code> share one key and the alias would mark that lazy relation as already loaded. The two
+     * accessor names differ, so this is a runtime hazard rather than a compilation one.
+     */
+    @Test
+    public void shouldAddEntity_NotAddAGetterAliasCollidingInCaseWithAnotherAttribute() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField hungryField = new SimpleField();
+        hungryField.setName("hungry");
+        hungryField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(hungryField);
+
+        final BusinessObject relatedBO = new BusinessObject();
+        relatedBO.setQualifiedName(UNIQUE_RELATION_QUALIFIED_NAME);
+        final RelationField hungryRelation = new RelationField();
+        hungryRelation.setName("HUNGRY");
+        hungryRelation.setFetchType(RelationField.FetchType.LAZY);
+        hungryRelation.setReference(relatedBO);
+        employeeBO.addField(hungryRelation);
+
+        //when
+        final JDefinedClass entityClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then the relation keeps its own accessor, and the BOOLEAN gets no alias
+        assertThat(entityClass.methods()).extracting(JMethod::name)
+                .contains("isHungry", "getHUNGRY")
+                .doesNotContain("getHungry");
+    }
+
+    /**
+     * BPA-833: the case-insensitive skip is restricted to <em>lazy</em> relations, the client proxy's lazy-loading
+     * bookkeeping being the whole hazard. An eager relation consults none of it, so the alias must still be
+     * generated rather than forfeit the fix for that attribute.
+     */
+    @Test
+    public void shouldAddEntity_StillAddTheGetterAlias_WhenTheCaseClashIsWithAnEagerRelation() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField hungryField = new SimpleField();
+        hungryField.setName("hungry");
+        hungryField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(hungryField);
+
+        final BusinessObject relatedBO = new BusinessObject();
+        relatedBO.setQualifiedName(UNIQUE_RELATION_QUALIFIED_NAME);
+        final RelationField hungryRelation = new RelationField();
+        hungryRelation.setName("HUNGRY");
+        hungryRelation.setFetchType(RelationField.FetchType.EAGER);
+        hungryRelation.setReference(relatedBO);
+        employeeBO.addField(hungryRelation);
+
+        //when
+        final JDefinedClass entityClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then both accessors exist - distinct method names, so nothing collides
+        assertThat(entityClass.methods()).extracting(JMethod::name)
+                .contains("isHungry", "getHungry", "getHUNGRY");
+        assertThat(warnMessages()).isEmpty();
+    }
+
+    /**
+     * BPA-833: a multiple BOOLEAN attribute is a <code>List&lt;Boolean&gt;</code>, so it already has a
+     * <code>getX()</code> accessor and an alias would duplicate it. Guards the type check the alias pass relies on.
+     */
+    @Test
+    public void shouldAddEntity_NotAddAnyGetterAlias_ForAMultipleBooleanAttribute() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField flagsField = new SimpleField();
+        flagsField.setName("flags");
+        flagsField.setType(FieldType.BOOLEAN);
+        flagsField.setCollection(Boolean.TRUE);
+        employeeBO.addField(flagsField);
+
+        //when
+        final JDefinedClass entityClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then exactly one read accessor, and it is the get-prefixed one a collection always gets
+        assertThat(entityClass.methods()).extracting(JMethod::name)
+                .containsOnlyOnce("getFlags")
+                .doesNotContain("isFlags");
+    }
+
+    /**
+     * BPA-833: a skipped alias leaves the attribute with the defect, and this log line is the only signal an
+     * administrator gets. An attribute named <code>Class</code> is the clearest way into this branch, not the only
+     * one. {@code shouldAddEntity_NotAddAGetterAliasCollidingWithAnotherAttributeAccessor} reaches it through
+     * another attribute, which is why the message names that cause too.
+     */
+    @Test
+    public void shouldAddEntity_WarnWithTheAttributeAndTheAccessorToUse_WhenTheAliasNameIsTaken() throws Exception {
+        //given a BOOLEAN whose alias would be the inherited, final Object.getClass()
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField clazzField = new SimpleField();
+        clazzField.setName("Class");
+        clazzField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(clazzField);
+
+        //when
+        entityCodeGenerator.addEntity(employeeBO);
+
+        //then
+        assertThat(warnMessages()).singleElement(as(STRING))
+                .contains(EMPLOYEE_QUALIFIED_NAME)
+                .contains("'Class'")
+                .contains("already taken")
+                .contains("<yourVariable>.isClass()")
+                // the remedy has to match the cause: there is no "either attribute" to rename here
+                .contains("Rename this attribute.")
+                .doesNotContain("Rename either attribute");
+    }
+
+    /**
+     * BPA-833: the other skip reason, a name matching another one case-insensitively, which would break the client
+     * proxy's lazy-loading bookkeeping. It must be reported differently, the remedy a reader needs not being the
+     * same.
+     */
+    @Test
+    public void shouldAddEntity_WarnAboutLazyLoading_WhenAnotherAttributeDiffersOnlyInCase() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField hungryField = new SimpleField();
+        hungryField.setName("hungry");
+        hungryField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(hungryField);
+        final BusinessObject relatedBO = new BusinessObject();
+        relatedBO.setQualifiedName(UNIQUE_RELATION_QUALIFIED_NAME);
+        final RelationField hungryRelation = new RelationField();
+        hungryRelation.setName("HUNGRY");
+        hungryRelation.setFetchType(RelationField.FetchType.LAZY);
+        hungryRelation.setReference(relatedBO);
+        employeeBO.addField(hungryRelation);
+
+        //when
+        entityCodeGenerator.addEntity(employeeBO);
+
+        //then
+        assertThat(warnMessages()).singleElement(as(STRING))
+                .contains("'hungry'")
+                .contains("the same name in a different case")
+                .contains("read as null")
+                .contains("Rename either attribute so that the two names differ by more than case.");
+    }
+
+    /**
+     * BPA-833: two BOOLEAN attributes differing only in the case of their first letter both want the same
+     * <code>getHungry()</code> alias, and only one can have it. Pins the alias pass to emitting exactly one and to
+     * warning about the attribute that lost, the one place the alias output depends on attribute ordering.
+     * <p>
+     * Asserted on the alias pass alone, the model being undeployable anyway for reasons that predate BPA-833: see
+     * {@code shouldAddEntity_DuplicateThePrimaryAccessors_WhenTwoAttributesDifferOnlyInCase}.
+     */
+    @Test
+    public void shouldAddEntity_GiveTheAliasToTheFirstAttribute_WhenTwoBooleansWantIt() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField lowerCaseField = new SimpleField();
+        lowerCaseField.setName("hungry");
+        lowerCaseField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(lowerCaseField);
+        final SimpleField upperCaseField = new SimpleField();
+        upperCaseField.setName("Hungry");
+        upperCaseField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(upperCaseField);
+
+        //when
+        final JDefinedClass entityClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then the alias pass emitted exactly one getHungry(), and said which attribute went without
+        assertThat(entityClass.methods()).extracting(JMethod::name).containsOnlyOnce("getHungry");
+        assertThat(warnMessages()).singleElement(as(STRING))
+                .contains("'Hungry'")
+                .contains("already taken")
+                .contains("Rename this attribute.");
+    }
+
+    /**
+     * Records a defect that predates BPA-833, in its own test so that repairing it fails a test named after it
+     * rather than one named after the alias pass: for two attributes differing only in the case of their first
+     * letter, the <em>primary</em> accessor pass emits <code>isHungry()</code> and <code>setHungry()</code> twice
+     * each, so the generated source does not compile. Such a model passes validation and so reaches the generator,
+     * though both fields map to column <code>HUNGRY</code> and it could never deploy.
+     * <p>
+     * If this test fails because the duplication is gone, delete it; it asserts a defect, not a requirement.
+     */
+    @Test
+    public void shouldAddEntity_DuplicateThePrimaryAccessors_WhenTwoAttributesDifferOnlyInCase() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField lowerCaseField = new SimpleField();
+        lowerCaseField.setName("hungry");
+        lowerCaseField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(lowerCaseField);
+        final SimpleField upperCaseField = new SimpleField();
+        upperCaseField.setName("Hungry");
+        upperCaseField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(upperCaseField);
+
+        //when
+        final JDefinedClass entityClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then
+        assertThat(entityClass.methods()).extracting(JMethod::name)
+                .as("the accessor pass, not the BPA-833 alias pass, emits each of these twice")
+                .filteredOn(name -> "isHungry".equals(name) || "setHungry".equals(name)).hasSize(4);
+    }
+
+    /**
+     * BPA-833: the ordinary case must stay silent - a warning on every BOOLEAN attribute would be noise in every
+     * BDM install log.
+     */
+    @Test
+    public void shouldAddEntity_NotWarn_WhenTheAliasIsGenerated() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final SimpleField foundField = new SimpleField();
+        foundField.setName("found");
+        foundField.setType(FieldType.BOOLEAN);
+        employeeBO.addField(foundField);
+
+        //when
+        entityCodeGenerator.addEntity(employeeBO);
+
+        //then
+        assertThat(warnMessages()).isEmpty();
+    }
+
+    /**
+     * BPA-833: non-BOOLEAN attributes already use a regular <code>getX()</code> accessor, so no alias is
+     * generated for them.
+     */
+    @Test
+    public void shouldAddAccessors_NotAddAnyGetterAlias_ForNonBooleanField() throws Exception {
+        //given
+        final SimpleField nameField = new SimpleField();
+        nameField.setName("name");
+        nameField.setType(FieldType.STRING);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        final JFieldVar basicField = entityCodeGenerator.addField(definedClass, nameField, "h2");
+
+        //when
+        entityCodeGenerator.addAccessors(definedClass, basicField);
+
+        //then
+        assertThat(definedClass.methods()).extracting(JMethod::name).containsExactly("setName", "getName");
     }
 
     @Test

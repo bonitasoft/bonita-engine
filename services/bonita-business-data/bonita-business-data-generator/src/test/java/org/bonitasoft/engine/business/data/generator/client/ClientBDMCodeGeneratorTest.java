@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.data.generator.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
 import static org.assertj.core.util.Strings.concat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
@@ -73,6 +74,33 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     @After
     public void tearDown() throws Exception {
         FileUtils.deleteDirectory(destDir);
+    }
+
+    /**
+     * BPA-833: the alias is generated in {@code EntityCodeGenerator#addFieldsAndMethods}, shared by the server and
+     * client generators, so the two model jars stay in sync. Only the server side exercised that until here.
+     */
+    @Test
+    public void generateBom_should_add_the_boolean_getter_alias_to_the_client_entity() throws Exception {
+        //given
+        final SimpleField hungry = new SimpleField();
+        hungry.setName("hungry");
+        hungry.setType(FieldType.BOOLEAN);
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        employeeBO.addField(hungry);
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(employeeBO);
+
+        //when
+        bdmCodeGenerator.generateBom(bom, destDir);
+
+        //then
+        final File entitySource = new File(destDir, "com/company/hr/Employee.java");
+        assertThat(entitySource).exists();
+        assertThat(contentOf(entitySource))
+                .contains("public Boolean isHungry()")
+                .contains("public Boolean getHungry()");
     }
 
     @Test

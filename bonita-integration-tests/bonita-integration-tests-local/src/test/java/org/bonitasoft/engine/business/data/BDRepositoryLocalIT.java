@@ -67,6 +67,8 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
 
     private static final String BIZ_EMPLOYEE = "bizEmployee";
 
+    private static final String BIZ_MAIN_ADDRESS = "bizMainAddress";
+
     private static final String PROCESS_NAME = "lazy";
 
     private static final String VERSION = "1.0";
@@ -210,6 +212,131 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
 
         // cleanup
         disableAndDeleteProcess(definition.getId());
+    }
+
+    /**
+     * BPA-833: the reported regression, driven through the real path, with business data loaded by the engine and
+     * read by its own Groovy expression evaluation.
+     * <p>
+     * A BOOLEAN BDM attribute is generated with an <code>isActive()</code> accessor returning the wrapper
+     * <code>Boolean</code>, which Groovy 4 does not accept as a property getter, so the
+     * <code>address.active</code> shorthand falls back to reading the private field, which Groovy 4 refuses to do
+     * across a class hierarchy, unlike Groovy 3. The generated <code>getActive()</code> alias is what keeps it
+     * working on the generated subclass every receiver is.
+     * <p>
+     * Both receivers that carry the defect are covered: {@code BusinessDataRetriever} proxies every business data
+     * through {@code ServerProxyfier}, and Hibernate adds its own proxy on top for a lazily loaded relation. A
+     * plain business data is therefore just as broken, and is the likelier customer form.
+     */
+    @Test
+    public void should_read_a_boolean_attribute_of_a_proxied_business_data_as_a_groovy_property() throws Exception {
+        //given
+        final Expression mainAddressExpression = createGroovyExpressionThatCreateActiveAddress();
+        final Expression employeeExpression = createGroovyExpressionThatCreateEmployeeWithMainAddress(
+                BIZ_MAIN_ADDRESS);
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, VERSION);
+        processDefinitionBuilder.addBusinessData(BIZ_MAIN_ADDRESS, ADDRESS_QUALIFIED_NAME, mainAddressExpression);
+        processDefinitionBuilder.addBusinessData(BIZ_EMPLOYEE, EMPLOYEE_QUALIFIED_NAME, null);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addAutomaticTask(TASK_AUTOMATIC_TASK_TO_INIT_BIZ_DATA)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(BIZ_EMPLOYEE),
+                        OperatorType.ASSIGNMENT, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask(TASK_HUMAN_TASK, ACTOR_NAME);
+        processDefinitionBuilder.addTransition(TASK_AUTOMATIC_TASK_TO_INIT_BIZ_DATA, TASK_HUMAN_TASK);
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, matti);
+
+        //when the property shorthand is evaluated as a gateway condition would, on both receivers that carry
+        //the defect: the process business data itself, and an entity reached through a lazy relation
+        //then, in a try/finally so the process is always disabled: leaving it enabled would make
+        //cleanAndUninstallBusinessDataModel() throw in @After and bury the assertion message. The try opens before
+        //startProcess because without the fix the automatic task fails first and waitForUserTaskAndGetIt times out.
+        try {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+            final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance, TASK_HUMAN_TASK);
+
+            assertThat(evaluateBooleanShorthand(humanTaskInstance, "directBusinessData",
+                    BIZ_MAIN_ADDRESS + ".active", BIZ_MAIN_ADDRESS, ADDRESS_QUALIFIED_NAME))
+                    .as("a plain business data is already a generated subclass - the engine proxies every one")
+                    .isEqualTo(Boolean.TRUE);
+
+            assertThat(evaluateBooleanShorthand(humanTaskInstance, "throughLazyRelation",
+                    BIZ_EMPLOYEE + ".mainAddress.active", BIZ_EMPLOYEE, EMPLOYEE_QUALIFIED_NAME))
+                    .as("a lazily related entity is a Hibernate proxy, the shape in the reported stack trace")
+                    .isEqualTo(Boolean.TRUE);
+
+            //and the two receivers really are two distinct generated subclasses, neither of them the entity class
+            //itself. That, not any particular proxy library, is the condition BPA-833 turns on. Asserted without
+            //Javassist's _$$_jvst or Hibernate's $HibernateProxy$ name templates, undocumented internals a library
+            //bump would change; one soft contains() is kept for the lazy path, whose wrapping layer was in question.
+            //NOTE the two evaluations must stay separate: batched into one evaluateExpressionsOnActivityInstance
+            //call, both business data resolve in the same persistence context, mainAddress comes back already
+            //managed, and both receivers collapse to the same ServerProxyfier subclass, so the lazy path stops
+            //being lazy and the distinction disappears.
+            final String directReceiver = receiverClassName(humanTaskInstance,
+                    BIZ_MAIN_ADDRESS + ".getClass().getName()", BIZ_MAIN_ADDRESS, ADDRESS_QUALIFIED_NAME);
+            final String lazyReceiver = receiverClassName(humanTaskInstance,
+                    BIZ_EMPLOYEE + ".mainAddress.getClass().getName()", BIZ_EMPLOYEE, EMPLOYEE_QUALIFIED_NAME);
+            assertThat(directReceiver)
+                    .as("a plain business data is wrapped by ServerProxyfier, so a subclass of the entity")
+                    .startsWith(ADDRESS_QUALIFIED_NAME)
+                    .isNotEqualTo(ADDRESS_QUALIFIED_NAME);
+            assertThat(lazyReceiver)
+                    .as("a lazily related entity is wrapped again, over a Hibernate proxy, as in the reported trace")
+                    .startsWith(ADDRESS_QUALIFIED_NAME)
+                    .isNotEqualTo(ADDRESS_QUALIFIED_NAME)
+                    .isNotEqualTo(directReceiver)
+                    .contains("HibernateProxy");
+        } finally {
+            disableAndDeleteProcess(definition.getId());
+        }
+    }
+
+    private String receiverClassName(final HumanTaskInstance humanTaskInstance, final String script,
+            final String businessDataName, final String businessDataType) throws Exception {
+        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("receiverClass",
+                "return " + script, String.class.getName(),
+                new ExpressionBuilder().createBusinessDataExpression(businessDataName, businessDataType));
+        return (String) getProcessAPI().evaluateExpressionsOnActivityInstance(humanTaskInstance.getId(),
+                Collections.singletonMap(expression, new HashMap<>())).get("receiverClass");
+    }
+
+    private Serializable evaluateBooleanShorthand(final HumanTaskInstance humanTaskInstance,
+            final String expressionName, final String script, final String businessDataName,
+            final String businessDataType) throws Exception {
+        final Expression condition = new ExpressionBuilder().createGroovyScriptExpression(expressionName,
+                "return " + script, Boolean.class.getName(),
+                new ExpressionBuilder().createBusinessDataExpression(businessDataName, businessDataType));
+        return getProcessAPI().evaluateExpressionsOnActivityInstance(humanTaskInstance.getId(),
+                Collections.singletonMap(condition, new HashMap<>())).get(expressionName);
+    }
+
+    private Expression createGroovyExpressionThatCreateActiveAddress() throws InvalidExpressionException {
+        final String script = "import " + ADDRESS_QUALIFIED_NAME + "; "
+                + "Address address = new Address(); "
+                + "address.street='32, rue Gustave Eiffel'; "
+                + "address.city='" + CITY_GRENOBLE + "'; "
+                + "address.active=true; "
+                + "return address;";
+        return new ExpressionBuilder().createGroovyScriptExpression("createActiveAddress", script,
+                ADDRESS_QUALIFIED_NAME);
+    }
+
+    private Expression createGroovyExpressionThatCreateEmployeeWithMainAddress(final String businessDataAddressName)
+            throws InvalidExpressionException {
+        final String script = "import " + EMPLOYEE_QUALIFIED_NAME + "; import " + ADDRESS_QUALIFIED_NAME + "; "
+                + "Employee e = new Employee(); "
+                + "e.firstName = 'Alphonse'; "
+                + "e.lastName = 'Dupond'; "
+                + "e.mainAddress = " + businessDataAddressName + "; "
+                + "return e;";
+        return new ExpressionBuilder().createGroovyScriptExpression("createEmployeeWithMainAddress", script,
+                EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createBusinessDataExpression(businessDataAddressName,
+                        ADDRESS_QUALIFIED_NAME));
     }
 
     private void addClientBDMZipToClassLoader() throws Exception {
@@ -402,10 +529,18 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         country.setNullable(Boolean.TRUE);
         country.setReference(countryBO);
 
+        // BPA-833: the BOOLEAN attribute read as a Groovy property by
+        // should_read_a_boolean_attribute_of_a_proxied_business_data_as_a_groovy_property
+        final SimpleField active = new SimpleField();
+        active.setName("active");
+        active.setType(FieldType.BOOLEAN);
+        active.setNullable(Boolean.TRUE);
+
         final BusinessObject addressBO = new BusinessObject();
         addressBO.setQualifiedName(ADDRESS_QUALIFIED_NAME);
         addressBO.addField(street);
         addressBO.addField(city);
+        addressBO.addField(active);
         addressBO.addField(country);
 
         final RelationField addresses = new RelationField();
@@ -415,6 +550,16 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         addresses.setCollection(Boolean.TRUE);
         addresses.setNullable(Boolean.TRUE);
         addresses.setReference(addressBO);
+
+        // BPA-833: a lazy to-one relation is what makes Hibernate hand out a proxy of the referenced entity, the
+        // second of the two receivers the test above reads through.
+        final RelationField mainAddress = new RelationField();
+        mainAddress.setType(RelationField.Type.AGGREGATION);
+        mainAddress.setFetchType(RelationField.FetchType.LAZY);
+        mainAddress.setName("mainAddress");
+        mainAddress.setCollection(Boolean.FALSE);
+        mainAddress.setNullable(Boolean.TRUE);
+        mainAddress.setReference(addressBO);
 
         final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
@@ -438,6 +583,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         employee.addField(lastName);
         employee.addField(phoneNumbers);
         employee.addField(addresses);
+        employee.addField(mainAddress);
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
