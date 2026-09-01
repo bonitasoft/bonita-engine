@@ -63,7 +63,7 @@ jakartaJstlApiVersion = "1.2.7"
 xbeanClassloaderVersion = "5.0.0"
 jgettextVersion = "0.15.1"
 hamcrestVersion = "3.0"
-woodstoxCoreVersion = "7.2.1"
+woodstoxCoreVersion = "7.2.2"
 # When updating Keycloak version, if necessary, make sure to update the code in
 # subscription/bpm/bonita-web-server-sp package org.bonitasoft.console.common.server.auth.impl
 keycloakVersion = "21.1.2"
