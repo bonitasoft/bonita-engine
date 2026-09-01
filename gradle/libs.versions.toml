@@ -262,6 +262,6 @@ groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx",
 
 [plugins]
 bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "1.1.0" }
-dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.54.0" } # used by "List out-of-date dependencies" script
+dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.61.0" } # used by "List out-of-date dependencies" script
 taskInfo = { id = "org.barfuin.gradle.taskinfo", version = "3.0.2" } # Adds a 'tiTree' task to display Gradle task-graph
 testRetry = { id = "org.gradle.test-retry", version = "1.6.5" } # used to retry flaky tests automatically
