@@ -94,7 +94,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         john = createUser("john", "bpm");
         matti = createUser("matti", "bpm");
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("matti", PASSWORD);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
@@ -458,7 +458,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         processInstances.add(processInstance);
         final long step1Id = waitForUserTask(processInstance, "step1");
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", PASSWORD);
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinitionId, 0, 5,

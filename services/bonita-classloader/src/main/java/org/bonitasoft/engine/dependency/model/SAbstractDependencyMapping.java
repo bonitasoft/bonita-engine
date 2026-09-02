@@ -38,7 +38,7 @@ public abstract class SAbstractDependencyMapping implements PersistentObject {
     private ScopeType artifactType;
     private long dependencyId;
 
-    public SAbstractDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
+    protected SAbstractDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super();
         this.artifactId = artifactId;
         this.artifactType = artifactType;

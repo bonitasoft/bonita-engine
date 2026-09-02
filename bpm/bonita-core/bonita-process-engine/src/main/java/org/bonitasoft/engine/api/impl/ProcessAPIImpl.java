@@ -23,8 +23,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -110,6 +122,7 @@ import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescr
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
@@ -181,6 +194,7 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.lock.SLockTimeoutException;
 import org.bonitasoft.engine.log.LogMessageBuilder;
+import org.bonitasoft.engine.mdc.FlowNodeInstanceMDC;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
@@ -338,13 +352,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void releaseLocks(final LockService lockService, final List<BonitaLock> locks, final long tenantId) {
+    private void releaseLocks(final LockService lockService, final List<BonitaLock> locks) {
         if (locks == null) {
             return;
         }
         for (final BonitaLock lock : locks) {
             try {
-                lockService.unlock(lock, tenantId);
+                lockService.unlock(lock);
             } catch (final SLockException e) {
                 logError(e);
             }
@@ -3297,13 +3311,15 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long processInstanceId) throws SBonitaException {
         final UserTransactionService userTransactionService = serviceAccessor.getUserTransactionService();
         final ProcessInstanceService processInstanceService = serviceAccessor.getProcessInstanceService();
+        final DocumentService documentService = serviceAccessor.getDocumentService();
 
         try {
             userTransactionService.executeInTransaction((Callable<Void>) () -> {
-                final SProcessInstance sProcessInstance = processInstanceService
-                        .getProcessInstance(processInstanceId);
-
+                final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
                 deleteJobsOnProcessInstance(sProcessInstance);
+                // Documents are only deleted when deleting the unfinished process instance from the API,
+                // and not when the finished process instance is archived:
+                documentService.deleteDocumentContentsForProcessInstance(sProcessInstance.getId());
                 processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
                 return null;
             });
@@ -3352,19 +3368,24 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
 
             final LockService lockService = serviceAccessor.getLockService();
+            final DocumentService documentService = serviceAccessor.getDocumentService();
             final String objectType = SFlowElementsContainerType.PROCESS.name();
             List<BonitaLock> locks = null;
             try {
-                locks = createLockProcessInstances(lockService, objectType, processInstancesWithChildrenIds,
-                        serviceAccessor.getTenantId());
+                locks = createLockProcessInstances(lockService, objectType, processInstancesWithChildrenIds);
                 return userTxService.executeInTransaction(() -> {
                     final List<SProcessInstance> sProcessInstances = new ArrayList<>(
                             processInstancesWithChildrenIds.keySet());
                     deleteJobsOnProcessInstance(processDefinitionId, sProcessInstances);
+                    for (SProcessInstance spi : sProcessInstances) {
+                        // Documents are only deleted when deleting the unfinished process instance from the API,
+                        // and not when the finished process instance is archived:
+                        documentService.deleteDocumentContentsForProcessInstance(spi.getId());
+                    }
                     return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
                 });
             } finally {
-                releaseLocks(lockService, locks, serviceAccessor.getTenantId());
+                releaseLocks(lockService, locks);
             }
 
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
@@ -3615,8 +3636,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<BonitaLock> createLockProcessInstances(final LockService lockService, final String objectType,
-            final Map<SProcessInstance, List<Long>> sProcessInstances,
-            final long tenantId) throws SLockException, SLockTimeoutException {
+            final Map<SProcessInstance, List<Long>> sProcessInstances) throws SLockException, SLockTimeoutException {
         final List<BonitaLock> locks = new ArrayList<>();
         final HashSet<Long> uniqueIds = new HashSet<>();
         for (final Entry<SProcessInstance, List<Long>> processInstanceWithChildrenIds : sProcessInstances.entrySet()) {
@@ -3624,7 +3644,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             uniqueIds.addAll(processInstanceWithChildrenIds.getValue());
         }
         for (final Long id : uniqueIds) {
-            final BonitaLock childLock = lockService.lock(id, objectType, tenantId);
+            final BonitaLock childLock = lockService.lock(id, objectType);
             locks.add(childLock);
         }
         return locks;
@@ -3638,7 +3658,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         BonitaLock lock = null;
         try {
-            lock = lockService.lock(processInstanceId, objectType, serviceAccessor.getTenantId());
+            lock = lockService.lock(processInstanceId, objectType);
             deleteProcessInstanceInTransaction(serviceAccessor, processInstanceId);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
@@ -3649,7 +3669,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } finally {
             if (lock != null) {
                 try {
-                    lockService.unlock(lock, serviceAccessor.getTenantId());
+                    lockService.unlock(lock);
                 } catch (final SLockException e) {
                     throw new DeletionException(
                             "Lock was not released. Object type: " + objectType + ", id: " + processInstanceId, e);
@@ -4830,9 +4850,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 throw new TimerEventTriggerInstanceNotFoundException(timerEventTriggerInstanceId);
             }
             eventInstanceService.updateEventTriggerInstance(sTimerEventTriggerInstance, descriptor);
-            return schedulerService
-                    .rescheduleJob(sTimerEventTriggerInstance.getJobTriggerName(),
-                            String.valueOf(getServiceAccessor().getTenantId()), executionDate);
+            return schedulerService.rescheduleJob(sTimerEventTriggerInstance.getJobTriggerName(), executionDate);
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
         }
@@ -4888,8 +4906,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         BonitaLock lock = null;
         try {
             // lock process execution
-            lock = lockService.lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(),
-                    serviceAccessor.getTenantId());
+            lock = lockService.lock(processInstanceId, SFlowElementsContainerType.PROCESS.name());
             inTx(() -> {
                 try {
                     return processInstanceInterruptor.interruptProcessInstance(processInstanceId,
@@ -4908,7 +4925,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } finally {
             // unlock process execution
             try {
-                lockService.unlock(lock, serviceAccessor.getTenantId());
+                lockService.unlock(lock);
             } catch (final SLockException e) {
                 // ignore it
             }
@@ -5926,10 +5943,9 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SProcessDefinition processDefinition = processDefinitionService
                     .getProcessDefinition(processDefinitionId);
             final SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(humanTaskName);
-            if (!(flowNode instanceof SHumanTaskDefinition)) {
+            if (!(flowNode instanceof SHumanTaskDefinition humanTask)) {
                 return Collections.emptyList();
             }
-            final SHumanTaskDefinition humanTask = (SHumanTaskDefinition) flowNode;
             final String actorName = humanTask.getActorName();
             final List<Long> userIds = getUserIdsForActor(serviceAccessor, processDefinitionId, actorName, startIndex,
                     maxResults);
@@ -6155,76 +6171,84 @@ public class ProcessAPIImpl implements ProcessAPI {
         BPMWorkFactory workFactory = serviceAccessor.getBPMWorkFactory();
 
         SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-        if (shouldBeReadyTask) {
-            /*
-             * this is to protect from concurrent execution of the task when 2 users call execute user task at the same
-             * time
-             * it still might have concurrency issue but:
-             * - if the second client call execute with contract inputs, on commit there will be a constraint violation
-             * + rollback
-             * - if there is no contract input, the work will check that the activity is in ready state before calling
-             * execute.
-             * The only left issue is that on this last case the executor will change to the last one.
-             */
-            checkIsHumanTaskInReadyState(flowNodeInstance);
-        }
-        if (flowNodeInstance instanceof SUserTaskInstance) {
-            try {
-                throwContractViolationExceptionIfContractIsInvalid(inputs, serviceAccessor, flowNodeInstance);
-            } catch (SContractViolationException e) {
-                throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(),
-                        e.getCause());
-            }
-        }
-        if (flowNodeInstance instanceof SHumanTaskInstance
-                && ((SHumanTaskInstance) flowNodeInstance).getAssigneeId() <= 0) {
-            throw new SFlowNodeExecutionException("The user task " + flowNodeInstanceId + " is not assigned");
-        }
         final SSession session = getSession();
-        if (session != null) {
-            final long executerSubstituteUserId = session.getUserId();
-            final long executerUserId;
-            if (userId == 0) {
-                executerUserId = executerSubstituteUserId;
-            } else {
-                executerUserId = userId;
+        final Optional<Long> executerSubstituteUserId = Optional.ofNullable(session).map(SSession::getUserId);
+        final Optional<Long> executerUserId = session == null ? Optional.empty()
+                : userId == 0L ? executerSubstituteUserId : Optional.of(userId);
+        try (var flowNodeInstanceMDC = new FlowNodeInstanceMDC(flowNodeInstanceId,
+                executerUserId,
+                executerSubstituteUserId,
+                flowNodeInstance.getProcessDefinitionId(),
+                flowNodeInstance.getParentProcessInstanceId(),
+                flowNodeInstance.getRootProcessInstanceId())) {
+            if (shouldBeReadyTask) {
+                /*
+                 * this is to protect from concurrent execution of the task when 2 users call execute user task at the
+                 * same
+                 * time
+                 * it still might have concurrency issue but:
+                 * - if the second client call execute with contract inputs, on commit there will be a constraint
+                 * violation
+                 * + rollback
+                 * - if there is no contract input, the work will check that the activity is in ready state before
+                 * calling
+                 * execute.
+                 * The only left issue is that on this last case the executor will change to the last one.
+                 */
+                checkIsHumanTaskInReadyState(flowNodeInstance);
             }
-            final boolean isFirstState = flowNodeInstance.getStateId() == 0;
-
             if (flowNodeInstance instanceof SUserTaskInstance) {
-                contractDataService.addUserTaskData(flowNodeInstance.getId(), inputs);
-            }
-            // TODO: the following 4 instructions seem to be redundant with stepForward:
-            // Cannot we factorize this?
-            serviceAccessor.getBPMArchiverService().archiveFlowNodeInstance(flowNodeInstance);
-            // flag as executing
-            activityInstanceService.setExecuting(flowNodeInstance);
-            activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId);
-            activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
-            WorkDescriptor work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
-            workService.registerWork(work);
-            if (log.isInfoEnabled() && !isFirstState /*
-                                                      * don't log when create
-                                                      * subtask
-                                                      */) {
-                final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance,
-                        session.getUserName(), executerUserId,
-                        executerSubstituteUserId, inputs);
-                log.info(message);
-            } else if (log.isDebugEnabled()) {
-                log.debug("Executing state " + flowNodeInstance.getStateName() + " (" + flowNodeInstance.getStateId()
-                        + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
-            }
-            if (executerUserId != executerSubstituteUserId) {
                 try {
-                    final SUser executorUser = identityService.getUser(executerUserId);
-                    String stb = "The user " + session.getUserName() + " " + "acting as delegate of the user "
-                            + executorUser.getUserName() + " "
-                            + "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
-                    commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb);
-                } catch (final SBonitaException e) {
-                    log.error(
-                            "Error when adding a comment on the process instance.", e);
+                    throwContractViolationExceptionIfContractIsInvalid(inputs, serviceAccessor, flowNodeInstance);
+                } catch (SContractViolationException e) {
+                    throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(),
+                            e.getCause());
+                }
+            }
+            if (flowNodeInstance instanceof SHumanTaskInstance
+                    && ((SHumanTaskInstance) flowNodeInstance).getAssigneeId() <= 0) {
+                throw new SFlowNodeExecutionException("The user task " + flowNodeInstanceId + " is not assigned");
+            }
+
+            if (session != null) {
+                final boolean isFirstState = flowNodeInstance.getStateId() == 0;
+
+                if (flowNodeInstance instanceof SUserTaskInstance) {
+                    contractDataService.addUserTaskData(flowNodeInstance.getId(), inputs);
+                }
+                // TODO: the following 4 instructions seem to be redundant with stepForward:
+                // Cannot we factorize this?
+                serviceAccessor.getBPMArchiverService().archiveFlowNodeInstance(flowNodeInstance);
+                // flag as executing
+                activityInstanceService.setExecuting(flowNodeInstance);
+                activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId.orElse(0L));
+                activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId.orElse(0L));
+                WorkDescriptor work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
+                workService.registerWork(work);
+                if (log.isInfoEnabled() && !isFirstState /*
+                                                          * don't log when create
+                                                          * subtask
+                                                          */) {
+                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance,
+                            session.getUserName(), executerUserId.orElse(0L),
+                            executerSubstituteUserId.orElse(0L), inputs);
+                    log.info(message);
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Executing state " + flowNodeInstance.getStateName() + " ("
+                            + flowNodeInstance.getStateId()
+                            + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
+                }
+                if (!executerUserId.equals(executerSubstituteUserId)) {
+                    try {
+                        final SUser executorUser = identityService.getUser(executerUserId.orElse(0L));
+                        String stb = "The user " + session.getUserName() + " " + "acting as delegate of the user "
+                                + executorUser.getUserName() + " "
+                                + "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
+                        commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb);
+                    } catch (final SBonitaException e) {
+                        log.error(
+                                "Error when adding a comment on the process instance.", e);
+                    }
                 }
             }
         }

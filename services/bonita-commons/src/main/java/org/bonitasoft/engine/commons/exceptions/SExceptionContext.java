@@ -68,9 +68,17 @@ public enum SExceptionContext {
      */
     WAITING_MESSAGE_INSTANCE_TYPE,
     /**
+     * Corresponding to the name of the connector
+     */
+    CONNECTOR_NAME,
+    /**
      * Corresponding to the identifier of the connector definition
      */
     CONNECTOR_DEFINITION_ID,
+    /**
+     * Corresponding to the name of the input of the connector
+     */
+    CONNECTOR_INPUT_NAME,
     /**
      * Corresponding to the class name of the implementation of the connector definition
      */
@@ -102,6 +110,14 @@ public enum SExceptionContext {
     /**
      * Corresponding to the identifier of the document
      */
-    DOCUMENT_ID;
+    DOCUMENT_ID,
+    /**
+     * Corresponding to the name of the transition
+     */
+    TRANSITION_NAME,
+    /**
+     * Corresponding to the target flownode name of the transition
+     */
+    TRANSITION_TARGET_FLOWNODE_NAME;
 
 }

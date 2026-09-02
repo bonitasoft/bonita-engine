@@ -35,7 +35,7 @@ public class RecoveryMechanismIT extends CommonAPILocalIT {
 
     @Before
     public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         recoveryService = getServiceAccessor().lookup("recoveryService");
         recoveryService.setConsiderElementsOlderThan("PT0S");
     }

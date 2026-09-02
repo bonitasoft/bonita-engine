@@ -78,8 +78,7 @@ public class InitializingLoopActivityState implements FlowNodeState {
             final SLoopActivityInstance loopActivity = (SLoopActivityInstance) activityInstanceService
                     .getFlowNodeInstance(flowNodeInstance.getId());
             final SLoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
-            if (loopCharacteristics instanceof SStandardLoopCharacteristics) {
-                final SStandardLoopCharacteristics standardLoop = (SStandardLoopCharacteristics) loopCharacteristics;
+            if (loopCharacteristics instanceof SStandardLoopCharacteristics standardLoop) {
                 final SExpression loopMax = ((SStandardLoopCharacteristics) loopCharacteristics).getLoopMax();
                 Integer intLoopMax;
 

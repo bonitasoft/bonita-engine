@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -27,7 +28,6 @@ import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -40,11 +40,10 @@ import org.bonitasoft.engine.transaction.TransactionService;
 @Slf4j
 public class JobWrapper implements StatelessJob {
 
+    @Serial
     private static final long serialVersionUID = 7145451610635400449L;
 
     private final StatelessJob statelessJob;
-
-    private final long tenantId;
 
     private final SEvent jobExecuting;
 
@@ -54,22 +53,17 @@ public class JobWrapper implements StatelessJob {
 
     private final JobIdentifier jobIdentifier;
 
-    private final SessionAccessor sessionAccessor;
-
     private final TransactionService transactionService;
 
     private final PersistenceService persistenceService;
 
     private final JobService jobService;
 
-    public JobWrapper(final JobIdentifier jobIdentifier, final StatelessJob statelessJob, final long tenantId,
-            final EventService eventService, final SessionAccessor sessionAccessor,
-            final TransactionService transactionService, PersistenceService persistenceService, JobService jobService) {
+    public JobWrapper(final JobIdentifier jobIdentifier, final StatelessJob statelessJob,
+            final EventService eventService, final TransactionService transactionService,
+            PersistenceService persistenceService, JobService jobService) {
         this.jobIdentifier = jobIdentifier;
-        this.sessionAccessor = sessionAccessor;
         this.statelessJob = statelessJob;
-
-        this.tenantId = tenantId;
         this.eventService = eventService;
         this.transactionService = transactionService;
         this.persistenceService = persistenceService;
@@ -91,7 +85,6 @@ public class JobWrapper implements StatelessJob {
     @Override
     public void execute() throws SJobExecutionException, SFireEventException {
         try {
-            sessionAccessor.setTenantId(tenantId);
             if (eventService.hasHandlers(JOB_EXECUTING, null)) {
                 jobExecuting.setObject(this);
                 eventService.fireEvent(jobExecuting);
@@ -118,48 +111,36 @@ public class JobWrapper implements StatelessJob {
     }
 
     void handleFailure(Throwable e) {
-        log.error("Error while executing job " + jobIdentifier + " : " + e.getMessage(), e);
+        log.error("Error while executing job {} : {}", jobIdentifier, e.getMessage(), e);
         try {
             registerFailInAnOtherThread(e, jobIdentifier);
             transactionService.setRollbackOnly();
         } catch (STransactionException | STransactionNotFoundException e1) {
-            log.error(
-                    "Unable to rollback transaction after fail on job  " + jobIdentifier.getId(), e);
+            log.error("Unable to rollback transaction after fail on job  {}", jobIdentifier.getId(), e);
         }
     }
 
     private void registerFailInAnOtherThread(final Throwable jobException, final JobIdentifier jobIdentifier)
             throws STransactionNotFoundException {
-        transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
-
-            @Override
-            public void afterCompletion(final int txState) {
-                Thread thread = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            sessionAccessor.setTenantId(jobIdentifier.getTenantId());
-                            transactionService.executeInTransaction(() -> {
-                                jobService.logJobError(jobException, jobIdentifier.getId());
-                                return null;
-                            });
-                        } catch (Exception e) {
-                            log.error(
-                                    "Error while registering the error for the job " + jobIdentifier.getId(), e);
-                            log.error("job exception was ", jobException);
-                        }
-                        sessionAccessor.deleteTenantId();
-                    }
-                }, "Job error handler");
-                thread.start();
+        transactionService.registerBonitaSynchronization((BonitaTransactionSynchronization) txState -> {
+            Thread thread = new Thread(() -> {
                 try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    log.error(
-                            "Thread to log error on job " + jobIdentifier.getId() + " interrupted", e);
+                    transactionService.executeInTransaction(() -> {
+                        jobService.logJobError(jobException, jobIdentifier.getId());
+                        return null;
+                    });
+                } catch (Exception e) {
+                    log.error("Error while registering the error for the job {}", jobIdentifier.getId(), e);
+                    log.error("job exception was ", jobException);
                 }
+            }, "Job error handler");
 
+            thread.start();
+
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                log.error("Thread to log error on job {} interrupted", jobIdentifier.getId(), e);
             }
         });
     }

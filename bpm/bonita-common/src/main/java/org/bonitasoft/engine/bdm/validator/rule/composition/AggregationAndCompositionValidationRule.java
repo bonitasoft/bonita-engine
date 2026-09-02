@@ -47,8 +47,7 @@ public class AggregationAndCompositionValidationRule extends ValidationRule<Busi
         for (BusinessObject bo : businessObjects)
             fieldList.addAll(bo.getFields());
         for (Field field : fieldList) {
-            if (field instanceof RelationField) {
-                RelationField relationField = (RelationField) field;
+            if (field instanceof RelationField relationField) {
                 if (relationField.getType() == AGGREGATION) {
                     aggregatedBusinessObjects.add(relationField.getReference());
                 }

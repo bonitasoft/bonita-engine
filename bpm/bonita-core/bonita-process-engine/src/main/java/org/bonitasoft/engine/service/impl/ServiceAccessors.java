@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * This is the main entry point to the engine services
@@ -24,25 +22,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public interface ServiceAccessors {
 
-    /**
-     * @deprecated since 9.0.0, use {@link #getServiceAccessor()} instead
-     */
-    @Deprecated(forRemoval = true, since = "9.0.0")
-    PlatformInitServiceAccessor getPlatformInitServiceAccessor();
-
     ServiceAccessor getServiceAccessor();
-
-    /**
-     * @deprecated since 9.0.0, use {@link #getServiceAccessor()} instead
-     */
-    @Deprecated(forRemoval = true, since = "9.0.0")
-    PlatformServiceAccessor getPlatformServiceAccessor();
-
-    /**
-     * @deprecated since 9.0.0, use {@link #getServiceAccessor()} instead
-     */
-    @Deprecated(forRemoval = true, since = "9.0.0")
-    TenantServiceAccessor getTenantServiceAccessor();
 
     void destroy();
 }

@@ -16,9 +16,7 @@ package org.bonitasoft.engine.core.form;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -29,7 +27,6 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Entity
 @Data
@@ -37,7 +34,6 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @NoArgsConstructor
 @Builder
 @Table(name = "form_mapping")
-@IdClass(PersistentObjectId.class)
 public class SFormMapping implements PersistentObject {
 
     public static final String TARGET_INTERNAL = "INTERNAL";
@@ -51,17 +47,12 @@ public class SFormMapping implements PersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column(name = "process")
     private long processDefinitionId;
     private String task;
     private String target;
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "page_mapping_tenant_id", referencedColumnName = "tenantId"),
-            @JoinColumn(name = "page_mapping_id", referencedColumnName = "id")
-    })
+    @JoinColumn(name = "page_mapping_id", referencedColumnName = "id")
     private SPageMapping pageMapping;
     private Integer type;
     private long lastUpdateDate;

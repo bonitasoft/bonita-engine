@@ -13,23 +13,19 @@
  **/
 package org.bonitasoft.web.rest.model.bdm;
 
+import java.io.Serial;
 import java.io.Serializable;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class BusinessDataModelItem implements Serializable {
 
-    /**
-     * UID
-     */
+    @Serial
     private static final long serialVersionUID = -6119736077951213751L;
 
     private String fileUpload;
-
-    public String getFileUpload() {
-        return fileUpload;
-    }
-
-    public void setFileUpload(String fileUpload) {
-        this.fileUpload = fileUpload;
-    }
 
 }

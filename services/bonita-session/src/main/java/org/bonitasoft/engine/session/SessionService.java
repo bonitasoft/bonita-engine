@@ -39,19 +39,17 @@ public interface SessionService {
     /**
      * Create a new session for the given user;
      *
-     * @param tenantId
-     * @param userName
-     *        userName
+     * @param userName userName
      * @return a new session
      * @throws SSessionException
      *         if some error arrives while creating the session
      * @since 6.0
      */
-    SSession createSession(long tenantId, String userName) throws SSessionException;
+    SSession createSession(String userName) throws SSessionException;
 
-    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser) throws SSessionException;
+    SSession createSession(long userId, String userName, boolean technicalUser) throws SSessionException;
 
-    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser, List<String> profiles,
+    SSession createSession(long userId, String userName, boolean technicalUser, List<String> profiles,
             Set<String> permissions)
             throws SSessionException;
 
@@ -148,17 +146,13 @@ public interface SessionService {
     void deleteSessions();
 
     /**
-     * Delete all sessions of a tenant
-     *
-     * @param tenantId
+     * Delete all sessions
      */
-    void deleteSessionsOfTenant(long tenantId);
+    void deleteAllSessions();
 
     /**
      * Delete all sessions of a tenant except the one of the technical user
-     *
-     * @param tenantId
      */
-    void deleteSessionsOfTenantExceptTechnicalUser(long tenantId);
+    void deleteSessionsExceptTechnicalUser();
 
 }

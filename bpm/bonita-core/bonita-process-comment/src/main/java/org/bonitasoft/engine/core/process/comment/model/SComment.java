@@ -17,7 +17,6 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
@@ -25,7 +24,6 @@ import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -34,7 +32,6 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")
 @Table(name = "process_comment")
 public class SComment implements PersistentObject {
@@ -47,8 +44,6 @@ public class SComment implements PersistentObject {
     public static final String KIND_KEY = "kind";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private Long userId;
     @Column

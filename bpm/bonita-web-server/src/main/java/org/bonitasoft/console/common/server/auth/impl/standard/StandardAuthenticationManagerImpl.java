@@ -14,16 +14,22 @@
 package org.bonitasoft.console.common.server.auth.impl.standard;
 
 import java.io.Serializable;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
+import org.bonitasoft.console.common.server.auth.AuthenticationManagerProperties;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.credentials.Credentials;
 import org.bonitasoft.console.common.server.utils.LocaleUtils;
+import org.bonitasoft.console.common.server.utils.UrlBuilder;
+import org.bonitasoft.engine.properties.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,19 +43,24 @@ public class StandardAuthenticationManagerImpl implements AuthenticationManager 
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(StandardAuthenticationManagerImpl.class.getName());
 
+    protected String loginPageURL = null;
+
     @Override
     public String getLoginPageURL(final HttpServletRequestAccessor request, final String redirectURL)
             throws ServletException {
-        final StringBuilder url = new StringBuilder();
-        String context = request.asHttpServletRequest().getContextPath();
-        url.append(context).append(AuthenticationManager.LOGIN_PAGE).append("?");
+        final UrlBuilder loginURL = new UrlBuilder(getLoginPage(request));
         //adds the locale to the login URL if it is set in the requested URL
         String localeFromRequestedURL = LocaleUtils.getLocaleFromRequestURL(request.asHttpServletRequest());
         if (localeFromRequestedURL != null) {
-            url.append(LocaleUtils.PORTAL_LOCALE_PARAM).append("=").append(localeFromRequestedURL).append("&");
+            loginURL.appendParameter(LocaleUtils.PORTAL_LOCALE_PARAM, localeFromRequestedURL);
         }
-        url.append(AuthenticationManager.REDIRECT_URL).append("=").append(redirectURL);
-        return url.toString();
+        if (StringUtils.isNotBlank(redirectURL)) {
+            //Decodes the redirect URL if it is encoded because LoginUrl already encodes it (avoid double encoding)
+            //since this method is part of a public interface, we cannot change the calling code to pass decoded redirectURL
+            String decodedRedirectURL = URLDecoder.decode(redirectURL, StandardCharsets.UTF_8);
+            loginURL.appendParameter(AuthenticationManager.REDIRECT_URL, decodedRedirectURL);
+        }
+        return loginURL.build();
     }
 
     @Override
@@ -67,5 +78,30 @@ public class StandardAuthenticationManagerImpl implements AuthenticationManager 
     public String getLogoutPageURL(final HttpServletRequestAccessor request, final String redirectURL)
             throws ServletException {
         return null;
+    }
+
+    protected String getLoginPage(HttpServletRequestAccessor requestAccessor) {
+        //the login page cannot be different from one request to another, so only compute it once
+        if (loginPageURL == null) {
+            StringProperty loginPage = new StringProperty("External Login URL",
+                    AuthenticationManager.BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR,
+                    getAuthenticationProperty(
+                            AuthenticationManager.BONITA_RUNTIME_AUTHENTICATION_LOGIN_URL_VAR,
+                            getDefaultLoginPage(requestAccessor)));
+            loginPageURL = loginPage.getValue();
+        }
+        return loginPageURL;
+    }
+
+    protected String getDefaultLoginPage(HttpServletRequestAccessor requestAccessor) {
+        final StringBuilder url = new StringBuilder();
+        String context = requestAccessor.asHttpServletRequest().getContextPath();
+        url.append(context).append(LOGIN_PAGE);
+        return url.toString();
+    }
+
+    protected String getAuthenticationProperty(String propertyName, String defaultValue) {
+        String propertyValue = AuthenticationManagerProperties.getProperties().getTenantProperty(propertyName);
+        return propertyValue != null ? propertyValue : defaultValue;
     }
 }

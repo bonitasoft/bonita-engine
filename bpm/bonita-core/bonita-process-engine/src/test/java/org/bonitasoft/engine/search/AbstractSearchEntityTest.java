@@ -114,9 +114,6 @@ class AbstractSearchEntityTest {
             public void setId(long id) {
             }
 
-            @Override
-            public void setTenantId(long id) {
-            }
         }
     }
 }

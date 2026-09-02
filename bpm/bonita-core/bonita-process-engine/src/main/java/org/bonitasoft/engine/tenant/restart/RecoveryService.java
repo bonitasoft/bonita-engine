@@ -29,14 +29,12 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,10 +60,8 @@ public class RecoveryService {
     private final UserTransactionService userTransactionService;
     private final FlowNodesRecover flowNodesRecover;
     private final ProcessesRecover processesRecover;
-    private final SessionAccessor sessionAccessor;
     private final ObjectFactory<RecoveryMonitor> recoveryMonitorProvider;
     private final MeterRegistry meterRegistry;
-    private long tenantId;
     private int readBatchSize;
     private int batchRestartSize;
     private Duration considerElementsOlderThan;
@@ -79,7 +75,6 @@ public class RecoveryService {
             UserTransactionService userTransactionService,
             FlowNodesRecover flowNodesRecover,
             ProcessesRecover processesRecover,
-            SessionAccessor sessionAccessor,
             ObjectFactory<RecoveryMonitor> recoveryMonitorProvider,
             MeterRegistry meterRegistry) {
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -87,27 +82,25 @@ public class RecoveryService {
         this.userTransactionService = userTransactionService;
         this.flowNodesRecover = flowNodesRecover;
         this.processesRecover = processesRecover;
-        this.sessionAccessor = sessionAccessor;
         this.recoveryMonitorProvider = recoveryMonitorProvider;
         this.meterRegistry = meterRegistry;
     }
 
     @PostConstruct
     protected void initMetrics() {
-        Tags tags = Tags.of("tenant", String.valueOf(tenantId));
         this.longTaskTimer = LongTaskTimer
                 .builder(DURATION_OF_RECOVERY_TASK)
-                .description("duration of recovery task").tags(tags)
+                .description("duration of recovery task")
                 .register(meterRegistry);
         Gauge.builder(NUMBER_OF_ELEMENTS_RECOVERED_LAST_RECOVERY, numberOfElementsRecoveredDuringTheLastRecover,
                 AtomicLong::doubleValue)
-                .description("number of elements recovered").baseUnit("elements").tags(tags)
+                .description("number of elements recovered").baseUnit("elements")
                 .register(meterRegistry);
         numberOfElementsRecoveredTotal = Counter.builder(NUMBER_OF_ELEMENTS_RECOVERED_TOTAL)
-                .baseUnit("elements").description("Total number of elements recovered").tags(tags)
+                .baseUnit("elements").description("Total number of elements recovered")
                 .register(meterRegistry);
         numberOfRecoverExecuted = Counter.builder(NUMBER_OF_RECOVERY)
-                .baseUnit("executions").description("Number of recovery executed").tags(tags)
+                .baseUnit("executions").description("Number of recovery executed")
                 .register(meterRegistry);
     }
 
@@ -124,11 +117,6 @@ public class RecoveryService {
     @Value("${bonita.tenant.work.batch_restart_size:1000}")
     public void setBatchRestartSize(int batchRestartSize) {
         this.batchRestartSize = batchRestartSize;
-    }
-
-    @Value("${tenantId}")
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
     }
 
     @VisibleForTesting
@@ -209,7 +197,6 @@ public class RecoveryService {
     public void recoverAllElements() {
         longTaskTimer.record(() -> {
             try {
-                sessionAccessor.setTenantId(tenantId);
                 List<ElementToRecover> allElementsToRecover = userTransactionService.executeInTransaction(
                         () -> RecoveryService.this.getAllElementsToRecover(considerElementsOlderThan));
                 log.debug("Found {} that can potentially be recovered", allElementsToRecover.size());

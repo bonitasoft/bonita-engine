@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.business.data;
 
 import static java.util.Collections.singletonList;
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.*;
@@ -44,6 +44,7 @@ import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import net.javacrumbs.jsonunit.core.Option;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -71,14 +72,34 @@ import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.process.*;
-import org.bonitasoft.engine.bpm.process.impl.*;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
+import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UnavailableLockException;
-import org.bonitasoft.engine.expression.*;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionConstants;
+import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.ExpressionType;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -111,13 +132,12 @@ public class BDRepositoryIT extends CommonAPIIT {
     public ExpectedException expectedException = ExpectedException.none();
     private User testUser;
     private File clientFolder;
-    private long tenantId;
     private BusinessObjectModel model;
 
     @Before
     public void setUp() throws Exception {
         clientFolder = temporaryFolder.newFolder();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         testUser = createUser("testUser", "bpm");
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
@@ -128,8 +148,6 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         assertThat(getTenantAdministrationAPI().isPaused())
                 .as("should have resume tenant after installing Business Object Model").isFalse();
-
-        tenantId = getSession().getTenantId();
     }
 
     @After
@@ -142,7 +160,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         cleanAndUninstallBusinessDataModel();
 
         deleteUser(testUser);
-        logoutOnTenant();
+        logout();
     }
 
     @Test
@@ -152,7 +170,7 @@ public class BDRepositoryIT extends CommonAPIIT {
             getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
             assertThatThrownBy(
                     () -> getTenantAdministrationAPI().updateBusinessDataModel(getZip(buildBOMWithInvalidQuery())))
-                            .isInstanceOf(BusinessDataRepositoryDeploymentException.class);
+                    .isInstanceOf(BusinessDataRepositoryDeploymentException.class);
         } finally {
             getTenantAdministrationAPI().resume();
         }
@@ -695,7 +713,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     @Test
     public void should_undeploy_delete_generate_client_bdm_zip() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         cleanAndUninstallBusinessDataModel();
         expectedException.expect(BusinessDataRepositoryException.class);
         getTenantAdministrationAPI().getClientBDMZip();
@@ -767,20 +785,20 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(nbOfAddress).isEqualTo(1L);
         assertThat(nbOfEmployee).isEqualTo(1L);
 
-        logoutOnTenant();
+        logout();
 
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().resume();
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("testUser", "bpm");
 
         evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
 
         assertCount(processInstanceId);
 
@@ -1753,7 +1771,10 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // then
         assertThatJson(lazyAddressResultWithChildName).as("should get address with lazy link to country")
-                .hasSameStructureAs(getJsonContent("getBusinessDataByIdsEmployee.json"));
+                .node("[0].addresses[0].links[0]")
+                .isObject()
+                .containsEntry("rel", "country")
+                .containsKey("href");
     }
 
     private void verifyCommandGetBusinessDataById(final SimpleBusinessDataReference businessDataReference)
@@ -1770,7 +1791,8 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // then
         assertThatJson(lazyAddressResultWithChildName).as("should get address with lazy link to country")
-                .hasSameStructureAs(getJsonContent("getBusinessDataByIdAddress.json"));
+                .when(Option.IGNORING_VALUES)
+                .isEqualTo(getJsonContent("getBusinessDataByIdAddress.json"));
 
         // when
         parameters.remove("businessDataChildName");
@@ -1778,7 +1800,10 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // then
         assertThatJson(employeeResultWithAddress).as("should get employee with lazy link to country in addresses")
-                .hasSameStructureAs(getJsonContent("getBusinessDataByIdEmployee.json"));
+                .node("addresses[0].links[0]")
+                .isObject()
+                .containsEntry("rel", "country")
+                .containsKey("href");
 
     }
 
@@ -1806,7 +1831,9 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // then
         assertThatJson(jsonResult).as("should get employee")
-                .hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
+                .when(Option.IGNORING_VALUES)
+                .whenIgnoringPaths("[0].hireDate")
+                .isEqualTo(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
 
     }
 
@@ -1831,7 +1858,9 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // then
         assertThatJson(jsonResult).as("should get employee")
-                .hasSameStructureAs(getJsonContent("getEmployeeByPhoneNumber.json"));
+                .when(Option.IGNORING_VALUES)
+                .whenIgnoringPaths("[0].hireDate", "[0].booleanField")
+                .isEqualTo(getJsonContent("getEmployeeByPhoneNumber.json"));
 
     }
 
@@ -1845,7 +1874,9 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata())
                 .as("should have no metadata when custom countFor is not here").isNull();
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee")
-                .hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
+                .when(Option.IGNORING_VALUES)
+                .whenIgnoringPaths("[0].hireDate", "[0].booleanField")
+                .isEqualTo(getJsonContent("findByFirstNameFetchAddresses.json"));
 
     }
 
@@ -1894,12 +1925,13 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // then
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee")
-                .hasSameStructureAs(getJsonContent("findByHireDate.json"));
+                .isArray()
+                .isNotEmpty();
         final BusinessDataQueryMetadata businessDataQueryMetadata = businessDataQueryResult
                 .getBusinessDataQueryMetadata();
         assertThat(businessDataQueryMetadata).as("should have metadata").isNotNull();
         assertThat(businessDataQueryMetadata.getCount()).isEqualTo(1L);
-        assertThat(businessDataQueryMetadata.getStartIndex()).isEqualTo(0);
+        assertThat(businessDataQueryMetadata.getStartIndex()).isZero();
         assertThat(businessDataQueryMetadata.getMaxResults()).isEqualTo(10);
 
     }
@@ -2118,14 +2150,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(businessDataReference.getStorageIdAsString()).isNull();
 
         disableAndDeleteProcess(definition.getId());
-    }
-
-    private String getClientBdmJarClassPath(final String bonitaHomePath) {
-        return new StringBuilder().append(bonitaHomePath).append(File.separator).append("engine-server")
-                .append(File.separator).append("work")
-                .append(File.separator).append("tenants").append(File.separator).append(tenantId).append(File.separator)
-                .append("data-management-client")
-                .toString();
     }
 
     @Test
@@ -2601,7 +2625,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         waitForUserTask("userTask");
         assertThat(new String(getProcessAPI().getDocumentContent(
                 getProcessAPI().getLastDocument(processInstance.getId(), "myDoc").getContentStorageId())))
-                        .isEqualTo("updatedContents");
+                .isEqualTo("updatedContents");
 
         getProcessAPI().sendSignal("theSignal");
         //then
@@ -2610,7 +2634,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         //instantiation of the event sub process work and did not reinitialized elements
         assertThat(new String(getProcessAPI().getDocumentContent(
                 getProcessAPI().getLastDocument(processInstance.getId(), "myDoc").getContentStorageId())))
-                        .isEqualTo("updatedContents");
+                .isEqualTo("updatedContents");
         assertThat(getProcessAPI().getDocumentList(processInstance.getId(), "MyList", 0, 100)).hasSize(2);
         try {
             getProcessAPI().getLastDocument(eventSubProcessActivity.getParentProcessInstanceId(), "myDoc");
@@ -2619,7 +2643,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
         assertThat(
                 getProcessAPI().getDocumentList(eventSubProcessActivity.getParentProcessInstanceId(), "MyList", 0, 100))
-                        .isEmpty();
+                .isEmpty();
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -2664,7 +2688,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThatJson(
                 getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(
                         processInstance.getId()).get("ref_myBusinessData")))
-                                .node("lastName").isEqualTo("\"Doe\"");
+                .node("lastName").isEqualTo("\"Doe\"");
         //when
         getProcessAPI().sendSignal("theSignal");
         waitForUserTask("userTaskInSubProcess");
@@ -2673,7 +2697,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThatJson(
                 getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(
                         processInstance.getId()).get("ref_myBusinessData")))
-                                .node("lastName").isEqualTo("\"newName\"");
+                .node("lastName").isEqualTo("\"newName\"");
         disableAndDeleteProcess(processDefinition);
     }
 

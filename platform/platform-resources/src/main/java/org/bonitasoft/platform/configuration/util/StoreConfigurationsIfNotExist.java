@@ -29,7 +29,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
  */
 public class StoreConfigurationsIfNotExist extends TransactionCallbackWithoutResult {
 
-    public static final String SELECT_CONFIGURATION_EXISTS = "SELECT count(1) FROM configuration WHERE tenant_id = ? AND content_type = ? AND resource_name = ?";
+    public static final String SELECT_CONFIGURATION_EXISTS = "SELECT count(1) FROM configuration WHERE content_type = ? AND resource_name = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final String dbVendor;
@@ -46,7 +46,7 @@ public class StoreConfigurationsIfNotExist extends TransactionCallbackWithoutRes
     public void doInTransactionWithoutResult(TransactionStatus status) {
         for (FullBonitaConfiguration configuration : configurations) {
             final Integer nbRows = jdbcTemplate.queryForObject(SELECT_CONFIGURATION_EXISTS, Integer.class,
-                    configuration.getTenantId(), configuration.getConfigurationType(), configuration.getResourceName());
+                    configuration.getConfigurationType(), configuration.getResourceName());
 
             if (nbRows == 0) {
                 // only keep elements that do not already exist in database...
@@ -55,10 +55,9 @@ public class StoreConfigurationsIfNotExist extends TransactionCallbackWithoutRes
                 jdbcTemplate.batchUpdate(BonitaAllConfigurationPreparedStatementSetter.INSERT_CONFIGURATION,
                         new BonitaAllConfigurationPreparedStatementSetter(singletonList(configuration), dbVendor));
             } else {
-                LOGGER.debug("Configuration already exists for type: {}, resource: {} and tenant id: {}. Ignoring it.",
+                LOGGER.debug("Configuration already exists for type: {}, resource: {}. Ignoring it.",
                         configuration.getConfigurationType(),
-                        configuration.getResourceName(),
-                        configuration.getTenantId());
+                        configuration.getResourceName());
             }
         }
     }

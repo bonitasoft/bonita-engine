@@ -21,7 +21,6 @@ import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,7 +42,6 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     private static final String BONITA_WORK_EXECUTOR = "bonita-work-executor";
     private final Logger logger = LoggerFactory.getLogger(DefaultBonitaExecutorServiceFactory.class);
 
-    private final long tenantId;
     private final MeterRegistry meterRegistry;
     private final ExecutorServiceMetricsProvider executorServiceMetricsProvider;
     private final BonitaWorkExecutorFactory bonitaWorkExecutorFactory;
@@ -51,14 +49,13 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     private final WorkFactory workFactory;
     private final WorkExecutionAuditor workExecutionAuditor;
 
-    public DefaultBonitaExecutorServiceFactory(@Value("${tenantId}") long tenantId,
+    public DefaultBonitaExecutorServiceFactory(
             MeterRegistry meterRegistry,
             EngineClock engineClock,
             WorkFactory workFactory,
             WorkExecutionAuditor workExecutionAuditor,
             ExecutorServiceMetricsProvider executorServiceMetricsProvider,
             BonitaWorkExecutorFactory bonitaWorkExecutorFactory) {
-        this.tenantId = tenantId;
         this.meterRegistry = meterRegistry;
         this.workFactory = workFactory;
         this.workExecutionAuditor = workExecutionAuditor;
@@ -75,20 +72,19 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
                 engineClock,
                 workExecutionCallback,
                 workExecutionAuditor,
-                meterRegistry,
-                tenantId);
+                meterRegistry);
         logger.info(
                 "Creating a new Thread pool to handle works: {}", bonitaThreadPoolExecutor);
 
         //TODO this returns the timed executor service, this should be used instead of the BonitaExecutorService but we should change it everywhere
         executorServiceMetricsProvider
-                .bindMetricsOnly(meterRegistry, bonitaThreadPoolExecutor, BONITA_WORK_EXECUTOR, tenantId);
+                .bindMetricsOnly(meterRegistry, bonitaThreadPoolExecutor, BONITA_WORK_EXECUTOR);
         return bonitaExecutorService;
     }
 
     @Override
     public void unbind() {
-        executorServiceMetricsProvider.unbind(meterRegistry, BONITA_WORK_EXECUTOR, tenantId);
+        executorServiceMetricsProvider.unbind(meterRegistry, BONITA_WORK_EXECUTOR);
     }
 
 }

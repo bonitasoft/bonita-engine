@@ -65,7 +65,6 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         jobService = getServiceAccessor().getJobService();
         TestUtil.stopScheduler(schedulerService, getTransactionService());
         TestUtil.startScheduler(schedulerService);
-        getServiceAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
     }
 
     @After
@@ -137,7 +136,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
         // pause
         getTransactionService().begin();
-        schedulerService.pauseJobs(sessionAccessor.getTenantId());
+        schedulerService.pauseJobs();
         getTransactionService().complete();
         Thread.sleep(100);
         ReleaseWaitersJob.checkNotExecutedDuring(1500);
@@ -301,10 +300,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
     private <T> T inTx(Callable<T> callable) throws Exception {
 
-        return userTransactionService.executeInTransaction(() -> {
-            getServiceAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
-            return callable.call();
-        });
+        return userTransactionService.executeInTransaction(() -> callable.call());
     }
 
     private SJobDescriptor jobDescriptor(Class<?> jobClass, String jobName) {

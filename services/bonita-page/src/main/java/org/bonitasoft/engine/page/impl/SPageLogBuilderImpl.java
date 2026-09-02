@@ -41,7 +41,7 @@ public class SPageLogBuilderImpl extends CRUDELogBuilder implements SPageLogBuil
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
                 && log.getNumericIndex(SPageLogBuilderFactoryImpl.PAGE_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFields are missing: page identifier");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: page identifier");
         }
     }
 

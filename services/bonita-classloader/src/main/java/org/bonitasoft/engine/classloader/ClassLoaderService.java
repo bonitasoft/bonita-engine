@@ -23,7 +23,7 @@ import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
  */
 public interface ClassLoaderService extends PlatformLifecycleService {
 
-    void registerDependencyServiceOfTenant(Long tenantId, TenantDependencyService tenantDependencyService);
+    void registerDependencyService(TenantDependencyService tenantDependencyService);
 
     /**
      * Get the local ClassLoader for the given type and id.

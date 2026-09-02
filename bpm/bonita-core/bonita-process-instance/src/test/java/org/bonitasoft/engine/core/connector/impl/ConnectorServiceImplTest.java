@@ -306,8 +306,8 @@ public class ConnectorServiceImplTest {
                 .singletonList(new SBARResource("HoogardenBeerConnector.impl", BARResourceType.CONNECTOR,
                         processDefinition.getId(),
                         connectorImplFile)))
-                                .when(processResourcesService)
-                                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
+                .when(processResourcesService)
+                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
 
         //setConnectorImplementation store to cache
         connectorService.setConnectorImplementation(processDefinition, connectorDefId, connectorDefVersion, zip1);
@@ -422,8 +422,8 @@ public class ConnectorServiceImplTest {
         doReturn(Collections.singletonList(
                 new SBARResource("myConnector1.impl", BARResourceType.CONNECTOR, processDefinition.getId(),
                         createConnectorImplFile("connectorId", "connectorVersion"))))
-                                .when(processResourcesService)
-                                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
+                .when(processResourcesService)
+                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
         doReturn(new SDependency("jar2.jar", "jar2.jar", new byte[] { 2 })).when(dependencyService)
                 .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, "jar2.jar");
         systemOutRule.clearLog();
@@ -502,8 +502,8 @@ public class ConnectorServiceImplTest {
         doReturn(Collections.singletonList(
                 new SBARResource(implName, BARResourceType.CONNECTOR, processDefinition.getId(),
                         createConnectorImplFile(connectorId, connectorVersion, jars))))
-                                .when(processResourcesService)
-                                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
+                .when(processResourcesService)
+                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
         for (BarResource jar : jars) {
             doReturn(new SDependency(jar.getName(), jar.getName(), jar.getContent())).when(dependencyService)
                     .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, jar.getName());
@@ -530,8 +530,8 @@ public class ConnectorServiceImplTest {
         doReturn(Collections.singletonList(
                 new SBARResource(implName, BARResourceType.CONNECTOR, processDefinition.getId(),
                         createConnectorImplFile(connectorId, connectorVersion, jars))))
-                                .when(processResourcesService)
-                                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
+                .when(processResourcesService)
+                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
         for (BarResource jar : jars) {
             doReturn(null).when(dependencyService).getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS,
                     jar.getName());
@@ -649,7 +649,7 @@ public class ConnectorServiceImplTest {
         assertThatThrownBy(
                 () -> connectorService.executeOutputOperation(new ArrayList<>(), new SExpressionContext(1L, "", 1L),
                         connectorResult))
-                                .isInstanceOf(SConnectorException.class);
+                .isInstanceOf(SConnectorException.class);
 
         // Then
         verify(connectorExecutor).disconnect(any(SConnectorAdapter.class));

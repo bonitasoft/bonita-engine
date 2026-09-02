@@ -205,11 +205,6 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    public Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName) {
-        return Optional.empty();
-    }
-
-    @Override
     protected QueryOptions getDefaultQueryOptionForDependencyMapping() {
         return new QueryOptions(0, 100, SPlatformDependencyMapping.class, "id", OrderByType.ASC);
     }

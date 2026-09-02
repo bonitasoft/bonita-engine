@@ -20,7 +20,7 @@ import org.junit.Test;
 public class SelectRangeTest {
 
     @Test
-    public void getStartIndex_should_return_startIndex_used_in_constructor() throws Exception {
+    public void getStartIndex_should_return_startIndex_used_in_constructor() {
         //given
         SelectRange range = new SelectRange(5, 10);
 
@@ -29,7 +29,7 @@ public class SelectRangeTest {
     }
 
     @Test
-    public void getMaxResults_should_return_maxResults_used_in_constructor() throws Exception {
+    public void getMaxResults_should_return_maxResults_used_in_constructor() {
         //given
         SelectRange range = new SelectRange(5, 10);
 

@@ -10,7 +10,9 @@ dependencies {
     api project(':bpm:bonita-client')
     api project(':bonita-integration-tests:bonita-test-utils')
     api libs.assertj
-    api libs.jsonUnitFluent
+    api(libs.jsonUnit) {
+        exclude(group: "org.slf4j", module: "slf4j-api")
+    }
     api libs.systemRules
     api libs.concurrentUnit
     runtimeOnly libs.logback
@@ -19,6 +21,7 @@ dependencies {
     testImplementation libs.awaitility
     testImplementation libs.xmlunit
     testImplementation libs.mockitoCore
+    testImplementation libs.logback
 }
 
 test.doFirst {
@@ -48,10 +51,6 @@ publishing {
 
 httpTests {
     integrationTestsSuite = "**/*IT.class"
-}
-
-tests {
-    slowTestsSuite = "**/*IT.class"
 }
 
 databaseIntegrationTest { include "**/*IT.class" }

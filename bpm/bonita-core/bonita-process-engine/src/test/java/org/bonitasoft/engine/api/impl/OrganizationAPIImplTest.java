@@ -24,7 +24,6 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.profile.ProfileService;
@@ -70,9 +69,6 @@ public class OrganizationAPIImplTest {
     private SupervisorMappingService supervisorService;
 
     @Mock
-    private ExternalIdentityMappingService externalIdentityMappingService;
-
-    @Mock
     private ProcessDefinitionService processDefinitionService;
 
     @Mock
@@ -94,7 +90,6 @@ public class OrganizationAPIImplTest {
         given(serviceAccessor.getActorMappingService()).willReturn(actorMappingService);
         given(serviceAccessor.getProfileService()).willReturn(profileService);
         given(serviceAccessor.getSupervisorService()).willReturn(supervisorService);
-        given(serviceAccessor.getExternalIdentityMappingService()).willReturn(externalIdentityMappingService);
         given(serviceAccessor.getProcessDefinitionService()).willReturn(processDefinitionService);
 
         given(userInfoDef1.getId()).willReturn(CUSTOM_USER_INFO_DEF_ID1);
@@ -119,7 +114,6 @@ public class OrganizationAPIImplTest {
         verify(profileService, times(1)).deleteAllProfileMembers();
         verify(activityInstanceService, times(1)).deleteAllPendingMappings();
         verify(supervisorService, times(1)).deleteAllProcessSupervisors();
-        verify(externalIdentityMappingService, times(1)).deleteAllExternalIdentityMappings();
         verify(identityService, times(1)).deleteAllUserMemberships();
         verify(identityService, times(1)).deleteAllGroups();
         verify(identityService, times(1)).deleteAllRoles();

@@ -79,7 +79,6 @@ class CaseVariablePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isFalse()
-
     }
 
     @Test
@@ -92,7 +91,6 @@ class CaseVariablePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -105,7 +103,6 @@ class CaseVariablePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isFalse()
-
     }
 
     @Test
@@ -118,7 +115,6 @@ class CaseVariablePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -129,7 +125,6 @@ class CaseVariablePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -140,6 +135,5 @@ class CaseVariablePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isFalse()
-
     }
 }

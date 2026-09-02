@@ -27,17 +27,18 @@ import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
 import org.bonitasoft.engine.persistence.HibernatePersistenceService;
 import org.bonitasoft.engine.persistence.QueryBuilderFactory;
 import org.bonitasoft.engine.sequence.SequenceManager;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @Configuration
 @ComponentScan("org.bonitasoft.engine")
+@EnableAspectJAutoProxy // Uses JDK dynamic proxies (interface-based)
 @Data
 public class EngineConfiguration {
 
@@ -55,11 +56,11 @@ public class EngineConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    HibernatePersistenceService persistenceService(final ReadSessionAccessor sessionAccessor,
-            final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
+    HibernatePersistenceService persistenceService(final HibernateConfigurationProvider hbmConfigurationProvider,
+            final Properties extraHibernateProperties,
             final SequenceManager sequenceManager, HibernateMetricsBinder hibernateMetricsBinder,
             QueryBuilderFactory queryBuilderFactory) {
-        return new HibernatePersistenceService(sessionAccessor, hbmConfigurationProvider,
+        return new HibernatePersistenceService(hbmConfigurationProvider,
                 extraHibernateProperties, sequenceManager, queryBuilderFactory, hibernateMetricsBinder);
     }
 

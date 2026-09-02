@@ -77,7 +77,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final long tenantId)
+    public SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor)
             throws SJobDescriptorCreationException {
         if (sJobDescriptor == null) {
             throw new IllegalArgumentException("The job descriptor is null");
@@ -85,11 +85,9 @@ public class JobServiceImpl implements JobService {
             throw new IllegalArgumentException("The job name is null");
         }
 
-        // Set the tenant manually on the object because it will be serialized
         final SJobDescriptor sJobDescriptorToRecord = new SJobDescriptor(sJobDescriptor.getJobClassName(),
                 sJobDescriptor.getJobName(),
                 sJobDescriptor.getDescription());
-        sJobDescriptorToRecord.setTenantId(tenantId);
 
         try {
             create(sJobDescriptorToRecord, JOB_DESCRIPTOR);
@@ -150,24 +148,22 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<SJobParameter> createJobParameters(final List<SJobParameter> sJobParameters, final long tenantId,
-            final long jobDescriptorId)
+    public List<SJobParameter> createJobParameters(final List<SJobParameter> sJobParameters, final long jobDescriptorId)
             throws SJobParameterCreationException {
-        final List<SJobParameter> createdSJobParameters = new ArrayList<SJobParameter>();
+        final List<SJobParameter> createdSJobParameters = new ArrayList<>();
         if (sJobParameters != null) {
             for (final SJobParameter sJobParameter : sJobParameters) {
-                createdSJobParameters.add(createJobParameter(sJobParameter, tenantId, jobDescriptorId));
+                createdSJobParameters.add(createJobParameter(sJobParameter, jobDescriptorId));
             }
         }
         return createdSJobParameters;
     }
 
     @Override
-    public List<SJobParameter> setJobParameters(final long tenantId, final long jobDescriptorId,
-            final List<SJobParameter> parameters)
+    public List<SJobParameter> setJobParameters(final long jobDescriptorId, final List<SJobParameter> parameters)
             throws SJobParameterCreationException {
         deleteAllJobParameters(jobDescriptorId);
-        return createJobParameters(parameters, tenantId, jobDescriptorId);
+        return createJobParameters(parameters, jobDescriptorId);
     }
 
     protected void deleteAllJobParameters(final long jobDescriptorId) throws SJobParameterCreationException {
@@ -181,18 +177,15 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public SJobParameter createJobParameter(final SJobParameter sJobParameter, final long tenantId,
-            final long jobDescriptorId)
+    public SJobParameter createJobParameter(final SJobParameter sJobParameter, final long jobDescriptorId)
             throws SJobParameterCreationException {
         if (sJobParameter == null) {
             throw new IllegalArgumentException("The job descriptor is null");
         }
 
-        // Set the tenant manually on the object because it will be serialized
         final SJobParameter sJobParameterToRecord = SJobParameter.builder()
                 .key(sJobParameter.getKey())
                 .value(sJobParameter.getValue()).jobDescriptorId(jobDescriptorId).build();
-        sJobParameterToRecord.setTenantId(tenantId);
 
         try {
             create(sJobParameterToRecord, JOB_PARAMETER);
@@ -236,8 +229,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<SJobParameter> getJobParameters(Long jobDescriptorId) throws SBonitaReadException {
-        Map<String, Object> parameters = Collections.<String, Object> singletonMap("jobDescriptorId", jobDescriptorId);
-        return readPersistenceService.selectList(new SelectListDescriptor<SJobParameter>("getJobParameters", parameters,
+        Map<String, Object> parameters = Collections.singletonMap("jobDescriptorId", jobDescriptorId);
+        return readPersistenceService.selectList(new SelectListDescriptor<>("getJobParameters", parameters,
                 SJobParameter.class, QueryOptions.countQueryOptions()));
     }
 
@@ -308,11 +301,13 @@ public class JobServiceImpl implements JobService {
         return readPersistenceService.searchEntity(SJobLog.class, queryOptions, null);
     }
 
-    private void delete(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
+    private void delete(final PersistentObject persistentObject, final String eventType)
+            throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(persistentObject), eventType);
     }
 
-    private void create(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
+    private void create(final PersistentObject persistentObject, final String eventType)
+            throws SRecorderException {
         recorder.recordInsert(new InsertRecord(persistentObject), eventType);
     }
 
@@ -328,7 +323,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJobDescriptorByJobName(final String jobName) throws SJobDescriptorDeletionException {
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SJobDescriptor.class, "jobName", jobName));
         final List<OrderByOption> orders = Arrays
                 .asList(new OrderByOption(SJobDescriptor.class, "id", OrderByType.ASC));
@@ -346,7 +341,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteAllJobDescriptors() throws SJobDescriptorDeletionException {
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final List<FilterOption> filters = new ArrayList<>();
         final QueryOptions queryOptions = new QueryOptions(0, 100, null, filters, null);
         try {
             final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);

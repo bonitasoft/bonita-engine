@@ -1,6 +1,4 @@
 {
-  "tenantId": 2,
-  "tenantId_string": "2",
   "name": "dataInstanceName",
   "description": "description",
   "transientData": false,

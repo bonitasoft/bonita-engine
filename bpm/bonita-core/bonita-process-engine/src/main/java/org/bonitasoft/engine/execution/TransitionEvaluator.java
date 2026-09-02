@@ -60,6 +60,7 @@ public class TransitionEvaluator {
         final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(),
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 sDefinition.getId());
+        sExpressionContext.setProcessDefinition(sDefinition);
         if (SFlowNodeType.GATEWAY.equals(flowNodeInstance.getType())) {
             return evaluateOutgoingTransitionsForGateways(transitions, sDefinition, flowNodeInstance,
                     sExpressionContext);

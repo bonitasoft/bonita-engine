@@ -189,8 +189,8 @@ public class DatabaseConfigurationTest {
         // expect:
         assertThatThrownBy(
                 () -> new DatabaseConfiguration("bdm.", properties, null))
-                        .isExactlyInstanceOf(PlatformException.class)
-                        .hasMessage("Invalid integer value 'ten' for property 'bdm.connection-pool.maxIdle'");
+                .isExactlyInstanceOf(PlatformException.class)
+                .hasMessage("Invalid integer value 'ten' for property 'bdm.connection-pool.maxIdle'");
     }
 
 }

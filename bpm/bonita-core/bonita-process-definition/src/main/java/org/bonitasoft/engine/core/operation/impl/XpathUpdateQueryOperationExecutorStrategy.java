@@ -100,8 +100,7 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
                     final String parentPath = xpathExpression.substring(0, xpathExpression.lastIndexOf('/'));
                     final String attributeName = xpathExpression.substring(xpathExpression.lastIndexOf('/') + 2); // +1 for @
                     final Node parentNode = (Node) xpath.compile(parentPath).evaluate(document, XPathConstants.NODE);
-                    if (parentNode instanceof Element) {
-                        final Element element = (Element) parentNode;
+                    if (parentNode instanceof Element element) {
                         if (value instanceof String) {
                             element.setAttribute(attributeName, getStringValue(value));
                         } else if (value instanceof Attr) {

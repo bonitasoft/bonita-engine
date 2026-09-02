@@ -46,6 +46,19 @@ public class ConsoleProperties {
     //Default time between two database check of custom page and rest api last update date in milliseconds
     private static final int DEFAULT_PAGE_LAST_UPDATE_CHECK_INTERVAL_MILLIS = 3000;
 
+    /** Name of attribute attached to the request to indicate the request id */
+    private static final String REQUEST_ID_ATTRIBUTE_NAME = "req.requestId.attributeName";
+    private static final String DEFAULT_REQUEST_ID_ATTRIBUTE_NAME = "track.requestId";
+    /** Name of request header containing the request id when not already attached */
+    private static final String REQUEST_ID_HEADER_NAME = "req.requestId.headerName";
+    private static final String DEFAULT_REQUEST_ID_HEADER_NAME = "X-Request-ID";
+    /** Name of attribute attached to the request to indicate the correlation id */
+    private static final String CORRELATION_ID_ATTRIBUTE_NAME = "req.correlationId.attributeName";
+    private static final String DEFAULT_CORRELATION_ID_ATTRIBUTE_NAME = "track.correlationId";
+    /** Name of request header containing the correlation id when not already attached */
+    private static final String CORRELATION_ID_HEADER_NAME = "req.correlationId.headerName";
+    private static final String DEFAULT_CORRELATION_ID_HEADER_NAME = "X-Correlation-ID";
+
     private static final String PROPERTIES_FILE = "console-config.properties";
 
     private static Map<String, Optional<String>> consoleProperties;
@@ -81,6 +94,25 @@ public class ConsoleProperties {
             return Long.valueOf(pageLastUpdateCheckInterval);
         }
         return DEFAULT_PAGE_LAST_UPDATE_CHECK_INTERVAL_MILLIS;
+    }
+
+    public String getRequestIdAttributeName() {
+        return Optional.ofNullable(this.getProperty(REQUEST_ID_ATTRIBUTE_NAME))
+                .orElse(DEFAULT_REQUEST_ID_ATTRIBUTE_NAME);
+    }
+
+    public String getRequestIdHeaderName() {
+        return Optional.ofNullable(this.getProperty(REQUEST_ID_HEADER_NAME)).orElse(DEFAULT_REQUEST_ID_HEADER_NAME);
+    }
+
+    public String getCorrelationIdAttributeName() {
+        return Optional.ofNullable(this.getProperty(CORRELATION_ID_ATTRIBUTE_NAME))
+                .orElse(DEFAULT_CORRELATION_ID_ATTRIBUTE_NAME);
+    }
+
+    public String getCorrelationIdHeaderName() {
+        return Optional.ofNullable(this.getProperty(CORRELATION_ID_HEADER_NAME))
+                .orElse(DEFAULT_CORRELATION_ID_HEADER_NAME);
     }
 
     public String getProperty(String propertyName) {

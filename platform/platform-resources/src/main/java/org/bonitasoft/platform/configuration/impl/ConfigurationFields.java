@@ -18,7 +18,6 @@ package org.bonitasoft.platform.configuration.impl;
  */
 public interface ConfigurationFields {
 
-    String TENANT_ID = "tenant_id";
     String CONTENT_TYPE = "content_type";
     String RESOURCE_NAME = "resource_name";
     String RESOURCE_CONTENT = "resource_content";

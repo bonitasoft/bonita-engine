@@ -100,7 +100,7 @@ public class AbstractApplicationDefinition<ITEM extends AbstractApplicationItem>
                 public Supplier<? extends ITEM> findItemCreator(TreeIndexed<String> tree) {
                     // We need the "link" attribute to discriminate between legacy application and application link.
                     boolean isLink;
-                    if (tree != null && tree.get(AbstractApplicationItem.ATTRIBUTE_LINK)instanceof TreeLeaf<?> v) {
+                    if (tree != null && tree.get(AbstractApplicationItem.ATTRIBUTE_LINK) instanceof TreeLeaf<?> v) {
                         isLink = Optional.ofNullable(v.getValue()).map(Object::toString).map(Boolean::parseBoolean)
                                 .orElse(Boolean.FALSE);
                     } else {

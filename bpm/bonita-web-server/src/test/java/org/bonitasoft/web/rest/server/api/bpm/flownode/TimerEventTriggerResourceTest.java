@@ -13,13 +13,9 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
-import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -128,7 +124,7 @@ public class TimerEventTriggerResourceTest extends RestletTest {
                 .get();
 
         //then
-        assertJsonEquals(getJson("timerEventTriggerInstances.json"), response.getEntityAsText());
+        assertThatJson(getJson("timerEventTriggerInstances.json")).isEqualTo(response.getEntityAsText());
     }
 
     @Test
@@ -142,7 +138,7 @@ public class TimerEventTriggerResourceTest extends RestletTest {
                 .put("{\"executionDate\": 9223372036854775807}");
 
         //then
-        assertJsonEquals(getJson("timerEventTriggerInstance.json"), response.getEntityAsText());
+        assertThatJson(getJson("timerEventTriggerInstance.json")).isEqualTo(response.getEntityAsText());
     }
 
     private SearchResult<TimerEventTriggerInstance> createSearchResult() {

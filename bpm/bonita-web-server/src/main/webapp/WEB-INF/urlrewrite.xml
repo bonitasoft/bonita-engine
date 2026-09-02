@@ -221,10 +221,6 @@
         <from>^(/portal/custom-page)?/API/system/session([\?/]|$)</from>
         <to>/APIToolkit/system/session$2</to>
     </rule>
-    <rule>
-        <from>^(/portal/custom-page)?/API/system/tenant([\?/]|$)</from>
-        <to>/APIToolkit/system/tenant$2</to>
-    </rule>
 
     <rule>
         <note>

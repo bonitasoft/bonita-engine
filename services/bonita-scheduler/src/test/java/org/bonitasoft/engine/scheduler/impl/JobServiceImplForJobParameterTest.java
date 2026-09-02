@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -79,19 +80,18 @@ public class JobServiceImplForJobParameterTest {
 
     /**
      * method for
-     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobParameters(java.util.List, long, long)}.
+     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobParameters(java.util.List, long)}.
      *
      * @throws SJobParameterCreationException
      * @throws SRecorderException
      */
     @Test
-    public final void createJobParameters() throws SJobParameterCreationException, SRecorderException {
-        final long tenantId = 2;
+    public final void createJobParameters() throws SJobParameterCreationException {
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
         final List<SJobParameter> result = jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter),
-                tenantId, jobDescriptorId);
+                jobDescriptorId);
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(sJobParameter, result.get(0));
@@ -100,11 +100,10 @@ public class JobServiceImplForJobParameterTest {
     @Test
     public final void createJobParameters_with_null_parameters_should_return_empty_list() throws Exception {
         // Given
-        final long tenantId = 2;
         final long jobDescriptorId = 9;
 
         // When
-        final List<SJobParameter> result = jobServiceImpl.createJobParameters(null, tenantId, jobDescriptorId);
+        final List<SJobParameter> result = jobServiceImpl.createJobParameters(null, jobDescriptorId);
 
         // Then
         assertNotNull(result);
@@ -114,12 +113,11 @@ public class JobServiceImplForJobParameterTest {
     @Test
     public final void createJobParameter_with_empty_list_should_return_empty_list() throws Exception {
         // Given
-        final long tenantId = 2;
         final long jobDescriptorId = 9;
 
         // When
-        final List<SJobParameter> result = jobServiceImpl.createJobParameters(Collections.<SJobParameter> emptyList(),
-                tenantId, jobDescriptorId);
+        final List<SJobParameter> result = jobServiceImpl.createJobParameters(Collections.emptyList(),
+                jobDescriptorId);
 
         // Then
         assertNotNull(result);
@@ -130,7 +128,6 @@ public class JobServiceImplForJobParameterTest {
     public final void createJobParameters_should_throw_exception_when_recorder_failed()
             throws SJobParameterCreationException, SRecorderException {
         // Given
-        final long tenantId = 2;
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
@@ -138,41 +135,39 @@ public class JobServiceImplForJobParameterTest {
                 nullable(String.class));
 
         // When
-        jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter), tenantId, jobDescriptorId);
+        jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter), jobDescriptorId);
     }
 
     /**
      * method for
-     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobParameter(org.bonitasoft.engine.scheduler.model.SJobParameter, long, long)}.
+     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobParameter(org.bonitasoft.engine.scheduler.model.SJobParameter, long)}.
      *
      * @throws SJobParameterCreationException
      * @throws SRecorderException
      */
     @Test
-    public final void createJobParameter() throws SJobParameterCreationException, SRecorderException {
-        final long tenantId = 2;
+    public final void createJobParameter() throws SJobParameterCreationException {
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        final SJobParameter result = jobServiceImpl.createJobParameter(sJobParameter, tenantId, jobDescriptorId);
+        final SJobParameter result = jobServiceImpl.createJobParameter(sJobParameter, jobDescriptorId);
         assertNotNull(result);
         assertEquals(sJobParameter, result);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public final void createJobParameter_with_null_parameters_should_throw_exception() throws Exception {
+    @Test
+    public final void createJobParameter_with_null_parameters_should_throw_exception() {
         // Given
-        final long tenantId = 2;
         final long jobDescriptorId = 9;
 
         // When
-        jobServiceImpl.createJobParameter(null, tenantId, jobDescriptorId);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> jobServiceImpl.createJobParameter(null, jobDescriptorId));
     }
 
-    @Test(expected = SJobParameterCreationException.class)
+    @Test
     public final void createJobParameter_should_throw_exception_when_recorder_failed() throws Exception {
         // Given
-        final long tenantId = 2;
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
@@ -180,7 +175,8 @@ public class JobServiceImplForJobParameterTest {
                 nullable(String.class));
 
         // When
-        jobServiceImpl.createJobParameter(sJobParameter, tenantId, jobDescriptorId);
+        assertThatExceptionOfType(SJobParameterCreationException.class)
+                .isThrownBy(() -> jobServiceImpl.createJobParameter(sJobParameter, jobDescriptorId));
     }
 
     /**
@@ -275,8 +271,8 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         when(readPersistenceService.selectById(
                 SelectDescriptorBuilder.getElementById(SJobParameter.class, "SJobParameter", jobParameterId)))
-                        .thenReturn(
-                                sJobParameter);
+                .thenReturn(
+                        sJobParameter);
 
         // When
         final SJobParameter result = jobServiceImpl.getJobParameter(jobParameterId);
@@ -322,12 +318,11 @@ public class JobServiceImplForJobParameterTest {
 
     /**
      * method for
-     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#setJobParameters(long, long, java.util.List)}.
+     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#setJobParameters(long, java.util.List)}.
      */
     @Test
     public final void setJobParameters() throws Exception {
         // Given
-        final long tenantId = 12;
         final long jobDescriptorId = 8;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
@@ -335,25 +330,22 @@ public class JobServiceImplForJobParameterTest {
         doReturn(sJobParameters).when(readPersistenceService).selectList(any());
 
         // When
-        final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, sJobParameters);
+        final List<SJobParameter> result = jobServiceImpl.setJobParameters(jobDescriptorId, sJobParameters);
 
         // Then
         assertEquals(sJobParameters, result);
         verify(jobServiceImpl).deleteAllJobParameters(jobDescriptorId);
         verify(jobServiceImpl, times(sJobParameters.size())).deleteJobParameter(sJobParameter);
-        verify(jobServiceImpl, times(sJobParameters.size())).createJobParameter(sJobParameter, tenantId,
-                jobDescriptorId);
+        verify(jobServiceImpl, times(sJobParameters.size())).createJobParameter(sJobParameter, jobDescriptorId);
     }
 
     @Test
     public void setJobParametersWithEmptyList() throws Exception {
         // Given
-        final long tenantId = 12;
         final long jobDescriptorId = 8;
 
         // When
-        final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId,
-                Collections.<SJobParameter> emptyList());
+        final List<SJobParameter> result = jobServiceImpl.setJobParameters(jobDescriptorId, Collections.emptyList());
 
         // Then
         assertNotNull(result);
@@ -363,36 +355,34 @@ public class JobServiceImplForJobParameterTest {
     @Test
     public void setJobParametersWithNullList() throws Exception {
         // Given
-        final long tenantId = 12;
         final long jobDescriptorId = 8;
 
         // When
-        final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, null);
+        final List<SJobParameter> result = jobServiceImpl.setJobParameters(jobDescriptorId, null);
 
         // Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
 
-    @Test(expected = SJobParameterCreationException.class)
+    @Test
     public void setJobParameters_should_throw_exception_when_search_failed()
-            throws SBonitaReadException, SBonitaReadException,
-            SJobParameterCreationException {
+            throws SBonitaReadException {
         // Given
-        final long tenantId = 12;
         final long jobDescriptorId = 8;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
         doThrow(new SBonitaReadException("")).when(readPersistenceService).selectList(any());
 
         // When
-        jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
+        assertThatExceptionOfType(SJobParameterCreationException.class)
+                .isThrownBy(() -> jobServiceImpl.setJobParameters(jobDescriptorId,
+                        Collections.singletonList(sJobParameter)));
     }
 
-    @Test(expected = SJobParameterCreationException.class)
+    @Test
     public void setJobParameters_should_throw_exception_when_delete_failed() throws Exception {
         // Given
-        final long tenantId = 12;
         final long jobDescriptorId = 8;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
@@ -401,13 +391,13 @@ public class JobServiceImplForJobParameterTest {
                 nullable(String.class));
 
         // When
-        jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
+        assertThatExceptionOfType(SJobParameterCreationException.class).isThrownBy(
+                () -> jobServiceImpl.setJobParameters(jobDescriptorId, Collections.singletonList(sJobParameter)));
     }
 
-    @Test(expected = SJobParameterCreationException.class)
+    @Test
     public final void setJobParameters_should_throw_exception_when_create_failed() throws Exception {
         // Given
-        final long tenantId = 12;
         final long jobDescriptorId = 8;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
@@ -415,7 +405,8 @@ public class JobServiceImplForJobParameterTest {
                 nullable(String.class));
 
         // When
-        jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
+        assertThatExceptionOfType(SJobParameterCreationException.class).isThrownBy(
+                () -> jobServiceImpl.setJobParameters(jobDescriptorId, Collections.singletonList(sJobParameter)));
     }
 
 }

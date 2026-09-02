@@ -15,18 +15,15 @@ package org.bonitasoft.engine.business.application.model;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.MappedSuperclass;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
 @MappedSuperclass
-@IdClass(PersistentObjectId.class)
 public abstract class AbstractSApplication implements PersistentObject {
 
     public static final String ID = "id";
@@ -49,8 +46,6 @@ public abstract class AbstractSApplication implements PersistentObject {
     public static final String INTERNAL_PROFILE = "internalProfile";
     public static final String LINK = "isLink";
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
 

@@ -110,7 +110,7 @@ public class EventTriggerIT extends AbstractEventIT {
             // Without optimisations, it takes around 30 seconds
             assertThat(Duration.between(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()),
                     LocalDateTime.now(ZoneId.systemDefault())))
-                            .isLessThanOrEqualTo(Duration.ofSeconds(10));
+                    .isLessThanOrEqualTo(Duration.ofSeconds(10));
             assertThat(getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult())
                     .hasSize(1);
 

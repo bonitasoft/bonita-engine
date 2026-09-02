@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.transition;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -38,11 +40,41 @@ public class TransitionConditionEvaluator {
             return null;
         }
         if (!Boolean.class.getName().equals(condition.getReturnType())) {
-            throw new SExpressionEvaluationException(
-                    "Condition expression must return a boolean, on transition: " + sTransitionDefinition.getName(),
-                    condition.getName());
+            throw new STransitionConditionEvaluationException(
+                    "Condition expression must return a boolean",
+                    getTransitionName(sTransitionDefinition),
+                    getTargetFlowNode(sTransitionDefinition, contextDependency),
+                    new SExpressionEvaluationException("Invalid expression return type", condition.getName()));
         }
-        return (Boolean) resolverService.evaluate(condition, contextDependency);
+        try {
+            return (Boolean) resolverService.evaluate(condition, contextDependency);
+        } catch (SBonitaException e) {
+            throw new STransitionConditionEvaluationException(
+                    "Unable to evaluate transition condition",
+                    getTransitionName(sTransitionDefinition),
+                    getTargetFlowNode(sTransitionDefinition, contextDependency), e);
+        }
+    }
+
+    private static String getTransitionName(STransitionDefinition transition) {
+        if (Objects.equals(transition.getName(), transition.getSource() + "_->_" + transition.getTarget())) {
+            return null;
+        }
+        return transition.getName();
+    }
+
+    private static String getTargetFlowNode(STransitionDefinition sTransitionDefinition,
+            SExpressionContext contextDependency) {
+        if (contextDependency.getProcessDefinition() != null
+                && contextDependency.getProcessDefinition().getProcessContainer() != null) {
+            var targetFlowNode = contextDependency.getProcessDefinition().getProcessContainer()
+                    .getFlowNode(sTransitionDefinition.getTarget());
+            if (targetFlowNode == null) {
+                return null;
+            }
+            return targetFlowNode.getType().name().toLowerCase() + "::" + targetFlowNode.getName();
+        }
+        return null;
     }
 
 }

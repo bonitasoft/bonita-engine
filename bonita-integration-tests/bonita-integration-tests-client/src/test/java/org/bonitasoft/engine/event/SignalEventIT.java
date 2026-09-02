@@ -53,7 +53,7 @@ public class SignalEventIT extends AbstractEventIT {
         final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableProcessWithActor(endSignalArchive,
                 ACTOR_NAME, user);
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         // Check that the process with trigger signal on start is not started, before send signal
@@ -101,7 +101,7 @@ public class SignalEventIT extends AbstractEventIT {
         final ProcessDefinition startSignal = deployAndEnableProcessWithActor(startSignalArchive, ACTOR_NAME, user);
         final ProcessDefinition endSignal = deployAndEnableProcess(endSignalArchive);
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final ProcessInstance instance = getProcessAPI().startProcess(startSignal.getId());
         waitForEvent(instance, "OnSignal", TestStates.WAITING);
@@ -134,7 +134,7 @@ public class SignalEventIT extends AbstractEventIT {
         final ProcessDefinition startSignal = deployAndEnableProcessWithActor(startSignalArchive, ACTOR_NAME, user);
         final ProcessDefinition endSignal = deployAndEnableProcess(endSignalArchive);
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         getProcessAPI().startProcess(endSignal.getId());
@@ -152,7 +152,7 @@ public class SignalEventIT extends AbstractEventIT {
         final DesignProcessDefinition startSignalDef = builder.done();
 
         final ProcessDefinition startSignal = deployAndEnableProcessWithActor(startSignalDef, ACTOR_NAME, user);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         getProcessAPI().sendSignal("GO");
@@ -169,7 +169,7 @@ public class SignalEventIT extends AbstractEventIT {
                 .addIntermediateCatchEvent("OnSignal").addSignalEventTrigger("GO")
                 .addUserTask("Task1", ACTOR_NAME).addTransition("Start", "OnSignal").addTransition("OnSignal", "Task1");
         final ProcessDefinition intermediateSignal = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessInstance instance = getProcessAPI().startProcess(intermediateSignal.getId());

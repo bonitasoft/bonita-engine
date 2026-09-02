@@ -34,7 +34,7 @@ import org.bonitasoft.engine.exception.UpdateException;
  * These commands are executed in a platform scope, see {@link CommandAPI} for an explanation of how to deploy, execute,
  * ... a command. The only
  * difference between the {@link CommandAPI} and the {@link PlatformCommandAPI} is that a platform command must extend
- * {@code org.bonitasoft.engine.command.PlatformCommand}.
+ * {@code org.bonitasoft.engine.command.RuntimeCommand}.
  *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier

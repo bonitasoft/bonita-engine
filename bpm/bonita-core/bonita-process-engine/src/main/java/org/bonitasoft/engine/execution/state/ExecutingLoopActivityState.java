@@ -20,6 +20,7 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -136,7 +137,7 @@ public class ExecutingLoopActivityState implements FlowNodeState {
             }
             return !loop;
         } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException(e);
+            throw new SActivityStateExecutionException("Unable to handle loop activity", ScopedException.ITERATION, e);
         }
     }
 

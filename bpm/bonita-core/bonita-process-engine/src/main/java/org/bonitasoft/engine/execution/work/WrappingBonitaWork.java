@@ -55,14 +55,4 @@ public abstract class WrappingBonitaWork extends TenantAwareBonitaWork {
         wrappedWork.handleFailure(e, context);
     }
 
-    @Override
-    public void setTenantId(final long tenantId) {
-        wrappedWork.setTenantId(tenantId);
-    }
-
-    @Override
-    public long getTenantId() {
-        return wrappedWork.getTenantId();
-    }
-
 }

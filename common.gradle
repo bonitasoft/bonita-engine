@@ -49,10 +49,10 @@ subprojects {
         // related to ehcache-core 2.x - must be challenged when upgrading to ehcache 3.x
         // needed to get org.terracotta.internal:statistics:1.0.5 (required by ehcache-core jar)
         maven {
-            url 'https://repo.terracotta.org/maven2/'
+            url='https://repo.terracotta.org/maven2/'
         }
         maven {
-            url "https://central.sonatype.com/repository/maven-snapshots/"
+            url="https://central.sonatype.com/repository/maven-snapshots/"
             mavenContent {
                 snapshotsOnly()
             }
@@ -62,8 +62,11 @@ subprojects {
 
     dependencies {
         testImplementation libs.junit5api
+        testImplementation libs.mockitoJunitJupiter
         testCompileOnly libs.junit4
         testRuntimeOnly libs.junitJupiterEngine
+        // in Gradle 8, this declaration is mandatory. See https://docs.gradle.org/8.3/userguide/upgrading_version_8.html#manually_declaring_dependencies :
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         // to support junit4 tests
         testRuntimeOnly libs.junitVintageEngine
     }
@@ -135,10 +138,10 @@ subprojects {
         }
     }
     testlogger {
-        showFullStackTraces false
-        showCauses true
-        showPassed false
-        showSkipped true
-        showSummary false
+        showFullStackTraces=false
+        showCauses=true
+        showPassed=false
+        showSkipped=true
+        showSummary=false
     }
 }

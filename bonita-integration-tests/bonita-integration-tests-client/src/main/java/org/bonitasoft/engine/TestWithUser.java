@@ -31,15 +31,15 @@ public class TestWithUser extends TestWithTechnicalUser {
     public void before() throws Exception {
         super.before();
         user = createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @Override
     @After
     public void after() throws Exception {
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
         deleteUser(USERNAME);
         super.after();
     }

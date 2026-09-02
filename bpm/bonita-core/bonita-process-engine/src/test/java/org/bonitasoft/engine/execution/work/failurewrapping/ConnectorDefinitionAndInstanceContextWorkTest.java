@@ -38,12 +38,15 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
     private static final ConnectorEvent ACTIVATION_EVENT = ConnectorEvent.ON_ENTER;
 
     private static final long CONNECTOR_INSTANCE_ID = 10L;
+    private static final String CONNECTOR_DEFINITION_ID = "groovy";
 
     @Override
     @Before
     public void before() throws SBonitaException {
-        txBonitaWork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME,
-                CONNECTOR_INSTANCE_ID));
+        txBonitaWork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork,
+                CONNECTOR_DEFINITION_ID,
+                CONNECTOR_DEFINITION_NAME,
+                CONNECTOR_INSTANCE_ID, ConnectorEvent.ON_ENTER));
         super.before();
     }
 
@@ -64,7 +67,9 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
     @Test
     public void handleFailureWithNameAndIdAndActivationEvent() throws Throwable {
-        txBonitaWork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME,
+        txBonitaWork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork,
+                CONNECTOR_DEFINITION_ID,
+                CONNECTOR_DEFINITION_NAME,
                 CONNECTOR_INSTANCE_ID,
                 ACTIVATION_EVENT));
         final Map<String, Object> context = singletonMap("serviceAccessor", serviceAccessor);

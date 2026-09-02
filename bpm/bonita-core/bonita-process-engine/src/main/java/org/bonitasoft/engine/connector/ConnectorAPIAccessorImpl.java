@@ -13,9 +13,18 @@
  **/
 package org.bonitasoft.engine.connector;
 
+import java.io.Serial;
 import java.lang.reflect.Proxy;
 
-import org.bonitasoft.engine.api.*;
+import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
+import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.PageAPI;
+import org.bonitasoft.engine.api.PermissionAPI;
+import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -34,15 +43,13 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class ConnectorAPIAccessorImpl implements APIAccessor {
 
+    @Serial
     private static final long serialVersionUID = 3365911149008207537L;
-
-    private final long tenantId;
 
     private APISession apiSession;
 
-    public ConnectorAPIAccessorImpl(final long tenantId) {
+    public ConnectorAPIAccessorImpl() {
         super();
-        this.tenantId = tenantId;
     }
 
     protected APISession getAPISession() {
@@ -51,10 +58,9 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
             final SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
             final SessionService sessionService = serviceAccessor.getSessionService();
             try {
-                final SSession session = sessionService.createSession(tenantId,
-                        ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the
-                sessionAccessor.setSessionInfo(session.getId(), tenantId);
-                apiSession = ModelConvertor.toAPISession(session, null);
+                final SSession session = sessionService.createSession(ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the
+                sessionAccessor.setSessionId(session.getId());
+                apiSession = ModelConvertor.toAPISession(session);
             } catch (final BonitaRuntimeException e) {
                 throw e;
             } catch (final Exception e) {

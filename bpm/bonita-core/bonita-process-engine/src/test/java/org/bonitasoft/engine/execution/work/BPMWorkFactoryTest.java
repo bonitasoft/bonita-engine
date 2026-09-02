@@ -116,7 +116,8 @@ public class BPMWorkFactoryTest {
     @Test
     public void createExecuteConnectorOfProcess() {
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory
-                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "groovy", "connectorDefName",
+                        ConnectorEvent.ON_ENTER,
                         null));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
@@ -136,7 +137,8 @@ public class BPMWorkFactoryTest {
                 new FlowNodeNameFilter(Arrays.asList("start1", "start2")));
 
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory
-                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "groovy", "connectorDefName",
+                        ConnectorEvent.ON_ENTER,
                         flowNodeSelector));
 
         assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start1))
@@ -158,7 +160,8 @@ public class BPMWorkFactoryTest {
                 new FlowNodeNameFilter(emptyList()));
 
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory
-                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "groovy", "connectorDefName",
+                        ConnectorEvent.ON_ENTER,
                         flowNodeSelector));
 
         assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start1))
@@ -168,7 +171,10 @@ public class BPMWorkFactoryTest {
     @Test
     public void createExecuteConnectorOfActivity() {
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory
-                .create(workFactory.createExecuteConnectorOfActivityDescriptor(1L, 3L, 4L, 5L, 6, "connectorDefName"));
+                .create(workFactory.createExecuteConnectorOfActivityDescriptor(1L, 3L, 3L, 4L, 5L, 6,
+                        "groovy",
+                        "connectorDefName",
+                        "ON_ENTER"));
 
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
@@ -241,10 +247,9 @@ public class BPMWorkFactoryTest {
         if (clazz.isAssignableFrom(work.getClass())) {
             return ((T) work);
         }
-        if (!(work instanceof WrappingBonitaWork)) {
+        if (!(work instanceof WrappingBonitaWork wrappingBonitaWork)) {
             return null;
         }
-        WrappingBonitaWork wrappingBonitaWork = ((WrappingBonitaWork) work);
         return getWorkOfClass(wrappingBonitaWork.getWrappedWork(), clazz);
     }
 

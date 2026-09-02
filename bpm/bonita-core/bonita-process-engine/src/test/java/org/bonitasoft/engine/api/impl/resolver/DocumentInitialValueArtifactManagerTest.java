@@ -72,9 +72,9 @@ public class DocumentInitialValueArtifactManagerTest {
         doReturn(getBarResources()).when(processResourcesService).get(PROCESS_ID, BARResourceType.DOCUMENT, 0, 10);
         doReturn(Collections
                 .singletonList(new SBARResource("10.pdf", BARResourceType.DOCUMENT, PROCESS_ID, new byte[] { 10 })))
-                        .when(
-                                processResourcesService)
-                        .get(PROCESS_ID, BARResourceType.DOCUMENT, 10, 10);
+                .when(
+                        processResourcesService)
+                .get(PROCESS_ID, BARResourceType.DOCUMENT, 10, 10);
 
         documentInitialValueDependencyManager.exportToBusinessArchive(PROCESS_ID, businessArchiveBuilder);
 

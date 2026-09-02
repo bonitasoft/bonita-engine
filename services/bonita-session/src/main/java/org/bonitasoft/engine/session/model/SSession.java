@@ -34,7 +34,6 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class SSession implements Serializable {
 
-    private long tenantId;
     private final long id;
     /**
      * creation date (GMT+0)

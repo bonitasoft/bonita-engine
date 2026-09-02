@@ -24,6 +24,7 @@ import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -116,7 +117,7 @@ public class UserFilterServiceImpl implements UserFilterService {
             }
         } catch (final SUserFilterExecutionException e) {
             throw e;
-        } catch (final Throwable e) {// catch throwable because we might have NoClassDefFound... see ENGINE-1333
+        } catch (final Throwable e) { // catch throwable because we might have NoClassDefFound... see ENGINE-1333
             throw new SUserFilterExecutionException(e);
         }
 
@@ -196,11 +197,16 @@ public class UserFilterServiceImpl implements UserFilterService {
             final SConnectorUserFilterAdapter adapter = new SConnectorUserFilterAdapter(filter, actorName);
             final HashMap<String, Object> inputParameters = new HashMap<>(parameters.size());
             for (final Entry<String, SExpression> input : parameters.entrySet()) {
-                if (expressionContext != null) {
-                    inputParameters.put(input.getKey(),
-                            expressionResolverService.evaluate(input.getValue(), expressionContext));
-                } else {
-                    inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
+                try {
+                    if (expressionContext != null) {
+                        inputParameters.put(input.getKey(),
+                                expressionResolverService.evaluate(input.getValue(), expressionContext));
+                    } else {
+                        inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
+                    }
+                } catch (SBonitaException e) {
+                    e.setConnectorInputOnContext(input.getKey());
+                    throw e;
                 }
             }
             connectorExecutor.execute(adapter, inputParameters, classLoader).get();

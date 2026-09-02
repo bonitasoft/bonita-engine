@@ -49,11 +49,10 @@ public class ParameterTest {
         testRepository.flush();
         Map<String, Object> parameterAsMap = jdbcTemplate
                 .queryForObject("SELECT * FROM proc_parameter WHERE name = 'parameterName'",
-                        new JdbcRowMapper("TENANTID", "ID", "PROCESS_ID"));
+                        new JdbcRowMapper("ID", "PROCESS_ID"));
 
         assertThat(parameterFromQuery).isEqualTo(sParameter);
         assertThat(parameterAsMap).containsOnly(
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", sParameter.getId()),
                 entry("PROCESS_ID", 12345L),
                 entry("NAME", "parameterName"),

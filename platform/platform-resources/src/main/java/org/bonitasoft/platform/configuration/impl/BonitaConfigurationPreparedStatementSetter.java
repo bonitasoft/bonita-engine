@@ -29,25 +29,22 @@ import org.springframework.jdbc.support.lob.TemporaryLobCreator;
  */
 public class BonitaConfigurationPreparedStatementSetter implements BatchPreparedStatementSetter, ConfigurationColumns {
 
-    public static final String INSERT_CONFIGURATION = "INSERT into configuration(tenant_id, content_type, resource_name, resource_content) values (?,?,?,?)";
+    public static final String INSERT_CONFIGURATION = "INSERT into configuration(content_type, resource_name, resource_content) values (?,?,?)";
     private final List<BonitaConfiguration> bonitaConfigurations;
 
     private final String dbVendor;
     private final ConfigurationType type;
-    private final long tenantId;
 
     public BonitaConfigurationPreparedStatementSetter(List<BonitaConfiguration> bonitaConfigurations, String dbVendor,
-            ConfigurationType type, long tenantId) {
+            ConfigurationType type) {
         this.bonitaConfigurations = bonitaConfigurations;
         this.dbVendor = dbVendor == null ? PlatformSetup.getPropertyBonitaDbVendor() : dbVendor;
         this.type = type;
-        this.tenantId = tenantId;
     }
 
     @Override
     public void setValues(PreparedStatement ps, int i) throws SQLException {
         final BonitaConfiguration bonitaConfiguration = bonitaConfigurations.get(i);
-        ps.setLong(COLUMN_INDEX_TENANT_ID, tenantId);
         ps.setString(COLUMN_INDEX_TYPE, type.toString());
         ps.setString(COLUMN_INDEX_RESOURCE_NAME, bonitaConfiguration.getResourceName());
         switch (DatabaseVendor.parseValue(dbVendor)) {

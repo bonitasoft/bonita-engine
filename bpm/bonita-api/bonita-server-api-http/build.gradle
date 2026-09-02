@@ -8,7 +8,6 @@ dependencies {
     api libs.commonsFileUpload
     api libs.commonsIO
     testImplementation libs.springTest
-    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.assertj
     testImplementation libs.mockitoCore
     testImplementation libs.systemRules

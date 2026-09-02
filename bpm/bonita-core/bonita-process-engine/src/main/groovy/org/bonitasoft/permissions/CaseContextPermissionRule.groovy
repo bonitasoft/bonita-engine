@@ -73,5 +73,4 @@ class CaseContextPermissionRule implements PermissionRule {
         }
         return Long.valueOf(compoundResourceId.get(0))
     }
-
 }

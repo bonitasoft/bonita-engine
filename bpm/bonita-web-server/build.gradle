@@ -10,6 +10,7 @@ repositories {
 dependencies {
     implementation(project(":bpm:bonita-common"))
     implementation(project(":bpm:bonita-web-extensions"))
+    implementation(project(":services:bonita-commons"))
     implementation libs.commonsIO
     implementation libs.slf4jApi
     implementation libs.ehCache
@@ -44,14 +45,16 @@ dependencies {
     annotationProcessor libs.lombok
 
     testImplementation(project(":bpm:bonita-server"))
-    testImplementation libs.jsonUnit
+    testImplementation(libs.jsonUnit) {
+        exclude(group: "org.slf4j", module: "slf4j-api")
+    }
     testImplementation libs.assertj
     testImplementation libs.logback
     testImplementation libs.springTest
     testImplementation libs.systemRules
     testImplementation libs.mockitoCore
     testImplementation libs.hamcrest
-    testImplementation libs.mockitoJunitJupiter
+    testRuntimeOnly libs.jsonassert
 }
 
 configurations {

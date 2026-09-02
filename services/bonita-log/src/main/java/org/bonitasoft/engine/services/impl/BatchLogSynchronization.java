@@ -30,7 +30,7 @@ import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 class BatchLogSynchronization implements BonitaTransactionSynchronization {
 
     private final PersistenceService persistenceService;
-    private QueriableLoggerImpl queriableLogger;
+    private final QueriableLoggerImpl queriableLogger;
     private final List<SQueriableLog> logs = new ArrayList<>();
 
     public BatchLogSynchronization(PersistenceService persistenceService, QueriableLoggerImpl queriableLogger) {

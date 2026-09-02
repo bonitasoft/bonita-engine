@@ -1,88 +1,77 @@
 CREATE TABLE configuration (
-  tenant_id INT8 NOT NULL,
   content_type VARCHAR(50) NOT NULL,
   resource_name VARCHAR(120) NOT NULL,
-  resource_content BYTEA NOT NULL
+  resource_content BYTEA NOT NULL,
+  CONSTRAINT pk_configuration PRIMARY KEY (content_type, resource_name)
 );
-ALTER TABLE configuration ADD CONSTRAINT pk_configuration PRIMARY KEY (tenant_id, content_type, resource_name);
-CREATE INDEX idx_configuration ON configuration (tenant_id, content_type);
+CREATE INDEX idx_configuration ON configuration (content_type);
 
 CREATE TABLE contract_data (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   kind VARCHAR(20) NOT NULL,
   scopeId INT8 NOT NULL,
   name VARCHAR(50) NOT NULL,
-  val TEXT
+  val TEXT,
+  CONSTRAINT pk_contract_data PRIMARY KEY (id, scopeId),
+  CONSTRAINT uk_contract_data_kind_scopeid_name UNIQUE (kind, scopeId, name)
 );
 
-ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id, scopeId);
-
-ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (kind, scopeId, name, tenantid);
-
-CREATE INDEX idx_cd_kind_scope_name ON contract_data (kind, scopeId, name);
-
 CREATE TABLE arch_contract_data (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   kind VARCHAR(20) NOT NULL,
   scopeId INT8 NOT NULL,
   name VARCHAR(50) NOT NULL,
   val TEXT,
   archiveDate INT8 NOT NULL,
-  sourceObjectId INT8 NOT NULL
+  sourceObjectId INT8 NOT NULL,
+  CONSTRAINT pk_arch_contract_data PRIMARY KEY (id, scopeId),
+  CONSTRAINT uk_arch_contract_data_kind_scopeid_name UNIQUE (kind, scopeId, name)
 );
-ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id, scopeId);
-ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (kind, scopeId, name, tenantid);
-CREATE INDEX idx_acd_kind_scope_name ON arch_contract_data (kind, scopeId, name);
 
 CREATE TABLE actor (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   scopeId INT8 NOT NULL,
   name VARCHAR(50) NOT NULL,
   displayName VARCHAR(75),
   description TEXT,
   initiator BOOLEAN,
-  UNIQUE (tenantid, id, scopeId, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT uk_actor_id_scopeid_name UNIQUE (id, scopeId, name),
+  CONSTRAINT pk_actor PRIMARY KEY (id)
 );
 
 CREATE TABLE actormember (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   actorId INT8 NOT NULL,
   userId INT8 NOT NULL,
   groupId INT8 NOT NULL,
   roleId INT8 NOT NULL,
-  UNIQUE (tenantid, actorid, userId, groupId, roleId),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT uk_actormember_actorid_userid_groupid_roleid UNIQUE (actorId, userId, groupId, roleId),
+  CONSTRAINT pk_actormember PRIMARY KEY (id)
 );
+
+ALTER TABLE actormember ADD CONSTRAINT fk_actormember_actorid FOREIGN KEY (actorId) REFERENCES actor(id);
+
 CREATE TABLE category (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(50) NOT NULL,
   creator INT8,
   description TEXT,
   creationDate INT8 NOT NULL,
   lastUpdateDate INT8 NOT NULL,
-  UNIQUE (tenantid, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_category PRIMARY KEY (id),
+  CONSTRAINT uk_category_name UNIQUE (name)
 );
 
 CREATE TABLE processcategorymapping (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   categoryid INT8 NOT NULL,
   processid INT8 NOT NULL,
-  UNIQUE (tenantid, categoryid, processid),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_processcategorymapping PRIMARY KEY (id),
+  CONSTRAINT uk_processcategorymapping_categoryid_processid UNIQUE (categoryid, processid)
 );
-
-ALTER TABLE processcategorymapping ADD CONSTRAINT fk_catmapping_catid FOREIGN KEY (tenantid, categoryid) REFERENCES category(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE processcategorymapping ADD CONSTRAINT fk_processcategorymapping_categoryid FOREIGN KEY (categoryid) REFERENCES category(id) ON DELETE CASCADE;
 
 CREATE TABLE arch_process_comment(
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   userId INT8,
   processInstanceId INT8 NOT NULL,
@@ -90,25 +79,29 @@ CREATE TABLE arch_process_comment(
   content VARCHAR(512) NOT NULL,
   archiveDate INT8 NOT NULL,
   sourceObjectId INT8 NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_process_comment PRIMARY KEY (id)
 );
-
 CREATE INDEX idx1_arch_process_comment on arch_process_comment (sourceobjectid);
 CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate);
+
 CREATE TABLE process_comment (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   kind VARCHAR(25) NOT NULL,
   userId INT8,
   processInstanceId INT8 NOT NULL,
   postDate INT8 NOT NULL,
   content VARCHAR(512) NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_process_comment PRIMARY KEY (id)
 );
 CREATE INDEX idx1_process_comment on process_comment (processInstanceId);
 
+CREATE TABLE process_content (
+  id INT8 NOT NULL,
+  content TEXT NOT NULL,
+  CONSTRAINT pk_process_content PRIMARY KEY (id)
+);
+
 CREATE TABLE process_definition (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   processId INT8 NOT NULL,
   name VARCHAR(150) NOT NULL,
@@ -123,19 +116,37 @@ CREATE TABLE process_definition (
   lastUpdateDate INT8,
   categoryId INT8,
   iconPath VARCHAR(255),
-  content_tenantid INT8 NOT NULL,
   content_id INT8 NOT NULL,
-  PRIMARY KEY (tenantid, id),
-  UNIQUE (tenantid, name, version)
+  CONSTRAINT pk_process_definition PRIMARY KEY (id),
+  CONSTRAINT uk_process_definition_name_version UNIQUE (name, version)
 );
-CREATE TABLE process_content (
-  tenantid INT8 NOT NULL,
+ALTER TABLE process_definition ADD CONSTRAINT fk_process_definition_content_id FOREIGN KEY (content_id) REFERENCES process_content(id);
+
+CREATE TABLE document (
   id INT8 NOT NULL,
-  content TEXT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  author INT8,
+  creationdate INT8 NOT NULL,
+  hascontent BOOLEAN NOT NULL,
+  filename VARCHAR(255),
+  mimetype VARCHAR(255),
+  url VARCHAR(1024),
+  content BYTEA,
+  CONSTRAINT pk_document PRIMARY KEY (id)
 );
+
+CREATE TABLE document_mapping (
+  id INT8 NOT NULL,
+  processinstanceid INT8 NOT NULL,
+  documentid INT8 NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  version VARCHAR(50) NOT NULL,
+  index_ INT NOT NULL,
+  CONSTRAINT pk_document_mapping PRIMARY KEY (id)
+);
+ALTER TABLE document_mapping ADD CONSTRAINT fk_document_mapping_documentid FOREIGN KEY (documentid) REFERENCES document(id) ON DELETE CASCADE;
+
 CREATE TABLE arch_document_mapping (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   sourceObjectId INT8,
   processinstanceid INT8 NOT NULL,
@@ -145,34 +156,12 @@ CREATE TABLE arch_document_mapping (
   version VARCHAR(50) NOT NULL,
   index_ INT NOT NULL,
   archiveDate INT8 NOT NULL,
-  PRIMARY KEY (tenantid, ID)
+  CONSTRAINT pk_arch_document_mapping PRIMARY KEY (id)
 );
 CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid);
-CREATE TABLE document (
-  tenantid INT8 NOT NULL,
-  id INT8 NOT NULL,
-  author INT8,
-  creationdate INT8 NOT NULL,
-  hascontent BOOLEAN NOT NULL,
-  filename VARCHAR(255),
-  mimetype VARCHAR(255),
-  url VARCHAR(1024),
-  content BYTEA,
-  PRIMARY KEY (tenantid, id)
-);
-CREATE TABLE document_mapping (
-  tenantid INT8 NOT NULL,
-  id INT8 NOT NULL,
-  processinstanceid INT8 NOT NULL,
-  documentid INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  description TEXT,
-  version VARCHAR(50) NOT NULL,
-  index_ INT NOT NULL,
-  PRIMARY KEY (tenantid, ID)
-);
+ALTER TABLE arch_document_mapping ADD CONSTRAINT fk_arch_document_mapping_documentid FOREIGN KEY (documentid) REFERENCES document(id) ON DELETE CASCADE;
+
 CREATE TABLE arch_process_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(75) NOT NULL,
   processDefinitionId INT8 NOT NULL,
@@ -192,14 +181,13 @@ CREATE TABLE arch_process_instance (
   stringIndex3 VARCHAR(255),
   stringIndex4 VARCHAR(255),
   stringIndex5 VARCHAR(255),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_process_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx1_arch_process_instance ON arch_process_instance (sourceObjectId, rootProcessInstanceId, callerId);
 CREATE INDEX idx2_arch_process_instance ON arch_process_instance (processDefinitionId, archiveDate);
 CREATE INDEX idx3_arch_process_instance ON arch_process_instance (sourceObjectId, callerId, stateId);
 
 CREATE TABLE arch_flownode_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   flownodeDefinitionId INT8 NOT NULL,
   kind VARCHAR(25) NOT NULL,
@@ -245,7 +233,7 @@ CREATE TABLE arch_flownode_instance (
   aborting BOOLEAN NOT NULL,
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_flownode_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(logicalGroup2, kind, executedBy);
 CREATE INDEX idx_afi_kind_lg3 ON arch_flownode_instance(kind, logicalGroup3);
@@ -255,7 +243,6 @@ CREATE INDEX idx1_afi_root_parent ON arch_flownode_instance (rootContainerId, pa
 CREATE INDEX idx_lg4_lg2 on arch_flownode_instance(logicalGroup4, logicalGroup2);
 
 CREATE TABLE arch_connector_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   containerId INT8 NOT NULL,
   containerType VARCHAR(10) NOT NULL,
@@ -266,10 +253,10 @@ CREATE TABLE arch_connector_instance (
   state VARCHAR(50),
   sourceObjectId INT8,
   archiveDate INT8 NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_arch_connector_instance PRIMARY KEY (id)
 );
-
 CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (containerId, containerType);
+
 CREATE TABLE process_instance (
   id INT8 NOT NULL,
   name VARCHAR(75) NOT NULL,
@@ -298,7 +285,6 @@ CREATE TABLE process_instance (
 CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (processdefinitionid, stateid);
 
 CREATE TABLE flownode_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   flownodeDefinitionId INT8 NOT NULL,
   kind VARCHAR(25) NOT NULL,
@@ -346,7 +332,7 @@ CREATE TABLE flownode_instance (
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
   tokenCount INT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (id)
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
@@ -355,7 +341,6 @@ CREATE INDEX idx_fn_lg2_state ON flownode_instance (logicalGroup2, stateName);
 CREATE INDEX idx_fni_activity_instance_id_kind ON flownode_instance(activityInstanceId, kind);
 
 CREATE TABLE connector_instance (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   containerId INT8 NOT NULL,
   containerType VARCHAR(10) NOT NULL,
@@ -367,22 +352,20 @@ CREATE TABLE connector_instance (
   executionOrder INT,
   exceptionMessage VARCHAR(255),
   stackTrace TEXT,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_connector_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx_ci_container_activation ON connector_instance (containerId, containerType, activationEvent);
 
 CREATE TABLE event_trigger_instance (
-	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
   	eventInstanceId INT8 NOT NULL,
   	eventInstanceName VARCHAR(50),
   	executionDate INT8,
   	jobTriggerName VARCHAR(255),
-  	PRIMARY KEY (tenantid, id)
+    CONSTRAINT pk_event_trigger_instance PRIMARY KEY (id)
 );
 
 CREATE TABLE waiting_event (
-	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
   	kind VARCHAR(15) NOT NULL,
   	eventType VARCHAR(50),
@@ -406,13 +389,12 @@ CREATE TABLE waiting_event (
   	correlation3 VARCHAR(128),
   	correlation4 VARCHAR(128),
   	correlation5 VARCHAR(128),
-  	PRIMARY KEY (tenantid, id)
+    CONSTRAINT pk_waiting_event PRIMARY KEY (id)
 );
 CREATE INDEX idx_waiting_event ON waiting_event (progress, kind, locked, active);
 CREATE INDEX idx_waiting_event_correl ON waiting_event (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE message_instance (
-	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
   	messageName VARCHAR(255) NOT NULL,
   	targetProcess VARCHAR(255) NOT NULL,
@@ -427,85 +409,121 @@ CREATE TABLE message_instance (
   	correlation4 VARCHAR(128),
   	correlation5 VARCHAR(128),
   	creationDate INT8 NOT NULL,
-  	PRIMARY KEY (tenantid, id)
+    CONSTRAINT pk_message_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
 CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE pending_mapping (
-	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
   	activityId INT8 NOT NULL,
   	actorId INT8,
   	userId INT8,
-  	PRIMARY KEY (tenantid, id)
+  	CONSTRAINT pk_pending_mapping PRIMARY KEY (id),
+    CONSTRAINT uk_pending_mapping_activityid_userid_actorid UNIQUE (activityId, userId, actorId)
 );
-CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (activityId, userId, actorId);
-CREATE INDEX idx_pending_mapping_deadlock ON pending_mapping(tenantid, activityId);
+ALTER TABLE pending_mapping ADD CONSTRAINT fk_pending_mapping_activityid FOREIGN KEY (activityId) REFERENCES flownode_instance(id);
 
 CREATE TABLE ref_biz_data_inst (
-	tenantid INT8 NOT NULL,
-  	id INT8 NOT NULL,
-  	kind VARCHAR(15) NOT NULL,
-  	name VARCHAR(255) NOT NULL,
-  	proc_inst_id INT8,
-  	fn_inst_id INT8,
-  	data_id INT8,
-  	data_classname VARCHAR(255) NOT NULL
+  id INT8 NOT NULL,
+  kind VARCHAR(15) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  proc_inst_id INT8,
+  fn_inst_id INT8,
+  data_id INT8,
+  data_classname VARCHAR(255) NOT NULL,
+  CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (id)
 );
-
 CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (fn_inst_id);
 CREATE INDEX idx_biz_data_inst3 ON ref_biz_data_inst (proc_inst_id);
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (tenantid, id);
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE;
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_inst_proc_inst_id FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE;
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_inst_fn_inst_id FOREIGN KEY (fn_inst_id) REFERENCES flownode_instance(id) ON DELETE CASCADE;
 
 CREATE TABLE multi_biz_data (
-	tenantid INT8 NOT NULL,
-  	id INT8 NOT NULL,
-  	idx INT8 NOT NULL,
-  	data_id INT8 NOT NULL,
-  	PRIMARY KEY (tenantid, id, data_id)
+  id INT8 NOT NULL,
+  idx INT8 NOT NULL,
+  data_id INT8 NOT NULL,
+  CONSTRAINT pk_multi_biz_data PRIMARY KEY (id, data_id)
 );
-
-ALTER TABLE multi_biz_data ADD CONSTRAINT fk_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE multi_biz_data ADD CONSTRAINT fk_multi_biz_data_id FOREIGN KEY (id) REFERENCES ref_biz_data_inst(id) ON DELETE CASCADE;
 
 CREATE TABLE arch_ref_biz_data_inst (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	kind VARCHAR(15) NOT NULL,
-  	name VARCHAR(255) NOT NULL,
-  	orig_proc_inst_id BIGINT,
-  	orig_fn_inst_id BIGINT,
-  	data_id BIGINT,
-  	data_classname VARCHAR(255) NOT NULL
+  id BIGINT NOT NULL,
+  kind VARCHAR(15) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  orig_proc_inst_id BIGINT,
+  orig_fn_inst_id BIGINT,
+  data_id BIGINT,
+  data_classname VARCHAR(255) NOT NULL,
+  CONSTRAINT pk_arch_ref_biz_data_inst PRIMARY KEY (id)
 );
 CREATE INDEX idx_arch_biz_data_inst1 ON arch_ref_biz_data_inst (orig_proc_inst_id);
 CREATE INDEX idx_arch_biz_data_inst2 ON arch_ref_biz_data_inst (orig_fn_inst_id);
-ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT pk_arch_ref_biz_data_inst PRIMARY KEY (tenantid, id);
 
 CREATE TABLE arch_multi_biz_data (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	idx BIGINT NOT NULL,
-  	data_id BIGINT NOT NULL
+  id BIGINT NOT NULL,
+  idx BIGINT NOT NULL,
+  data_id BIGINT NOT NULL,
+  CONSTRAINT pk_arch_multi_biz_data PRIMARY KEY (id, data_id)
 );
-ALTER TABLE arch_multi_biz_data ADD CONSTRAINT pk_arch_rbdi_mbd PRIMARY KEY (tenantid, id, data_id);
-ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_multi_biz_data_id FOREIGN KEY (id) REFERENCES arch_ref_biz_data_inst(id) ON DELETE CASCADE;
 
 CREATE TABLE processsupervisor (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   processDefId INT8 NOT NULL,
   userId INT8 NOT NULL,
   groupId INT8 NOT NULL,
   roleId INT8 NOT NULL,
-  UNIQUE (tenantid, processDefId, userId, groupId, roleId),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_processsupervisor PRIMARY KEY (id),
+  CONSTRAINT uk_processsupervisor_processdefid_userid_groupid_roleid UNIQUE (processDefId, userId, groupId, roleId)
 );
 
+CREATE TABLE page (
+  id INT8 NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255) NOT NULL,
+  description TEXT,
+  installationDate INT8 NOT NULL,
+  installedBy INT8 NOT NULL,
+  provided BOOLEAN,
+  editable BOOLEAN,
+  removable BOOLEAN,
+  lastModificationDate INT8 NOT NULL,
+  lastUpdatedBy INT8 NOT NULL,
+  contentName VARCHAR(280) NOT NULL,
+  content BYTEA,
+  contentType VARCHAR(50) NOT NULL,
+  processDefinitionId INT8 NOT NULL,
+  pageHash VARCHAR(32),
+  CONSTRAINT pk_page PRIMARY KEY (id),
+  CONSTRAINT uk_page_name_processdefinitionid UNIQUE (name, processDefinitionId)
+);
+
+CREATE TABLE profile (
+  id INT8 NOT NULL,
+  isDefault BOOLEAN NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  creationDate INT8 NOT NULL,
+  createdBy INT8 NOT NULL,
+  lastUpdateDate INT8 NOT NULL,
+  lastUpdatedBy INT8 NOT NULL,
+  CONSTRAINT uk_profile_name UNIQUE (name),
+  CONSTRAINT pk_profile PRIMARY KEY (id)
+);
+
+CREATE TABLE profilemember (
+  id INT8 NOT NULL,
+  profileId INT8 NOT NULL,
+  userId INT8 NOT NULL,
+  groupId INT8 NOT NULL,
+  roleId INT8 NOT NULL,
+  CONSTRAINT pk_profilemember PRIMARY KEY (id),
+  CONSTRAINT uk_profilemember_profileid_userid_groupid_roleid UNIQUE (profileId, userId, groupId, roleId)
+);
+ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_profileid FOREIGN KEY (profileId) REFERENCES profile(id);
+
 CREATE TABLE business_app (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   token VARCHAR(50) NOT NULL,
   version VARCHAR(50) NOT NULL,
@@ -525,164 +543,152 @@ CREATE TABLE business_app (
   displayName VARCHAR(255) NOT NULL,
   editable BOOLEAN,
   internalProfile VARCHAR(255),
-  isLink BOOLEAN DEFAULT FALSE
+  isLink BOOLEAN DEFAULT FALSE,
+  CONSTRAINT pk_business_app PRIMARY KEY (id),
+  CONSTRAINT uk_business_app_token_version UNIQUE (token, version)
 );
-
-ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version);
-
 CREATE INDEX idx_app_token ON business_app (token);
 CREATE INDEX idx_app_profile ON business_app (profileId);
 CREATE INDEX idx_app_homepage ON business_app (homePageId);
+ALTER TABLE business_app ADD CONSTRAINT fk_business_app_profileid FOREIGN KEY (profileId) REFERENCES profile (id);
+ALTER TABLE business_app ADD CONSTRAINT fk_business_app_layoutid FOREIGN KEY (layoutId) REFERENCES page (id);
+ALTER TABLE business_app ADD CONSTRAINT fk_business_app_themeid FOREIGN KEY (themeId) REFERENCES page (id);
 
 CREATE TABLE business_app_page (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   applicationId INT8 NOT NULL,
   pageId INT8 NOT NULL,
-  token VARCHAR(255) NOT NULL
+  token VARCHAR(255) NOT NULL,
+  CONSTRAINT pk_business_app_page PRIMARY KEY (id),
+  CONSTRAINT uk_business_app_page_applicationid_token UNIQUE (applicationId, token)
 );
-
-ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token);
-
 CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token);
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId);
+ALTER TABLE business_app_page ADD CONSTRAINT fk_business_app_page_applicationid FOREIGN KEY (applicationId) REFERENCES business_app (id) ON DELETE CASCADE;
+ALTER TABLE business_app_page ADD CONSTRAINT fk_business_app_page_pageid FOREIGN KEY (pageId) REFERENCES page (id);
 
 CREATE TABLE business_app_menu (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   displayName VARCHAR(255) NOT NULL,
   applicationId INT8 NOT NULL,
   applicationPageId INT8,
   parentId INT8,
-  index_ INT8
+  index_ INT8,
+  CONSTRAINT pk_business_app_menu PRIMARY KEY (id)
 );
-
-ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id);
-
 CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId);
 CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId);
 CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId);
+-- cannot have both fk_business_app_menu_applicationid and fk_business_app_menu_applicationpageid because this create to path for deletion of business_app_menu elements:
+-- business_app -> business_app_menu
+-- business_app -> business_app_page -> business_app_menu
+-- this is not allowed in SQL Server
+ALTER TABLE business_app_menu ADD CONSTRAINT fk_business_app_menu_applicationid FOREIGN KEY (applicationId) REFERENCES business_app (id);
+ALTER TABLE business_app_menu ADD CONSTRAINT fk_business_app_menu_applicationpageid FOREIGN KEY (applicationPageId) REFERENCES business_app_page (id);
+ALTER TABLE business_app_menu ADD CONSTRAINT fk_business_app_menu_parentid FOREIGN KEY (parentId) REFERENCES business_app_menu (id);
 
 CREATE TABLE command (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(50) NOT NULL,
   description TEXT,
   IMPLEMENTATION VARCHAR(100) NOT NULL,
   isSystem BOOLEAN,
-  UNIQUE (tenantid, name),
-  PRIMARY KEY (tenantid, id)
-);
-CREATE TABLE arch_data_instance (
-    tenantId INT8 NOT NULL,
-	id INT8 NOT NULL,
-	name VARCHAR(50),
-	description VARCHAR(50),
-	transientData BOOLEAN,
-	className VARCHAR(100),
-	containerId INT8,
-	containerType VARCHAR(60),
-	namespace VARCHAR(100),
-	element VARCHAR(60),
-	intValue INT,
-	longValue INT8,
-	shortTextValue VARCHAR(255),
-	booleanValue BOOLEAN,
-	doubleValue NUMERIC(19,5),
-	floatValue REAL,
-	blobValue BYTEA,
-	clobValue TEXT,
-	discriminant VARCHAR(50) NOT NULL,
-	archiveDate INT8 NOT NULL,
-	sourceObjectId INT8 NOT NULL,
-	PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_command PRIMARY KEY (id),
+  CONSTRAINT uk_command_name UNIQUE (name)
 );
 
+CREATE TABLE arch_data_instance (
+  id INT8 NOT NULL,
+  name VARCHAR(50),
+  description VARCHAR(50),
+  transientData BOOLEAN,
+  className VARCHAR(100),
+  containerId INT8,
+  containerType VARCHAR(60),
+  namespace VARCHAR(100),
+  element VARCHAR(60),
+  intValue INT,
+  longValue INT8,
+  shortTextValue VARCHAR(255),
+  booleanValue BOOLEAN,
+  doubleValue NUMERIC(19,5),
+  floatValue REAL,
+  blobValue BYTEA,
+  clobValue TEXT,
+  discriminant VARCHAR(50) NOT NULL,
+  archiveDate INT8 NOT NULL,
+  sourceObjectId INT8 NOT NULL,
+  CONSTRAINT pk_arch_data_instance PRIMARY KEY (id)
+);
 CREATE INDEX idx1_arch_data_instance ON arch_data_instance (containerId, containerType, archiveDate, name, sourceObjectId);
 CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id);
 
 CREATE TABLE data_instance (
-    tenantId INT8 NOT NULL,
-	id INT8 NOT NULL,
-	name VARCHAR(50),
-	description VARCHAR(50),
-	transientData BOOLEAN,
-	className VARCHAR(100),
-	containerId INT8,
-	containerType VARCHAR(60),
-	namespace VARCHAR(100),
-	element VARCHAR(60),
-	intValue INT,
-	longValue INT8,
-	shortTextValue VARCHAR(255),
-	booleanValue BOOLEAN,
-	doubleValue NUMERIC(19,5),
-	floatValue REAL,
-	blobValue BYTEA,
-	clobValue TEXT,
-	discriminant VARCHAR(50) NOT NULL,
-	PRIMARY KEY (tenantid, id)
+  id INT8 NOT NULL,
+  name VARCHAR(50),
+  description VARCHAR(50),
+  transientData BOOLEAN,
+  className VARCHAR(100),
+  containerId INT8,
+  containerType VARCHAR(60),
+  namespace VARCHAR(100),
+  element VARCHAR(60),
+  intValue INT,
+  longValue INT8,
+  shortTextValue VARCHAR(255),
+  booleanValue BOOLEAN,
+  doubleValue NUMERIC(19,5),
+  floatValue REAL,
+  blobValue BYTEA,
+  clobValue TEXT,
+  discriminant VARCHAR(50) NOT NULL,
+  CONSTRAINT pk_data_instance PRIMARY KEY (id)
 );
 CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, name);
 
 CREATE TABLE dependency (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(150) NOT NULL,
   description TEXT,
   filename VARCHAR(255) NOT NULL,
   value_ BYTEA NOT NULL,
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_dependency PRIMARY KEY (id),
+  CONSTRAINT uk_dependency_name UNIQUE (name)
 );
-CREATE INDEX idx_dependency_name ON dependency (name);
 
 CREATE TABLE dependencymapping (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   artifactid INT8 NOT NULL,
   artifacttype VARCHAR(50) NOT NULL,
   dependencyid INT8 NOT NULL,
-  UNIQUE (tenantid, dependencyid, artifactid, artifacttype),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_dependencymapping PRIMARY KEY (id),
+  CONSTRAINT uk_dependencymapping_dependencyid_artifactid_artifacttype UNIQUE (dependencyid, artifactid, artifacttype)
 );
 CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid);
-ALTER TABLE dependencymapping ADD CONSTRAINT fk_depmapping_depid FOREIGN KEY (tenantid, dependencyid) REFERENCES dependency(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE dependencymapping ADD CONSTRAINT fk_dependencymapping_dependencyid FOREIGN KEY (dependencyid) REFERENCES dependency(id) ON DELETE CASCADE;
+
 CREATE TABLE pdependency (
   id INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL UNIQUE,
+  name VARCHAR(50) NOT NULL,
   description TEXT,
   filename VARCHAR(255) NOT NULL,
   value_ BYTEA NOT NULL,
-  PRIMARY KEY (id)
+  CONSTRAINT pk_pdependency PRIMARY KEY (id),
+  CONSTRAINT uk_pdependency_name UNIQUE (name)
 );
-CREATE INDEX idx_pdependency_name ON pdependency (name);
 
 CREATE TABLE pdependencymapping (
   id INT8 NOT NULL,
   artifactid INT8 NOT NULL,
   artifacttype VARCHAR(50) NOT NULL,
   dependencyid INT8 NOT NULL,
-  UNIQUE (dependencyid, artifactid, artifacttype),
-  PRIMARY KEY (id)
+  CONSTRAINT pk_pdependencymapping PRIMARY KEY (id),
+  CONSTRAINT uk_pdependencymapping_dependencyid_artifactid_artifacttype UNIQUE (dependencyid, artifactid, artifacttype)
 );
 CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid);
-ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;
-CREATE TABLE external_identity_mapping (
-  tenantid INT8 NOT NULL,
-  id INT8 NOT NULL,
-  kind VARCHAR(25) NOT NULL,
-  externalId VARCHAR(50) NOT NULL,
-  userId INT8 NOT NULL,
-  groupId INT8 NOT NULL,
-  roleId INT8 NOT NULL,
-  UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
-  PRIMARY KEY (tenantid, id)
-);
+ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdependencymapping_dependencyid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;
+
 CREATE TABLE group_ (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(125) NOT NULL,
   parentPath VARCHAR(255),
@@ -692,12 +698,11 @@ CREATE TABLE group_ (
   creationDate INT8,
   lastUpdate INT8,
   iconid INT8,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_group PRIMARY KEY (id)
 );
 CREATE INDEX idx_group_name ON group_ (parentPath, name);
 
 CREATE TABLE role (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(255) NOT NULL,
   displayName VARCHAR(255),
@@ -706,14 +711,11 @@ CREATE TABLE role (
   creationDate INT8,
   lastUpdate INT8,
   iconid INT8,
-  UNIQUE (tenantid, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_role PRIMARY KEY (id),
+  CONSTRAINT uk_role_name UNIQUE (name)
 );
 
-CREATE INDEX idx_role_name ON role (name);
-
 CREATE TABLE user_ (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   enabled BOOLEAN NOT NULL,
   userName VARCHAR(255) NOT NULL,
@@ -727,21 +729,17 @@ CREATE TABLE user_ (
   creationDate INT8,
   lastUpdate INT8,
   iconid INT8,
-  UNIQUE (tenantid, userName),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_user PRIMARY KEY (id),
+  CONSTRAINT uk_user_username UNIQUE (userName)
 );
 
-CREATE INDEX idx_user_name ON user_ (userName);
-
 CREATE TABLE user_login (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   lastConnection INT8,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_user_login PRIMARY KEY (id)
 );
 
 CREATE TABLE user_contactinfo (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   userId INT8 NOT NULL,
   email VARCHAR(255),
@@ -757,49 +755,49 @@ CREATE TABLE user_contactinfo (
   country VARCHAR(255),
   website VARCHAR(255),
   personal BOOLEAN NOT NULL,
-  UNIQUE (tenantid, userId, personal),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_user_contactinfo PRIMARY KEY (id),
+  CONSTRAINT uk_user_contactinfo_userid_personal UNIQUE (userId, personal)
 );
-ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
-CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, personal);
-
+ALTER TABLE user_contactinfo ADD CONSTRAINT fk_user_contactinfo_userid FOREIGN KEY (userId) REFERENCES user_ (id) ON DELETE CASCADE;
 
 CREATE TABLE custom_usr_inf_def (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(75) NOT NULL,
   description TEXT,
-  UNIQUE (tenantid, name),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_custom_usr_inf_def PRIMARY KEY (id),
+  CONSTRAINT uk_custom_usr_inf_def_name UNIQUE (name)
 );
-
-CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name);
 
 CREATE TABLE custom_usr_inf_val (
   id INT8 NOT NULL,
-  tenantid INT8 NOT NULL,
   definitionId INT8 NOT NULL,
   userId INT8 NOT NULL,
   value VARCHAR(255),
-  UNIQUE (tenantid, definitionId, userId),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_custom_usr_inf_val PRIMARY KEY (id),
+  CONSTRAINT uk_custom_usr_inf_val_definitionid_userid UNIQUE (definitionId, userId)
 );
-ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
-ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_definition_id FOREIGN KEY (tenantid, definitionId) REFERENCES custom_usr_inf_def (tenantid, id) ON DELETE CASCADE;
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_custom_usr_inf_val_userid FOREIGN KEY (userId) REFERENCES user_ (id) ON DELETE CASCADE;
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_custom_usr_inf_val_definitionid FOREIGN KEY (definitionId) REFERENCES custom_usr_inf_def (id) ON DELETE CASCADE;
 
 CREATE TABLE user_membership (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   userId INT8 NOT NULL,
   roleId INT8 NOT NULL,
   groupId INT8 NOT NULL,
   assignedBy INT8,
   assignedDate INT8,
-  UNIQUE (tenantid, userId, roleId, groupId),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_user_membership PRIMARY KEY (id),
+  CONSTRAINT uk_user_membership_userid_roleid_groupid UNIQUE (userId, roleId, groupId)
 );
+
+CREATE TABLE icon (
+  id INT8 NOT NULL,
+  mimetype VARCHAR(255) NOT NULL,
+  content BYTEA NOT NULL,
+  CONSTRAINT pk_icon PRIMARY KEY (id)
+);
+
 CREATE TABLE queriable_log (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   log_timestamp INT8 NOT NULL,
   whatYear SMALLINT NOT NULL,
@@ -822,57 +820,13 @@ CREATE TABLE queriable_log (
   numericIndex3 INT8,
   numericIndex4 INT8,
   numericIndex5 INT8,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_queriable_log PRIMARY KEY (id)
 );
-
-CREATE TABLE queriablelog_p (
-  tenantid INT8 NOT NULL,
-  id INT8 NOT NULL,
-  queriableLogId INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  stringValue VARCHAR(255),
-  blobId INT8,
-  valueType VARCHAR(30),
-  PRIMARY KEY (tenantid, id)
-);
-
-CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId);
-ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id);
-CREATE TABLE page (
-  tenantId INT8 NOT NULL,
-  id INT8 NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  displayName VARCHAR(255) NOT NULL,
-  description TEXT,
-  installationDate INT8 NOT NULL,
-  installedBy INT8 NOT NULL,
-  provided BOOLEAN,
-  editable BOOLEAN,
-  removable BOOLEAN,
-  lastModificationDate INT8 NOT NULL,
-  lastUpdatedBy INT8 NOT NULL,
-  contentName VARCHAR(280) NOT NULL,
-  content BYTEA,
-  contentType VARCHAR(50) NOT NULL,
-  processDefinitionId INT8 NOT NULL,
-  pageHash VARCHAR(32)
-);
-
-ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
-
-ALTER TABLE page ADD CONSTRAINT uk_page UNIQUE (tenantId, name, processDefinitionId);
 
 CREATE TABLE sequence (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   nextid INT8 NOT NULL,
-  PRIMARY KEY (tenantid, id)
-);
-CREATE TABLE blob_ (
-    tenantId INT8 NOT NULL,
-	id INT8 NOT NULL,
-	blobValue BYTEA,
-	PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_sequence PRIMARY KEY (id)
 );
 
 CREATE TABLE platform (
@@ -885,100 +839,47 @@ CREATE TABLE platform (
   created INT8 NOT NULL,
   created_by VARCHAR(50) NOT NULL,
   information TEXT,
-  PRIMARY KEY (id)
+  maintenance_enabled BOOLEAN NOT NULL,
+  CONSTRAINT pk_platform PRIMARY KEY (id)
 );
 
-CREATE TABLE tenant (
-  id INT8 NOT NULL,
-  created INT8 NOT NULL,
-  createdBy VARCHAR(50) NOT NULL,
-  description VARCHAR(255),
-  defaultTenant BOOLEAN NOT NULL,
-  iconname VARCHAR(50),
-  iconpath VARCHAR(255),
-  name VARCHAR(50) NOT NULL,
-  status VARCHAR(15) NOT NULL,
-  PRIMARY KEY (id)
-);
 CREATE TABLE platformCommand (
   id INT8 PRIMARY KEY,
   name VARCHAR(50) NOT NULL UNIQUE,
   description TEXT,
   IMPLEMENTATION VARCHAR(100) NOT NULL
 );
-CREATE TABLE profile (
-  tenantId INT8 NOT NULL,
-  id INT8 NOT NULL,
-  isDefault BOOLEAN NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  description TEXT,
-  creationDate INT8 NOT NULL,
-  createdBy INT8 NOT NULL,
-  lastUpdateDate INT8 NOT NULL,
-  lastUpdatedBy INT8 NOT NULL,
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
-);
 
-CREATE TABLE profilemember (
-  tenantId INT8 NOT NULL,
-  id INT8 NOT NULL,
-  profileId INT8 NOT NULL,
-  userId INT8 NOT NULL,
-  groupId INT8 NOT NULL,
-  roleId INT8 NOT NULL,
-  UNIQUE (tenantId, profileId, userId, groupId, roleId),
-  PRIMARY KEY (tenantId, id)
-);
 CREATE TABLE job_desc (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   jobclassname VARCHAR(100) NOT NULL,
   jobname VARCHAR(100) NOT NULL,
   description VARCHAR(50),
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_job_desc PRIMARY KEY (id)
 );
-CREATE INDEX idx_job_desc_id ON job_desc(id);
 
 CREATE TABLE job_param (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   jobDescriptorId INT8 NOT NULL,
   key_ VARCHAR(50) NOT NULL,
   value_ BYTEA NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  CONSTRAINT pk_job_param PRIMARY KEY (id)
 );
+ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobdescriptorid FOREIGN KEY (jobDescriptorId) REFERENCES job_desc(id) ON DELETE CASCADE;
 CREATE INDEX idx_job_param_jobid ON job_param(jobDescriptorId);
 
 CREATE TABLE job_log (
-  tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   jobDescriptorId INT8 NOT NULL,
   retryNumber INT8,
   lastUpdateDate INT8,
   lastMessage TEXT,
-  PRIMARY KEY (tenantid, id, jobDescriptorId)
+  CONSTRAINT pk_job_log PRIMARY KEY (id),
+  CONSTRAINT uk_job_log_jobdescriptorid UNIQUE (jobDescriptorId)
 );
+ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobdescriptorid FOREIGN KEY (jobDescriptorId) REFERENCES job_desc(id) ON DELETE CASCADE;
 
-ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
-ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
-CREATE INDEX idx_job_log_jobdescid ON job_log(jobdescriptorid);
-
-CREATE TABLE form_mapping (
-  tenantId INT8 NOT NULL,
-  id INT8 NOT NULL,
-  process INT8 NOT NULL,
-  type INT NOT NULL,
-  task VARCHAR(255),
-  page_mapping_tenant_id INT8,
-  page_mapping_id INT8,
-  lastUpdateDate INT8,
-  lastUpdatedBy INT8,
-  target VARCHAR(16) NOT NULL,
-  PRIMARY KEY (tenantId, id)
-);
 CREATE TABLE page_mapping (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   key_ VARCHAR(255) NOT NULL,
   pageId INT8 NULL,
@@ -987,31 +888,41 @@ CREATE TABLE page_mapping (
   page_authoriz_rules TEXT NULL,
   lastUpdateDate INT8 NULL,
   lastUpdatedBy INT8 NULL,
-  CONSTRAINT UK_page_mapping UNIQUE (tenantId, key_),
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT uk_page_mapping_key UNIQUE (key_),
+  CONSTRAINT pk_page_mapping PRIMARY KEY (id)
 );
-ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id);
+
+CREATE TABLE form_mapping (
+  id INT8 NOT NULL,
+  process INT8 NOT NULL,
+  type INT NOT NULL,
+  task VARCHAR(255),
+  page_mapping_id INT8,
+  lastUpdateDate INT8,
+  lastUpdatedBy INT8,
+  target VARCHAR(16) NOT NULL,
+  CONSTRAINT pk_form_mapping PRIMARY KEY (id)
+);
+
+ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_id) REFERENCES page_mapping(id);
 
 CREATE TABLE proc_parameter (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   process_id INT8 NOT NULL,
   name VARCHAR(255) NOT NULL,
   value TEXT NULL,
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT pk_proc_parameter PRIMARY KEY (id)
 );
 
 CREATE TABLE bar_resource (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   process_id INT8 NOT NULL,
   name VARCHAR(255) NOT NULL,
   type VARCHAR(16) NOT NULL,
   content BYTEA NOT NULL,
-  UNIQUE (tenantId, process_id, name, type),
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT pk_bar_resource PRIMARY KEY (id),
+  CONSTRAINT uk_bar_resource_processid_name_type UNIQUE (process_id, name, type)
 );
-CREATE INDEX idx_bar_resource ON bar_resource (process_id, type, name);
 
 CREATE TABLE temporary_content (
   id INT8 NOT NULL,
@@ -1026,7 +937,6 @@ CREATE TABLE temporary_content (
 CREATE INDEX idx_temporary_content ON temporary_content (key_);
 
 CREATE TABLE tenant_resource (
-  tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(255) NOT NULL,
   type VARCHAR(16) NOT NULL,
@@ -1034,15 +944,44 @@ CREATE TABLE tenant_resource (
   lastUpdatedBy INT8 NOT NULL,
   lastUpdateDate INT8,
   state VARCHAR(50) NOT NULL,
-  CONSTRAINT UK_tenant_resource UNIQUE (tenantId, name, type),
-  PRIMARY KEY (tenantId, id)
+  CONSTRAINT pk_tenant_resource PRIMARY KEY (id),
+  CONSTRAINT uk_tenant_resource_name_type UNIQUE (name, type)
 );
-CREATE INDEX idx_tenant_resource ON tenant_resource (type, name);
 
-CREATE TABLE icon (
-  tenantId INT8 NOT NULL,
+CREATE TABLE bpm_failure (
   id INT8 NOT NULL,
-  mimetype VARCHAR(255) NOT NULL,
-  content BYTEA NOT NULL,
-  CONSTRAINT pk_icon PRIMARY KEY (tenantId, id)
+  processDefinitionId INT8 NOT NULL,
+  processInstanceId INT8 NOT NULL,
+  rootProcessInstanceId INT8,
+  flowNodeInstanceId INT8,
+  scope VARCHAR(255),
+  context VARCHAR(1024),
+  errorMessage VARCHAR(1024),
+  stackTrace TEXT,
+  failureDate INT8 NOT NULL,
+  CONSTRAINT pk_bpm_failure PRIMARY KEY (id)
 );
+CREATE INDEX idx_bpm_failure_flownodeinstanceid ON bpm_failure (flowNodeInstanceId);
+CREATE INDEX idx_bpm_failure_processinstanceid ON bpm_failure (processInstanceId);
+CREATE INDEX idx_bpm_failure_rootprocessinstanceid ON bpm_failure (rootProcessInstanceId);
+CREATE INDEX idx_bpm_failure_processdefinitionid ON bpm_failure (processDefinitionId);
+
+CREATE TABLE arch_bpm_failure (
+  id INT8 NOT NULL,
+  processDefinitionId INT8 NOT NULL,
+  processInstanceId INT8 NOT NULL,
+  rootProcessInstanceId INT8,
+  flowNodeInstanceId INT8,
+  scope VARCHAR(255),
+  context VARCHAR(1024),
+  errorMessage VARCHAR(1024),
+  stackTrace TEXT,
+  failureDate INT8 NOT NULL,
+  archiveDate INT8 NOT NULL,
+  sourceObjectId INT8 NOT NULL,
+  CONSTRAINT pk_arch_bpm_failure PRIMARY KEY (id)
+);
+CREATE INDEX idx_arch_bpm_failure_flownodeinstanceid ON arch_bpm_failure (flowNodeInstanceId);
+CREATE INDEX idx_arch_bpm_failure_processinstanceid ON arch_bpm_failure (processInstanceId);
+CREATE INDEX idx_arch_bpm_failure_rootprocessinstanceid ON arch_bpm_failure (rootProcessInstanceId);
+CREATE INDEX idx_arch_bpm_failure_processdefinitionid ON arch_bpm_failure (processDefinitionId);

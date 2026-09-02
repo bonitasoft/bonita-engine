@@ -48,15 +48,14 @@ public interface JobService {
     String JOB_LOG = "JOB_LOG";
 
     /**
-     * Create a new job descriptor for a specific tenant
+     * Create a new job descriptor
      *
      * @param sJobDescriptor JobDescriptor to create
-     * @param tenantId Identifier of tenant
      * @return The created jobDescriptor
      * @throws SJobDescriptorCreationException
      * @since 6.1
      */
-    SJobDescriptor createJobDescriptor(SJobDescriptor sJobDescriptor, long tenantId)
+    SJobDescriptor createJobDescriptor(SJobDescriptor sJobDescriptor)
             throws SJobDescriptorCreationException;
 
     /**
@@ -81,7 +80,7 @@ public interface JobService {
     void deleteJobDescriptor(SJobDescriptor sJobDescriptor) throws SJobDescriptorDeletionException;
 
     /**
-     * Delete all job descriptors for a specific tenant
+     * Delete all job descriptors
      *
      * @throws SJobDescriptorDeletionException
      * @since 6.4
@@ -126,43 +125,39 @@ public interface JobService {
     List<SJobDescriptor> searchJobDescriptors(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
-     * Create new job parameters for a specific tenant
+     * Create new job parameters
      *
      * @param parameters JobParameters to create
-     * @param tenantId Identifier of tenant
      * @param jobDescriptorId Identifier of job descriptor
      * @return
      * @throws SJobParameterCreationException
      * @since 6.2
      */
-    List<SJobParameter> createJobParameters(List<SJobParameter> parameters, long tenantId, long jobDescriptorId)
+    List<SJobParameter> createJobParameters(List<SJobParameter> parameters, long jobDescriptorId)
             throws SJobParameterCreationException;
 
     /**
-     * Delete jobs parameters corresponding to tenant and job descriptor, if exist. After, create new job parameters for
-     * a specific tenant
+     * Delete jobs parameters corresponding to the job descriptor, if exist. After, create new job parameters
      *
-     * @param tenantId
      * @param jobDescriptorId
      * @param parameters
      * @return A list of new SJobParameter objects
      * @throws SJobParameterCreationException
      * @since 6.1
      */
-    List<SJobParameter> setJobParameters(final long tenantId, long jobDescriptorId, List<SJobParameter> parameters)
+    List<SJobParameter> setJobParameters(long jobDescriptorId, List<SJobParameter> parameters)
             throws SJobParameterCreationException;
 
     /**
-     * Create a new job parameter for a specific tenant
+     * Create a new job parameter
      *
      * @param sJobParameter JobParameter to create
-     * @param tenantId Identifier of tenant
      * @param jobDescriptorId Identifier of job descriptor
      * @return
      * @throws SJobParameterCreationException
      * @since 6.2
      */
-    SJobParameter createJobParameter(SJobParameter sJobParameter, long tenantId, long jobDescriptorId)
+    SJobParameter createJobParameter(SJobParameter sJobParameter, long jobDescriptorId)
             throws SJobParameterCreationException;
 
     /**
@@ -203,7 +198,7 @@ public interface JobService {
     List<SJobParameter> getJobParameters(Long jobDescriptorId) throws SBonitaReadException;
 
     /**
-     * Create a new job log for a specific tenant
+     * Create a new job log
      *
      * @param sJobLog JobLog to create
      * @return

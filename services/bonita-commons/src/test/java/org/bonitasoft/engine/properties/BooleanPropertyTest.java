@@ -14,9 +14,11 @@
 package org.bonitasoft.engine.properties;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -24,8 +26,14 @@ import org.junit.jupiter.api.Test;
  */
 class BooleanPropertyTest {
 
+    @BeforeEach
+    void setUp() {
+        // Reset the static cache of already logged properties before each test
+        BooleanProperty.clearLoggedProperties();
+    }
+
     @Test
-    public void booleanProperty_should_take_System_property_if_set() throws Exception {
+    void booleanProperty_should_take_System_property_if_set() throws Exception {
         restoreSystemProperties(() -> {
             final String propertyKey = "my.feature.enable";
             System.setProperty(propertyKey, "false");
@@ -36,7 +44,7 @@ class BooleanPropertyTest {
     }
 
     @Test
-    public void booleanProperty_should_take_envVar_if_no_System_property_if_set() throws Exception {
+    void booleanProperty_should_take_envVar_if_no_System_property_if_set() throws Exception {
         final String systemPropertyKey = "my.super-cool.feature.enabled";
         final String envPropertyKey = "MY_SUPERCOOL_FEATURE_ENABLED";
         Boolean enabled = withEnvironmentVariable(envPropertyKey, "false")
@@ -45,7 +53,18 @@ class BooleanPropertyTest {
     }
 
     @Test
-    public void booleanProperty_should_take_default_value_if_no_System_property_nor_env_variable_if_set() {
+    void booleanProperty_should_take_default_value_if_no_System_property_nor_env_variable_if_set() {
         assertThat(new BooleanProperty("Some feature", "some.key", false).isEnabled()).isFalse();
+    }
+
+    @Test
+    void initialization_message_should_be_logged_once_only() throws Exception {
+        String log = tapSystemOut(() -> new BooleanProperty("my boolean property", "my.boolean.property", false));
+        assertThat(log).contains(
+                "my boolean property disabled, you may enable it using env property MY_BOOLEAN_PROPERTY or System property -Dmy.boolean.property [=true/false]");
+
+        // should not log again:
+        log = tapSystemOut(() -> new BooleanProperty("my property", "my.boolean.property", false));
+        assertThat(log).doesNotContain("my.property");
     }
 }

@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -122,7 +121,6 @@ public class EventTriggerInstanceQueriesTest {
                 eventInstanceName, 96L,
                 jobTriggerName);
         sTimerEventTriggerInstance.setId(id);
-        sTimerEventTriggerInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
         return sTimerEventTriggerInstance;
     }
 
@@ -132,7 +130,6 @@ public class EventTriggerInstanceQueriesTest {
                 name, 9, 6, 8, 4, 2);
         sIntermediateCatchEventInstance.setLogicalGroup(3, processInstanceId);
         sIntermediateCatchEventInstance.setId(id);
-        sIntermediateCatchEventInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
         return sIntermediateCatchEventInstance;
     }
 

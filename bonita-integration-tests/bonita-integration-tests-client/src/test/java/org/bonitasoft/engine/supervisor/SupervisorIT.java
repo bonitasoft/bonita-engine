@@ -327,9 +327,9 @@ public class SupervisorIT extends TestWithTechnicalUser {
         // Already deleted Supervisor
         assertThatThrownBy(
                 () -> getProcessAPI().deleteSupervisor(myProcess1.getId(), null, role2.getId(), group2.getId()))
-                        .isInstanceOf(DeletionException.class)
-                        // Only check the name and not the cause, because in HTTP mode, the stacks are merged and the cause removed:
-                        .hasMessageContaining("SupervisorNotFoundException");
+                .isInstanceOf(DeletionException.class)
+                // Only check the name and not the cause, because in HTTP mode, the stacks are merged and the cause removed:
+                .hasMessageContaining("SupervisorNotFoundException");
     }
 
     @Test

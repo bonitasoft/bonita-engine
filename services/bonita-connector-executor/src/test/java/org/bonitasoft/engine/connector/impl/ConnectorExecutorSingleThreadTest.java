@@ -67,7 +67,7 @@ class ConnectorExecutorSingleThreadTest {
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
                 Clock.SYSTEM);
         connectorExecutorImpl = new ConnectorExecutorImpl(sessionAccessor, sessionService,
-                timeTracker, meterRegistry, TENANT_ID, new DefaultExecutorServiceMetricsProvider(),
+                timeTracker, meterRegistry, new DefaultExecutorServiceMetricsProvider(),
                 new ConnectorSingleThreadExecutorFactory(1));
         connectorExecutorImpl.start();
     }
@@ -84,7 +84,7 @@ class ConnectorExecutorSingleThreadTest {
                 .execute(new FailingSConnector(), new HashMap<>(),
                         Thread.currentThread().getContextClassLoader())
                 .get(5, TimeUnit.SECONDS))
-                        .isInstanceOf(ExecutionException.class);
+                .isInstanceOf(ExecutionException.class);
 
         // Execute a successful connector — must succeed even with pool size 1
         ConnectorExecutionResult result = connectorExecutorImpl
@@ -101,9 +101,9 @@ class ConnectorExecutorSingleThreadTest {
                 .execute(new FailingSConnector(), new HashMap<>(),
                         Thread.currentThread().getContextClassLoader())
                 .get(5, TimeUnit.SECONDS))
-                        .isInstanceOf(ExecutionException.class)
-                        .hasCauseInstanceOf(RuntimeException.class)
-                        .hasMessageContaining("connector failure");
+                .isInstanceOf(ExecutionException.class)
+                .hasCauseInstanceOf(RuntimeException.class)
+                .hasMessageContaining("connector failure");
     }
 
     @Test
@@ -113,7 +113,7 @@ class ConnectorExecutorSingleThreadTest {
                 .execute(new FailingSConnector(), new HashMap<>(),
                         Thread.currentThread().getContextClassLoader())
                 .get(5, TimeUnit.SECONDS))
-                        .isInstanceOf(ExecutionException.class);
+                .isInstanceOf(ExecutionException.class);
 
         // Execute a successful connector
         connectorExecutorImpl

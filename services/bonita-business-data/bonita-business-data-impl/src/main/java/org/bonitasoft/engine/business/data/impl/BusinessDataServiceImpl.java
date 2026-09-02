@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import static java.lang.String.format;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -55,14 +57,18 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.commons.TypeConverterUtil;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Service;
 
+@Service
+@ConditionalOnSingleCandidate(BusinessDataService.class)
 public class BusinessDataServiceImpl implements BusinessDataService {
 
-    private final BusinessDataRepository businessDataRepository;
+    protected final BusinessDataRepository businessDataRepository;
 
     private final JsonBusinessDataSerializer jsonBusinessDataSerializer;
 
-    private final BusinessDataModelRepository businessDataModelRepository;
+    protected final BusinessDataModelRepository businessDataModelRepository;
 
     private final TypeConverterUtil typeConverterUtil;
 
@@ -100,7 +106,6 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return true;
         }
         return isEntity(dataList.get(0));
-
     }
 
     private boolean isEntity(final Object data) {
@@ -185,7 +190,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         primaryKeys = new ArrayList<>();
         for (final Entity entity : entities) {
             if (entity.getPersistenceId() == null) {
-                throw new SBusinessDataNotFoundException(String.format(
+                throw new SBusinessDataNotFoundException(format(
                         "Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
                         businessDataReloader.getEntityRealClass(entity).getName()));
             }
@@ -212,7 +217,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             try {
                 return businessDataReloader.reloadEntity(entity);
             } catch (SBusinessDataNotFoundException e) {
-                throw new SBusinessDataNotFoundException(String.format(
+                throw new SBusinessDataNotFoundException(format(
                         "Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
                         businessDataReloader.getEntityRealClass(entity).getName()), e);
             }
@@ -386,7 +391,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     private String getQualifiedQueryName(final Class<? extends Entity> businessDataClass, final String queryName) {
-        return String.format("%s.%s", businessDataClass.getSimpleName(), queryName);
+        return format("%s.%s", businessDataClass.getSimpleName(), queryName);
     }
 
     private Map<String, Serializable> getQueryParameters(final Query queryDefinition,

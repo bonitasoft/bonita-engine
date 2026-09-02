@@ -141,8 +141,7 @@ public class ServerProxyfier {
         }
 
         private boolean isAListOfEntities(final Object invocationResult) {
-            if (invocationResult instanceof List) {
-                final List<?> list = (List<?>) invocationResult;
+            if (invocationResult instanceof List<?> list) {
                 return !list.isEmpty() && list.get(0) instanceof Entity;
             }
             return false;

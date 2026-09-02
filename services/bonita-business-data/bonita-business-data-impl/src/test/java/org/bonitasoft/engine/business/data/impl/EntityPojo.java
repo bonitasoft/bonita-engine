@@ -59,7 +59,6 @@ public class EntityPojo implements Entity {
         this.persistenceId = persistenceId;
         aggregationEntities = new ArrayList<>();
         compositionEntities = new ArrayList<>();
-
     }
 
     public EntityPojo() {

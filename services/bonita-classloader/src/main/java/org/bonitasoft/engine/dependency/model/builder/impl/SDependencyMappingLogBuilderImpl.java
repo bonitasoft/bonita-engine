@@ -40,12 +40,12 @@ public class SDependencyMappingLogBuilderImpl extends CRUDELogBuilder implements
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getNumericIndex(SDependencyLogIndexesMapper.DEPENDENCY_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Dependency Id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Dependency Id");
         }
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
             if (log.getNumericIndex(SDependencyLogIndexesMapper.DEPENDENCY_MAPPING_INDEX) == 0L) {
                 throw new MissingMandatoryFieldsException(
-                        "Some mandatoryFildes are missing: " + "Dependency Mapping Id");
+                        "Some mandatory fields are missing: " + "Dependency Mapping Id");
             }
         }
     }

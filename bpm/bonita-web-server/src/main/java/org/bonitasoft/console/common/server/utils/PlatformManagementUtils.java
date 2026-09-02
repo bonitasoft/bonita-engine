@@ -115,12 +115,8 @@ public class PlatformManagementUtils {
     public void updateConfigurationFile(final String file, final byte[] content) throws IOException, BonitaException {
         final PlatformSession platformSession = platformLogin();
         final PlatformAPI platformAPI = getPlatformAPI(platformSession);
-        platformAPI.updateClientTenantConfigurationFile(getDefaultTenantId(), file, content);
+        platformAPI.updateClientTenantConfigurationFile(file, content);
         platformLogout(platformSession);
-    }
-
-    long getDefaultTenantId() {
-        return TenantsManagementUtils.getDefaultTenantId();
     }
 
     /**

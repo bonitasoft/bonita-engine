@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.expression.ExpressionService;
 
@@ -92,22 +91,6 @@ public class AdvancedStartProcessValidator {
             strings.add(explanation + " on " + element);
         }
         return strings;
-    }
-
-    private List<String> checkFlowNodesContracts(List<String> flowNodeNames,
-            Map<String, Map<String, Serializable>> activitiesContractInputs,
-            SProcessDefinition processDefinition) {
-        List<String> problems = new ArrayList<>();
-        for (String flowNodeName : flowNodeNames) {
-            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(flowNodeName);
-            if (flowNode instanceof SUserTaskDefinition && ((SUserTaskDefinition) flowNode).getContract() != null) {
-                problems.addAll(validateContract(
-                        activitiesContractInputs == null ? Collections.<String, Serializable> emptyMap()
-                                : activitiesContractInputs.get(flowNodeName),
-                        ((SUserTaskDefinition) flowNode).getContract(), flowNodeName));
-            }
-        }
-        return problems;
     }
 
     private List<String> checkFlowNodesAreSupported(List<String> flowNodeNames, List<String> foundFlowNodes,

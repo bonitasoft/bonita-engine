@@ -45,6 +45,7 @@ import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -65,7 +66,6 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.IconService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
@@ -111,8 +111,6 @@ import org.springframework.context.ApplicationContext;
  */
 public interface ServiceAccessor {
 
-    long getTenantId();
-
     ParentContainerResolver getParentContainerResolver();
 
     SessionService getSessionService();
@@ -132,6 +130,8 @@ public interface ServiceAccessor {
     ProcessInstanceService getProcessInstanceService();
 
     ActivityInstanceService getActivityInstanceService();
+
+    BPMFailureService getBpmFailureService();
 
     BPMInstancesCreator getBPMInstancesCreator();
 
@@ -182,8 +182,6 @@ public interface ServiceAccessor {
     OperationService getOperationService();
 
     SupervisorMappingService getSupervisorService();
-
-    ExternalIdentityMappingService getExternalIdentityMappingService();
 
     UserFilterService getUserFilterService();
 
@@ -284,8 +282,6 @@ public interface ServiceAccessor {
     PlatformLoginService getPlatformLoginService();
 
     TransactionService getTransactionService();
-
-    TenantServiceAccessor getTenantServiceAccessor();
 
     PlatformSessionService getPlatformSessionService();
 

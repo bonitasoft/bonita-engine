@@ -36,18 +36,16 @@ class RefreshClassloaderSynchronization implements BonitaTransactionSynchronizat
     private final BroadcastService broadcastService;
     private final RefreshClassLoaderTask callable;
     private final Set<ClassLoaderIdentifier> identifiers = new HashSet<>();
-    private final Long tenantId;
 
     public RefreshClassloaderSynchronization(ClassLoaderServiceImpl classLoaderService,
             BroadcastService broadcastService,
             RefreshClassLoaderTask callable,
             ClassLoaderUpdater classLoaderUpdater,
-            Long tenantId, ClassLoaderIdentifier identifier) {
+            ClassLoaderIdentifier identifier) {
         this.classLoaderService = classLoaderService;
         this.classLoaderUpdater = classLoaderUpdater;
         this.broadcastService = broadcastService;
         this.callable = callable;
-        this.tenantId = tenantId;
         addClassloaderToRefresh(identifier);
     }
 
@@ -57,14 +55,14 @@ class RefreshClassloaderSynchronization implements BonitaTransactionSynchronizat
         if (txState == Status.STATUS_COMMITTED) {
             //we use the ClassLoaderUpdater to refresh those classloader in an other thread/transaction.
             //This can't be done in the current thread because we are still executing afterCompletion transactionSync
-            classLoaderUpdater.refreshClassloaders(classLoaderService, tenantId, identifiers);
+            classLoaderUpdater.refreshClassloaders(classLoaderService, identifiers);
             refreshClassLoaderOnOtherNodes();
         }
     }
 
     private void refreshClassLoaderOnOtherNodes() {
         try {
-            Map<String, TaskResult<Void>> execute = broadcastService.executeOnOthersAndWait(callable, tenantId);
+            Map<String, TaskResult<Void>> execute = broadcastService.executeOnOthersAndWait(callable);
             for (Map.Entry<String, TaskResult<Void>> resultEntry : execute.entrySet()) {
                 if (resultEntry.getValue().isError()) {
                     throw new IllegalStateException(resultEntry.getValue().getThrowable());

@@ -14,7 +14,6 @@
 package org.bonitasoft.platform.configuration.impl;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 
@@ -26,8 +25,7 @@ public class BonitaConfigurationCleaner implements BatchPreparedStatementSetter 
     public static final String DELETE_ALL_CONFIGURATION = "DELETE FROM configuration";
 
     @Override
-    public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-
+    public void setValues(PreparedStatement preparedStatement, int i) {
     }
 
     @Override

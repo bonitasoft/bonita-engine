@@ -78,6 +78,7 @@ public class ArchivedCaseDatastore extends CommonDatastore<ArchivedCaseItem, Arc
         result.setSearchIndex3Value(item.getStringIndexValue(3));
         result.setSearchIndex4Value(item.getStringIndexValue(4));
         result.setSearchIndex5Value(item.getStringIndexValue(5));
+        result.setCallerId(item.getCallerId());
         return result;
     }
 
@@ -113,12 +114,36 @@ public class ArchivedCaseDatastore extends CommonDatastore<ArchivedCaseItem, Arc
                 ArchivedProcessInstancesSearchDescriptor.STARTED_BY);
         addLongFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_SOURCE_OBJECT_ID,
                 ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID);
-
+        addLongFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_ROOT_CASE_ID,
+                ArchivedProcessInstancesSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
+        addAddDifferentFromRootIdFilterIfNecessary(filters, builder);
+        addStringFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_SEARCH_INDEX_1_VALUE,
+                ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_1);
+        addStringFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_SEARCH_INDEX_2_VALUE,
+                ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_2);
+        addStringFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_SEARCH_INDEX_3_VALUE,
+                ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_3);
+        addStringFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_SEARCH_INDEX_4_VALUE,
+                ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_4);
+        addStringFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_SEARCH_INDEX_5_VALUE,
+                ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_5);
         addCallerFilterToSearchBuilderIfNecessary(filters, builder);
         return builder;
     }
 
-    void addCallerFilterToSearchBuilderIfNecessary(final Map<String, String> filters,
+    protected void addAddDifferentFromRootIdFilterIfNecessary(Map<String, String> filters,
+            SearchOptionsBuilder builder) {
+        /*
+         * When filtering on Root Case Id, we want all the subprocesses of the root case to be returned.
+         * Not the root case itself.
+         */
+        if (filters.containsKey(ArchivedCaseItem.ATTRIBUTE_ROOT_CASE_ID)) {
+            builder.differentFrom(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID,
+                    MapUtil.getValueAsLong(filters, ArchivedCaseItem.ATTRIBUTE_ROOT_CASE_ID));
+        }
+    }
+
+    protected void addCallerFilterToSearchBuilderIfNecessary(final Map<String, String> filters,
             final SearchOptionsBuilder builder) {
         /*
          * By default we add a caller filter of -1 to avoid having sub processes.

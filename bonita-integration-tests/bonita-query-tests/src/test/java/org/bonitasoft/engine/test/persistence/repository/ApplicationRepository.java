@@ -15,7 +15,10 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
-import org.bonitasoft.engine.business.application.model.*;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
+import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
+import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;

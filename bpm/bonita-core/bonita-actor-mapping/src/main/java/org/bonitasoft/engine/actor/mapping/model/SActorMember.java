@@ -13,22 +13,21 @@
  **/
 package org.bonitasoft.engine.actor.mapping.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "actormember")
-@IdClass(PersistentObjectId.class)
 public class SActorMember implements PersistentObject {
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
     @Column

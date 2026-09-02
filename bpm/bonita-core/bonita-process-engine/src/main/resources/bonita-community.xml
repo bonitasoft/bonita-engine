@@ -192,12 +192,6 @@
     <bean id="sequenceMappingProvider" class="org.bonitasoft.engine.sequence.SequenceMappingProvider" autowire="byType" />
 
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.STenant" />
-        <constructor-arg name="sequenceId" value="1" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.1:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.SPlatformDependency" />
         <constructor-arg name="sequenceId" value="2" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.2:${bonita.platform.sequence.defaultRangeSize}}" />
@@ -268,11 +262,6 @@
         <constructor-arg name="className" value="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" />
         <constructor-arg name="sequenceId" value="30" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.30:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter" />
-        <constructor-arg name="sequenceId" value="31" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.31:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.scheduler.model.SJobDescriptor" />
@@ -446,11 +435,6 @@
         </constructor-arg>
         <constructor-arg name="sequenceId" value="10060" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10060:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" />
-        <constructor-arg name="sequenceId" value="10070" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10070:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" />
@@ -648,20 +632,28 @@
         <constructor-arg name="sequenceId" value="5" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.5:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
-
-    <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
-        <constructor-arg name="sequenceMappingProvider" ref="sequenceMappingProvider" />
-        <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
-        <constructor-arg name="retries" value="${bonita.platform.sequence.retries}" />
-        <constructor-arg name="delay" value="${bonita.platform.sequence.delay}" />
-        <constructor-arg name="delayFactor" value="${bonita.platform.sequence.delayFactor}" />
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.core.process.instance.model.SBPMFailure</value>
+            </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="6" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
     </bean>
-
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.core.process.instance.model.SABPMFailure</value>
+            </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="7" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
+    </bean>
 
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
         <constructor-arg name="txManager" ref="transactionManager" />
     </bean>
-
 
     <bean id="communityHbmResourcesProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
         <property name="resources">
@@ -698,8 +690,6 @@
                 <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.queries.hbm.xml</value>
                 <!-- identity -->
                 <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
-                <!-- external identity -->
-                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.queries.hbm.xml</value>
                 <!-- document -->
                 <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
                 <!-- archived document -->
@@ -724,6 +714,8 @@
                 <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
                 <!-- parameters -->
                 <value>org/bonitasoft/engine/parameter/parameter.queries.hbm.xml</value>
+                <!-- BPM Failures -->
+                <value>org/bonitasoft/engine/core/failure/model/impl/hibernate/failure.queries.hbm.xml</value>
             </set>
         </property>
         <property name="classAliasMappings">
@@ -800,7 +792,6 @@
                 <entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="saComment" />
                 <!-- platform -->
                 <entry key="org.bonitasoft.engine.platform.model.SPlatform" value="platform" />
-                <entry key="org.bonitasoft.engine.platform.model.STenant" value="tenant" />
                 <!-- platform command -->
                 <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="platformCommand" />
                 <!-- page -->
@@ -819,8 +810,6 @@
                 <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="user_membership" />
                 <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="contactinfo" />
                 <entry key="org.bonitasoft.engine.identity.SIcon" value="icon" />
-                <!-- external identity -->
-                <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="ext_ident_mapping" />
                 <!-- document -->
                 <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="doc" />
                 <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="doc" />
@@ -873,7 +862,6 @@
                 <value>org.bonitasoft.engine.identity.model.SUser</value>
                 <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
-                <value>org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActor</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActorMember</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationWithIcon</value>
@@ -881,7 +869,6 @@
                 <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
                 <value>org.bonitasoft.engine.platform.model.SPlatform</value>
-                <value>org.bonitasoft.engine.platform.model.STenant</value>
                 <value>org.bonitasoft.engine.platform.command.model.SPlatformCommand</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
@@ -1011,7 +998,8 @@
                 <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLog</value>
-                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SBPMFailure</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SABPMFailure</value>
             </set>
         </property>
     </bean>
@@ -1151,7 +1139,6 @@
     <bean id="messagesHandlingService" class="org.bonitasoft.engine.message.MessagesHandlingService">
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="workService" ref="workService" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
         <constructor-arg name="workFactory" ref="workFactory" />
         <constructor-arg name="meterRegistry" ref="meterRegistry" />
@@ -1314,11 +1301,6 @@
         <property name="sourceList">
             <list>
                 <ref bean="searchSCommentSupervisedBy" />
-                <ref bean="addEntityMemberCommand" />
-                <ref bean="removeEntityMemberCommand" />
-                <ref bean="searchEntityMembersCommand" />
-                <ref bean="searchEntityMembersForUserCommand" />
-                <ref bean="deleteEntityMembersCommand" />
                 <ref bean="searchWaitingEventsCommand" />
                 <ref bean="advancedStartProcessCommand" />
                 <ref bean="executeBDMQuery" />
@@ -1371,82 +1353,6 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.external.comment.SearchCommentsSupervisedBy</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="addEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>addEntityMemberCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Adds a Entity member to the provided identity notions. Parameter keys: EXTERNAL_ID_KEY: Entity member
-                id provided as is by the external system,
-                userId: -1 is not needed, roleId: -1 is not needed, groupId: -1 is not needed
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.AddEntityMemberCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="removeEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>removeEntityMemberCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Removes a Entity member mapping: ENTITY_MEMBER_ID_KEY: Entity member id to remove</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.RemoveEntityMemberCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="searchEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>searchEntityMembersCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Searches Entity member mappings: Parameter keys: DISCRIMINATOR_ID_KEY: the discriminator to isolate
-                the different functional notions,
-                SEARCH_OPTIONS_KEY: the Search options to filter and sort the results, MEMBER_TYPE_KEY: Member Type to
-                search for (USER, GROUP, ROLE, or MEMBERSHIP).
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.SearchEntityMembersCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="searchEntityMembersForUserCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>searchEntityMembersForUserCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Searches Entity member mappings: Parameter keys: USER_ID_KEY: the ID of the user to search Entity
-                members for (directly associated, or through role or
-                group), DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions,
-                SEARCH_OPTIONS_KEY: the Search options to filter and sort the
-                results.
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.SearchEntityMembersForUserCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="deleteEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>deleteEntityMembersCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Delete all Entity member mappings associated with provided externalId, for specific Discriminator.
-                Parameter keys: EXTERNAL_ID_KEY: external id
-                provided as is by the external system, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different
-                functional notions.
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.identitymapping.DeleteEntityMembersCommand</value>
         </constructor-arg>
     </bean>
 
@@ -1850,7 +1756,6 @@
           class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
         <constructor-arg name="eventInstanceRepository" ref="eventInstanceRepository" />
         <constructor-arg name="meterRegistry" ref="meterRegistry" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
 
@@ -1897,13 +1802,6 @@
     <!--  Used to inject the bean referenced by property 'authentication.service.ref.name' in SecuredLoginServiceImpl: -->
     <alias name="${authentication.service.ref.name:authenticationService}" alias="entryPointAuthenticationService"  />
 
-    <bean id="externalIdentityMappingService"
-          class="org.bonitasoft.engine.external.identity.mapping.impl.ExternalIdentityMappingServiceImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-    </bean>
-
     <bean id="expressionResolverService"
           class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl">
         <constructor-arg name="expressionService" ref="expressionService" />
@@ -1933,11 +1831,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-    </bean>
-
-    <bean class="org.bonitasoft.engine.dependency.impl.DependencyServiceRegistrator" init-method="registerDependencyService">
-        <constructor-arg name="tenantDependencyService" ref="dependencyService" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">
@@ -2108,7 +2001,6 @@
                 <entry key="hibernate.cache.use_query_cache" value="false" />
             </map>
         </constructor-arg>
-        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
 
@@ -2154,14 +2046,6 @@
     </bean>
 
     <bean id="countQueryProvider" class="org.bonitasoft.engine.business.data.impl.CountQueryProvider" />
-
-    <bean id="businessDataService" class="org.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
-        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
-        <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
-        <constructor-arg name="typeConverterUtil" ref="typeConverterUtil" />
-        <constructor-arg name="businessDataReloader" ref="businessDataReloader" />
-        <constructor-arg name="countQueryProvider" ref="countQueryProvider" />
-    </bean>
 
     <bean id="archivingStrategy" class="org.bonitasoft.engine.archive.impl.DefaultArchivingStrategy">
         <constructor-arg name="additionalConfiguration" ref="archivingStrategyAdditionalConfiguration" />

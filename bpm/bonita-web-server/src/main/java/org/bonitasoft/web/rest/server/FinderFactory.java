@@ -19,18 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataFindByIdsResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataFindByIdsResourceFinder;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataModelResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataModelResourceFinder;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataQueryResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataQueryResourceFinder;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResourceFinder;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResourceFinder;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseContextResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
@@ -102,11 +94,8 @@ public class FinderFactory {
         finders.put(BPMSignalResource.class, new BPMSignalResourceFinder());
         finders.put(CaseContextResource.class, new CaseContextResourceFinder());
         finders.put(ArchivedCaseContextResource.class, new ArchivedCaseContextResourceFinder());
-        finders.put(BusinessDataResource.class, new BusinessDataResourceFinder());
         finders.put(BusinessDataReferenceResource.class, new BusinessDataReferenceResourceFinder());
-        finders.put(BusinessDataFindByIdsResource.class, new BusinessDataFindByIdsResourceFinder());
         finders.put(BusinessDataReferencesResource.class, new BusinessDataReferencesResourceFinder());
-        finders.put(BusinessDataQueryResource.class, new BusinessDataQueryResourceFinder());
         finders.put(FormMappingResource.class, new FormMappingResourceFinder());
         finders.put(UserTaskContractResource.class, new UserTaskContractResourceFinder());
         finders.put(UserTaskExecutionResource.class, new UserTaskExecutionResourceFinder());
@@ -115,7 +104,6 @@ public class FinderFactory {
         finders.put(ProcessContractResource.class, new ProcessContractResourceFinder());
         finders.put(ProcessDefinitionDesignResource.class, new ProcessDefinitionDesignResourceFinder());
         finders.put(ProcessInstantiationResource.class, new ProcessInstantiationResourceFinder());
-        finders.put(BusinessDataModelResource.class, new BusinessDataModelResourceFinder());
         finders.put(I18nTranslationResource.class, new I18nTanslationResourceFinder());
         finders.put(ArchivedCaseVariableResource.class, new ArchivedCaseVariableResourceFinder());
         finders.put(ArchivedCaseVariablesResource.class, new ArchivedCaseVariablesResourceFinder());

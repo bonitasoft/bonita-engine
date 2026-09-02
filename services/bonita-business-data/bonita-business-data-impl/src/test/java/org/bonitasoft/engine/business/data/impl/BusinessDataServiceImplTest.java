@@ -60,13 +60,14 @@ public class BusinessDataServiceImplTest {
     JsonBusinessDataSerializer jsonEntitySerializer;
     @Mock
     BusinessDataModelRepository businessDataModelRepository;
-    private BusinessDataServiceImpl businessDataService;
     @Mock
     private BusinessDataRepository businessDataRepository;
     @Mock
     private BusinessDataReloader businessDataReloader;
     @Mock
     private CountQueryProvider countQueryProvider;
+
+    private BusinessDataServiceImpl businessDataService;
 
     @Before
     public void before() {
@@ -107,7 +108,7 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNull() throws Exception {
+    public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNull() {
         assertThatExceptionOfType(SBusinessDataNotFoundException.class)
                 .isThrownBy(() -> businessDataService.callJavaOperation(null, pojo, "someMethod",
                         String.class.getName()));
@@ -499,7 +500,7 @@ public class BusinessDataServiceImplTest {
 
         final List<Entity> entities = new ArrayList<>();
         entities.add(entity);
-        doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(),
+        doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(), anyMap(),
                 anyInt(), anyInt());
 
         //given

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.document.model;
 
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
@@ -37,9 +36,7 @@ import lombok.experimental.SuperBuilder;
 public abstract class AbstractSMappedDocument extends AbstractSDocumentMapping {
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumns({
-            @JoinColumn(name = "tenantid", referencedColumnName = "tenantid", insertable = false, updatable = false),
-            @JoinColumn(name = "documentid", referencedColumnName = "id", insertable = false, updatable = false) })
+    @JoinColumn(name = "documentid", referencedColumnName = "id", insertable = false, updatable = false)
     protected SLightDocument document;
 
     public AbstractSMappedDocument(AbstractSDocumentMapping documentMapping, SDocument document) {
@@ -52,7 +49,6 @@ public abstract class AbstractSMappedDocument extends AbstractSDocumentMapping {
         this.setIndex(documentMapping.getIndex());
         this.document = SLightDocument.builder()
                 .id(document.getId())
-                .tenantId(document.getTenantId())
                 .fileName(document.getFileName())
                 .hasContent(document.hasContent())
                 .mimeType(document.getMimeType())

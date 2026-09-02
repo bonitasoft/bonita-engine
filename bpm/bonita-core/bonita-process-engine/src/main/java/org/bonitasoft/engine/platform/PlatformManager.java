@@ -19,13 +19,9 @@ import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
-import org.bonitasoft.engine.platform.exception.STenantActivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.tenant.TenantStateManager;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,21 +35,14 @@ public class PlatformManager {
     private static final Logger logger = LoggerFactory.getLogger(PlatformManager.class);
     private final BonitaTaskExecutor bonitaTaskExecutor;
     private final NodeConfiguration nodeConfiguration;
-    private final UserTransactionService transactionService;
-    private final PlatformService platformService;
     private final List<PlatformLifecycleService> platformServices;
     private final PlatformStateProvider platformStateProvider;
     private final PlatformVersionChecker platformVersionChecker;
 
-    public PlatformManager(NodeConfiguration nodeConfiguration,
-            UserTransactionService transactionService,
-            PlatformService platformService,
-            List<PlatformLifecycleService> platformServices,
-            PlatformStateProvider platformStateProvider,
-            BonitaTaskExecutor bonitaTaskExecutor, PlatformVersionChecker platformVersionChecker) {
+    public PlatformManager(NodeConfiguration nodeConfiguration, List<PlatformLifecycleService> platformServices,
+            PlatformStateProvider platformStateProvider, BonitaTaskExecutor bonitaTaskExecutor,
+            PlatformVersionChecker platformVersionChecker) {
         this.nodeConfiguration = nodeConfiguration;
-        this.transactionService = transactionService;
-        this.platformService = platformService;
         this.platformServices = platformServices;
         this.platformStateProvider = platformStateProvider;
         this.bonitaTaskExecutor = bonitaTaskExecutor;
@@ -68,7 +57,7 @@ public class PlatformManager {
     }
 
     /**
-     * Stop the platform and default tenant
+     * Stop the platform
      *
      * @return true if the node was stopped, false if it was not stoppable (already stopped, starting or stopping)
      */
@@ -77,7 +66,7 @@ public class PlatformManager {
         if (!platformStateProvider.initializeStop()) {
             return false;
         }
-        getDefaultTenantStateManager().stop();
+        getTenantStateManager().stop();
         for (final PlatformLifecycleService platformService : platformServices) {
             logger.info("Stop service of platform: {}", platformService);
             platformService.stop();
@@ -102,14 +91,14 @@ public class PlatformManager {
         startPlatformServices();
         platformStateProvider.setStarted();
 
-        getDefaultTenantStateManager().start();
+        getTenantStateManager().start();
 
         restartHandlersOfPlatform();
         logger.info("Platform started.");
         return true;
     }
 
-    TenantStateManager getDefaultTenantStateManager() {
+    TenantStateManager getTenantStateManager() {
         return ServiceAccessorSingleton.getInstance().getTenantStateManager();
     }
 
@@ -130,27 +119,6 @@ public class PlatformManager {
             logger.info("Start service of platform : {}", platformService);
             platformService.start();
         }
-    }
-
-    public void activateTenant() throws Exception {
-        STenant tenant = getTenantInTransaction();
-        if (!STenant.DEACTIVATED.equals(tenant.getStatus())) {
-            throw new STenantActivationException(
-                    "Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
-        }
-        getDefaultTenantStateManager().activate();
-    }
-
-    public void deactivateTenant() throws Exception {
-        final STenant tenant = getTenantInTransaction();
-        if (STenant.DEACTIVATED.equals(tenant.getStatus())) {
-            throw new STenantDeactivationException("Tenant deactivation failed. Tenant is already deactivated");
-        }
-        getDefaultTenantStateManager().deactivate();
-    }
-
-    private STenant getTenantInTransaction() throws Exception {
-        return transactionService.executeInTransaction(() -> platformService.getDefaultTenant());
     }
 
 }

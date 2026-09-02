@@ -32,7 +32,6 @@ public class WorkDescriptor implements Serializable {
 
     private final String uuid = UUID.randomUUID().toString();
     private final String type;
-    private Long tenantId;
     private final Map<String, Serializable> parameters;
     private int retryCount = 0;
     private Instant executionThreshold;
@@ -43,15 +42,6 @@ public class WorkDescriptor implements Serializable {
     public WorkDescriptor(String type) {
         this.type = type;
         this.parameters = new HashMap<>();
-    }
-
-    public Long getTenantId() {
-        return tenantId;
-    }
-
-    public WorkDescriptor setTenantId(Long tenantId) {
-        this.tenantId = tenantId;
-        return this;
     }
 
     public String getUuid() {
@@ -154,7 +144,6 @@ public class WorkDescriptor implements Serializable {
                 .append(retryCount, that.retryCount)
                 .append(uuid, that.uuid)
                 .append(type, that.type)
-                .append(tenantId, that.tenantId)
                 .append(parameters, that.parameters)
                 .append(executionThreshold, that.executionThreshold)
                 .append(executionCount, that.executionCount)
@@ -168,7 +157,6 @@ public class WorkDescriptor implements Serializable {
         return new HashCodeBuilder(17, 37)
                 .append(uuid)
                 .append(type)
-                .append(tenantId)
                 .append(parameters)
                 .append(retryCount)
                 .append(executionThreshold)
@@ -183,7 +171,6 @@ public class WorkDescriptor implements Serializable {
         return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
                 .append("uuid", uuid)
                 .append("type", type)
-                .append("tenantId", tenantId)
                 .append("parameters", parameters)
                 .append("retryCount", retryCount)
                 .append("executionThreshold", executionThreshold)

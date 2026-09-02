@@ -168,7 +168,7 @@ public class ApplicationIT extends TestWithTechnicalUser {
         long userId = user.getId();
         assertThat(
                 getPermissionAPI().isAuthorized(new APICallContext("GET", "identity", "user", String.valueOf(userId))))
-                        .isTrue();
+                .isTrue();
         assertThat(getPermissionAPI()
                 .isAuthorized(new APICallContext("GET", "identity", "user", String.valueOf(userId + 1)))).isFalse();
         assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "identity", "user", null))).isFalse();

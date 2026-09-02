@@ -21,6 +21,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -245,7 +246,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         // create user
         final User jack = createUser("jack", PASSWORD);
         final User john = createUser("john", PASSWORD);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", PASSWORD);
         // create process
         final DesignProcessDefinition designProcessDefinition = buildProcessDefinitionWithHumanAndAutomaticSteps(
@@ -301,7 +302,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
                 jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(username, PASSWORD);
         final long step1Id = waitForUserTask(processInstance, "step1");
 
@@ -364,12 +365,12 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(username, PASSWORD);
         waitForUserTaskAndExecuteIt(p1, "step1", jack);
         waitForUserTaskAndExecuteIt(p2, "step1", jack);
         waitForUserTaskAndExecuteIt(p3, "step1", jack);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", PASSWORD);
         waitForUserTaskAndExecuteIt(p4, "step1", jack);
 
@@ -408,12 +409,12 @@ public class SearchProcessInstanceIT extends TestWithUser {
         // assign pending task to jack
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
                 jack);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(username, PASSWORD);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", PASSWORD);
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -497,7 +498,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
                 jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("jack", "bpm");
         final long step1Id = waitForUserTask("step1");
 
@@ -559,12 +560,12 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("jack", "bpm");
         waitForUserTaskAndExecuteIt(p1, "step1", jack);
         waitForUserTaskAndExecuteIt(p2, "step1", jack);
         waitForUserTaskAndExecuteIt(p3, "step1", jack);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
         waitForUserTaskAndExecuteIt(p4, "step1", jack);
 
@@ -601,15 +602,15 @@ public class SearchProcessInstanceIT extends TestWithUser {
         // assign pending task to jack
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
                 jack);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("jack", "bpm");
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("pierre", "bpm");
         final ProcessInstance p5 = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -638,7 +639,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final User paul = createUser("paul", "bpm");
         final User jack = createUser("jack", paul.getId());
         final User john = createUser("john", paul.getId());
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
 
         // create process
@@ -755,48 +756,95 @@ public class SearchProcessInstanceIT extends TestWithUser {
 
     @Test
     public void twoPoolsWithOneWithACallActivityCaseTest() throws Exception {
-        final ProcessDefinitionBuilder process2DefinitionBuilder = new ProcessDefinitionBuilder()
-                .createNewInstance("process2", "1.0");
-        process2DefinitionBuilder.addActor(ACTOR_NAME);
-        process2DefinitionBuilder.addUserTask("User task", ACTOR_NAME);
-        final DesignProcessDefinition designProcess2Definition = process2DefinitionBuilder.done();
-        final ProcessDefinition process2Definition = deployAndEnableProcessWithActor(designProcess2Definition,
-                ACTOR_NAME, user);
+        final ProcessDefinition subProcessDefinition = buildAndDeploySubprocess();
 
-        final ProcessDefinitionBuilder process1DefinitionBuilder = new ProcessDefinitionBuilder()
-                .createNewInstance("process1", "1.0");
-        process1DefinitionBuilder.addActor(ACTOR_NAME);
+        final ProcessDefinition rootProcessDefinition = buildAndDeployProcessWithCallActivity();
 
-        final Expression process2Name = new ExpressionBuilder().createConstantStringExpression("process2");
-        final Expression process2Version = new ExpressionBuilder().createConstantStringExpression("1.0");
-        process1DefinitionBuilder.addCallActivity("call process2", process2Name, process2Version);
-        final DesignProcessDefinition designProcess1Definition = process1DefinitionBuilder.done();
-        final ProcessDefinition process1Definition = deployAndEnableProcessWithActor(designProcess1Definition,
-                ACTOR_NAME, user);
-
-        final ProcessInstance instance1 = getProcessAPI().startProcess(process1Definition.getId());
-        waitForUserTask(instance1, "User task");
+        final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcessDefinition.getId());
+        waitForUserTask(rootProcessInstance, "User task");
 
         final SearchOptions opts = new SearchOptionsBuilder(0, 10).done();
         final SearchResult<ProcessInstance> processInstanceSearchResult = getProcessAPI()
                 .searchOpenProcessInstances(opts);
         Assert.assertThat(processInstanceSearchResult.getCount(), is(1L));
 
-        disableAndDeleteProcess(process1Definition);
-        disableAndDeleteProcess(process2Definition);
+        disableAndDeleteProcess(rootProcessDefinition);
+        disableAndDeleteProcess(subProcessDefinition);
     }
 
-    private ProcessDefinitionBuilder createProcessDefinition(final String processName, final boolean withUserTask) {
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance(processName, "17.3");
-        if (withUserTask) {
-            designProcessDefinition.addActor(ACTOR_NAME);
-            designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        } else {
-            designProcessDefinition.addAutomaticTask("step1");
-        }
+    private ProcessDefinition buildAndDeploySubprocess() throws InvalidProcessDefinitionException, BonitaException {
+        final ProcessDefinitionBuilder subProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("subprocess", "1.0");
+        subProcessDefinitionBuilder.addActor(ACTOR_NAME);
+        subProcessDefinitionBuilder.addUserTask("User task", ACTOR_NAME);
+        final DesignProcessDefinition designProcessDefinition = subProcessDefinitionBuilder.done();
+        return deployAndEnableProcessWithActor(designProcessDefinition,
+                ACTOR_NAME, user);
+    }
 
-        return designProcessDefinition;
+    private ProcessDefinition buildAndDeployProcessWithCallActivity()
+            throws InvalidExpressionException, InvalidProcessDefinitionException, BonitaException {
+        final ProcessDefinitionBuilder rootProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("process1", "1.0");
+        rootProcessDefinitionBuilder.addActor(ACTOR_NAME);
+        final Expression subProcessName = new ExpressionBuilder().createConstantStringExpression("subprocess");
+        final Expression subProcessVersion = new ExpressionBuilder().createConstantStringExpression("1.0");
+        rootProcessDefinitionBuilder.addCallActivity("call subprocess", subProcessName, subProcessVersion);
+        final DesignProcessDefinition designProcessDefinition = rootProcessDefinitionBuilder.done();
+        return deployAndEnableProcessWithActor(designProcessDefinition,
+                ACTOR_NAME, user);
+    }
+
+    @Test
+    public void searchProcessInstanceByRootProcessInstanceId() throws Exception {
+        final ProcessDefinition subProcessDefinition = buildAndDeploySubprocess();
+
+        final ProcessDefinition rootProcessDefinition = buildAndDeployProcessWithCallActivity();
+
+        final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcessDefinition.getId());
+        waitForUserTask(rootProcessInstance, "User task");
+
+        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
+        searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                rootProcessInstance.getId());
+        searchOptionsBuilder.differentFrom(ProcessInstanceSearchDescriptor.ID, rootProcessInstance.getId());
+        final SearchOptions opts = searchOptionsBuilder.done();
+        final SearchResult<ProcessInstance> processInstanceSearchResult = getProcessAPI()
+                .searchProcessInstances(opts);
+        Assert.assertThat(processInstanceSearchResult.getCount(), is(1L));
+        Assert.assertThat(processInstanceSearchResult.getResult().get(0).getProcessDefinitionId(),
+                is(subProcessDefinition.getId()));
+
+        disableAndDeleteProcess(rootProcessDefinition);
+        disableAndDeleteProcess(subProcessDefinition);
+    }
+
+    @Test
+    public void searchArchivedProcessInstanceByRootProcessInstanceId() throws Exception {
+        final ProcessDefinition subProcessDefinition = buildAndDeploySubprocess();
+
+        final ProcessDefinition rootProcessDefinition = buildAndDeployProcessWithCallActivity();
+
+        final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcessDefinition.getId());
+        waitForUserTaskAssignAndExecuteIt(rootProcessInstance, "User task", user, Collections.emptyMap());
+        waitForProcessToFinish(rootProcessInstance);
+
+        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
+        searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                rootProcessInstance.getId());
+        searchOptionsBuilder.differentFrom(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID,
+                rootProcessInstance.getId());
+        searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.STATE_ID,
+                ProcessInstanceState.COMPLETED.getId());
+        final SearchOptions opts = searchOptionsBuilder.done();
+        final SearchResult<ArchivedProcessInstance> archivedProcessInstanceSearchResult = getProcessAPI()
+                .searchArchivedProcessInstancesInAllStates(opts);
+        Assert.assertThat(archivedProcessInstanceSearchResult.getCount(), is(1L));
+        Assert.assertThat(archivedProcessInstanceSearchResult.getResult().get(0).getProcessDefinitionId(),
+                is(subProcessDefinition.getId()));
+
+        disableAndDeleteProcess(rootProcessDefinition);
+        disableAndDeleteProcess(subProcessDefinition);
     }
 
     @Test
@@ -1316,7 +1364,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
                 ACTOR_NAME, user1);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         waitForUserTask(processInstance1, "step1");
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("john1", "bpm");
         final DesignProcessDefinition designProcessDefinition2 = createProcessDefinition("2", true, "value2", "value4",
@@ -1325,7 +1373,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
                 ACTOR_NAME, user2);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         waitForUserTask(processInstance2, "step1");
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("john3", "bpm");
         final DesignProcessDefinition designProcessDefinition3 = createProcessDefinition("5", true, "value4", "value3",
@@ -1334,7 +1382,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
                 ACTOR_NAME, user3);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition3.getId());
         waitForUserTask(processInstance3, "step1");
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("john2", "bpm");
         final DesignProcessDefinition designProcessDefinition4 = createProcessDefinition("4", true, "value5", "value1",
@@ -1343,7 +1391,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
                 ACTOR_NAME, user4);
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition4.getId());
         waitForUserTask(processInstance4, "step1");
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("john4", "bpm");
         final DesignProcessDefinition designProcessDefinition5 = createProcessDefinition("1", true, "value3", "value5",
@@ -1385,7 +1433,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition1 = deployAndEnableProcess(designProcessDefinition1);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         waitForProcessToFinish(processInstance1);
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("john1", "bpm");
         final DesignProcessDefinition designProcessDefinition2 = createProcessDefinition("2", false, "value2", "value4",
@@ -1393,7 +1441,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition2 = deployAndEnableProcess(designProcessDefinition2);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         waitForProcessToFinish(processInstance2);
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("john3", "bpm");
         final DesignProcessDefinition designProcessDefinition3 = createProcessDefinition("5", false, "value4", "value3",
@@ -1401,7 +1449,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition3 = deployAndEnableProcess(designProcessDefinition3);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition3.getId());
         waitForProcessToFinish(processInstance3);
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("john2", "bpm");
         final DesignProcessDefinition designProcessDefinition4 = createProcessDefinition("4", false, "value5", "value1",
@@ -1409,7 +1457,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition4 = deployAndEnableProcess(designProcessDefinition4);
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition4.getId());
         waitForProcessToFinish(processInstance4);
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("john4", "bpm");
         final DesignProcessDefinition designProcessDefinition5 = createProcessDefinition("1", false, "value3", "value5",

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.dependency;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.bonitasoft.engine.dependency.model.AbstractSDependency;
@@ -135,6 +134,4 @@ public interface DependencyService {
     AbstractSDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName)
             throws SBonitaReadException;
 
-    Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName)
-            throws SBonitaReadException;
 }

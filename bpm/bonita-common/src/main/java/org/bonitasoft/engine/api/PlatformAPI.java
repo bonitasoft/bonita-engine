@@ -142,10 +142,9 @@ public interface PlatformAPI {
 
     /**
      * INTERNAL USE ONLY
-     * Get client configuration files at tenant level.
-     * Since 8.0, as there is only 1 tenant, the tenantId is not relevant anymore.
+     * Get client configuration files
      *
-     * @return the client tenants configuration files as a map with file name and file content
+     * @return the client tenants configuration files as a map of "file name" and "file content"
      * @since 7.3
      */
     @Internal
@@ -153,24 +152,22 @@ public interface PlatformAPI {
 
     /**
      * INTERNAL USE ONLY
-     * get client auto login configuration file for tenant
+     * get a specific client configuration file
      *
      * @return file content
      * @since 7.3
      */
     @Internal
-    byte[] getClientTenantConfiguration(long tenantId, String file);
+    byte[] getClientTenantConfiguration(String file);
 
     /**
      * INTERNAL USE ONLY
-     * update a single client configuration file of the tenant
+     * update a single client configuration file
      *
-     * @param tenantId tenant to update
      * @param file file name to update
      * @param content the new content of the file
-     * @throws UpdateException
      * @since 7.3
      */
     @Internal
-    void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException;
+    void updateClientTenantConfigurationFile(String file, byte[] content) throws UpdateException;
 }

@@ -243,10 +243,8 @@ public class EntitySerializerPojo implements Entity {
         if (this == o)
             return true;
 
-        if (!(o instanceof EntitySerializerPojo))
+        if (!(o instanceof EntitySerializerPojo that))
             return false;
-
-        EntitySerializerPojo that = (EntitySerializerPojo) o;
 
         return new EqualsBuilder()
                 .append(getPersistenceId(), that.getPersistenceId())

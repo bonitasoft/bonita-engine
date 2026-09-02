@@ -18,9 +18,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -84,6 +87,8 @@ public abstract class FileUploadServlet extends HttpServlet {
 
     protected static final String CONTENT_TYPE_ATTRIBUTE = "contentType";
 
+    protected static final String JARLESS_BAR_ATTRIBUTE = "jarlessBar";
+
     public static final int MEGABYTE = 1048576;
 
     public static final int KILOBYTE = 1024;
@@ -131,6 +136,29 @@ public abstract class FileUploadServlet extends HttpServlet {
 
     protected void setUploadDirectoryPath(final String uploadDirectoryPath) {
         this.uploadDirectoryPath = uploadDirectoryPath;
+    }
+
+    /**
+     * Test whether file is a jar less bar (only when check is relevant).
+     *
+     * @param fileName the file name
+     * @param item the file item
+     * @return true when file is a bar file without jar dependency files and check is relevant, false otherwise
+     */
+    private boolean isJarLessBar(String fileName, FileItem item) {
+        if (Arrays.equals(supportedExtensionsList, new String[] { "bar" }) && fileName.endsWith(".bar")) {
+            ZipEntry zipEntry = null;
+            try (ZipInputStream zipInputstream = new ZipInputStream(item.getInputStream());) {
+                while ((zipEntry = zipInputstream.getNextEntry()) != null) {
+                    if (".jarless".equals(zipEntry.getName())) {
+                        return true;
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error while checking if file is a jar less bar", e);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -185,7 +213,10 @@ public abstract class FileUploadServlet extends HttpServlet {
                 // Response
                 final String responseString;
                 if (JSON_CONTENT_TYPE.equals(responseContentType)) {
-                    responseString = generateResponseJson(request, fileName, item.getContentType(), uploadedFileKey);
+                    // just check whether it's a jarless bar to display a warning
+                    boolean isJarlessBar = isJarLessBar(fileName, item);
+                    responseString = generateResponseJson(request, fileName, item.getContentType(), uploadedFileKey,
+                            isJarlessBar);
                 } else if (TEXT_CONTENT_TYPE.equals(responseContentType)) {
                     responseString = generateResponseString(request, fileName, uploadedFileKey);
                 } else {
@@ -256,20 +287,23 @@ public abstract class FileUploadServlet extends HttpServlet {
     }
 
     protected String generateResponseJson(final HttpServletRequest request, final String fileName, String contentType,
-            final String uploadedFileName) throws Exception {
+            final String uploadedFileName, final boolean isJarlessBar) throws Exception {
         final Map<String, Serializable> responseMap = new HashMap<>();
-        fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFileName);
+        fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFileName, isJarlessBar);
         return objectMapper.writeValueAsString(responseMap);
     }
 
     protected void fillJsonResponseMap(HttpServletRequest request, final Map<String, Serializable> responseMap,
             final String fileName,
-            final String contentType, final String uploadedFileName) {
+            final String contentType, final String uploadedFileName, final boolean isJarlessBar) {
         if (alsoReturnOriginalFilename) {
             responseMap.put(FILE_NAME_RESPONSE_ATTRIBUTE, getFilenameLastSegment(fileName));
         }
         responseMap.put(TEMP_PATH_RESPONSE_ATTRIBUTE, uploadedFileName);
         responseMap.put(CONTENT_TYPE_ATTRIBUTE, contentType);
+        if (isJarlessBar) {
+            responseMap.put(JARLESS_BAR_ATTRIBUTE, Boolean.TRUE);
+        }
     }
 
     protected String getFilenameLastSegment(final String fileName) {

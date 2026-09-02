@@ -35,15 +35,40 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
-import org.bonitasoft.engine.core.process.instance.model.*;
+import org.bonitasoft.engine.core.process.instance.model.SAbstractConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.*;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallActivityInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatewayInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SALoopActivityInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAMultiInstanceActivityInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAReceiveTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASendTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubProcessActivityInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -73,8 +98,9 @@ public class BPMArchiverService {
     private final ContractDataService contractDataService;
     private final DataInstanceService dataInstanceService;
     private final ActivityInstanceService activityInstanceService;
+    private final BPMFailureService bpmFailureService;
 
-    private final int BATCH_SIZE = 100;
+    private static final int BATCH_SIZE = 100;
 
     public BPMArchiverService(ArchiveService archiveService,
             ProcessInstanceService processInstanceService,
@@ -86,7 +112,8 @@ public class BPMArchiverService {
             RefBusinessDataService refBusinessDataService,
             ContractDataService contractDataService,
             DataInstanceService dataInstanceService,
-            ActivityInstanceService activityInstanceService) {
+            ActivityInstanceService activityInstanceService,
+            BPMFailureService bpmFailureService) {
         this.archiveService = archiveService;
         this.processInstanceService = processInstanceService;
         this.documentService = documentService;
@@ -98,6 +125,7 @@ public class BPMArchiverService {
         this.contractDataService = contractDataService;
         this.dataInstanceService = dataInstanceService;
         this.activityInstanceService = activityInstanceService;
+        this.bpmFailureService = bpmFailureService;
     }
 
     public void archiveAndDeleteProcessInstance(final SProcessInstance processInstance) throws SArchivingException {
@@ -137,6 +165,9 @@ public class BPMArchiverService {
             archiveConnectorInstancesIfAny(processInstance, processDefinition, archiveDate);
 
             archiveRefBusinessDataInstances(processInstance.getId());
+
+            //process instance failures
+            archiveProcessInstanceFailures(processInstance, archiveDate);
 
             // Archive
             archiveAndDeleteProcessInstanceObject(processDefinition, processInstance, saProcessInstance, archiveDate);
@@ -293,12 +324,13 @@ public class BPMArchiverService {
 
             if (activityDef != null && !activityDef.getConnectors().isEmpty()) {
                 archiveConnectors(archiveDate, flowNodeInstance.getId(),
-                        SConnectorInstance.FLOWNODE_TYPE);
+                        SAbstractConnectorInstance.FLOWNODE_TYPE);
             }
         }
         if (flowNodeInstance instanceof SUserTaskInstance) {
             archiveContractData(archiveDate, flowNodeInstance.getId());
         }
+        archiveFlowNodeFailures(flowNodeInstance, archiveDate);
 
         // then archive the flow node instance:
         archiveFlowNodeInstance(flowNodeInstance, archiveDate);
@@ -307,6 +339,24 @@ public class BPMArchiverService {
         final SFlowNodeInstance flowNodeInstance2 = activityInstanceService
                 .getFlowNodeInstance(flowNodeInstance.getId());
         processInstanceService.deleteFlowNodeInstance(flowNodeInstance2, processDefinition);
+    }
+
+    private void archiveProcessInstanceFailures(SProcessInstance processInstance, long archiveDate)
+            throws SArchivingException {
+        try {
+            bpmFailureService.archiveProcessInstanceFailures(processInstance.getId(), archiveDate);
+        } catch (SBonitaException e) {
+            throw new SArchivingException(e);
+        }
+    }
+
+    private void archiveFlowNodeFailures(SFlowNodeInstance flowNodeInstance, long archiveDate)
+            throws SArchivingException {
+        try {
+            bpmFailureService.archiveFlowNodeFailures(flowNodeInstance.getId(), archiveDate);
+        } catch (SBonitaException e) {
+            throw new SArchivingException(e);
+        }
     }
 
     private void setExceptionContext(final SProcessDefinition processDefinition, final SProcessInstance processInstance,

@@ -20,7 +20,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -28,14 +27,10 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @SuperBuilder
 @Entity
 @Table(name = "pdependency")
-public class SPlatformDependency extends AbstractSDependency implements PlatformPersistentObject {
+public class SPlatformDependency extends AbstractSDependency {
 
     public SPlatformDependency(final String name, final String fileName, final byte[] value) {
         super(name, fileName, value);
     }
 
-    @Override
-    public void setTenantId(long id) {
-        //no tenantId
-    }
 }

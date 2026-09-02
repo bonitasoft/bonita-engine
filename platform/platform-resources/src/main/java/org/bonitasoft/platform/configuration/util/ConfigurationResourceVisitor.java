@@ -39,13 +39,13 @@ public class ConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
     }
 
     @Override
-    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
-        LOGGER.info("found file " + path.getFileName());
+        LOGGER.info("found file {}", path.getFileName());
         bonitaConfigurations.add(new BonitaConfiguration(path.getFileName().toString(), Files.readAllBytes(path)));
         return FileVisitResult.CONTINUE;
     }

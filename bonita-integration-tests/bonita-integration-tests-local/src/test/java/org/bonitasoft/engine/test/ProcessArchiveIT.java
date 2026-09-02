@@ -51,14 +51,14 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         john = createUser(USERNAME, "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
         deleteUser(john);
-        logoutOnTenant();
+        logout();
     }
 
     @Test()
@@ -156,7 +156,7 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
 
     @Test
     public void archivedFlowNodeInstance() throws Exception {
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessToDelete", "1.0");

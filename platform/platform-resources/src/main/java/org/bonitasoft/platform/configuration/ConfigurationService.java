@@ -46,36 +46,55 @@ public interface ConfigurationService {
     List<BonitaConfiguration> getPlatformEngineConf();
 
     /**
-     * Retrieves the platform configuration for tenant template
-     *
-     * @return a list of BonitaConfiguration that represents each file
-     */
-    List<BonitaConfiguration> getTenantTemplateEngineConf();
-
-    /**
-     * Retrieves the security script configuration for tenant template
-     *
-     * @return a list of BonitaConfiguration that represents each file
-     */
-    List<BonitaConfiguration> getTenantTemplateSecurityScripts();
-
-    /**
      * Retrieves the engine tenant configuration for a tenant
      *
-     * @param tenantId tenant identifier
      * @return a list of BonitaConfiguration that represents each file
      */
 
-    List<BonitaConfiguration> getTenantEngineConf(long tenantId);
+    List<BonitaConfiguration> getTenantEngineConf();
 
     /**
      * Retrieves the security scripts for a tenant
      *
-     * @param tenantId tenant identifier
      * @return a list of BonitaConfiguration that represents each file
      */
 
-    List<BonitaConfiguration> getTenantSecurityScripts(long tenantId);
+    List<BonitaConfiguration> getTenantSecurityScripts();
+
+    /**
+     * store security script for a tenant
+     *
+     * @param bonitaConfigurations list of files
+     */
+    void storeTenantSecurityScripts(List<BonitaConfiguration> bonitaConfigurations);
+
+    /**
+     * store tenant configuration files for portal
+     *
+     * @param bonitaConfigurations list of files
+     */
+    void storeTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations);
+
+    /**
+     * updates tenant configurations for portal, for all tenants and for tenant template.
+     *
+     * @param bonitaConfigurations list of configurations to store
+     */
+    void updateTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations);
+
+    void updateDefaultConfiguration(Path configurationRootFolder) throws PlatformException;
+
+    /**
+     * Retrieves the portal configuration for a tenant
+     *
+     * @return list of files
+     */
+    List<BonitaConfiguration> getTenantPortalConf();
+
+    /**
+     * Retrieves a portal configuration file for a tenant
+     */
+    BonitaConfiguration getTenantPortalConfiguration(String file);
 
     /**
      * store platform configuration file in database
@@ -85,105 +104,9 @@ public interface ConfigurationService {
     void storePlatformEngineConf(List<BonitaConfiguration> bonitaConfigurations);
 
     /**
-     * store tenant template configuration file in database
-     *
-     * @param bonitaConfigurations list of files
-     */
-    void storeTenantTemplateEngineConf(List<BonitaConfiguration> bonitaConfigurations);
-
-    /**
-     * store tenant template security scripts
-     *
-     * @param bonitaConfigurations list of files
-     */
-    void storeTenantTemplateSecurityScripts(List<BonitaConfiguration> bonitaConfigurations);
-
-    /**
-     * store tenant configuration file in database
-     *
-     * @param bonitaConfigurations list of files
-     * @param tenantId tenant identifier
-     */
-    void storeTenantEngineConf(List<BonitaConfiguration> bonitaConfigurations, long tenantId);
-
-    /**
-     * store security script for a tenant
-     *
-     * @param bonitaConfigurations list of files
-     * @param tenantId tenant identifier
-     */
-    void storeTenantSecurityScripts(List<BonitaConfiguration> bonitaConfigurations, long tenantId);
-
-    /**
-     * store tenant template configuration files for portal
-     *
-     * @param bonitaConfigurations list of files
-     */
-    void storeTenantTemplatePortalConf(List<BonitaConfiguration> bonitaConfigurations);
-
-    /**
-     * store tenant configuration files for portal
-     *
-     * @param bonitaConfigurations list of files
-     * @param tenantId
-     */
-    void storeTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations, long tenantId);
-
-    /**
-     * updates tenant configurations for portal, for all tenants and for tenant template.
-     *
-     * @param bonitaConfigurations list of configurations to store
-     */
-    void updateTenantPortalConfForAllTenantsAndTemplate(List<BonitaConfiguration> bonitaConfigurations);
-
-    void updateDefaultConfigurationForAllTenantsAndTemplate(Path configurationRootFolder) throws PlatformException;
-
-    /**
-     * store platform configuration files for portal
-     *
-     * @param bonitaConfigurations list of files
-     */
-    void storePlatformPortalConf(List<BonitaConfiguration> bonitaConfigurations);
-
-    /**
-     * Retrieves the portal template configuration for a tenant
-     *
-     * @return list of files
-     */
-    List<BonitaConfiguration> getTenantTemplatePortalConf();
-
-    /**
-     * Retrieves the portal configuration for a tenant
-     *
-     * @param tenantId
-     * @return list of files
-     */
-    List<BonitaConfiguration> getTenantPortalConf(long tenantId);
-
-    /**
-     * Retrieves a portal configuration file for a tenant
-     *
-     * @param tenantId
-     * @param file
-     * @return file
-     */
-    BonitaConfiguration getTenantPortalConfiguration(long tenantId, String file);
-
-    /**
-     * Read configuration files located under configuration root folder
-     * each file is stored in database
-     *
-     * @param configurationRootFolder root folder containing configuration files
-     * @param tenantId tenant key
-     * @throws PlatformException
-     */
-    void storeTenantConfiguration(File configurationRootFolder, long tenantId) throws PlatformException;
-
-    /**
      * store platform configuration files for engine
      *
      * @param configurationRootFolder root folder containing configuration files
-     * @throws PlatformException
      */
     void storePlatformConfiguration(File configurationRootFolder) throws PlatformException;
 
@@ -191,7 +114,6 @@ public interface ConfigurationService {
      * store whole configuration files for engine and portal, excluding licenses files
      *
      * @param configurationRootFolder path to root folder
-     * @throws PlatformException
      */
     void storeAllConfiguration(Path configurationRootFolder) throws PlatformException;
 
@@ -201,9 +123,9 @@ public interface ConfigurationService {
      * .
      * ├── platform_engine
      * ├── platform_portal
-     * ├── tenant_template_engine
-     * ├── tenant_template_portal
-     * └── tenant_template_security_scripts
+     * ├── tenant_engine
+     * ├── tenant_portal
+     * └── tenant_security_scripts
      */
     List<File> writeAllConfigurationToFolder(File configurationFolder, File licenseFolder) throws PlatformException;
 
@@ -211,9 +133,6 @@ public interface ConfigurationService {
      * read licensesFolder for license files
      * sub-folders are ignored
      * each *.lic file is stored in database
-     *
-     * @param licensesFolder
-     * @throws PlatformException
      */
     void storeLicenses(File licensesFolder) throws PlatformException;
 
@@ -221,17 +140,8 @@ public interface ConfigurationService {
      * Retrieves all license files stored in database.
      *
      * @return a list of BonitaConfiguration that represents each license file
-     * @throws PlatformException
      */
     List<BonitaConfiguration> getLicenses() throws PlatformException;
-
-    /**
-     * Delete all configuration files for a tenant
-     *
-     * @param tenantId the tenant id.
-     * @throws IllegalArgumentException when tenantId value is out of range (<= 0 )
-     */
-    void deleteTenantConfiguration(long tenantId);
 
     /**
      * Delete all configuration and license files
@@ -240,12 +150,5 @@ public interface ConfigurationService {
 
     List<LightBonitaConfiguration> getMandatoryStructureConfiguration();
 
-    /**
-     * @return
-     */
-    List<Long> getAllTenants();
-
     void storeConfigurationsIfNotExist(List<FullBonitaConfiguration> configurations);
-
-    long getDefaultTenantId();
 }

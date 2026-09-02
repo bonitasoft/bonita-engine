@@ -130,7 +130,8 @@ public class ApplicationInstallerUpdateTest {
 
         assertThat(
                 captor.getAllValues().stream().allMatch(file -> Stream.of("page", "layout", "theme", "restApiExtension")
-                        .anyMatch(name -> file.getName().startsWith(name)))).isTrue();
+                        .anyMatch(name -> file.getName().startsWith(name))))
+                .isTrue();
     }
 
     @Test
@@ -344,7 +345,7 @@ public class ApplicationInstallerUpdateTest {
     private byte[] createValidBDMZipFile() throws IOException {
         return zip(file("bom.xml", ("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<businessObjectModel xmlns=\"http://documentation.bonitasoft.com/bdm-xml-schema/1.0\" modelVersion=\"1.0\" productVersion=\"8.0.0\" />")
-                        .getBytes()));
+                .getBytes()));
     }
 
 }

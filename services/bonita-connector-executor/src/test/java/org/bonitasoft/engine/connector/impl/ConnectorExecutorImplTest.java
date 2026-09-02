@@ -46,8 +46,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectorExecutorImplTest {
 
-    public static final long TENANT_ID = 12L;
-
     @Mock
     private SessionAccessor sessionAccessor;
 
@@ -76,7 +74,6 @@ public class ConnectorExecutorImplTest {
         connectorExecutorImpl = new ConnectorExecutorImpl(sessionAccessor, sessionService,
                 timeTracker,
                 meterRegistry,
-                TENANT_ID,
                 new DefaultExecutorServiceMetricsProvider(),
                 new ConnectorSingleThreadExecutorFactory(1));
 
@@ -271,8 +268,8 @@ public class ConnectorExecutorImplTest {
         assertThat(
                 meterRegistry.find("executor.pool.size")
                         .tag("name", "bonita-connector-executor")
-                        .tag("tenant", String.valueOf(TENANT_ID))
-                        .gauge()).isNotNull();
+                        .gauge())
+                .isNotNull();
     }
 
     // =================================================================================================================
@@ -313,16 +310,6 @@ public class ConnectorExecutorImplTest {
         public void disconnect() {
             // do nothing
         }
-    }
-
-    @Test
-    public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED)
-                .tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_PENDING)
-                .tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_RUNNING)
-                .tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
     }
 
 }

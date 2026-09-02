@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;

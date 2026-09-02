@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
@@ -46,6 +48,9 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.mdc.MDCHelper;
+import org.bonitasoft.engine.mdc.MDCHelper.CheckedCallable4;
+import org.bonitasoft.engine.mdc.ProcessInstanceMDC;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -139,22 +144,28 @@ public class ProcessStarter {
         final long starterSubstituteUserId = SessionInfos.getUserIdFromSession();
         final long starterUserId = getStarterUserId(starterSubstituteUserId);
 
-        final SProcessInstance startedSProcessInstance;
-        try {
-            final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
-            startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations,
-                    operationContext, connectorsWithInput,
-                    new FlowNodeSelector(sProcessDefinition, filter), processContractInputs);
-        } catch (final SProcessInstanceCreationException e) {
-            e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
-            e.setProcessDefinitionNameOnContext(sProcessDefinition.getName());
-            e.setProcessDefinitionVersionOnContext(sProcessDefinition.getVersion());
-            throw e;
-        }
+        Supplier<ProcessInstanceMDC> processInstanceMDC = () -> new ProcessInstanceMDC(0, Optional.of(starterUserId),
+                Optional.of(starterSubstituteUserId),
+                sProcessDefinition.getId(), 0);
+        CheckedCallable4<ProcessInstance, SProcessInstanceCreationException, SBonitaReadException, SProcessDefinitionException, SContractViolationException> call = () -> {
+            try {
+                final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
+                final SProcessInstance startedSProcessInstance = processExecutor.start(starterUserId,
+                        starterSubstituteUserId, sOperations,
+                        operationContext, connectorsWithInput,
+                        new FlowNodeSelector(sProcessDefinition, filter), processContractInputs);
+                logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId,
+                        startedSProcessInstance);
+                return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
+            } catch (final SProcessInstanceCreationException e) {
+                e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
+                e.setProcessDefinitionNameOnContext(sProcessDefinition.getName());
+                e.setProcessDefinitionVersionOnContext(sProcessDefinition.getVersion());
+                throw e;
+            }
+        };
 
-        logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId,
-                startedSProcessInstance);
-        return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
+        return MDCHelper.tryWithMDC(processInstanceMDC, call);
     }
 
     protected long getStarterUserId(final long starterSubstituteUserId) {

@@ -162,7 +162,7 @@ public class SpringBeanAccessor {
 
     protected Properties getProperties() throws IOException {
         Properties platformProperties = BONITA_HOME_SERVER.getPlatformProperties();
-        platformProperties.putAll(BONITA_HOME_SERVER.getTenantProperties(BONITA_HOME_SERVER.getDefaultTenantId()));
+        platformProperties.putAll(BONITA_HOME_SERVER.getTenantProperties());
         return platformProperties;
     }
 
@@ -174,7 +174,7 @@ public class SpringBeanAccessor {
         extractHazelcastConfigurationFile(platformConfiguration);
 
         bonitaConfigurations.addAll(platformConfiguration);
-        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getTenantConfiguration(BONITA_HOME_SERVER.getDefaultTenantId()));
+        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getTenantConfiguration());
         return bonitaConfigurations;
     }
 

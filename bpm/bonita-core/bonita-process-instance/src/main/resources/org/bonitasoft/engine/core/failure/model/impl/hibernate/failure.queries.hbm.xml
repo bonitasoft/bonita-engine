@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<query name="getFlowNodeFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SBPMFailure AS f
+        WHERE f.flowNodeInstanceId = :flowNodeInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+    <query name="deleteByIdsSBPMFailure">
+        DELETE
+        FROM org.bonitasoft.engine.core.process.instance.model.SBPMFailure AS f
+        WHERE f.id IN (:ids)
+    </query>
+
+    <query name="deleteArchivedBPMFailuresByFlowNodeInstanceIds">
+        DELETE
+        FROM org.bonitasoft.engine.core.process.instance.model.SABPMFailure AS f
+        WHERE f.flowNodeInstanceId IN (:flowNodeInstanceIds)
+    </query>
+
+    <query name="getArchivedFlowNodeFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SABPMFailure AS f
+        WHERE f.flowNodeInstanceId = :flowNodeInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+    <query name="getProcessInstanceFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SBPMFailure AS f
+        WHERE f.processInstanceId = :processInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+    <query name="deleteArchivedBPMFailuresByProcessInstanceIds">
+        DELETE
+        FROM org.bonitasoft.engine.core.process.instance.model.SABPMFailure AS f
+        WHERE f.processInstanceId IN (:processInstanceIds)
+    </query>
+
+    <query name="getArchivedProcessInstanceFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SABPMFailure AS f
+        WHERE f.processInstanceId = :processInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+    <query name="getChildProcessInstancesFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SBPMFailure AS f
+        WHERE f.rootProcessInstanceId = :rootProcessInstanceId
+        AND f.processInstanceId != f.rootProcessInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+    <query name="getArchivedChildProcessInstancesFailures">
+        SELECT f
+        FROM org.bonitasoft.engine.core.process.instance.model.SABPMFailure AS f
+        WHERE f.rootProcessInstanceId = :rootProcessInstanceId
+        AND f.processInstanceId != f.rootProcessInstanceId
+        ORDER BY f.failureDate DESC
+    </query>
+
+</hibernate-mapping>

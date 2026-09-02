@@ -157,8 +157,6 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         createDependency(ID2, PROCESS, "LocalResource211", "LocalResource1.jar", generateJar(LocalClass1.class));
         createDependency(ID1, PROCESS, "LocalResource123", "LocalResource3.jar", generateJar(LocalClass3.class));
         createDependency(ID1, TENANT, "LocalResource122", "LocalResource2.jar", generateJar(LocalClass2.class));
-        createDependency(ID2, TENANT, "LocalResource222", "LocalResource2.jar", generateJar(LocalClass2.class));
-        createDependency(ID1, TENANT, "LocalResource124", "LocalResource4.jar", generateJar(LocalClass4.class));
         getTransactionService().complete();
     }
 
@@ -500,12 +498,10 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testDifferentsApplicationHaveDifferentGlobalClassLoader() throws Exception {
+    public void different_applications_should_have_same_global_classLoader() throws Exception {
         initializeClassLoaderServiceWithTwoApplications();
-        final ClassLoader process1Classloader = classLoaderService
-                .getClassLoader(identifier(PROCESS, ID1));
-        final ClassLoader tenant1Classloader = classLoaderService
-                .getClassLoader(identifier(TENANT, ID1));
+        final ClassLoader process1Classloader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader tenant1Classloader = classLoaderService.getClassLoader(ClassLoaderIdentifier.TENANT);
 
         final Class<?> sharedClassLoadedFromProcess1 = process1Classloader
                 .loadClass("org.bonitasoft.engine.classloader.SharedClass1");

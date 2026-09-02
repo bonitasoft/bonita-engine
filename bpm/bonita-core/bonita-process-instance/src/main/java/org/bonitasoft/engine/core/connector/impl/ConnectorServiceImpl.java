@@ -262,7 +262,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             throws SConnectorException {
         final String implementationClassName = getConnectorImplementationDescriptor(processDefinitionId,
                 connectorDefinitionId, connectorDefinitionVersion)
-                        .getImplementationClassName();
+                .getImplementationClassName();
         final Map<String, Object> inputParameters;
         try {
             inputParameters = evaluateInputParameters(connectorDefinitionId, connectorInputParameters,
@@ -318,15 +318,20 @@ public class ConnectorServiceImpl implements ConnectorService {
         final Map<String, Object> inputParameters = new HashMap<>(parameters.size());
         try {
             for (final Entry<String, SExpression> input : parameters.entrySet()) {
-                if (sExpressionContext != null) {
-                    final String key = input.getKey();
-                    if (inputValues != null && !inputValues.isEmpty() && inputValues.containsKey(key)) {
-                        sExpressionContext.setSerializableInputValues(inputValues.get(key));
+                try {
+                    if (sExpressionContext != null) {
+                        final String key = input.getKey();
+                        if (inputValues != null && !inputValues.isEmpty() && inputValues.containsKey(key)) {
+                            sExpressionContext.setSerializableInputValues(inputValues.get(key));
+                        }
+                        inputParameters.put(input.getKey(),
+                                expressionResolverService.evaluate(input.getValue(), sExpressionContext));
+                    } else {
+                        inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
                     }
-                    inputParameters.put(input.getKey(),
-                            expressionResolverService.evaluate(input.getValue(), sExpressionContext));
-                } else {
-                    inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
+                } catch (SBonitaException e) {
+                    e.setConnectorInputOnContext(input.getKey());
+                    throw e;
                 }
             }
         } finally {

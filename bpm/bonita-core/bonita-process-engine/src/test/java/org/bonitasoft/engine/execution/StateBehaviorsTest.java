@@ -16,10 +16,9 @@ package org.bonitasoft.engine.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_RE_EXECUTE;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -90,6 +89,7 @@ public class StateBehaviorsTest {
     @Before
     public void setConstants() {
         when(flowNodeInstance.getId()).thenReturn(flownodeInstanceId);
+        when(flowNodeDefinition.getName()).thenReturn("Step");
     }
 
     @Test
@@ -177,7 +177,7 @@ public class StateBehaviorsTest {
                 anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
-        expectedException.expectMessage("no user id returned by the user filter");
+        expectedException.expectMessage("No user id returned by the user filter userFilterDefinition on activity Step");
         //when
         stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
                 userFilterDefinition);
@@ -191,7 +191,7 @@ public class StateBehaviorsTest {
                 anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
-        expectedException.expectMessage("no user id returned by the user filter");
+        expectedException.expectMessage("No user id returned by the user filter userFilterDefinition on activity Step");
         //when
         stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
                 userFilterDefinition);
@@ -205,7 +205,7 @@ public class StateBehaviorsTest {
                 anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
-        expectedException.expectMessage("no user id returned by the user filter");
+        expectedException.expectMessage("No user id returned by the user filter userFilterDefinition on activity Step");
         //when
         stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
                 userFilterDefinition);
@@ -219,7 +219,7 @@ public class StateBehaviorsTest {
                 anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
-        expectedException.expectMessage("no user id returned by the user filter");
+        expectedException.expectMessage("No user id returned by the user filter userFilterDefinition on activity Step");
         //when
         stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
                 userFilterDefinition);

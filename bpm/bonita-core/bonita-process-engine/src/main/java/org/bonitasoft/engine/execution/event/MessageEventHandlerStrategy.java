@@ -136,7 +136,6 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         fillCorrelation(builder, messageTrigger.getCorrelations(), expressionContext);
         getEventInstanceService().createWaitingEvent(builder.done());
         messagesHandlingService.triggerMatchingOfMessages();
-
     }
 
     public void handleCatchEvent(final SProcessDefinition processDefinition,
@@ -158,9 +157,14 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
                 getParentContainerType(receiveTaskInstance).name(),
                 processDefinition.getId());
 
-        fillCorrelation(builder, messageTrigger.getCorrelations(), expressionContext);
-        getEventInstanceService().createWaitingEvent(builder.done());
-        messagesHandlingService.triggerMatchingOfMessages();
+        try {
+            fillCorrelation(builder, messageTrigger.getCorrelations(), expressionContext);
+            getEventInstanceService().createWaitingEvent(builder.done());
+            messagesHandlingService.triggerMatchingOfMessages();
+        } catch (SBonitaException e) {
+            e.setMessageInstanceNameOnContext(messageTrigger.getMessageName());
+            throw e;
+        }
     }
 
     @Override
@@ -171,8 +175,14 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SExpressionContext expressionContext = new SExpressionContext(eventInstance.getParentContainerId(),
                 getParentContainerType(eventInstance).name(),
                 processDefinitionId);
-
-        handleThrowMessage(sEventTriggerDefinition, eventInstance.getName(), processDefinitionId, expressionContext);
+        try {
+            handleThrowMessage(sEventTriggerDefinition, eventInstance.getName(), processDefinitionId,
+                    expressionContext);
+        } catch (SBonitaException e) {
+            e.setMessageInstanceNameOnContext(
+                    ((SThrowMessageEventTriggerDefinition) sEventTriggerDefinition).getMessageName());
+            throw e;
+        }
     }
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskInstance sendTaskInstance,
@@ -181,7 +191,13 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SExpressionContext expressionContext = new SExpressionContext(sendTaskInstance.getId(),
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 processDefinition.getId());
-        handleThrowMessage(messageTrigger, sendTaskInstance.getName(), processDefinition.getId(), expressionContext);
+        try {
+            handleThrowMessage(messageTrigger, sendTaskInstance.getName(), processDefinition.getId(),
+                    expressionContext);
+        } catch (SBonitaException e) {
+            e.setMessageInstanceNameOnContext(messageTrigger.getMessageName());
+            throw e;
+        }
     }
 
     private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition,

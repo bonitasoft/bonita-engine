@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.comment.model.archive;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -23,13 +22,11 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "arch_process_comment")
-@IdClass(PersistentObjectId.class)
 public class SAComment implements ArchivedPersistentObject {
 
     public static final String ID_KEY = "id";
@@ -41,8 +38,6 @@ public class SAComment implements ArchivedPersistentObject {
     public static final String SOURCEOBJECTID_KEY = "sourceObjectId";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private Long userId;
     private long processInstanceId;
     private long sourceObjectId;
@@ -51,7 +46,6 @@ public class SAComment implements ArchivedPersistentObject {
     private String content;
 
     public SAComment(final SComment sComment) {
-        tenantId = sComment.getTenantId();
         content = sComment.getContent();
         postDate = sComment.getPostDate();
         sourceObjectId = sComment.getId();

@@ -27,11 +27,10 @@ import org.quartz.impl.JobDetailImpl;
 
 public class JobUtils {
 
-    static JobDetailImpl createJobDetails(long tenantId, long jobDescriptorId) {
+    static JobDetailImpl createJobDetails(long jobDescriptorId) {
         JobDetailImpl jobDetail = new JobDetailImpl();
         jobDetail.setName("someName");
         HashMap<String, Object> map = new HashMap<>();
-        map.put("tenantId", String.valueOf(tenantId));
         map.put("jobId", String.valueOf(jobDescriptorId));
         JobDataMap jobDataMap = new JobDataMap(map);
         jobDetail.setJobDataMap(jobDataMap);

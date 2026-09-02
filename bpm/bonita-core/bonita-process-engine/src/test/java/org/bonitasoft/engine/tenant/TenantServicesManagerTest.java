@@ -16,25 +16,18 @@ package org.bonitasoft.engine.tenant;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SLifecycleException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -73,15 +66,15 @@ public class TenantServicesManagerTest {
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         tenantServicesManager = new TenantServicesManager(sessionAccessor, sessionService, transactionService,
                 classLoaderService,
-                asList(tenantService1, tenantService2, tenantService3), TENANT_ID, tenantElementsRestarter);
-        doReturn(true).when(sessionAccessor).isTenantSession();
+                asList(tenantService1, tenantService2, tenantService3), tenantElementsRestarter);
+        doThrow(SessionIdNotSetException.class).when(sessionAccessor).getSessionId();
     }
 
     @Test
     public void should_not_refresh_classloaders_on_start() throws Exception {
         tenantServicesManager.start();
 
-        verify(classLoaderService).getClassLoader(identifier(ScopeType.TENANT, TENANT_ID));
+        verify(classLoaderService).getClassLoader(ClassLoaderIdentifier.TENANT);
         verifyNoMoreInteractions(classLoaderService);
     }
 
@@ -223,7 +216,7 @@ public class TenantServicesManagerTest {
         assertThatThrownBy(() -> {
             tenantServicesManager.start();
         }).isInstanceOf(SLifecycleException.class)
-                .hasMessageContaining("Unable to START a service. All services are STOPPED again")
+                .hasMessageContaining("Unable to START a service. All services are kept STOPPED.")
                 .hasRootCauseExactlyInstanceOf(UnsupportedOperationException.class);
     }
 

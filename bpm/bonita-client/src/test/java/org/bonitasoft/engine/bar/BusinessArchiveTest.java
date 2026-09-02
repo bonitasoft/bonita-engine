@@ -580,7 +580,7 @@ public class BusinessArchiveTest {
 
         assertThat(result.getProcessContainer().getFlowNode("start1").getOutgoingTransitions().get(0).getCondition()
                 .getContent())
-                        .as("the condition on the transition was not kept").isEqualTo("true");
+                .as("the condition on the transition was not kept").isEqualTo("true");
 
         assertEquals(process.getFlowElementContainer().getConnectors().size(),
                 result.getFlowElementContainer().getConnectors().size());

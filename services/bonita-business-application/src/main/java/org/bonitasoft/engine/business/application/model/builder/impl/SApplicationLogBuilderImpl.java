@@ -41,7 +41,7 @@ public class SApplicationLogBuilderImpl extends CRUDELogBuilder implements SAppl
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
                 && log.getNumericIndex(SApplicationLogBuilderFactoryImpl.APPLICATION_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException(
-                    "Some mandatoryFields are missing: business application identifier");
+                    "Some mandatory fields are missing: business application identifier");
         }
     }
 

@@ -24,7 +24,15 @@ import static org.mockito.Mockito.*;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import javax.transaction.Synchronization;
@@ -40,8 +48,17 @@ import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.*;
-import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessResourceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -64,7 +81,11 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.*;
+import org.bonitasoft.engine.core.process.definition.model.impl.SContextEntryImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SUserFilterDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SUserTaskDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
@@ -74,7 +95,14 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.*;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
+import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
@@ -87,7 +115,14 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SBlobDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.ContractDataNotFoundException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExceptionContext;
+import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
@@ -101,8 +136,16 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
-import org.bonitasoft.engine.operation.*;
-import org.bonitasoft.engine.persistence.*;
+import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderAndField;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
@@ -131,7 +174,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -141,7 +188,6 @@ public class ProcessAPIImplTest {
 
     private static final int MAX_RESULT = 10;
     private static final int START_INDEX = 0;
-    private static final long TENANT_ID = 1;
     private static final long ACTOR_ID = 100;
     private static final long PROCESS_DEFINITION_ID = 110;
     private static final long PROCESS_INSTANCE_ID = 45;
@@ -228,7 +274,6 @@ public class ProcessAPIImplTest {
     @Before
     public void setup() throws Exception {
         doReturn(serviceAccessor).when(processAPI).getServiceAccessor();
-        when(serviceAccessor.getTenantId()).thenReturn(TENANT_ID);
         when(serviceAccessor.getDataInstanceService()).thenReturn(dataInstanceService);
         when(serviceAccessor.getOperationService()).thenReturn(operationService);
         when(serviceAccessor.getActorMappingService()).thenReturn(actorMappingService);
@@ -275,7 +320,7 @@ public class ProcessAPIImplTest {
         SAProcessInstance value1 = new SAProcessInstance(sProcessInstance);
         value1.setId(ARCHIVED_PROCESS_INSTANCE_ID);
         when(processInstanceService.getArchivedProcessInstance(PROCESS_INSTANCE_ID)).thenReturn(value1);
-        doReturn(SSession.builder().id(54L).tenantId(1).userName("john").userId(12).build()).when(processAPI)
+        doReturn(SSession.builder().id(54L).userName("john").userId(12).build()).when(processAPI)
                 .getSession();
         doReturn("john").when(processAPI).getUserNameFromSession();
 
@@ -395,8 +440,8 @@ public class ProcessAPIImplTest {
             processAPI.cancelProcessInstance(PROCESS_INSTANCE_ID);
             fail("The process instance does not exists");
         } catch (final ProcessInstanceNotFoundException pinfe) {
-            verify(lockService).lock(PROCESS_INSTANCE_ID, SFlowElementsContainerType.PROCESS.name(), TENANT_ID);
-            verify(lockService).unlock(nullable(BonitaLock.class), eq(TENANT_ID));
+            verify(lockService).lock(PROCESS_INSTANCE_ID, SFlowElementsContainerType.PROCESS.name());
+            verify(lockService).unlock(nullable(BonitaLock.class));
         }
     }
 
@@ -592,7 +637,7 @@ public class ProcessAPIImplTest {
         final List<SDataInstance> sDataInstances = singletonList(sDataInstance);
         when(transientDataService.getDataInstances(FLOW_NODE_INSTANCE_ID,
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults))
-                        .thenReturn(sDataInstances);
+                .thenReturn(sDataInstances);
         final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
         doReturn(singletonList(dataInstance)).when(processAPI).convertModelToDataInstances(sDataInstances);
 
@@ -1104,8 +1149,8 @@ public class ProcessAPIImplTest {
         doReturn(sTimerEventTriggerInstance).when(eventInstanceService)
                 .getEventTriggerInstance(STimerEventTriggerInstance.class, timerEventTriggerInstanceId);
 
-        doThrow(new SSchedulerException(new Exception(""))).when(schedulerService).rescheduleJob(nullable(String.class),
-                nullable(String.class), eq(date));
+        doThrow(new SSchedulerException(new Exception(""))).when(schedulerService)
+                .rescheduleJob(nullable(String.class), eq(date));
 
         // When
         processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, date);
@@ -1343,6 +1388,7 @@ public class ProcessAPIImplTest {
         inputValues.put("input2", "value");
         sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setAssigneeId(543L);
+        sUserTaskInstance.setExecutedBySubstitute(15);
         WorkDescriptor workDescriptor = WorkDescriptor.create("flownode");
         doReturn(workDescriptor).when(workFactory).createExecuteFlowNodeWorkDescriptor(sUserTaskInstance);
         //when
@@ -1580,8 +1626,8 @@ public class ProcessAPIImplTest {
     public void should_get_external_resources_from_process() throws Exception {
         doReturn(
                 new SBARResource("myResource", BARResourceType.EXTERNAL, PROCESS_DEFINITION_ID, new byte[] { 1, 2, 3 }))
-                        .when(processResourcesService)
-                        .get(PROCESS_DEFINITION_ID, BARResourceType.EXTERNAL, "myResource");
+                .when(processResourcesService)
+                .get(PROCESS_DEFINITION_ID, BARResourceType.EXTERNAL, "myResource");
 
         byte[] myResource = processAPI.getExternalProcessResource(PROCESS_DEFINITION_ID, "myResource");
 
@@ -1610,8 +1656,8 @@ public class ProcessAPIImplTest {
     public void should_get_document_resource_from_process() throws Exception {
         doReturn(
                 new SBARResource("myDoc", BARResourceType.DOCUMENT, PROCESS_DEFINITION_ID, new byte[] { 4, 5, 6 }))
-                        .when(processResourcesService)
-                        .get(PROCESS_DEFINITION_ID, BARResourceType.DOCUMENT, "myDoc");
+                .when(processResourcesService)
+                .get(PROCESS_DEFINITION_ID, BARResourceType.DOCUMENT, "myDoc");
 
         byte[] myDoc = processAPI.getDocumentProcessResource(PROCESS_DEFINITION_ID, "myDoc");
 
@@ -1697,7 +1743,7 @@ public class ProcessAPIImplTest {
         // When
         assertThatThrownBy(() -> processAPI.executeOperations(connectorResult, new ArrayList<>(),
                 new HashMap<>(), new SExpressionContext(), ProcessAPIImplTest.class.getClassLoader(), serviceAccessor))
-                        .isInstanceOf(SOperationExecutionException.class);
+                .isInstanceOf(SOperationExecutionException.class);
 
         // Then
         verify(connectorService).disconnect(connectorResult);

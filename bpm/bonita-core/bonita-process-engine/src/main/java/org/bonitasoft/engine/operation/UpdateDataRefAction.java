@@ -111,8 +111,7 @@ public class UpdateDataRefAction implements EntityAction {
         try {
             final SRefBusinessDataInstance reference = refBusinessDataRetriever
                     .getRefBusinessDataInstance(businessDataContext);
-            if (reference instanceof SSimpleRefBusinessDataInstance) {
-                final SSimpleRefBusinessDataInstance simpleReference = (SSimpleRefBusinessDataInstance) reference;
+            if (reference instanceof SSimpleRefBusinessDataInstance simpleReference) {
                 refBusinessDataService.updateRefBusinessDataInstance(simpleReference, null);
             } else {
                 final SProcessMultiRefBusinessDataInstance multiReference = (SProcessMultiRefBusinessDataInstance) reference;

@@ -36,13 +36,13 @@ public class GetAllConfigurationInTransaction implements TransactionCallback<Lis
 
     @Override
     public List<FullBonitaConfiguration> doInTransaction(TransactionStatus transactionStatus) {
-        LOGGER.debug("get all configurations");
+        LOGGER.debug("Get all configurations from database");
 
         final List<FullBonitaConfiguration> fullBonitaConfigurations = jdbcTemplate.query(
                 FullBonitaConfigurationRowMapper.SELECT_CONFIGURATION,
                 new FullBonitaConfigurationRowMapper());
 
-        LOGGER.debug("configurations found:" + fullBonitaConfigurations.toString());
+        LOGGER.debug("Configurations found:{}", fullBonitaConfigurations);
 
         return fullBonitaConfigurations;
     }

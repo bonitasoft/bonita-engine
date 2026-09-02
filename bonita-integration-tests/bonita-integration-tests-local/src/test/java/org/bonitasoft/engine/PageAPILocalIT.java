@@ -27,7 +27,7 @@ public class PageAPILocalIT extends CommonAPIIT {
 
     @Before
     public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
     }
 
     @After
@@ -38,7 +38,7 @@ public class PageAPILocalIT extends CommonAPIIT {
                 getPageAPI().deletePage(page.getId());
             }
         }
-        logoutOnTenant();
+        logout();
     }
 
     /*

@@ -57,7 +57,7 @@ public class BonitaEngineAutoConfigurationTest {
                     assertThat(businessDataDatabaseConfiguration.getXaDatasource().getMaxPoolSize()).isEqualTo(6);
                     assertThat(
                             businessDataDatabaseConfiguration.getDbVendor())
-                                    .isEqualTo("mysql");
+                            .isEqualTo("mysql");
                 });
     }
 

@@ -18,9 +18,18 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourcesService;
@@ -48,22 +57,13 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
-    protected long getTenantId() {
-        try {
-            return getSessionAccessor().getTenantId();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-    }
-
     @Override
     @AvailableInMaintenanceMode
     public boolean isPaused() {
-        final long tenantId = getTenantId();
         try {
-            return getServiceAccessorNoException().getPlatformService().getDefaultTenant().isPaused();
+            return getServiceAccessorNoException().getPlatformService().getPlatform().isMaintenanceEnabled();
         } catch (final SBonitaException e) {
-            throw new RetrieveException("Unable to retrieve the tenant with id " + tenantId, e);
+            throw new RetrieveException("Unable to retrieve the tenant status", e);
         }
     }
 
@@ -143,7 +143,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         try {
             final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
             TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
-            String bdm_version = tenantStateManager.executeTenantManagementOperation("BDM Installation",
+            String bdm_version = tenantStateManager.executeManagementOperation("BDM Installation",
                     () -> bdmRepository.install(zip, userId));
             log.info("Installation of the BDM completed.");
             return bdm_version;
@@ -165,8 +165,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         try {
             final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
             TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
-            tenantStateManager.executeTenantManagementOperation("BDM Uninstallation", () -> {
-                bdmRepository.uninstall(serviceAccessor.getTenantId());
+            tenantStateManager.executeManagementOperation("BDM Uninstallation", () -> {
+                bdmRepository.uninstall();
                 return null;
             });
             log.info("BDM successfully uninstalled");
@@ -204,8 +204,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         try {
             final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
             TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
-            tenantStateManager.executeTenantManagementOperation("BDM Cleanup and uninstallation", () -> {
-                bdmRepository.dropAndUninstall(serviceAccessor.getTenantId());
+            tenantStateManager.executeManagementOperation("BDM Cleanup and uninstallation", () -> {
+                bdmRepository.dropAndUninstall();
                 return null;
             });
         } catch (final SBusinessDataRepositoryException sbdre) {

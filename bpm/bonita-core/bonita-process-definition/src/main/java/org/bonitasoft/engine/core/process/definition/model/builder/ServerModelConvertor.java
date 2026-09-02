@@ -94,8 +94,7 @@ public class ServerModelConvertor {
     }
 
     public static SDataDefinition convertDataDefinition(final DataDefinition dataDefinition) {
-        if (dataDefinition instanceof XMLDataDefinition) {
-            final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
+        if (dataDefinition instanceof XMLDataDefinition xmlDataDef) {
             final SXMLDataDefinitionBuilderFactory fact = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class);
             final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(dataDefinition.getName())
                     .setElement(xmlDataDef.getElement())
@@ -107,8 +106,7 @@ public class ServerModelConvertor {
         }
         final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
         SDataDefinitionBuilder builder;
-        if (dataDefinition instanceof TextDataDefinition) {
-            final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
+        if (dataDefinition instanceof TextDataDefinition textDataDefinition) {
             builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
         } else {
             builder = fact.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());

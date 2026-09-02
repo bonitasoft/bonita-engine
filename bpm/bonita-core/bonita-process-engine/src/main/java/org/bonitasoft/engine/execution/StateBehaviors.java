@@ -32,6 +32,7 @@ import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
@@ -85,7 +86,6 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNode
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -202,26 +202,27 @@ public class StateBehaviors {
             if (activityDefinition != null) {// can be null if the activity was added in runtime
                 try {
                     final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
-                    if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
+                    if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics miLoop
                             && ((SMultiInstanceLoopCharacteristics) loopCharacteristics)
                                     .getDataOutputItemRef() != null) {
-                        final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
                         final SBusinessDataDefinition businessData = processContainer
                                 .getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
                         if (businessData == null) {
                             mapDataOutputOfMultiInstance(flowNodeInstance, miLoop);
                         } else {
-                            MapMultiInstanceBusinessDataOutput(flowNodeInstance, miLoop);
+                            mapMultiInstanceBusinessDataOutput(flowNodeInstance, miLoop);
                         }
                     }
                 } catch (final SBonitaException sbe) {
-                    throw new SActivityStateExecutionException(sbe);
+                    throw new SActivityStateExecutionException(
+                            "Error while mapping multi instance output of " + flowNodeInstance,
+                            ScopedException.ITERATION, sbe);
                 }
             }
         }
     }
 
-    private void MapMultiInstanceBusinessDataOutput(final SFlowNodeInstance flowNodeInstance,
+    private void mapMultiInstanceBusinessDataOutput(final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException,
             SRefBusinessDataInstanceModificationException {
@@ -271,25 +272,34 @@ public class StateBehaviors {
             throws SActivityStateExecutionException {
         if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType())
                 || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
-            try {
-                final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) processContainer
-                        .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-                if (humanTaskDefinition != null) {
-                    final String actorName = humanTaskDefinition.getActorName();
-                    final long processDefinitionId = flowNodeInstance.getLogicalGroup(0);
-                    final SUserFilterDefinition sUserFilterDefinition = humanTaskDefinition.getSUserFilterDefinition();
-                    if (sUserFilterDefinition != null) {
+            final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) processContainer
+                    .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+            if (humanTaskDefinition != null) {
+                final String actorName = humanTaskDefinition.getActorName();
+                final long processDefinitionId = flowNodeInstance.getLogicalGroup(0);
+                final SUserFilterDefinition sUserFilterDefinition = humanTaskDefinition.getSUserFilterDefinition();
+                if (sUserFilterDefinition != null) {
+                    try {
                         mapUsingUserFilters(flowNodeInstance, humanTaskDefinition, actorName, processDefinitionId,
                                 sUserFilterDefinition);
-                    } else {
+                    } catch (SActivityStateExecutionException e) {
+                        throw e;
+                    } catch (SBonitaException e) {
+                        throw new SActivityStateExecutionException(
+                                "Error while mapping actor '" + actorName + "' with filter "
+                                        + sUserFilterDefinition.getUserFilterId() + " for " + flowNodeInstance,
+                                ScopedException.ACTOR_MAPPING, e);
+                    }
+                } else {
+                    try {
                         mapUsingActors(flowNodeInstance, actorName, processDefinitionId);
+                    } catch (SBonitaException e) {
+                        throw new SActivityStateExecutionException("Error while mapping actors for " + flowNodeInstance,
+                                ScopedException.ACTOR_MAPPING, e);
                     }
                 }
-            } catch (final SActivityStateExecutionException e) {
-                throw e;
-            } catch (final Exception e) {
-                throw new SActivityStateExecutionException(e);
             }
+
         }
     }
 
@@ -320,8 +330,9 @@ public class StateBehaviors {
         final List<Long> userIds = result.getResult();
         if (userIds == null || userIds.isEmpty() || userIds.contains(0L) || userIds.contains(-1L)) {
             throw new SActivityStateExecutionException(
-                    "no user id returned by the user filter " + sUserFilterDefinition + " on activity "
-                            + humanTaskDefinition.getName());
+                    "No user id returned by the user filter " + sUserFilterDefinition + " on activity "
+                            + humanTaskDefinition.getName(),
+                    ScopedException.ACTOR_MAPPING);
         }
         for (final Long userId : new TreeSet<>(userIds)) {
             final SPendingActivityMapping mapping = SPendingActivityMapping.builder()
@@ -339,8 +350,7 @@ public class StateBehaviors {
             final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
         // handle catch event
-        if (flowNodeInstance instanceof SIntermediateCatchEventInstance) {
-            final SCatchEventInstance intermediateCatchEventInstance = (SCatchEventInstance) flowNodeInstance;
+        if (flowNodeInstance instanceof SIntermediateCatchEventInstance intermediateCatchEventInstance) {
             // handleEventTriggerInstances(processDefinition, intermediateCatchEventInstance);
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SIntermediateCatchEventDefinition intermediateCatchEventDefinition = (SIntermediateCatchEventDefinition) processContainer
@@ -349,10 +359,10 @@ public class StateBehaviors {
                 eventsHandler.handleCatchEvent(processDefinition, intermediateCatchEventDefinition,
                         intermediateCatchEventInstance);
             } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException("unable to handle catch event " + flowNodeInstance, e);
+                throw new SActivityStateExecutionException("unable to handle catch event " + flowNodeInstance,
+                        ScopedException.EVENT, e);
             }
-        } else if (flowNodeInstance instanceof SReceiveTaskInstance) {
-            final SReceiveTaskInstance receiveTaskInstance = (SReceiveTaskInstance) flowNodeInstance;
+        } else if (flowNodeInstance instanceof SReceiveTaskInstance receiveTaskInstance) {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SReceiveTaskDefinition receiveTaskIDefinition = (SReceiveTaskDefinition) processContainer
                     .getFlowNode(receiveTaskInstance
@@ -360,7 +370,8 @@ public class StateBehaviors {
             try {
                 eventsHandler.handleCatchMessage(processDefinition, receiveTaskIDefinition, receiveTaskInstance);
             } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException("unable to handle catch event " + flowNodeInstance, e);
+                throw new SActivityStateExecutionException("unable to handle catch event " + flowNodeInstance,
+                        ScopedException.EVENT, e);
             }
         }
     }
@@ -380,7 +391,9 @@ public class StateBehaviors {
                     .getBoundaryEventDefinition(boundaryInstance.getName());
             eventsHandler.handleCatchEvent(processDefinition, boundaryEventDefinition, boundaryInstance);
         } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException("unable to handle catch event " + boundaryInstance, e);
+            throw new SActivityStateExecutionException("Unable to handle catch event " + boundaryInstance,
+                    ScopedException.EVENT,
+                    e);
         }
     }
 
@@ -394,35 +407,37 @@ public class StateBehaviors {
     public void updateDisplayNameAndDescription(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
-        try {
-            final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-            final SFlowNodeDefinition flowNode = processContainer
-                    .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-            if (flowNode != null) {
-                final SExpression displayNameExpression = flowNode.getDisplayName();
-                final SExpression displayDescriptionExpression = flowNode.getDisplayDescription();
-                final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(),
-                        DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                        processDefinition.getId());
-                final String displayName;
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final SFlowNodeDefinition flowNode = processContainer
+                .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+        if (flowNode != null) {
+            final SExpression displayNameExpression = flowNode.getDisplayName();
+            final SExpression displayDescriptionExpression = flowNode.getDisplayDescription();
+            final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(),
+                    DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                    processDefinition.getId());
+            try {
+                String displayName = flowNode.getName();
                 if (displayNameExpression != null) {
                     displayName = (String) expressionResolverService.evaluate(displayNameExpression,
                             sExpressionContext);
-                } else {
-                    displayName = flowNode.getName();
                 }
-                final String displayDescription;
+                activityInstanceService.updateDisplayName(flowNodeInstance, displayName);
+            } catch (SBonitaException e) {
+                throw new SActivityStateExecutionException("Error while updating display name",
+                        ScopedException.GENERAL_INFORMATION, e);
+            }
+            try {
+                String displayDescription = flowNode.getDescription();
                 if (displayDescriptionExpression != null) {
                     displayDescription = (String) expressionResolverService.evaluate(displayDescriptionExpression,
                             sExpressionContext);
-                } else {
-                    displayDescription = flowNode.getDescription();
                 }
-                activityInstanceService.updateDisplayName(flowNodeInstance, displayName);
                 activityInstanceService.updateDisplayDescription(flowNodeInstance, displayDescription);
+            } catch (SBonitaException e) {
+                throw new SActivityStateExecutionException("Error while updating display description",
+                        ScopedException.GENERAL_INFORMATION, e);
             }
-        } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
         }
     }
 
@@ -432,10 +447,9 @@ public class StateBehaviors {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SFlowNodeDefinition flowNodeDefinition = processContainer
                 .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-        if (!(flowNodeDefinition instanceof SHumanTaskDefinition)) {
+        if (!(flowNodeDefinition instanceof SHumanTaskDefinition humanTaskDefinition)) {
             return;
         }
-        SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) flowNodeDefinition;
         final SExpression expectedDurationExpression = humanTaskDefinition.getExpectedDuration();
         if (expectedDurationExpression == null) {
             return;
@@ -452,23 +466,24 @@ public class StateBehaviors {
                 activityInstanceService.setExpectedEndDate(flowNodeInstance, System.currentTimeMillis() + duration);
             }
         } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException("error while updating expected end date", e);
+            throw new SActivityStateExecutionException("Error while updating expected end date",
+                    ScopedException.GENERAL_INFORMATION, e);
         }
     }
 
     public void updateDisplayDescriptionAfterCompletion(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
-        try {
-            final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-            final SFlowNodeDefinition flowNode = processContainer
-                    .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-            if (flowNode != null) {
-                final SExpression displayDescriptionAfterCompletionExpression = flowNode
-                        .getDisplayDescriptionAfterCompletion();
-                final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(),
-                        DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                        processDefinition.getId());
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final SFlowNodeDefinition flowNode = processContainer
+                .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+        if (flowNode != null) {
+            final SExpression displayDescriptionAfterCompletionExpression = flowNode
+                    .getDisplayDescriptionAfterCompletion();
+            final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(),
+                    DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                    processDefinition.getId());
+            try {
                 final String displayDescriptionAfterCompletion;
                 if (displayDescriptionAfterCompletionExpression != null) {
                     displayDescriptionAfterCompletion = (String) expressionResolverService.evaluate(
@@ -477,9 +492,10 @@ public class StateBehaviors {
                     activityInstanceService.updateDisplayDescription(flowNodeInstance,
                             displayDescriptionAfterCompletion);
                 }
+            } catch (final SBonitaException e) {
+                throw new SActivityStateExecutionException("Error while updating display description",
+                        ScopedException.GENERAL_INFORMATION, e);
             }
-        } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
         }
     }
 
@@ -489,8 +505,7 @@ public class StateBehaviors {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SFlowNodeDefinition flowNode = processContainer
                     .getFlowNode(activityInstance.getFlowNodeDefinitionId());
-            if (flowNode instanceof SActivityDefinition) {
-                final SActivityDefinition activityDefinition = (SActivityDefinition) flowNode;
+            if (flowNode instanceof SActivityDefinition activityDefinition) {
                 final List<SOperation> sOperations = activityDefinition.getSOperations();
                 final SExpressionContext sExpressionContext = new SExpressionContext(activityInstance.getId(),
                         DataInstanceContainer.ACTIVITY_INSTANCE.name(),
@@ -498,21 +513,22 @@ public class StateBehaviors {
                 operationService.execute(sOperations, sExpressionContext);
             }
         } catch (final SOperationExecutionException e) {
-            throw new SActivityStateExecutionException(e);
+            throw new SActivityStateExecutionException("Error while executing operations",
+                    ScopedException.OPERATION, e);
         }
     }
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
-        if (flowNodeInstance instanceof SThrowEventInstance) {
-            final SThrowEventInstance throwEventInstance = (SThrowEventInstance) flowNodeInstance;
+        if (flowNodeInstance instanceof SThrowEventInstance throwEventInstance) {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SThrowEventDefinition eventDefinition = (SThrowEventDefinition) processContainer
                     .getFlowNode(throwEventInstance.getFlowNodeDefinitionId());
             try {
                 eventsHandler.handleThrowEvent(processDefinition, eventDefinition, throwEventInstance);
             } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException("unable to handle throw event " + flowNodeInstance, e);
+                throw new SActivityStateExecutionException("Unable to handle throw event " + flowNodeInstance,
+                        ScopedException.EVENT, e);
             }
         } else if (SFlowNodeType.SEND_TASK.equals(flowNodeInstance.getType())) {
             final SSendTaskInstance sendTaskInstance = (SSendTaskInstance) flowNodeInstance;
@@ -522,7 +538,8 @@ public class StateBehaviors {
             try {
                 eventsHandler.handleThrowMessage(processDefinition, sendTaskDefinition, sendTaskInstance);
             } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException("unable to handle throw message " + flowNodeInstance, e);
+                throw new SActivityStateExecutionException("Unable to handle throw message " + flowNodeInstance,
+                        ScopedException.EVENT, e);
             }
         }
     }
@@ -550,6 +567,7 @@ public class StateBehaviors {
     }
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId,
+            final long rootProcessInstanceId,
             final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final SConnectorInstance connector,
             final SConnectorDefinition sConnectorDefinition)
@@ -560,13 +578,18 @@ public class StateBehaviors {
         try {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
             workService.registerWork(workFactory.createExecuteConnectorOfActivityDescriptor(processDefinitionId,
-                    processInstanceId, flowNodeDefinitionId,
-                    flowNodeInstanceId, connectorInstanceId, connectorDefinitionName));
+                    processInstanceId, rootProcessInstanceId, flowNodeDefinitionId,
+                    flowNodeInstanceId, connectorInstanceId,
+                    sConnectorDefinition.getConnectorId(),
+                    connectorDefinitionName,
+                    sConnectorDefinition.getActivationEvent().name()));
         } catch (final SConnectorInstanceModificationException e) {
-            throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);
+            throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING",
+                    ScopedException.CONNECTOR, e);
         } catch (final SWorkRegisterException e) {
             throw new SActivityStateExecutionException(
                     "Unable to register the work that execute the connector " + connector + " on " + flowNodeInstanceId,
+                    ScopedException.CONNECTOR,
                     e);
         }
     }
@@ -604,7 +627,8 @@ public class StateBehaviors {
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(
-                    "Unable to create boundary events attached to activity " + activityInstance.getName(), e);
+                    "Unable to create boundary events attached to activity " + activityInstance.getName(),
+                    ScopedException.EVENT, e);
         }
     }
 
@@ -669,7 +693,8 @@ public class StateBehaviors {
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(
-                    "Unable to cancel boundary events attached to activity " + activityInstance.getName(), e);
+                    "Unable to cancel boundary events attached to activity " + activityInstance.getName(),
+                    ScopedException.EVENT, e);
         }
     }
 
@@ -682,7 +707,9 @@ public class StateBehaviors {
                 try {
                     addAssignmentSystemComment(flowNodeInstance, userId);
                 } catch (final SBonitaException e) {
-                    throw new SActivityStateExecutionException("error while updating display name and description", e);
+                    throw new SActivityStateExecutionException(
+                            "Error while adding a comment on task " + flowNodeInstance,
+                            ScopedException.GENERAL_INFORMATION, e);
                 }
             }
         }
@@ -742,7 +769,8 @@ public class StateBehaviors {
                             flowNodeInstance.getParentProcessInstanceId()));
         } catch (final SBonitaReadException | SProcessInstanceReadException | SProcessInstanceNotFoundException
                 | SFlowNodeReadException | SFlowNodeNotFoundException sbre) {
-            throw new SActivityStateExecutionException(sbre);
+            throw new SActivityStateExecutionException("Error while counting number of multi instances to create",
+                    ScopedException.ITERATION, sbre);
         }
 
     }
@@ -756,14 +784,14 @@ public class StateBehaviors {
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (loopDataInput != null) {
             final Serializable value = loopDataInput.getValue();
-            if (value instanceof List) {
-                final List<?> loopDataInputCollection = (List<?>) value;
+            if (value instanceof List<?> loopDataInputCollection) {
                 return loopDataInputCollection.size();
             }
             throw new SActivityStateExecutionException(
                     "The multi instance on activity " + flowNodeInstance.getName() + " of process "
                             + processDefinition.getName() + " " + processDefinition.getVersion()
-                            + " have a loop data input which is not a java.util.List");
+                            + " have a loop data input which is not a java.util.List",
+                    ScopedException.ITERATION);
         }
         return numberOfInstanceMax;
     }
@@ -810,7 +838,7 @@ public class StateBehaviors {
                         throw new SActivityStateExecutionException("The multi instance on activity "
                                 + flowNodeInstance.getName()
                                 + " of process " + processDefinition.getName() + " " + processDefinition.getVersion()
-                                + " have a loop data output which is not a java.util.List");
+                                + " have a loop data output which is not a java.util.List", ScopedException.ITERATION);
                     }
                 }
             }
@@ -898,8 +926,11 @@ public class StateBehaviors {
     public void executeConnector(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance,
             List<SConnectorDefinition> connectorsOnEnter,
             SConnectorInstance connectorInstance) throws SActivityStateExecutionException {
-        executeConnectorInWork(processDefinition.getId(), flowNodeInstance.getParentProcessInstanceId(),
-                flowNodeInstance.getFlowNodeDefinitionId(), flowNodeInstance.getId(), connectorInstance,
+        executeConnectorInWork(processDefinition.getId(),
+                flowNodeInstance.getParentProcessInstanceId(),
+                flowNodeInstance.getRootProcessInstanceId(),
+                flowNodeInstance.getFlowNodeDefinitionId(),
+                flowNodeInstance.getId(), connectorInstance,
                 getConnectorDefinition(connectorInstance, connectorsOnEnter));
     }
 

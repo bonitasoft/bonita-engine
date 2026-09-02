@@ -34,6 +34,7 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -447,12 +448,25 @@ public class TestProcess {
         return convertToCasesList(processInstances);
     }
 
+    public List<TestCase> listAllOpenCases() throws SearchException {
+        List<ProcessInstance> processInstances = searchProcessInstances();
+        return convertToCasesList(processInstances);
+    }
+
     private List<TestCase> convertToCasesList(List<ProcessInstance> processInstances) {
         List<TestCase> cases = new ArrayList<>();
         for (ProcessInstance instance : processInstances) {
             cases.add(new TestCase(instance));
         }
         return cases;
+    }
+
+    private List<ProcessInstance> searchProcessInstances() throws SearchException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 100);
+        builder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, getProcessDefinition().getId());
+        builder.differentFrom(ProcessInstanceSearchDescriptor.STATE_ID,
+                ProcessInstanceState.COMPLETED.getId());
+        return getProcessAPI(getSession()).searchProcessInstances(builder.done()).getResult();
     }
 
     private List<ProcessInstance> searchOpenedProcessInstances() throws SearchException {

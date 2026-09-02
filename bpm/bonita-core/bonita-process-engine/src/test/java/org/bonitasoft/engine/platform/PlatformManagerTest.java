@@ -15,7 +15,6 @@ package org.bonitasoft.engine.platform;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -24,11 +23,7 @@ import java.util.concurrent.Callable;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
-import org.bonitasoft.engine.platform.exception.STenantActivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.RunnableWithException;
@@ -45,8 +40,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 public class PlatformManagerTest {
-
-    private final Long TENANT_ID = 1L;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -75,7 +68,6 @@ public class PlatformManagerTest {
     private PlatformVersionChecker platformVersionChecker;
 
     private PlatformManager platformManager;
-    private STenant tenant;
     @Mock
     private PlatformRestartHandler platformRestartHandler1;
     @Mock
@@ -85,7 +77,7 @@ public class PlatformManagerTest {
     public void before() throws Exception {
         doReturn(asList(platformRestartHandler1, platformRestartHandler2)).when(nodeConfiguration)
                 .getPlatformRestartHandlers();
-        platformManager = spy(new PlatformManager(nodeConfiguration, transactionService, platformService,
+        platformManager = spy(new PlatformManager(nodeConfiguration,
                 asList(platformLifecycleService1, platformLifecycleService2), platformStateProvider,
                 bonitaTaskExecutor, platformVersionChecker));
         when(transactionService.executeInTransaction(any()))
@@ -95,13 +87,11 @@ public class PlatformManagerTest {
                     ((RunnableWithException) invocationOnMock.getArgument(0)).run();
                     return null;
                 });
-        doReturn(tenantManager).when(platformManager).getDefaultTenantStateManager();
-        doReturn(new SPlatform("1.3", "1.1.0", "0.0.0", null, false, "someUser", 123455)).when(platformService)
+        doReturn(tenantManager).when(platformManager).getTenantStateManager();
+        doReturn(new SPlatform("1.3", "1.1.0", "0.0.0", null, false, "someUser", 123455, false))
+                .when(platformService)
                 .getPlatform();
         doReturn(new SPlatformPropertiesImpl("1.3.0")).when(platformService).getSPlatformProperties();
-        tenant = new STenant();
-        tenant.setId(TENANT_ID);
-        doReturn(tenant).when(platformService).getDefaultTenant();
         doReturn(true).when(platformVersionChecker).verifyPlatformVersion();
     }
 
@@ -119,7 +109,6 @@ public class PlatformManagerTest {
 
     @Test
     public void should_start_platform_only_once() throws Exception {
-        //doReturn(false).when(platformStateProvider).initializeStart();
 
         boolean started = platformManager.start();
 
@@ -165,56 +154,6 @@ public class PlatformManagerTest {
     }
 
     @Test
-    public void should_activate_tenant_using_tenantManager() throws Exception {
-        doReturn(deactivated(tenant)).when(platformService).getDefaultTenant();
-
-        platformManager.activateTenant();
-
-        verify(tenantManager).activate();
-    }
-
-    @Test
-    public void should_throw_exception_when_activating_already_activated_Tenant() throws Exception {
-        doReturn(activated(new STenant())).when(platformService).getDefaultTenant();
-
-        assertThatThrownBy(() -> platformManager.activateTenant())
-                .isInstanceOf(STenantActivationException.class);
-    }
-
-    @Test
-    public void should_throw_exception_when_deactivating_already_deactivated_Tenant() throws Exception {
-        doReturn(deactivated(new STenant())).when(platformService).getDefaultTenant();
-
-        assertThatThrownBy(() -> platformManager.deactivateTenant())
-                .isInstanceOf(STenantDeactivationException.class);
-    }
-
-    @Test
-    public void should_throw_not_found_when_deactivating_non_existing_tenant() throws Exception {
-        doThrow(STenantNotFoundException.class).when(platformService).getDefaultTenant();
-
-        assertThatThrownBy(() -> platformManager.deactivateTenant())
-                .isInstanceOf(STenantNotFoundException.class);
-    }
-
-    @Test
-    public void should_throw_not_found_when_activating_non_existing_tenant() throws Exception {
-        doThrow(STenantNotFoundException.class).when(platformService).getDefaultTenant();
-
-        assertThatThrownBy(() -> platformManager.activateTenant())
-                .isInstanceOf(STenantNotFoundException.class);
-    }
-
-    @Test
-    public void should_deactivate_tenant_using_tenantManager() throws Exception {
-        doReturn(activated(tenant)).when(platformService).getDefaultTenant();
-
-        platformManager.deactivateTenant();
-
-        verify(tenantManager).deactivate();
-    }
-
-    @Test
     public void start_should_start_platform_and_tenant_services_in_the_right_order() throws Exception {
         // given:
         doReturn(true).when(platformStateProvider).initializeStart();
@@ -232,16 +171,6 @@ public class PlatformManagerTest {
         inOrder.verify(tenantManager).start();
         inOrder.verify(platformRestartHandler1).execute();
         inOrder.verify(platformRestartHandler2).execute();
-    }
-
-    private STenant deactivated(STenant tenant) {
-        tenant.setStatus(STenant.DEACTIVATED);
-        return tenant;
-    }
-
-    private STenant activated(STenant tenant) {
-        tenant.setStatus(STenant.ACTIVATED);
-        return tenant;
     }
 
 }

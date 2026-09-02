@@ -215,8 +215,8 @@ public class EvaluateExpressionIT extends TestWithUser {
         final DesignProcessDefinition processDef = createProcessDefinitionBuilderWithHumanAndAutomaticSteps(
                 "My_Process", "1.0",
                 Collections.singletonList("step1"), Collections.singletonList(isHuman))
-                        .addIntegerData(dataName, dataDefaultExp)
-                        .addDescription("Delivery all day and night long").getProcess();
+                .addIntegerData(dataName, dataDefaultExp)
+                .addDescription("Delivery all day and night long").getProcess();
 
         return deployAndEnableProcessWithActor(processDef, "Actor1", user);
     }

@@ -16,14 +16,17 @@ package org.bonitasoft.engine.api.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.STenantResourceState;
@@ -148,7 +151,7 @@ public class TenantAdministrationAPIImplTest {
         // Given
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         when(serviceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
-        when(tenantStateManager.executeTenantManagementOperation(anyString(), any(Callable.class)))
+        when(tenantStateManager.executeManagementOperation(anyString(), any(Callable.class)))
                 .thenAnswer(invocation -> {
                     Object[] args = invocation.getArguments();
                     return ((Callable) args[1]).call();
@@ -158,7 +161,7 @@ public class TenantAdministrationAPIImplTest {
         tenantManagementAPI.uninstallBusinessDataModel();
 
         // Then
-        verify(repository).uninstall(anyLong());
+        verify(repository).uninstall();
     }
 
     @Test(expected = BusinessDataRepositoryException.class)
@@ -166,12 +169,12 @@ public class TenantAdministrationAPIImplTest {
         // Given
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         when(serviceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
-        when(tenantStateManager.executeTenantManagementOperation(anyString(), any(Callable.class)))
+        when(tenantStateManager.executeManagementOperation(anyString(), any(Callable.class)))
                 .thenAnswer(invocation -> {
                     Object[] args = invocation.getArguments();
                     return ((Callable) args[1]).call();
                 });
-        doThrow(new SBusinessDataRepositoryException("error")).when(repository).uninstall(anyLong());
+        doThrow(new SBusinessDataRepositoryException("error")).when(repository).uninstall();
 
         // When
         tenantManagementAPI.uninstallBusinessDataModel();

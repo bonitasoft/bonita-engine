@@ -25,14 +25,10 @@ import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataQueryResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataQueryResourceFinder;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResourceFinder;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResourceFinder;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.ActivityVariableResourceFinder;
 import org.bonitasoft.web.rest.server.api.bpm.flownode.TimerEventTriggerResource;
@@ -87,23 +83,7 @@ public class FinderFactoryTest {
     }
 
     @Test
-    public void should_return_BusinessDataQueryFinder_for_BusinessDataQuery() throws Exception {
-
-        final Finder finder = factory.create(BusinessDataQueryResource.class);
-
-        assertThat(finder).isInstanceOf(BusinessDataQueryResourceFinder.class);
-    }
-
-    @Test
-    public void should_return_BusinessDataResourceFinder_for_BusinessDataResource() throws Exception {
-
-        final Finder finder = factory.create(BusinessDataResource.class);
-
-        assertThat(finder).isInstanceOf(BusinessDataResourceFinder.class);
-    }
-
-    @Test
-    public void should_return_BusinessDataReferenceResourceFinder_for_BusinessDataReferenceResource() throws Exception {
+    public void should_return_BusinessDataReferenceResourceFinder_for_BusinessDataReferenceResource() {
 
         final Finder finder = factory.create(BusinessDataReferenceResource.class);
 
@@ -111,8 +91,7 @@ public class FinderFactoryTest {
     }
 
     @Test
-    public void should_return_BusinessDataReferencesResourceFinder_for_BusinessDataReferencesResource()
-            throws Exception {
+    public void should_return_BusinessDataReferencesResourceFinder_for_BusinessDataReferencesResource() {
 
         final Finder finder = factory.create(BusinessDataReferencesResource.class);
 
@@ -120,7 +99,7 @@ public class FinderFactoryTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void should_throw_RuntimeException_for_a_not_supported_class() throws Exception {
+    public void should_throw_RuntimeException_for_a_not_supported_class() {
 
         factory.create(NotSupportedResource.class);
     }
@@ -174,29 +153,12 @@ public class FinderFactoryTest {
     }
 
     @Test
-    public void should_return_BusinessDataQueryResource_for_BusinessDataQueryResourceFinder() {
-        final BusinessDataQueryResourceFinder businessDataQueryResourceFinder = spy(
-                new BusinessDataQueryResourceFinder());
-        doReturn(commandAPI).when(businessDataQueryResourceFinder).getCommandAPI(any(Request.class));
-        final ServerResource serverResource = businessDataQueryResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(BusinessDataQueryResource.class);
-    }
-
-    @Test
     public void should_return_BusinessDataReferencesResource_for_BusinessDataReferencesResourceFinder() {
         final BusinessDataReferencesResourceFinder businessDataReferencesResourceFinder = spy(
                 new BusinessDataReferencesResourceFinder());
         doReturn(bdmAPI).when(businessDataReferencesResourceFinder).getBdmAPI(any(Request.class));
         final ServerResource serverResource = businessDataReferencesResourceFinder.create(request, response);
         assertThat(serverResource).isInstanceOf(BusinessDataReferencesResource.class);
-    }
-
-    @Test
-    public void should_return_BusinessDataResource_for_BusinessDataResourceFinder() {
-        final BusinessDataResourceFinder businessDataResourceFinder = spy(new BusinessDataResourceFinder());
-        doReturn(commandAPI).when(businessDataResourceFinder).getCommandAPI(any(Request.class));
-        final ServerResource serverResource = businessDataResourceFinder.create(request, response);
-        assertThat(serverResource).isInstanceOf(BusinessDataResource.class);
     }
 
     @Test

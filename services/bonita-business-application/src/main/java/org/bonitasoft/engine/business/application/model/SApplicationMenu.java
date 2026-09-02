@@ -16,7 +16,6 @@ package org.bonitasoft.engine.business.application.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -24,7 +23,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
@@ -32,7 +30,6 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "business_app_menu")
-@IdClass(PersistentObjectId.class)
 public class SApplicationMenu implements PersistentObject {
 
     public static String ID = "id";
@@ -43,8 +40,6 @@ public class SApplicationMenu implements PersistentObject {
     public static String INDEX = "index";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private String displayName;
     @Column

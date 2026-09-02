@@ -32,7 +32,7 @@ public class SearchApplicationPageDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> allFields;
 
     SearchApplicationPageDescriptor() {
-        keys = new HashMap<String, FieldDescriptor>(4);
+        keys = new HashMap<>(4);
         keys.put(ApplicationPageSearchDescriptor.ID, new FieldDescriptor(SApplicationPage.class, SApplicationPage.ID));
         keys.put(ApplicationPageSearchDescriptor.TOKEN,
                 new FieldDescriptor(SApplicationPage.class, SApplicationPage.TOKEN));
@@ -41,9 +41,9 @@ public class SearchApplicationPageDescriptor extends SearchEntityDescriptor {
         keys.put(ApplicationPageSearchDescriptor.PAGE_ID,
                 new FieldDescriptor(SApplicationPage.class, SApplicationPage.PAGE_ID));
 
-        allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
+        allFields = new HashMap<>(1);
 
-        final Set<String> pageFields = new HashSet<String>(1);
+        final Set<String> pageFields = new HashSet<>(1);
         pageFields.add(SApplicationPage.TOKEN);
         allFields.put(SApplicationPage.class, pageFields);
     }

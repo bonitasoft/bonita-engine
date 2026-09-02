@@ -14,13 +14,18 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.apache.commons.lang3.StringUtils.strip;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
@@ -32,7 +37,11 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.SchemaManager;
 import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
 import org.bonitasoft.engine.business.data.generator.BDMJarGenerationException;
 import org.bonitasoft.engine.business.data.generator.client.ClientBDMJarBuilder;
@@ -45,9 +54,9 @@ import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
+import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.io.IOUtils;
@@ -58,7 +67,6 @@ import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -79,24 +87,21 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private static final String BOM_NAME = "bom.zip";
 
-    private final DependencyService dependencyService;
+    private final TenantDependencyService dependencyService;
     private final ClassLoaderService classLoaderService;
 
     private final SchemaManager schemaManager;
     private final TenantResourcesService tenantResourcesService;
-    private final long tenantId;
     private final PlatformService platformService;
 
     public BusinessDataModelRepositoryImpl(final PlatformService platformService,
-            final DependencyService dependencyService,
-            ClassLoaderService classLoaderService, final SchemaManager schemaManager,
-            TenantResourcesService tenantResourcesService, @Value("${tenantId}") long tenantId) {
+            final TenantDependencyService dependencyService, ClassLoaderService classLoaderService,
+            final SchemaManager schemaManager, TenantResourcesService tenantResourcesService) {
         this.platformService = platformService;
         this.dependencyService = dependencyService;
         this.classLoaderService = classLoaderService;
         this.schemaManager = schemaManager;
         this.tenantResourcesService = tenantResourcesService;
-        this.tenantId = tenantId;
     }
 
     @Override
@@ -116,8 +121,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
         try {
-            Optional<Long> returnedId = dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT,
-                    BDR_DEPENDENCY_FILENAME);
+            Optional<Long> returnedId = dependencyService.getIdOfDependencyOfArtifactForTenant(BDR_DEPENDENCY_FILENAME);
             if (returnedId.isPresent()) {
                 return String.valueOf(returnedId.get());
             }
@@ -152,8 +156,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public boolean isBDMDeployed() {
         try {
-            return dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME)
-                    .isPresent();
+            return dependencyService.getIdOfDependencyOfArtifactForTenant(BDR_DEPENDENCY_FILENAME).isPresent();
         } catch (SBonitaReadException e) {
             return false;
         }
@@ -165,20 +168,18 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createAndDeployClientBDMZip(model, userId);
-        final long bdmVersion = createAndDeployServerBDMJar(tenantId, model);
+        final long bdmVersion = createAndDeployServerBDMJar(model);
         return String.valueOf(bdmVersion);
     }
 
-    protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model)
+    protected long createAndDeployServerBDMJar(final BusinessObjectModel model)
             throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
             final AbstractSDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME,
-                    serverBdmJar,
-                    BDR_DEPENDENCY_FILENAME, tenantId,
-                    ScopeType.TENANT);
+                    serverBdmJar, BDR_DEPENDENCY_FILENAME, -1L, ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
-            ClassLoaderIdentifier tenantClassLoader = identifier(ScopeType.TENANT, tenantId);
+            ClassLoaderIdentifier tenantClassLoader = ClassLoaderIdentifier.TENANT;
             classLoaderService.refreshClassLoaderImmediatelyWithRollback(tenantClassLoader);
             classLoaderService.refreshClassLoaderOnOtherNodes(tenantClassLoader);
             //replace the tenant classloader by the one that was just refreshed
@@ -304,11 +305,11 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     @Override
-    public void uninstall(final long tenantId) throws SBusinessDataRepositoryException {
+    public void uninstall() throws SBusinessDataRepositoryException {
         try {
             dependencyService.deleteDependency(BDR_DEPENDENCY_NAME);
-            classLoaderService.refreshClassLoaderImmediatelyWithRollback(identifier(ScopeType.TENANT, tenantId));
-            ClassLoader classLoader = classLoaderService.getClassLoader(identifier(ScopeType.TENANT, tenantId));
+            classLoaderService.refreshClassLoaderImmediatelyWithRollback(ClassLoaderIdentifier.TENANT);
+            ClassLoader classLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.TENANT);
             Thread.currentThread()
                     .setContextClassLoader(classLoader);
         } catch (final SDependencyNotFoundException sde) {
@@ -327,7 +328,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     @Override
-    public void dropAndUninstall(final long tenantId) throws SBusinessDataRepositoryException {
+    public void dropAndUninstall() throws SBusinessDataRepositoryException {
         final URL resource = Thread.currentThread().getContextClassLoader().getResource("bom.xml");
         if (resource != null) {
             try {
@@ -343,7 +344,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                                 "Drop of the schema failed due multiple exceptions: " + exceptions, exceptions.get(0));
                     }
                 }
-                uninstall(tenantId);
+                uninstall();
             } catch (final IOException | JAXBException | SAXException ioe) {
                 throw new SBusinessDataRepositoryException(ioe);
             }
@@ -354,8 +355,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     public boolean isDeployed(byte[] bdmArchive)
             throws InvalidBusinessDataModelException, SBusinessDataRepositoryDeploymentException {
         try {
-            var bdmDependencyId = dependencyService
-                    .getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME);
+            var bdmDependencyId = dependencyService.getIdOfDependencyOfArtifactForTenant(BDR_DEPENDENCY_FILENAME);
             if (bdmDependencyId.isEmpty()) {
                 log.debug("No BDM currently deployed.");
                 return false;

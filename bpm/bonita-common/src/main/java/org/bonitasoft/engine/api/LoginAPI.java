@@ -78,7 +78,7 @@ public interface LoginAPI {
      * @param session
      *        the tenant session
      * @throws SessionNotFoundException
-     *         if the given session is not found on the server side. This may occurs when the session has expired.
+     *         if the given session is not found on the server side. This may occur when the session has expired.
      * @throws LogoutException
      *         occurs when an exception is thrown during the logout
      */

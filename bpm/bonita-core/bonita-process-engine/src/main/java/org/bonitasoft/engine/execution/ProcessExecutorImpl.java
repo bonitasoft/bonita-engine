@@ -45,6 +45,7 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -115,6 +116,7 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.mdc.MDCConstants;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -123,6 +125,7 @@ import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+import org.slf4j.MDC;
 
 /**
  * @author Baptiste Mesta
@@ -245,7 +248,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         workService.registerWork(workFactory.createExecuteConnectorOfProcessDescriptor(
                                 processDefinitionId, sProcessInstance.getId(),
                                 sProcessInstance.getRootProcessInstanceId(), nextConnectorInstance.getId(),
-                                sConnectorDefinition.getName(), activationEvent,
+                                sConnectorDefinition.getConnectorId(),
+                                sConnectorDefinition.getName(),
+                                activationEvent,
                                 selectorForConnectorOnEnter));
                         return true;
                     }
@@ -283,6 +288,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 .startedBy(starterId).startedBySubstitute(starterSubstituteId).callerId(callerId).callerType(callerType)
                 .rootProcessInstanceId(rootProcessInstanceId).build();
         processInstanceService.createProcessInstance(sProcessInstance);
+
+        // Context will be auto clear by parent method (call hierarchy is always using ProcessInstanceMDC)
+        MDC.put(MDCConstants.PROCESS_INSTANCE_ID, String.valueOf(sProcessInstance.getId()));
+        MDC.put(MDCConstants.ROOT_PROCESS_INSTANCE_ID, String.valueOf(sProcessInstance.getRootProcessInstanceId()));
         return sProcessInstance;
     }
 
@@ -404,30 +413,45 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final List<ConnectorDefinitionWithInputValues> connectors,
             final FlowNodeSelector selectorForConnectorOnEnter, final Map<String, Serializable> processInputs)
             throws SBonitaException {
-
         SExpressionContext expressionContext = createExpressionsContextForProcessInstance(sProcessDefinition,
                 sProcessInstance);
+
         operations = operations != null ? new ArrayList<>(operations) : Collections.emptyList();
+        try {
+            storeProcessInstantiationInputs(sProcessInstance.getId(), processInputs);
 
-        storeProcessInstantiationInputs(sProcessInstance.getId(), processInputs);
+            // Create SDataInstances
+            bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition,
+                    expressionContext, operations, context,
+                    expressionContextToEvaluateOperations);
 
-        // Create SDataInstances
-        bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition,
-                expressionContext, operations, context,
-                expressionContextToEvaluateOperations);
+            initializeBusinessData(processContainer, sProcessInstance, expressionContext);
+            initializeStringIndexes(sProcessInstance, sProcessDefinition, processContainer);
 
-        initializeBusinessData(processContainer, sProcessInstance, expressionContext);
-        initializeStringIndexes(sProcessInstance, sProcessDefinition, processContainer);
-
-        createDocuments(sProcessDefinition, processContainer, sProcessInstance, userId, expressionContext, context);
-        createDocumentLists(processContainer, sProcessInstance, userId, expressionContext, context);
+            createDocuments(sProcessDefinition, processContainer, sProcessInstance, userId, expressionContext, context);
+            createDocumentLists(processContainer, sProcessInstance, userId, expressionContext, context);
+        } catch (SBonitaException e) {
+            e.setScope(ScopedException.DATA);
+            throw e;
+        }
         if (connectors != null) {
             //these are set only when start process through the command ExecuteActionsAndStartInstanceExt
-            executeConnectors(sProcessDefinition, sProcessInstance, connectors);
+            try {
+                executeConnectors(sProcessDefinition, sProcessInstance, connectors);
+            } catch (SBonitaException e) {
+                e.setScope(ScopedException.CONNECTOR);
+                throw e;
+            }
         }
         // operations given to the startProcess method of the API or by command, not operations of the process definition
-        executeOperations(operations, context, expressionContext, expressionContextToEvaluateOperations,
-                sProcessInstance);
+        try {
+            executeOperations(operations, context, expressionContext, expressionContextToEvaluateOperations,
+                    sProcessInstance);
+        } catch (SBonitaException e) {
+            // Data mapping of call activity
+            e.setScope(ScopedException.DATA);
+            throw e;
+        }
 
         // Create connectors
         bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(),
@@ -649,6 +673,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         log.debug("The flow node <{}> with id<{}> of process instance <{}> finished",
                 childFlowNode.getName(), childFlowNode.getId(), processInstanceId);
         if (wasTheLastFlowNodeToExecute) {
+            // flow node has finished, now we want to log only process information in the context
+            MDC.remove(MDCConstants.FLOW_NODE_INSTANCE_ID);
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
             if (sProcessInstance.getInterruptingEventId() > 0) {
                 //if it's interrupted by an event (error event), the flow node is kept to be executed last and deleted in triggerErrorEvents()

@@ -347,7 +347,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final long taskId = waitForUserTask(startProcess, "Request");
         getProcessAPI().assignUserTask(taskId, user1.getId());
         getProcessAPI().assignUserTask(taskId, user2.getId());
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("login1", "password");
         assertEquals(1, getProcessAPI()
                 .getAssignedHumanTaskInstances(user2.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT).size());

@@ -33,7 +33,6 @@ DELETE FROM arch_data_instance;
 DELETE FROM data_instance;
 DELETE FROM dependencymapping;
 DELETE FROM dependency;
-DELETE FROM external_identity_mapping;
 DELETE FROM user_membership;
 DELETE FROM custom_usr_inf_val;
 DELETE FROM custom_usr_inf_def;
@@ -42,10 +41,9 @@ DELETE FROM user_login;
 DELETE FROM user_;
 DELETE FROM role;
 DELETE FROM group_;
-DELETE FROM queriablelog_p;
 DELETE FROM queriable_log;
 DELETE FROM page;
-DELETE FROM sequence WHERE tenantId <> -1;
+DELETE FROM sequence;
 DELETE FROM profilemember;
 DELETE FROM profile;
 DELETE FROM job_log;
@@ -56,5 +54,7 @@ DELETE FROM platformCommand;
 DELETE FROM form_mapping;
 DELETE FROM page_mapping;
 DELETE FROM proc_parameter;
+DELETE FROM arch_bpm_failure;
+DELETE FROM bpm_failure;
 -- do NOT clear directly PLATFORM table, Hibernate needs to update its cache to know the platform has been deleted
  
