@@ -49,6 +49,7 @@ import org.bonitasoft.web.toolkit.server.ServletCall;
 import org.bonitasoft.web.toolkit.server.utils.ServerDateFormater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 
 /**
  * @author Séverin Moussel
@@ -217,7 +218,7 @@ public abstract class ToolkitHttpServlet extends HttpServlet {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error(exception.getMessage(), exception);
             }
-            var headers = Map.of("Retry-After",
+            var headers = Map.of(HttpHeaders.RETRY_AFTER,
                     RFC1123_DATE_TIME_FORMATTER.format(Instant.ofEpochMilli(ex.getRetryAfter())));
             outputException(exception, req, resp, ex.getStatusCode(), headers);
         } else {

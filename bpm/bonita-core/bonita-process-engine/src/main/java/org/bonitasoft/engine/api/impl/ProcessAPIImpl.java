@@ -2764,7 +2764,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ActivityInstanceNotFoundException(activityInstanceId);
         } catch (final SBonitaException e) {
             logError(e);
-            throw new ActivityInstanceNotFoundException(e);
+            throw new ActivityInstanceNotFoundException(activityInstanceId, e);
         }
     }
 
@@ -2796,7 +2796,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SUnreleasableTaskException e) {
             throw new UpdateException(e);
         } catch (final SActivityInstanceNotFoundException e) {
-            throw new ActivityInstanceNotFoundException(e);
+            throw new ActivityInstanceNotFoundException(userTaskId, e);
         } catch (final SBonitaException e) {
             logError(e);
             throw new UpdateException(e);
@@ -5839,8 +5839,13 @@ public class ProcessAPIImpl implements ProcessAPI {
                 .getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long parentProcessInstanceId = activityInstanceService
-                    .getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, sourceActivityInstanceId)
+            final SAFlowNodeInstance lastArchivedFlowNodeInstance = activityInstanceService
+                    .getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, sourceActivityInstanceId);
+            if (lastArchivedFlowNodeInstance == null) {
+                throw new ArchivedDataNotFoundException(
+                        new ArchivedActivityInstanceNotFoundException(sourceActivityInstanceId));
+            }
+            final long parentProcessInstanceId = lastArchivedFlowNodeInstance
                     .getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getClassLoader(
                     identifier(ScopeType.PROCESS, parentProcessInstanceId));

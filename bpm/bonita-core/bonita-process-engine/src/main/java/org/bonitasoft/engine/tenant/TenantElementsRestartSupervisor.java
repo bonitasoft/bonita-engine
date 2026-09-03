@@ -18,6 +18,4 @@ public interface TenantElementsRestartSupervisor {
     boolean shouldRestartElements();
 
     boolean willRestartElements();
-
-    boolean isResponsibleForRecovery();
 }

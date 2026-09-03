@@ -85,8 +85,6 @@ public class AbstractActivityDatastore<CONSOLE_ITEM extends ActivityItem, ENGINE
             return convertEngineToConsoleItem(activityInstance);
         } catch (final ActivityInstanceNotFoundException e) {
             throw new APIItemNotFoundException(ActivityDefinition.TOKEN, id);
-        } catch (final BonitaException e) {
-            throw new APIException(e);
         }
     }
 

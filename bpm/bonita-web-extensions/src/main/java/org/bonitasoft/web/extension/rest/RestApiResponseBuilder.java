@@ -24,6 +24,8 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpHeaders;
+
 /**
  * Build a RestApiResponse specifying response body, status and other HTTP attributes.
  */
@@ -148,7 +150,7 @@ public class RestApiResponseBuilder {
      */
     public RestApiResponse build() {
         if (pageIndex >= 0 && pageSize >= 0) {
-            additionalHeaders.put("Content-Range",
+            additionalHeaders.put(HttpHeaders.CONTENT_RANGE,
                     String.format("%s-%s/%s", pageIndex, pageSize, totalSize >= 0 ? totalSize : "*"));
         }
         return new RestApiResponse(response, httpStatus, additionalHeaders, additionalCookies, mediaType, characterSet);

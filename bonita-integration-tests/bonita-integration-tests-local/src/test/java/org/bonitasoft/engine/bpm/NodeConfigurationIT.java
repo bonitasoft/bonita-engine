@@ -21,24 +21,16 @@ import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.handler.SchedulerServiceRestartHandler;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
-import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class NodeConfigurationIT {
+public class NodeConfigurationIT extends CommonBPMServicesTest {
 
-    public static NodeConfiguration nodeConfiguration;
+    public NodeConfiguration nodeConfiguration;
 
-    @BeforeClass
-    public static void beforeClass() throws BonitaException {
-        ServiceAccessor serviceAccessor;
-        try {
-            serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
-        } catch (Exception ex) {
-            throw new BonitaException(ex);
-        }
-        nodeConfiguration = serviceAccessor.getPlatformConfiguration();
+    @Before
+    public void setup() throws BonitaException {
+        nodeConfiguration = getServiceAccessor().getPlatformConfiguration();
     }
 
     @Test

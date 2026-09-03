@@ -76,6 +76,8 @@ public class BusinessDataServiceImplTest {
         businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer,
                 businessDataModelRepository, new TypeConverterUtil(datePatterns),
                 businessDataReloader, countQueryProvider));
+        // Mock default standard shape enabled to true (matches runtime default)
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(true);
     }
 
     @Test
@@ -512,7 +514,9 @@ public class BusinessDataServiceImplTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
-        verify(jsonEntitySerializer).serializeEntities(entities, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        // Query returns String.class (not List), so hasMultipleResults is false
+        verify(jsonEntitySerializer).serializeEntityQueryResult(entities, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, true,
+                false);
     }
 
     @Test
@@ -530,7 +534,8 @@ public class BusinessDataServiceImplTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
-        verify(jsonEntitySerializer).serializeCountResult(Collections.singletonList(5L), EntityPojo.class.getName());
+        verify(jsonEntitySerializer).serializeScalarResult(Collections.singletonList(5L), EntityPojo.class.getName(),
+                true);
     }
 
     @Test
@@ -668,6 +673,269 @@ public class BusinessDataServiceImplTest {
         assertThatExceptionOfType(SBusinessDataRepositoryException.class)
                 .isThrownBy(() -> businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers,
                         PARAMETER_BUSINESSDATA_CLASS_URI_VALUE));
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_return_legacy_count_format_when_standardShapeDisabled() throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(false);
+
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        // Build a BDM model with the count query
+        final Query countQuery = new Query("customcount", "SELECT count(w) FROM Watched w", Long.class.getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(List.of(countQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<Long> countList = Collections.singletonList(10L);
+        doReturn(countList).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "customcount", new HashMap<>(), 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        verify(jsonEntitySerializer).serializeScalarResult(countList, entity.getClass().getName(), false);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_return_legacy_single_entity_list_format_when_standardShapeDisabled()
+            throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(false);
+
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        // Build a BDM model with a query returning one entity
+        final Query singleQuery = new Query("findByUserAndRequest", "SELECT w FROM Watched w",
+                entity.getClass().getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(List.of(singleQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<EntityPojo> results = Collections.singletonList(entity);
+        doReturn(results).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "findByUserAndRequest", new HashMap<>(),
+                0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        // Legacy mode serializes a single result as a list
+        // Query returns entity class (not List), so hasMultipleResults is false
+        verify(jsonEntitySerializer).serializeEntityQueryResult(results, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, false,
+                false);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_return_legacy_list_format_when_standardShapeDisabled() throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(false);
+
+        final EntityPojo entity1 = new EntityPojo(1562L);
+        final EntityPojo entity2 = new EntityPojo(2000L);
+        doReturn(entity1.getClass()).when(businessDataService).loadClass(entity1.getClass().getName());
+
+        // Build a BDM model with a list-returning query
+        final Query listQuery = new Query("findByCaseId", "SELECT w FROM Watched w", List.class.getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity1.getClass().getName());
+        businessObject.setQueries(List.of(listQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<EntityPojo> results = List.of(entity1, entity2);
+        doReturn(results).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+
+        businessDataService.getJsonQueryEntities(entity1.getClass().getName(), "findByCaseId", new HashMap<>(), 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        // Legacy list behavior is unchanged
+        // Query returns List.class, so hasMultipleResults is true
+        verify(jsonEntitySerializer).serializeEntityQueryResult(results, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, false,
+                true);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_handle_Long_scalar_query_with_standard_shape() throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(true);
+
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        final Query countQuery = new Query("customcount", "SELECT count(w) FROM Watched w", Long.class.getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(List.of(countQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<Long> countList = Collections.singletonList(10L);
+        doReturn(countList).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+        doReturn("{ \"value\": 10 }").when(jsonEntitySerializer)
+                .serializeScalarResult(countList, entity.getClass().getName(), true);
+
+        BusinessDataQueryResult result = businessDataService.getJsonQueryEntities(entity.getClass().getName(),
+                "customcount",
+                new HashMap<>(), 0, 10, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        assertThat(result.getJsonResults().toString()).contains("{", "value", "10");
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_return_standard_list_format_when_standardShapeEnabled() throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(true);
+
+        final EntityPojo entity1 = new EntityPojo(1562L);
+        final EntityPojo entity2 = new EntityPojo(2000L);
+        doReturn(entity1.getClass()).when(businessDataService).loadClass(entity1.getClass().getName());
+
+        final Query listQuery = new Query("findByCaseId", "SELECT w FROM Watched w", List.class.getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity1.getClass().getName());
+        businessObject.setQueries(List.of(listQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<EntityPojo> results = List.of(entity1, entity2);
+        doReturn(results).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+
+        businessDataService.getJsonQueryEntities(entity1.getClass().getName(), "findByCaseId", new HashMap<>(), 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        // Lists remain the same in standard mode
+        // Query returns List.class, so hasMultipleResults is true
+        verify(jsonEntitySerializer).serializeEntityQueryResult(results, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, true,
+                true);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_return_standard_single_entity_format_when_standardShapeEnabled()
+            throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(true);
+
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        // Build a BDM model with a query returning one entity
+        final Query singleQuery = new Query("findByUserAndRequest", "SELECT w FROM Watched w",
+                entity.getClass().getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(List.of(singleQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<EntityPojo> results = Collections.singletonList(entity);
+        doReturn(results).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "findByUserAndRequest", new HashMap<>(),
+                0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        // Standard mode serializes a single result as an object (not array)
+        // Query returns entity class (not List), so hasMultipleResults is false
+        verify(jsonEntitySerializer).serializeEntityQueryResult(results, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, true,
+                false);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_handle_Double_scalar_query_with_standard_shape() throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(true);
+
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        // Build a BDM model with a Double-returning query (e.g., AVG, MAX)
+        final Query avgQuery = new Query("averageSalary", "SELECT AVG(e.salary) FROM Employee e",
+                Double.class.getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(List.of(avgQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<Double> avgResult = Collections.singletonList(55000.75);
+        doReturn(avgResult).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+        doReturn("{ \"value\": 55000.75 }").when(jsonEntitySerializer)
+                .serializeScalarResult(avgResult, entity.getClass().getName(), true);
+
+        BusinessDataQueryResult result = businessDataService.getJsonQueryEntities(entity.getClass().getName(),
+                "averageSalary",
+                new HashMap<>(), 0, 10, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        assertThat(result.getJsonResults().toString()).contains("{", "value", "55000.75");
+        verify(jsonEntitySerializer).serializeScalarResult(avgResult, entity.getClass().getName(), true);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_handle_Float_scalar_query_with_legacy_shape() throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(false);
+
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        // Build a BDM model with a Float-returning query
+        final Query maxQuery = new Query("maxScore", "SELECT MAX(e.score) FROM Employee e", Float.class.getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(List.of(maxQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<Float> maxResult = Collections.singletonList(98.5f);
+        doReturn(maxResult).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "maxScore", new HashMap<>(), 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        verify(jsonEntitySerializer).serializeScalarResult(maxResult, entity.getClass().getName(), false);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_handle_Integer_scalar_query_with_standard_shape() throws Exception {
+        when(jsonEntitySerializer.isStandardShapeEnabled()).thenReturn(true);
+
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        // Build a BDM model with an Integer-returning query
+        final Query sumQuery = new Query("sumAge", "SELECT SUM(e.age) FROM Employee e", Integer.class.getName());
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(List.of(sumQuery));
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.setBusinessObjects(List.of(businessObject));
+        doReturn(bom).when(businessDataModelRepository).getBusinessObjectModel();
+
+        final List<Integer> sumResult = Collections.singletonList(450);
+        doReturn(sumResult).when(businessDataRepository)
+                .findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+        doReturn("{ \"value\": 450 }").when(jsonEntitySerializer)
+                .serializeScalarResult(sumResult, entity.getClass().getName(), true);
+
+        BusinessDataQueryResult result = businessDataService.getJsonQueryEntities(entity.getClass().getName(), "sumAge",
+                new HashMap<>(), 0, 10, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        assertThat(result.getJsonResults().toString()).contains("{", "value", "450");
+        verify(jsonEntitySerializer).serializeScalarResult(sumResult, entity.getClass().getName(), true);
     }
 
 }

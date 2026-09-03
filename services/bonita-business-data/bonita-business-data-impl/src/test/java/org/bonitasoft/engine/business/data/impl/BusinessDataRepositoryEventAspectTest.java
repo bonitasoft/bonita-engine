@@ -83,6 +83,16 @@ class BusinessDataRepositoryEventAspectTest {
     }
 
     @Test
+    void should_fire_delete_event_on_removeById() throws Exception {
+        aspect.afterRemoveById(entity);
+        ArgumentCaptor<SDeleteEvent> captor = ArgumentCaptor.forClass(SDeleteEvent.class);
+        verify(eventService).fireEvent(captor.capture());
+        SDeleteEvent event = captor.getValue();
+        assertThat(event.getType()).isEqualTo("BUSINESS_DATA_DELETED");
+        assertThat(event.getObject()).isEqualTo(entity);
+    }
+
+    @Test
     void should_fire_insert_event_on_merge_when_id_is_null() throws Throwable {
         when(entity.getPersistenceId()).thenReturn(null);
         Object dummyResult = new Object();

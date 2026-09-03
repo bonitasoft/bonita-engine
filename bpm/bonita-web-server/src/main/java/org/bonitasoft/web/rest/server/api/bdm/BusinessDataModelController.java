@@ -33,7 +33,6 @@ import org.bonitasoft.web.rest.server.api.tenant.TenantResourceItem;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,13 +46,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Emmanuel Duchastenier
  */
 @RestController
-@RequestMapping(path = "/API/tenant/bdm", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/API/tenant/bdm")
 public class BusinessDataModelController extends AbstractRESTController {
 
     /**
      * @deprecated as of 9.0.0. The BDM should only be updated at startup.
      */
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     @Deprecated(since = "9.0.0")
     public TenantResourceItem installOrUpdateBDM(@RequestBody final BusinessDataModelItem businessDataModelItem,
             HttpSession httpSession)

@@ -306,8 +306,8 @@ public class IdentityServiceImplForGroupTest {
     public void getGroupsByIdsThrowException() throws Exception {
         when(persistenceService
                 .selectList(SelectDescriptorBuilder.getElementsByIds(SGroup.class, "Group", Arrays.asList(123l))))
-                        .thenThrow(
-                                new SBonitaReadException(""));
+                .thenThrow(
+                        new SBonitaReadException(""));
 
         identityServiceImpl.getGroups(Arrays.asList(123l));
     }
@@ -351,8 +351,8 @@ public class IdentityServiceImplForGroupTest {
     public void getGroupsPaginatedWithOrderThrowException() throws Exception {
         when(persistenceService
                 .selectList(SelectDescriptorBuilder.getElements(SGroup.class, "Group", "name", OrderByType.ASC, 0, 10)))
-                        .thenThrow(
-                                new SBonitaReadException(""));
+                .thenThrow(
+                        new SBonitaReadException(""));
 
         identityServiceImpl.getGroups(0, 10, "name", OrderByType.ASC);
     }

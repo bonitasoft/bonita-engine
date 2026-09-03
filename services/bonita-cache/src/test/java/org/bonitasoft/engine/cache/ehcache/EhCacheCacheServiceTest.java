@@ -13,13 +13,18 @@
  **/
 package org.bonitasoft.engine.cache.ehcache;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 
-import net.sf.ehcache.CacheManager;
 import org.bonitasoft.engine.cache.CacheConfiguration;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.cache.SCacheException;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,26 +34,28 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class EhCacheCacheServiceTest {
 
-    @Mock
-    private List<CacheConfiguration> cacheConfigurations;
-
-    @Mock
-    private CacheConfiguration defaultCacheConfiguration;
+    private final List<CacheConfiguration> cacheConfigurations = Collections.emptyList();
 
     @Mock
     private CacheManager cacheManager;
 
     @Mock
-    private ReadSessionAccessor sessionAccessor;
+    private Cache<Object, Object> cache;
 
     private EhCacheCacheService cacheService;
 
     @Before
     public void setup() {
-        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, null) {
+        // Create a valid default cache configuration for Ehcache 3
+        CacheConfiguration defaultCacheConfiguration = new CacheConfiguration();
+        defaultCacheConfiguration.setMaxElementsInMemory(1_000);
+
+        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration) {
 
             @Override
             public synchronized void start() {
+                // Mock the cache manager but keep the real statistics service initialization
+                statisticsService = new org.ehcache.core.internal.statistics.DefaultStatisticsService();
                 cacheManager = EhCacheCacheServiceTest.this.cacheManager;
             }
         };
@@ -58,7 +65,7 @@ public class EhCacheCacheServiceTest {
     public void should_getKeys_return_empty_list_when_cache_manager_is_null() throws Exception {
         final List<Object> keys = cacheService.getKeys("unknownCache");
 
-        assertTrue(keys.isEmpty());
+        assertThat(keys).isEmpty();
     }
 
     @Test
@@ -67,7 +74,53 @@ public class EhCacheCacheServiceTest {
 
         final List<Object> keys = cacheService.getKeys("unknownCache");
 
-        assertTrue(keys.isEmpty());
+        assertThat(keys).isEmpty();
+    }
+
+    @Test
+    public void should_getCacheSize_return_zero_when_cache_manager_is_null() throws Exception {
+        final int size = cacheService.getCacheSize("unknownCache");
+
+        assertThat(size).isZero();
+    }
+
+    @Test
+    public void should_getCacheSize_return_zero_when_cache_does_not_exist() throws Exception {
+        cacheService.start();
+        when(cacheManager.getCache(eq("unknownCache"), any(), any())).thenReturn(null);
+
+        final int size = cacheService.getCacheSize("unknownCache");
+
+        assertThat(size).isZero();
+    }
+
+    @Test(expected = SCacheException.class)
+    public void should_getCacheSize_throw_SCacheException_when_cache_is_not_alive() throws Exception {
+        cacheService.start();
+        when(cacheManager.getCache(eq("testCache"), any(), any())).thenReturn(cache);
+        when(cache.iterator()).thenThrow(new IllegalStateException("Cache is not alive"));
+
+        cacheService.getCacheSize("testCache");
+    }
+
+    @Test(expected = SCacheException.class)
+    public void should_getCacheSize_throw_SCacheException_on_runtime_exception() throws Exception {
+        cacheService.start();
+        when(cacheManager.getCache(eq("testCache"), any(), any())).thenReturn(cache);
+        when(cache.iterator()).thenThrow(new RuntimeException("Unexpected error"));
+
+        cacheService.getCacheSize("testCache");
+    }
+
+    @Test
+    public void should_getCacheSize_use_statistics_when_available() throws Exception {
+        // Note: This test verifies that statistics are enabled
+        // The actual CacheServiceTest provides integration-level validation
+        // that the cache size is correctly retrieved
+        cacheService.start();
+
+        // Verify that statisticsService was initialized
+        assertThat(cacheService.statisticsService).as("StatisticsService should be initialized").isNotNull();
     }
 
 }

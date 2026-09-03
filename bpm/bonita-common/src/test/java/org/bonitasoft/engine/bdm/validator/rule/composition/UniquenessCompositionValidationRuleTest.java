@@ -96,5 +96,6 @@ public class UniquenessCompositionValidationRuleTest {
         assertThat(validationStatus).isNotOk();
         assertThat(validationStatus).hasError("Business object " + "wheel"
                 + " is referenced by composition in two business objects, or is referenced several times in a single business object");
+        assertThat(validationStatus).hasErrorSize(1);
     }
 }

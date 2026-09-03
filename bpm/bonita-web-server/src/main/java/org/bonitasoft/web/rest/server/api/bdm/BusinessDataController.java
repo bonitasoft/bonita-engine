@@ -26,14 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryResult;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
-import org.springframework.beans.propertyeditors.CustomCollectionEditor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,40 +36,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/API/bdm/businessData/{className}", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/API/bdm/businessData/{className}")
 public class BusinessDataController extends AbstractRESTController {
 
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        // For the "f" parameters in the request URL of a BDM query REST API call, register a CustomCollectionEditor
-        // in the data binder so that when the BDM query has a single multi-valued parameter,
-        // the string of the value won't be split into a list of values separated by a comma (',').
-        //
-        // BEWARE: we only register the CustomCollectionEditor for request parameter "f" or else it would break
-        // the /findByIds?ids=<id1>,<id2> endpoint.
-        // (==> It would cause the list of "ids" to be parsed as a single parameter value  “<id1>,<id2>”
-        // instead of two values “<id1>” and “<id2>”, which would result in an IllegalArgumentException.)
-        if ("f".equals(binder.getObjectName())) {
-            binder.registerCustomEditor(List.class, new CustomCollectionEditor(List.class));
-        }
-    }
-
     @GetMapping("/{id}")
-    public String getBusinessData(
-            @PathVariable("className") String className,
-            @PathVariable("id") Long id,
-            HttpSession session)
+    public String getBusinessData(@PathVariable String className, @PathVariable long id, HttpSession session)
             throws BonitaException {
         return getBusinessData(className, id, null, session);
     }
 
     @GetMapping("/{id}/{fieldName}")
-    public String getBusinessData(
-            @PathVariable("className") String className,
-            @PathVariable("id") Long id,
-            @PathVariable("fieldName") String fieldName,
-            HttpSession session)
-            throws BonitaException {
+    public String getBusinessData(@PathVariable String className, @PathVariable long id, @PathVariable String fieldName,
+            HttpSession session) throws BonitaException {
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("entityClassName", className);
         parameters.put("businessDataId", id);
@@ -86,11 +59,8 @@ public class BusinessDataController extends AbstractRESTController {
     }
 
     @GetMapping("/findByIds")
-    public String getBusinessData(
-            @PathVariable("className") String className,
-            @RequestParam("ids") List<Long> ids,
-            HttpSession session)
-            throws BonitaException {
+    public String getBusinessData(@PathVariable String className, @RequestParam("ids") List<Long> ids,
+            HttpSession session) throws BonitaException {
 
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("entityClassName", className);
@@ -100,10 +70,10 @@ public class BusinessDataController extends AbstractRESTController {
     }
 
     @GetMapping("")
-    public ResponseEntity<String> getBusinessDataByQuery(@PathVariable("className") String className,
-            @RequestParam("c") Integer searchPageSize,
+    public ResponseEntity<String> getBusinessDataByQuery(@PathVariable String className,
+            @RequestParam("c") int searchPageSize,
             @RequestParam(value = "f", required = false) List<String> filters,
-            @RequestParam("p") Integer searchPageNumber,
+            @RequestParam("p") int searchPageNumber,
             @RequestParam("q") String queryName,
             HttpSession session)
             throws BonitaException {
@@ -128,7 +98,7 @@ public class BusinessDataController extends AbstractRESTController {
                 "getBusinessDataByQueryCommand",
                 parameters);
 
-        var json = (String) businessDataQueryResult.getJsonResults();
+        var responseBody = (String) businessDataQueryResult.getJsonResults();
 
         // Build response with proper headers
         final var businessDataQueryMetadata = businessDataQueryResult.getBusinessDataQueryMetadata();
@@ -138,7 +108,7 @@ public class BusinessDataController extends AbstractRESTController {
         }
         HttpHeaders headers = buildHttpHeaders(searchPageSize, searchPageNumber, totalCount);
 
-        return new ResponseEntity<>(json, headers, HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(responseBody);
     }
 
     private static HttpHeaders buildHttpHeaders(Integer searchPageSize, Integer searchPageNumber, Long totalCount) {

@@ -13,14 +13,11 @@
  **/
 package org.bonitasoft.web.rest.server.api.bdm;
 
-import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.quality.Strictness.LENIENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,48 +26,40 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
-import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.io.FileContent;
-import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.tenant.TenantResourceState;
 import org.bonitasoft.engine.tenant.TenantResourceType;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@MockitoSettings(strictness = LENIENT)
-class BusinessDataModelControllerTest {
-
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-    private MockMvc mockMvc;
-
-    @Mock
-    private APISession apiSession;
-
-    @Spy
-    protected BusinessDataModelController controller;
+class BusinessDataModelControllerTest extends AbstractControllerTest<BusinessDataModelController> {
 
     @Mock
     protected TenantAdministrationAPI tenantAdministrationAPI;
 
-    @BeforeEach
-    void init() throws BonitaException {
+    private BusinessDataModelController controller;
+
+    @Override
+    protected BusinessDataModelController createController() {
+        controller = spy(new BusinessDataModelController());
+        return controller;
+    }
+
+    @Override
+    protected void configureMocks(BusinessDataModelController controller) throws Exception {
         doReturn(tenantAdministrationAPI).when(controller).getTenantAdministrationAPI(any());
         doReturn(true).when(tenantAdministrationAPI).isPaused();
-        mockMvc = initMockMvcWithSessionAttributes(controller, sessionAttributes, apiSession);
     }
 
     @Test
@@ -83,20 +72,24 @@ class BusinessDataModelControllerTest {
                 .thenReturn(new TenantResource(1, "bdm.zip", TenantResourceType.BDM, dateInMillis, 12,
                         TenantResourceState.INSTALLED));
 
-        mockMvc.perform(get("/API/tenant/bdm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get("/API/tenant/bdm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                         {
-                         "id" : "1",
-                         "name": "bdm.zip",
-                         "type": "BDM",
-                         "lastUpdateDate": "%s",
-                         "lastUpdatedBy": "12",
-                         "state": "INSTALLED"
-                        }""".formatted(formattedDate)));
+                            "id":"1",
+                            "name":"bdm.zip",
+                            "type":"BDM",
+                            "state":"INSTALLED",
+                            "lastUpdatedBy":"12",
+                            "lastUpdateDate":"%s",
+                            "fileUpload":""
+                        }
+                        """.formatted(formattedDate), true));
 
         verify(tenantAdministrationAPI).getBusinessDataModelResource();
     }
@@ -104,27 +97,32 @@ class BusinessDataModelControllerTest {
     @Test
     void should_update_new_bdm() throws Exception {
         byte[] bdmFileContent = getContent("bizdatamodel.zip");
-        final TenantResource tenantResource = new TenantResource(1L, "bizdatamodel", TenantResourceType.BDM, 1L, 1L,
+        final TenantResource tenantResource = new TenantResource(
+                1L, "bizdatamodel", TenantResourceType.BDM, 1L, 1L,
                 TenantResourceState.INSTALLED);
         doReturn(testBDMFile()).when(controller).getBusinessDataModel(any());
         doReturn("1.0").when(tenantAdministrationAPI).updateBusinessDataModel(bdmFileContent);
         doReturn(tenantResource).when(tenantAdministrationAPI).getBusinessDataModelResource();
 
-        mockMvc.perform(post("/API/tenant/bdm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"fileUpload\": \"bizdatamodel\"}")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                post("/API/tenant/bdm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"fileUpload": "bizdatamodel"}""")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                         {
-                          "id":"1",
-                          "name":"bizdatamodel",
-                          "type":"BDM",
-                          "state":"INSTALLED",
-                          "lastUpdatedBy":"1",
-                          "lastUpdateDate":"1970-01-01T00:00:00.001Z",
-                          "fileUpload":"bizdatamodel.zip"}"""));
+                            "id":"1",
+                            "name":"bizdatamodel",
+                            "type":"BDM",
+                            "state":"INSTALLED",
+                            "lastUpdatedBy":"1",
+                            "lastUpdateDate":"1970-01-01T00:00:00.001Z",
+                            "fileUpload":"bizdatamodel.zip"
+                        }""", true));
 
         verify(tenantAdministrationAPI).updateBusinessDataModel(bdmFileContent);
     }
@@ -147,16 +145,17 @@ class BusinessDataModelControllerTest {
         doThrow(new InvalidBusinessDataModelException(new Exception("invalid model"))).when(tenantAdministrationAPI)
                 .updateBusinessDataModel(any(byte[].class));
 
-        mockMvc.perform(post("/API/tenant/bdm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"fileUpload\": \"invalid bdm\"}")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                post("/API/tenant/bdm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"fileUpload": "invalid bdm"}""")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("""
-                        {
-                          "exception":"class org.bonitasoft.engine.business.data.InvalidBusinessDataModelException",
-                          "message":"invalid model"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(InvalidBusinessDataModelException.class.toString()))
+                .andExpect(jsonPath("$.message").value("invalid model"));
     }
 
     @Test
@@ -167,16 +166,17 @@ class BusinessDataModelControllerTest {
                 .when(tenantAdministrationAPI)
                 .updateBusinessDataModel(any());
 
-        mockMvc.perform(post("/API/tenant/bdm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"fileUpload\": \"bizdatamodel\"}")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                post("/API/tenant/bdm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"fileUpload": "bizdatamodel"}""")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().json("""
-                        {
-                          "exception":"class org.bonitasoft.web.toolkit.client.common.exception.api.APIException",
-                          "message":"repository deployment exception"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(APIException.class.toString()))
+                .andExpect(jsonPath("$.message").value("repository deployment exception"));
     }
 
     @Test
@@ -184,16 +184,18 @@ class BusinessDataModelControllerTest {
         doReturn(testBDMFile()).when(controller).getBusinessDataModel(any());
         doReturn(false).when(tenantAdministrationAPI).isPaused();
 
-        mockMvc.perform(post("/API/tenant/bdm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"fileUpload\": \"bizdatamodel\"}")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                post("/API/tenant/bdm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"fileUpload": "bizdatamodel"}""")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
-                .andExpect(content()
-                        .json("""
-                                {
-                                  "exception":"class org.bonitasoft.engine.exception.TenantStatusException",
-                                  "message":"Unable to install the Business Data Model. Please pause the BPM Services first. Go to Configuration > BPM Services."}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(TenantStatusException.class.toString()))
+                .andExpect(jsonPath("$.message").value(
+                        "Unable to install the Business Data Model. Please pause the BPM Services first. " +
+                                "Go to Configuration > BPM Services."));
     }
 }

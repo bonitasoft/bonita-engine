@@ -27,15 +27,7 @@ import org.bonitasoft.engine.business.data.BusinessDataReference;
  * @since 7.0.0
  * @see org.bonitasoft.engine.business.data.BusinessDataReference
  * @see org.bonitasoft.engine.bpm.process.ProcessInstance
- * @deprecated As of 7.3, replaced by {@link ProcessAPI#getProcessInstanceExecutionContext(long)}
- *             ({@link ProcessAPI#getArchivedProcessInstanceExecutionContext(long)} for
- *             archived process instances). In
- *             the map return by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} you can get
- *             {@link BusinessDataReference} by using
- *             "yourBusinessDataName_ref" key (business data name as declared in
- *             the process definition followed by "_ref" suffix).
  */
-@Deprecated(since = "7.3")
 public interface BusinessDataAPI {
 
     /**
@@ -51,14 +43,20 @@ public interface BusinessDataAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @throws org.bonitasoft.engine.bpm.data.DataNotFoundException
      *         If the specified business data value cannot be found.
-     * @deprecated See deprecated comment of {@link BusinessDataAPI}
+     * @deprecated As of 7.3, replaced by {@link ProcessAPI#getProcessInstanceExecutionContext(long)}
+     *             ({@link ProcessAPI#getArchivedProcessInstanceExecutionContext(long)} for
+     *             archived process instances). In
+     *             the map returned by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} you can get
+     *             {@link BusinessDataReference} by using
+     *             "yourBusinessDataName_ref" key (business data name as declared in
+     *             the process definition followed by "_ref" suffix).
      */
     @Deprecated(since = "7.3")
     BusinessDataReference getProcessBusinessDataReference(String businessDataName, long processInstanceId)
             throws DataNotFoundException;
 
     /**
-     * Lists the paginated @link BusinessDataReference}s of the process instance order by identifier.
+     * Lists the paginated {@link BusinessDataReference}s of the process instance order by identifier.
      *
      * @param processInstanceId
      *        The identifier of the process instance
@@ -67,7 +65,13 @@ public interface BusinessDataAPI {
      * @param maxResults
      *        the maximum number of result per page
      * @return the paginated references of the business data
-     * @deprecated See deprecated comment of {@link BusinessDataAPI}
+     * @deprecated As of 7.3, replaced by {@link ProcessAPI#getProcessInstanceExecutionContext(long)}
+     *             ({@link ProcessAPI#getArchivedProcessInstanceExecutionContext(long)} for
+     *             archived process instances). In
+     *             the map returned by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} you can get
+     *             {@link BusinessDataReference} by using
+     *             "yourBusinessDataName_ref" key (business data name as declared in
+     *             the process definition followed by "_ref" suffix).
      */
     @Deprecated(since = "7.3")
     List<BusinessDataReference> getProcessBusinessDataReferences(long processInstanceId, int startIndex,

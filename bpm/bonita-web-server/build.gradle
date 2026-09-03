@@ -3,10 +3,6 @@ import org.apache.tools.ant.filters.ReplaceTokens
 group = 'org.bonitasoft.console'
 description = 'Bonita Web Server'
 
-repositories {
-    maven { url = uri('https://maven.restlet.talend.com') }
-}
-
 dependencies {
     implementation(project(":bpm:bonita-common"))
     implementation(project(":bpm:bonita-web-extensions"))
@@ -22,15 +18,6 @@ dependencies {
     implementation libs.urlrewritefilter
     implementation libs.jakartaJstl
     implementation libs.jakartaJstlApi
-    implementation libs.restlet
-    implementation(libs.restletServlet) {
-        exclude(group: "org.restlet.jee", module: "org.restlet")
-    }
-    implementation(libs.restletJackson) {
-        exclude(group: "org.codehaus.woodstox", module: "woodstox-core-asl")
-        exclude(group: "org.codehaus.woodstox", module: "stax2-api")
-        exclude(group: "org.yaml", module: "snakeyaml")
-    }
     implementation libs.woodstoxCore
     implementation libs.groovyCore
     implementation libs.xbeanClassloader
@@ -54,12 +41,12 @@ dependencies {
     testImplementation libs.systemRules
     testImplementation libs.mockitoCore
     testImplementation libs.hamcrest
+    testImplementation libs.systemLambda
     testRuntimeOnly libs.jsonassert
 }
 
 configurations {
     configureEach {
-        // Specify woodstox version to override the version pulled by jackson-dataformat-xml (transitive dep of restlet)
         resolutionStrategy.force libs.woodstoxCore
     }
     tests

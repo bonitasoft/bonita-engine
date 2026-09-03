@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule.composition;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import static java.util.Collections.frequency;
+
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.api.result.StatusCode;
 import org.bonitasoft.engine.api.result.StatusContext;
@@ -38,19 +39,17 @@ public class UniquenessCompositionValidationRule extends ValidationRule<Business
     @Override
     protected ValidationStatus validate(BusinessObjectModel bom) {
         ValidationStatus validationStatus = new ValidationStatus();
-        List<BusinessObject> alreadyComposedBOs = new ArrayList<>();
-        for (BusinessObject compositeBO : bom.getReferencedBusinessObjectsByComposition()) {
-            if (alreadyComposedBOs.contains(compositeBO)) {
-                validationStatus.addError(StatusCode.SEVERAL_COMPOSITION_REFERENCE_FOR_A_BUSINESS_OBJECT,
+        // Make sure there are no duplicates object in composition in the model:
+        final List<BusinessObject> objectsByComposition = bom.getReferencedBusinessObjectsByComposition();
+        objectsByComposition.stream()
+                .distinct()
+                .filter(compositeBO -> frequency(objectsByComposition, compositeBO) > 1)
+                .forEach(compositeBO -> validationStatus.addError(
+                        StatusCode.SEVERAL_COMPOSITION_REFERENCE_FOR_A_BUSINESS_OBJECT,
                         String.format(
                                 "Business object %s is referenced by composition in two business objects, or is referenced several times in a single business object",
                                 compositeBO.getQualifiedName()),
-                        Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY,
-                                compositeBO.getQualifiedName()));
-            } else {
-                alreadyComposedBOs.add(compositeBO);
-            }
-        }
+                        Map.of(StatusContext.BUSINESS_OBJECT_NAME_KEY, compositeBO.getQualifiedName())));
         return validationStatus;
     }
 

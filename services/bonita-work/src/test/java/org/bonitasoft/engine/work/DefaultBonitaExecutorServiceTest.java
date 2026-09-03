@@ -211,52 +211,52 @@ public class DefaultBonitaExecutorServiceTest {
 
     private record LocalWorkFactory(long workSleepPeriodInSeconds) implements WorkFactory {
 
-    @Override
-    public BonitaWork create(WorkDescriptor workDescriptor) {
-        return new BonitaWork() {
+        @Override
+        public BonitaWork create(WorkDescriptor workDescriptor) {
+            return new BonitaWork() {
 
-            @Override
-            public String getDescription() {
-                return workDescriptor.toString();
-            }
-
-            @Override
-            public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
-                switch (workDescriptor.getType()) {
-                    case "EXCEPTION":
-                        throw new Exception("classic exception");
-                    case "SLEEP":
-                        TimeUnit.SECONDS.sleep(workSleepPeriodInSeconds);
-                        break;
-                    case "ASYNC":
-                        return CompletableFuture.supplyAsync(() -> {
-                            try {
-                                TimeUnit.MILLISECONDS.sleep(200);
-                            } catch (InterruptedException ignored) {
-                            }
-                            return null;
-                        }, Executors.newSingleThreadExecutor());
-                    case "ASYNC_EXCEPTION":
-                        return CompletableFuture.supplyAsync(() -> {
-                            try {
-                                TimeUnit.MILLISECONDS.sleep(200);
-                            } catch (InterruptedException ignored) {
-                            }
-                            throw new CompletionException(new SWorkException("my exception"));
-                        }, Executors.newSingleThreadExecutor());
-                    case "NORMAL":
-                    default:
+                @Override
+                public String getDescription() {
+                    return workDescriptor.toString();
                 }
-                return CompletableFuture.completedFuture(null);
-            }
 
-            @Override
-            public void handleFailure(Throwable e, Map<String, Object> context) {
-                // do nothing
-            }
-        };
+                @Override
+                public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
+                    switch (workDescriptor.getType()) {
+                        case "EXCEPTION":
+                            throw new Exception("classic exception");
+                        case "SLEEP":
+                            TimeUnit.SECONDS.sleep(workSleepPeriodInSeconds);
+                            break;
+                        case "ASYNC":
+                            return CompletableFuture.supplyAsync(() -> {
+                                try {
+                                    TimeUnit.MILLISECONDS.sleep(200);
+                                } catch (InterruptedException ignored) {
+                                }
+                                return null;
+                            }, Executors.newSingleThreadExecutor());
+                        case "ASYNC_EXCEPTION":
+                            return CompletableFuture.supplyAsync(() -> {
+                                try {
+                                    TimeUnit.MILLISECONDS.sleep(200);
+                                } catch (InterruptedException ignored) {
+                                }
+                                throw new CompletionException(new SWorkException("my exception"));
+                            }, Executors.newSingleThreadExecutor());
+                        case "NORMAL":
+                        default:
+                    }
+                    return CompletableFuture.completedFuture(null);
+                }
+
+                @Override
+                public void handleFailure(Throwable e, Map<String, Object> context) {
+                    // do nothing
+                }
+            };
+        }
+
     }
-
-}
 
 }
