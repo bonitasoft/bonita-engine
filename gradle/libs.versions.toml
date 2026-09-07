@@ -199,7 +199,7 @@ msSqlServer = { group = "com.microsoft.sqlserver", name = "mssql-jdbc", version.
 oracle = { group = "com.oracle.database.jdbc", name = "ojdbc11", version.ref = "oracleVersion" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
 
-lombok = "org.projectlombok:lombok:1.18.46"
+lombok = "org.projectlombok:lombok:1.18.48"
 
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 
