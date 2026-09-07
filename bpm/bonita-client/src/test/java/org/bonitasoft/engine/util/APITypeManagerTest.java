@@ -48,6 +48,8 @@ public class APITypeManagerTest {
         System.clearProperty("org.bonitasoft.engine.api-type.server.url");
         System.clearProperty("org.bonitasoft.engine.api-type.application.name");
         System.clearProperty("org.bonitasoft.engine.api-type.connections.max");
+        System.clearProperty("org.bonitasoft.engine.api-type.connections.evictIdleAfter");
+        System.clearProperty("org.bonitasoft.engine.api-type.connections.timeToLive");
         System.clearProperty("org.bonitasoft.engine.api-type.basicAuthentication.active");
         System.clearProperty("org.bonitasoft.engine.api-type.basicAuthentication.username");
         System.clearProperty("org.bonitasoft.engine.api-type.basicAuthentication.password");
@@ -170,6 +172,8 @@ public class APITypeManagerTest {
         System.setProperty("org.bonitasoft.engine.api-type.server.url", "localhost");
         System.setProperty("org.bonitasoft.engine.api-type.application.name", "bonita");
         System.setProperty("org.bonitasoft.engine.api-type.connections.max", "12");
+        System.setProperty("org.bonitasoft.engine.api-type.connections.evictIdleAfter", "30");
+        System.setProperty("org.bonitasoft.engine.api-type.connections.timeToLive", "120");
         System.setProperty("org.bonitasoft.engine.api-type.basicAuthentication.active", "true");
         System.setProperty("org.bonitasoft.engine.api-type.basicAuthentication.username", "someUser");
         System.setProperty("org.bonitasoft.engine.api-type.basicAuthentication.password", "secret");
@@ -178,6 +182,7 @@ public class APITypeManagerTest {
         //then
         assertThat(apiTypeParameters).containsOnly(entry("server.url", "localhost"),
                 entry("application.name", "bonita"), entry("connections.max", "12"),
+                entry("connections.evictIdleAfter", "30"), entry("connections.timeToLive", "120"),
                 entry("basicAuthentication.active", "true"), entry("basicAuthentication.username", "someUser"),
                 entry("basicAuthentication.password", "secret"));
     }
