@@ -16,11 +16,19 @@ package org.bonitasoft.engine.work;
 import java.util.Map;
 
 /**
- * this a callback called when a work finish.
+ * Callbacks the work executor makes around a work's execution: once when it starts, once when it finishes.
  *
  * @author Baptiste Mesta.
  */
 public interface WorkExecutionCallback {
+
+    /**
+     * The work is about to run: the pool task has taken it and calls {@link BonitaWork#work} next. Once per execution,
+     * so once more for each retry. A no-op by default: only an executor that has to tell a work that ran from one that
+     * was merely submitted needs it.
+     */
+    default void onStart(WorkDescriptor work) {
+    }
 
     void onSuccess(WorkDescriptor workDescriptor);
 
