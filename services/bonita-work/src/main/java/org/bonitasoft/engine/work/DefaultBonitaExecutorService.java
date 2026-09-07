@@ -108,6 +108,8 @@ public class DefaultBonitaExecutorService implements BonitaExecutorService {
             HashMap<String, Object> context = new HashMap<>();
             CompletableFuture<Void> asyncResult;
             runningWorks.incrementAndGet();
+            // the work starts here: what a stop leaves running is what a later start must not submit again
+            workExecutionCallback.onStart(work);
             try {
                 asyncResult = bonitaWork.work(context);
             } catch (Exception e) {

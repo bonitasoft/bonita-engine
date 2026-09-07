@@ -171,6 +171,34 @@ public class DefaultBonitaExecutorServiceTest {
     }
 
     @Test
+    public void should_call_on_start_callback_once_the_work_runs_and_before_it_completes() {
+        WorkDescriptor workDescriptor = WorkDescriptor.create("ASYNC");
+
+        var work = bonitaExecutorService.submit(workDescriptor);
+        await().until(work::isDone);
+
+        assertThat(workExecutionCallback.isOnStartCalled()).as("the pool task has run the work").isTrue();
+        assertThat(workExecutionCallback.isOnSuccessCalled()).as("its future has not completed yet").isFalse();
+        await().until(workExecutionCallback::isOnSuccessCalled);
+    }
+
+    @Test
+    public void should_not_call_on_start_callback_before_the_execution_date() {
+        WorkDescriptor workDescriptor = WorkDescriptor.create("NORMAL");
+        workDescriptor.mustBeExecutedAfter(Instant.now().plus(5, SECONDS));
+
+        bonitaExecutorService.submit(workDescriptor);
+
+        // re-queued until its date: submitted, not started
+        engineClock.addTime(1, SECONDS);
+        await().atLeast(50, TimeUnit.MILLISECONDS)
+                .untilAsserted(() -> assertThat(workExecutionCallback.isOnStartCalled()).isFalse());
+
+        engineClock.addTime(5, SECONDS);
+        await().until(workExecutionCallback::isOnStartCalled);
+    }
+
+    @Test
     public void should_call_on_failure_callback_ony_when_async_work_executed_properly() {
         WorkDescriptor workDescriptor = WorkDescriptor.create("ASYNC_EXCEPTION");
 
@@ -191,9 +219,15 @@ public class DefaultBonitaExecutorServiceTest {
 
     private static class MyWorkExecutionCallback implements WorkExecutionCallback {
 
+        private final AtomicBoolean onStartCalled = new AtomicBoolean(false);
         private final AtomicBoolean onSuccessCalled = new AtomicBoolean(false);
         private final AtomicBoolean onFailureCalled = new AtomicBoolean(false);
         private Throwable thrown;
+
+        @Override
+        public void onStart(WorkDescriptor work) {
+            onStartCalled.set(true);
+        }
 
         @Override
         public void onSuccess(WorkDescriptor workDescriptor) {
@@ -205,6 +239,10 @@ public class DefaultBonitaExecutorServiceTest {
                 Throwable thrown) {
             this.thrown = thrown;
             onFailureCalled.set(true);
+        }
+
+        public boolean isOnStartCalled() {
+            return onStartCalled.get();
         }
 
         public boolean isOnSuccessCalled() {
