@@ -55,7 +55,9 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
     private final AtomicLong retriedWorks = new AtomicLong();
     private final BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     private final long workTerminationTimeout;
-    private BonitaExecutorService executor;
+    // Volatile because execute() and isStopped() read this field without the lifecycle monitor it is written under,
+    // and need the latest write rather than a value the JIT cached.
+    private volatile BonitaExecutorService executor;
     private final IncidentService incidentService;
     public int numberOfFramesToLogInExceptions = 3;
     private final Random random = new Random();
@@ -231,11 +233,18 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
         this.delay = delay;
     }
 
+    /**
+     * Not synchronized: stop() holds the monitor while awaiting termination, and retry() re-enters this method from
+     * the pool threads it awaits, so synchronizing would stall submitters and could deadlock the stop.
+     */
     @Override
     public void execute(WorkDescriptor work) {
-        if (!isStopped()) {
+        // Read once: stop() can null the field between an isStopped() test and a dereference. A submission to the old
+        // pool is rejected by it; either way the caller gets a defined outcome, not a NullPointerException.
+        final BonitaExecutorService current = executor;
+        if (current != null) {
             logger.debug("Submitted work");
-            executor.submit(work);
+            current.submit(work);
         } else {
             logger.debug("Ignored work submission (service stopped) {}", work);
         }
