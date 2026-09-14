@@ -54,8 +54,12 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * <li><code>-Dorg.bonitasoft.engine.api-type.application.name=WEBAPP_NAME</code>, this is the name of the web
  * application, e.g. <code>bonita</code></li>
  * </ul>
- * Optionally you can specify the maximum number of connections (JVM-wide) using
- * <code>-Dorg.bonitasoft.engine.api-type.connections.max=CONNECTIONS_MAX</code>
+ * Optionally you can specify:
+ * <ul>
+ * <li><code>-Dorg.bonitasoft.engine.api-type.connections.max=CONNECTIONS_MAX</code>, this is the maximum number of connections (JVM-wide)</li>
+ * <li><code>-Dorg.bonitasoft.engine.api-type.connections.evictIdleAfter=CONNECTIONS_EVICT_IDLE</code>, this is the idle time in seconds after which pooled HTTP connections can be evicted.</li>
+ * <li><code>-Dorg.bonitasoft.engine.api-type.connections.timeToLive=CONNECTIONS_TIME_TO_LIVE</code>, this is the maximum lifetime in seconds of pooled HTTP connections.</li>
+ * </ul>
  * </p>
  * </li>
  * <li>TCP
@@ -76,6 +80,8 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * parameters.put("server.url", "http://myserver.com:8080");
  * parameters.put("application.name", "bonita-application");
  * parameters.put("connections.max", "5");
+ * parameters.put("connections.evictIdleAfter", "30");
+ * parameters.put("connections.timeToLive", "120");
  * APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, parameters);</code>
  * </pre>
  *
@@ -177,6 +183,8 @@ public class APITypeManager {
         addParameter(properties, "org.bonitasoft.engine.api-type.", "server.url");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "application.name");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "connections.max");
+        addParameter(properties, "org.bonitasoft.engine.api-type.", "connections.evictIdleAfter");
+        addParameter(properties, "org.bonitasoft.engine.api-type.", "connections.timeToLive");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "basicAuthentication.active");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "basicAuthentication.username");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "basicAuthentication.password");
