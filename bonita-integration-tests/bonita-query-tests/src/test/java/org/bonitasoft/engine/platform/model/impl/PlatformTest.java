@@ -73,4 +73,38 @@ public class PlatformTest {
                 entry("MAINTENANCE_ENABLED", false));
     }
 
+    /**
+     * The maintenance flag and the platform information are written by different transactions. Without
+     * {@code @DynamicUpdate} on {@link SPlatform}, updating one column flushed the whole row and wrote back a stale
+     * value of the other column (lost update).
+     */
+    @Test
+    public void should_only_update_the_changed_columns_of_SPlatform() {
+        //given: a platform loaded in this session while maintenance is disabled
+        SPlatform platform = repository.add(SPlatform.builder()
+                .initialBonitaVersion("5.9.0")
+                .dbSchemaVersion("1.2")
+                .applicationVersion("0.0.0")
+                .created(345L)
+                .information("some infos XYZ")
+                .createdBy("The almighty")
+                .maintenanceEnabled(false)
+                .build());
+        repository.flush();
+        // another transaction (pause()) enables maintenance behind the back of the loaded entity
+        jdbcTemplate.update("UPDATE platform SET maintenance_enabled = ?", true);
+
+        //when: the loaded entity updates another column (platform-info updater)
+        platform.setInformation("updated infos");
+        repository.flush();
+
+        //then: the maintenance flag written by the other transaction is preserved
+        Map<String, Object> platformAsMap = jdbcTemplate.queryForObject("SELECT * FROM platform",
+                new JdbcRowMapper(List.of("ID", "CREATED"),
+                        List.of("MAINTENANCE_MESSAGE_ACTIVE", "MAINTENANCE_ENABLED")));
+        assertThat(platformAsMap).contains(
+                entry("INFORMATION", "updated infos"),
+                entry("MAINTENANCE_ENABLED", true));
+    }
+
 }
