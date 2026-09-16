@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 
 @Data
@@ -31,6 +32,10 @@ import org.hibernate.annotations.Type;
 @Builder
 @Entity
 @Table(name = "platform")
+// Only write the columns that actually changed. The maintenance flag and the platform information are updated by
+// different transactions (pause/resume vs. the background platform-info updater), and a full-row UPDATE from one
+// would overwrite the other with a stale value.
+@DynamicUpdate
 public class SPlatform implements PersistentObject {
 
     public static final String CREATED_BY = "createdBy";
