@@ -75,6 +75,19 @@ public class SanitizerFilter extends ExcludingPatternFilter {
     private static final String[] CONCERNED_METHODS = { "POST", "PUT", "PATCH" };
 
     /**
+     * The URLs excluded from sanitization.
+     * <p>
+     * The process expression update endpoint carries Groovy script content in its JSON body, which HTML
+     * sanitization silently truncates at the first tag-like construct (BPA-862): {@code List<Object> list = new
+     * ArrayList<>();} gets persisted as {@code List}. The pattern is anchored so that no neighbouring endpoint is
+     * relaxed, and is supplied as a code default (not an {@code excludePattern} init-parameter) because only the
+     * default goes through {@link URLExcludePattern}'s {@code replace("bonita", <webappName>)} rewrite on a renamed
+     * web application; an init-parameter is used verbatim and would stop matching. The {@code bonita} literal is
+     * load-bearing for that reason: it must match the token {@link URLExcludePattern} replaces.
+     */
+    protected static final String SANITIZER_FILTER_EXCLUDED_PAGES_PATTERN = "^/(bonita/)?API/bpm/process/[0-9]+/expression/[0-9]+/?$";
+
+    /**
      * Json object mapper
      */
     private final ObjectMapper mapper = new ObjectMapper();
@@ -108,8 +121,7 @@ public class SanitizerFilter extends ExcludingPatternFilter {
 
     @Override
     public String getDefaultExcludedPages() {
-        // excludes nothing for now
-        return "";
+        return SANITIZER_FILTER_EXCLUDED_PAGES_PATTERN;
     }
 
     @Override
@@ -132,6 +144,14 @@ public class SanitizerFilter extends ExcludingPatternFilter {
         }
         // sanitize body
         final var sanitized = sanitize(body);
+        if (sanitized.isPresent()) {
+            // Request-scoped counterpart of the per-value warning raised in sanitizeValueAndPerformAction:
+            // that one reports that something was altered, this one reports which request it happened on,
+            // without which the altered endpoint cannot be identified from a support log bundle.
+            log.warn("Incoming HTML content has been altered by the sanitizer for request [{} {}]. The body "
+                    + "forwarded to the API differs from the one sent by the client (content may be removed or "
+                    + "truncated). More details at debug level.", method, req.getRequestURI());
+        }
         if (sanitized.isEmpty() && req instanceof MultiReadHttpServletRequest) {
             // Body was not altered and request is a MultiReadHttpServletRequest
             // (supports re-reading): pass the original request through unchanged
