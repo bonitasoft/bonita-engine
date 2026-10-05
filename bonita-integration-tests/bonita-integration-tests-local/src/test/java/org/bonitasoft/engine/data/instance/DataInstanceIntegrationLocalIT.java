@@ -13,13 +13,17 @@
  **/
 package org.bonitasoft.engine.data.instance;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Collections;
 
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -55,6 +59,71 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
     public void after() throws Exception {
         deleteUsers(cebolinha, cascao);
         logout();
+    }
+
+    /**
+     * BPA-833: {@code DataInstance.isTransientData()} returns the wrapper {@code Boolean}, and the JavaBeans
+     * specification sanctions the {@code is} accessor only for a primitive {@code boolean}. Groovy 4 enforces
+     * that, so the {@code dataInstance.transientData} shorthand has no usable property getter and falls back to
+     * reading the private field on {@code DataInstanceImpl} - which Groovy 4 refuses to do across a class
+     * hierarchy. Every instance {@code getProcessDataInstance} returns is one of the concrete subclasses, so the
+     * shorthand throws {@code MissingPropertyException} without the {@code getTransientData()} alias.
+     * <p>
+     * This guards the real path, which the JavaBeans unit tests cannot: a {@code DataInstance} obtained from the
+     * API and read by the engine's own Groovy expression evaluation.
+     * <p>
+     * One thing the naming below could imply but does not cover: {@code isTransient()} on a <em>process-level</em>
+     * data does not produce a transient data instance. {@code BPMInstancesCreator.createDataForProcess} routes every
+     * process-level data through {@code dataInstanceService} unconditionally, so {@code aTransientData} is a
+     * persisted row whose {@code transientData} flag is {@code true}. That is exactly what this test needs - both
+     * branches of a readable {@code Boolean} property - but the genuinely transient path, which goes through
+     * {@code TransientDataService} for flow-node data, is not exercised here.
+     */
+    @Test
+    public void should_read_transientData_of_a_process_data_instance_as_a_groovy_property() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("processReadingTransientDataAsAProperty", "1.0");
+        builder.addActor("actor");
+        builder.addShortTextData("persistedData", new ExpressionBuilder().createConstantStringExpression("aValue"));
+        builder.addShortTextData("aTransientData", new ExpressionBuilder().createConstantStringExpression("aValue"))
+                .isTransient();
+        builder.addUserTask("step1", "actor");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", cascao);
+
+        //startProcess is inside the guard deliberately: it is the statement most likely to fail on a flaky engine
+        //start, and left outside it would leave the process enabled - the exact situation the finally below exists
+        //to avoid
+        try {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+            //when-then the property shorthand is evaluated on each, as a process expression would. Asserted against
+            //a literal rather than against isTransientData(), so the value is pinned and not just its resolvability
+            assertThat(readTransientDataProperty(processInstance, "persistedData"))
+                    .as("a persisted process data")
+                    .isEqualTo(Boolean.FALSE);
+            assertThat(readTransientDataProperty(processInstance, "aTransientData"))
+                    .as("a transient process data - the other branch of the same property")
+                    .isEqualTo(Boolean.TRUE);
+        } finally {
+            //in a finally: this guard is meant to fail, and community/common.gradle enables test retry on every test task,
+            //so an enabled process left behind would make the retry die on a deploy conflict and report that
+            //instead of the real assertion failure
+            disableAndDeleteProcess(processDefinition);
+        }
+    }
+
+    private Serializable readTransientDataProperty(final ProcessInstance processInstance, final String dataName)
+            throws Exception {
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
+        final String expressionName = "isTransient";
+        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression(expressionName,
+                "return dataInstance.transientData", Boolean.class.getName(),
+                new ExpressionBuilder().createInputExpression("dataInstance", DataInstance.class.getName()));
+        return getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(),
+                Collections.singletonMap(expression,
+                        Collections.singletonMap("dataInstance", (Serializable) dataInstance)))
+                .get(expressionName);
     }
 
     @Test

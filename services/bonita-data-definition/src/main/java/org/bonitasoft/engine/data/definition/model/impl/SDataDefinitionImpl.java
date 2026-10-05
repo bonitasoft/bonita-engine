@@ -54,7 +54,7 @@ public class SDataDefinitionImpl implements SDataDefinition {
     }
 
     @Override
-    public Boolean isTransientData() {
+    public boolean isTransientData() {
         return transientData;
     }
 

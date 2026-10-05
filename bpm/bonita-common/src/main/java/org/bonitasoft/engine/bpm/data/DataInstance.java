@@ -54,8 +54,26 @@ public interface DataInstance extends NamedElement, BaseElement {
      * @return <code>true</code> if the data is transient, <code>false</code> otherwise.
      * @since 6.0.0
      * @see DataDefinition#isTransientData()
+     * @see #getTransientData()
      */
     Boolean isTransientData();
+
+    /**
+     * Is it transient? The canonical accessor for this property, and the one JavaBeans introspection and Groovy
+     * property access resolve to - {@link #isTransientData()} returns the wrapper <code>Boolean</code>, and the
+     * JavaBeans specification sanctions the <code>is</code> form only for a primitive <code>boolean</code>.
+     * {@link #isTransientData()} is retained for existing callers.
+     * <p>
+     * See {@code doc/groovy_3_to_4-specific-study/} for why this alias exists and why the return type was not
+     * narrowed instead.
+     *
+     * @return <code>true</code> if the data is transient, <code>false</code> otherwise.
+     * @since 12.0.0
+     * @see #isTransientData()
+     */
+    default Boolean getTransientData() {
+        return isTransientData();
+    }
 
     /**
      * Get the value of the data.

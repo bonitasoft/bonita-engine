@@ -1,3 +1,4 @@
-
-
-dependencies { api project(':services:bonita-expression') }
+dependencies {
+    api project(':services:bonita-expression')
+    testImplementation libs.assertj
+}
