@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.web.rest.server.api.system;
 
+import java.util.Objects;
+
 import jakarta.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +57,8 @@ public class MaintenanceController extends AbstractRESTController {
         try {
             MaintenanceAPI maintenanceAPI = getMaintenanceAPI(apiSession);
             MaintenanceDetails currentMaintenanceDetails = maintenanceAPI.getMaintenanceDetails();
+            // reference comparison is correct for an enum (constants are singletons), unlike the String guard below,
+            // where equal values are routinely distinct instances; the Boolean guard uses Objects.equals for null-safety
             if (maintenanceInfo.getMaintenanceState() != null
                     && currentMaintenanceDetails.getMaintenanceState() != maintenanceInfo.getMaintenanceState()) {
                 //only enable/disable maintenance mode if needed
@@ -63,10 +67,14 @@ public class MaintenanceController extends AbstractRESTController {
                 } else {
                     maintenanceAPI.disableMaintenanceMode();
                 }
+                // re-read: disableMaintenanceMode() also calls disableMaintenanceMessage(), so the guards below would
+                // otherwise compare a stale snapshot. A request that exits maintenance while asking to keep the banner
+                // up would find it "already active", skip re-enabling it, and answer with the banner off.
+                currentMaintenanceDetails = maintenanceAPI.getMaintenanceDetails();
             }
             if (maintenanceInfo.isMaintenanceMessageActive() != null
-                    && currentMaintenanceDetails.isMaintenanceMessageActive() != maintenanceInfo
-                            .isMaintenanceMessageActive()) {
+                    && !Objects.equals(currentMaintenanceDetails.isMaintenanceMessageActive(),
+                            maintenanceInfo.isMaintenanceMessageActive())) {
                 //only update if different
                 if (maintenanceInfo.isMaintenanceMessageActive()) {
                     maintenanceAPI.enableMaintenanceMessage();
@@ -75,8 +83,8 @@ public class MaintenanceController extends AbstractRESTController {
                 }
             }
             if (maintenanceInfo.getMaintenanceMessage() != null
-                    && currentMaintenanceDetails.getMaintenanceMessage() != maintenanceInfo
-                            .getMaintenanceMessage()) {
+                    && !Objects.equals(currentMaintenanceDetails.getMaintenanceMessage(),
+                            maintenanceInfo.getMaintenanceMessage())) {
                 //only update if different
                 maintenanceAPI.updateMaintenanceMessage(maintenanceInfo.getMaintenanceMessage());
             }

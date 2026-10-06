@@ -49,6 +49,65 @@ class MaintenanceControllerTest {
     @InjectMocks
     private MaintenanceController maintenanceController;
 
+    /**
+     * Jackson hands the controller a fresh String, never the interned literal: only a non-interned equal message
+     * tells a value comparison apart from a reference one.
+     */
+    @Test
+    public void should_not_update_maintenance_message_when_an_equal_but_not_interned_message_is_submitted()
+            throws BonitaException {
+        //given
+        APISession apiSession = mock(APISession.class);
+        doReturn(apiSession).when(maintenanceController).getApiSession(session);
+        doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
+        MaintenanceDetails currentDetails = MaintenanceDetailsImpl.builder()
+                .maintenanceState(MaintenanceDetails.State.DISABLED)
+                .maintenanceMessage("msg")
+                .maintenanceMessageActive(false)
+                .build();
+        doReturn(currentDetails).when(maintenanceAPI).getMaintenanceDetails();
+
+        //when the submitted message is equal but a different instance
+        maintenanceController.changeMaintenanceState(new MaintenanceDetailsClient(
+                MaintenanceDetails.State.DISABLED, new StringBuilder("msg").toString(), false), session);
+
+        //then
+        verify(maintenanceAPI, never()).updateMaintenanceMessage(any());
+    }
+
+    /**
+     * {@code MaintenanceAPIImpl.disableMaintenanceMode()} also clears the message flag, so the message guards must
+     * compare against details re-read after the state change, not the snapshot taken before it.
+     */
+    @Test
+    public void should_keep_the_message_active_when_maintenance_is_disabled_in_the_same_request()
+            throws BonitaException {
+        //given maintenance is on with the banner showing
+        APISession apiSession = mock(APISession.class);
+        doReturn(apiSession).when(maintenanceController).getApiSession(session);
+        doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
+        MaintenanceDetails whileEnabled = MaintenanceDetailsImpl.builder()
+                .maintenanceState(MaintenanceDetails.State.ENABLED)
+                .maintenanceMessage("msg")
+                .maintenanceMessageActive(true)
+                .build();
+        //and disabling maintenance clears the message flag as a side effect, as the engine does
+        MaintenanceDetails afterDisabling = MaintenanceDetailsImpl.builder()
+                .maintenanceState(MaintenanceDetails.State.DISABLED)
+                .maintenanceMessage("msg")
+                .maintenanceMessageActive(false)
+                .build();
+        doReturn(whileEnabled, afterDisabling).when(maintenanceAPI).getMaintenanceDetails();
+
+        //when the client exits maintenance but asks to keep the banner up
+        maintenanceController.changeMaintenanceState(new MaintenanceDetailsClient(
+                MaintenanceDetails.State.DISABLED, "msg", true), session);
+
+        //then the banner is re-enabled rather than left off
+        verify(maintenanceAPI).disableMaintenanceMode();
+        verify(maintenanceAPI).enableMaintenanceMessage();
+    }
+
     @Test
     public void should_get_maintenance_info_from_java_api() throws BonitaException {
         //given
@@ -101,13 +160,19 @@ class MaintenanceControllerTest {
         APISession apiSession = mock(APISession.class);
         doReturn(apiSession).when(maintenanceController).getApiSession(session);
 
-        MaintenanceDetails maintenanceDetails = MaintenanceDetailsImpl.builder()
+        MaintenanceDetails whileEnabled = MaintenanceDetailsImpl.builder()
                 .maintenanceState(MaintenanceDetails.State.ENABLED)
                 .maintenanceMessage("msg")
                 .maintenanceMessageActive(true)
                 .build();
+        //and disabling maintenance clears the message flag as a side effect, as the engine does
+        MaintenanceDetails afterDisabling = MaintenanceDetailsImpl.builder()
+                .maintenanceState(MaintenanceDetails.State.DISABLED)
+                .maintenanceMessage("msg")
+                .maintenanceMessageActive(false)
+                .build();
         doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
-        doReturn(maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
+        doReturn(whileEnabled, afterDisabling).when(maintenanceAPI).getMaintenanceDetails();
 
         MaintenanceDetailsClient maintenanceInfoClient = new MaintenanceDetailsClient(
                 MaintenanceDetails.State.DISABLED, "new Scheduled Maintenance msg", false);
@@ -115,12 +180,12 @@ class MaintenanceControllerTest {
         //when
         maintenanceController.changeMaintenanceState(maintenanceInfoClient, session);
 
-        //then
+        //then the message is updated, and not disabled a second time
         verify(maintenanceAPI).updateMaintenanceMessage("new Scheduled Maintenance msg");
         verify(maintenanceAPI, never()).enableMaintenanceMode();
         verify(maintenanceAPI).disableMaintenanceMode();
         verify(maintenanceAPI, never()).enableMaintenanceMessage();
-        verify(maintenanceAPI).disableMaintenanceMessage();
+        verify(maintenanceAPI, never()).disableMaintenanceMessage();
     }
 
     @Test
@@ -137,8 +202,9 @@ class MaintenanceControllerTest {
         doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
         doReturn(maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
+        //only the state is sent, as the platform maintenance page does
         MaintenanceDetailsClient maintenanceInfoClient = new MaintenanceDetailsClient(
-                MaintenanceDetails.State.DISABLED, "msg", true);
+                MaintenanceDetails.State.DISABLED, null, null);
 
         //when
         maintenanceController.changeMaintenanceState(maintenanceInfoClient, session);
