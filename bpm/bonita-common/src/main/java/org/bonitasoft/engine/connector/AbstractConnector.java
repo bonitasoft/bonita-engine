@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.connector;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,13 +37,20 @@ public abstract class AbstractConnector implements Connector {
     private EngineExecutionContext executionContext;
 
     public AbstractConnector() {
-        inputParameters = new HashMap<String, Object>();
-        outputParameters = new HashMap<String, Object>();
+        inputParameters = new HashMap<>();
+        outputParameters = new HashMap<>();
     }
 
     @Override
     public void setInputParameters(final Map<String, Object> parameters) {
         inputParameters.putAll(parameters);
+    }
+
+    /**
+     * @return an unmodifiable view of the input parameters map
+     */
+    protected Map<String, Object> getInputParameters() {
+        return Collections.unmodifiableMap(inputParameters);
     }
 
     protected Object getInputParameter(final String paramName) {
@@ -62,6 +70,15 @@ public abstract class AbstractConnector implements Connector {
     protected Object getInputParameter(final String parameterKey, final Serializable defaultValue) {
         final Object param = getInputParameter(parameterKey);
         return param == null ? defaultValue : param;
+    }
+
+    /**
+     * Add the given {@code parameters} to the output parameters map.
+     * 
+     * @param parameters the parameters to add
+     */
+    protected void setOutputParameters(final Map<String, Object> parameters) {
+        outputParameters.putAll(parameters);
     }
 
     protected void setOutputParameter(final String paramName, final Object value) {
