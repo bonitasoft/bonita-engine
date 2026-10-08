@@ -74,7 +74,7 @@ public abstract class AbstractConnector implements Connector {
 
     /**
      * Add the given {@code parameters} to the output parameters map.
-     * 
+     *
      * @param parameters the parameters to add
      */
     protected void setOutputParameters(final Map<String, Object> parameters) {
