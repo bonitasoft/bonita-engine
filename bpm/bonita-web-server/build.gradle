@@ -14,7 +14,10 @@ dependencies {
     implementation libs.commonsBeanUtils
     implementation libs.commonsCollections
     implementation libs.commonsLang
-    implementation libs.jsonSimple
+    implementation(libs.jsonSimple) {
+        // json-simple declares junit as a compile dependency, which would leak to consumers
+        exclude(group: 'junit', module: 'junit')
+    }
     implementation libs.urlrewritefilter
     implementation libs.jakartaJstl
     implementation libs.jakartaJstlApi
