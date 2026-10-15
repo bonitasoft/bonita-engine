@@ -13,10 +13,15 @@
  **/
 package org.bonitasoft.console.common.server.preferences.properties;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import org.bonitasoft.console.common.server.utils.DocumentUtil;
 
 /**
  * @author Yang zhiheng
@@ -46,6 +51,15 @@ public class ConsoleProperties {
     //Default time between two database check of custom page and rest api last update date in milliseconds
     private static final int DEFAULT_PAGE_LAST_UPDATE_CHECK_INTERVAL_MILLIS = 3000;
 
+    /**
+     * Whitelist of file extensions accepted by generic file upload widgets/forms
+     */
+    private static final String ALLOWED_ATTACHMENT_EXTENSIONS = "form.attachment.allowed.extensions";
+
+    // ponytail: functional whitelist scoped to common business document/image formats; extend via
+    // form.attachment.allowed.extensions if the business needs others.
+    private static final List<String> DEFAULT_ALLOWED_ATTACHMENT_EXTENSIONS = DocumentUtil.DEFAULT_ALLOWED_EXTENSIONS;
+
     private static final String PROPERTIES_FILE = "console-config.properties";
 
     private static Map<String, Optional<String>> consoleProperties;
@@ -68,6 +82,19 @@ public class ConsoleProperties {
             return Long.valueOf(maxSize);
         }
         return 100;
+    }
+
+    public List<String> getAllowedAttachmentExtensions() {
+        final String extensions = this.getProperty(ALLOWED_ATTACHMENT_EXTENSIONS);
+        if (extensions == null || extensions.isBlank()) {
+            return DEFAULT_ALLOWED_ATTACHMENT_EXTENSIONS;
+        }
+        final List<String> configuredExtensions = Arrays.stream(extensions.split(","))
+                .map(String::trim)
+                .filter(extension -> !extension.isEmpty())
+                .collect(Collectors.toList());
+        // a non-blank but malformed value (e.g. only commas) must not be treated as "no restriction"
+        return configuredExtensions.isEmpty() ? DEFAULT_ALLOWED_ATTACHMENT_EXTENSIONS : configuredExtensions;
     }
 
     public boolean isPageInDebugMode() {
