@@ -14,15 +14,24 @@
 package org.bonitasoft.console.common.server.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.engine.api.TemporaryContentAPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -109,5 +118,80 @@ public class FileUploadServletTest {
 
         // then
         assertThat(filenameLastSegment).isEmpty();
+    }
+
+    @Test
+    public void doPost_should_reject_file_with_extension_outside_default_whitelist() throws Exception {
+        // given
+        final FileItem fileItem = mock(FileItem.class);
+        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final PrintWriter printer = mock(PrintWriter.class);
+        final File tempFolder = File.createTempFile("upload", "");
+        tempFolder.mkdir();
+
+        fileUploadServlet.uploadDirectoryPath = tempFolder.getAbsolutePath();
+        doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(FileItemFactory.class));
+        doReturn(mock(TemporaryContentAPI.class)).when(fileUploadServlet).getTemporaryContentAPI();
+        doReturn(new String[] { "pdf" }).when(fileUploadServlet).getDefaultAllowedExtensions();
+
+        when(fileItem.getName()).thenReturn("script.exe");
+        when(serviceFileUpload.parseRequest(request)).thenReturn(List.of(fileItem));
+        when(request.getMethod()).thenReturn("post");
+        when(request.getContentType()).thenReturn("multipart/");
+        when(response.getWriter()).thenReturn(printer);
+        when(fileUploadServlet.getServletConfig()).thenReturn(mock(ServletConfig.class));
+
+        // when
+        fileUploadServlet.init();
+        fileUploadServlet.doPost(request, response);
+
+        // then
+        verify(response).setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+        verify(fileUploadServlet, never()).storeTempFile(anyString(), any());
+    }
+
+    @Test
+    public void doPost_should_reject_file_whose_actual_content_does_not_match_its_extension() throws Exception {
+        // given
+        final FileItem fileItem = mock(FileItem.class);
+        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final PrintWriter printer = mock(PrintWriter.class);
+        final File tempFolder = File.createTempFile("upload", "");
+        tempFolder.mkdir();
+
+        fileUploadServlet.uploadDirectoryPath = tempFolder.getAbsolutePath();
+        doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(FileItemFactory.class));
+        doReturn(mock(TemporaryContentAPI.class)).when(fileUploadServlet).getTemporaryContentAPI();
+        doReturn(new String[] { "pdf" }).when(fileUploadServlet).getDefaultAllowedExtensions();
+
+        // an HTML file renamed with a whitelisted ".pdf" extension, with a spoofed Content-Type
+        final byte[] htmlBytes = "<html><body>evil</body></html>".getBytes();
+        when(fileItem.getInputStream()).then(invoc -> new ByteArrayInputStream(htmlBytes));
+        when(fileItem.getName()).thenReturn("payslip.pdf");
+        when(fileItem.getContentType()).thenReturn("application/pdf");
+        when(serviceFileUpload.parseRequest(request)).thenReturn(List.of(fileItem));
+        when(request.getMethod()).thenReturn("post");
+        when(request.getContentType()).thenReturn("multipart/");
+        when(response.getWriter()).thenReturn(printer);
+        when(fileUploadServlet.getServletConfig()).thenReturn(mock(ServletConfig.class));
+
+        // when
+        fileUploadServlet.init();
+        fileUploadServlet.doPost(request, response);
+
+        // then
+        verify(response).setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+        verify(fileUploadServlet, never()).storeTempFile(anyString(), any());
+    }
+
+    @Test
+    public void getDefaultAllowedExtensions_should_not_allow_everything_when_a_subclass_does_not_override_it() {
+        // PlatformFileUploadServlet has no tenant ConsoleProperties to fall back on, and must still
+        // not re-open CVE-68 if ever mapped to an endpoint without a SupportedExtensions init-param
+        assertThat(new PlatformFileUploadServlet().getDefaultAllowedExtensions()).isNotEmpty();
     }
 }

@@ -15,6 +15,7 @@ package org.bonitasoft.console.common.server.servlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
@@ -174,6 +175,15 @@ public abstract class FileUploadServlet extends HttpServlet {
                     return;
                 }
 
+                // Check that the declared Content-Type and the actual content match the extension (CVE-68)
+                try (InputStream itemContent = item.getInputStream()) {
+                    if (!DocumentUtil.isContentConsistentWithExtension(fileName, item.getContentType(),
+                            itemContent)) {
+                        outputMediaTypeError(response, responsePW);
+                        return;
+                    }
+                }
+
                 // Make unique file name
                 final String uploadedFileKey = storeTempFile(fileName, item);
 
@@ -291,17 +301,36 @@ public abstract class FileUploadServlet extends HttpServlet {
             return false;
         }
 
-        // if no extension specified, all extensions are allowed
-        if (supportedExtensionsList.length < 1) {
+        final String[] extensions = supportedExtensionsList.length > 0 ? supportedExtensionsList
+                : getDefaultAllowedExtensions();
+
+        // if no extension whitelist applies at all, every extension is allowed
+        if (extensions.length < 1) {
             return true;
         }
 
-        for (final String extension : supportedExtensionsList) {
+        for (final String extension : extensions) {
             if (fileName.toLowerCase().endsWith("." + extension.toLowerCase())) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private static final String[] DEFAULT_ALLOWED_EXTENSIONS = DocumentUtil.DEFAULT_ALLOWED_EXTENSIONS
+            .toArray(new String[0]);
+
+    /**
+     * Extension whitelist used when this servlet declares no {@value #SUPPORTED_EXTENSIONS_PARAM} init-param,
+     * i.e. generic business file upload widgets/forms (see CVE-68). Defaults to
+     * {@link DocumentUtil#DEFAULT_ALLOWED_EXTENSIONS}
+     * (same fallback as {@code ConsoleProperties}, so the base servlet -- used directly by
+     * {@code PlatformFileUploadServlet}, which has no tenant {@code ConsoleProperties} -- never falls open
+     * to "every extension allowed"), overridden by {@link TenantFileUploadServlet} with a tenant-configurable
+     * whitelist.
+     */
+    protected String[] getDefaultAllowedExtensions() {
+        return DEFAULT_ALLOWED_EXTENSIONS;
     }
 }
