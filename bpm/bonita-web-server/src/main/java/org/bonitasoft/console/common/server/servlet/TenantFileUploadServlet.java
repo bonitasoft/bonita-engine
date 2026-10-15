@@ -63,4 +63,9 @@ public class TenantFileUploadServlet extends FileUploadServlet {
         return PropertiesFactory.getConsoleProperties();
     }
 
+    @Override
+    protected String[] getDefaultAllowedExtensions() {
+        return getConsoleProperties().getAllowedAttachmentExtensions().toArray(new String[0]);
+    }
+
 }
