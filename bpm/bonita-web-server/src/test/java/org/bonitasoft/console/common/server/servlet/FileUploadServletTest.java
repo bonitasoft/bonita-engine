@@ -134,6 +134,7 @@ public class FileUploadServletTest {
         when(formFieldItem.isFormField()).thenReturn(true);
         final DiskFileItem fileItem = mock(DiskFileItem.class);
         when(fileItem.getName()).thenReturn("data.txt");
+        when(fileItem.getContentType()).thenReturn("text/plain");
         @SuppressWarnings("unchecked")
         final JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> serviceFileUpload = mock(
                 JakartaServletFileUpload.class);
