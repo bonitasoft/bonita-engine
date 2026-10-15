@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.console.common.server.preferences.properties;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.console.common.server.preferences.properties.ConfigurationFilesManager.getProperties;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,9 +34,18 @@ public class ConsolePropertiesTest {
     private ConsoleProperties properties;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
+        resetStaticPropertiesCache();
         properties = spy(new ConsoleProperties());
         doReturn(getProperties("aProperty=aValue".getBytes())).when(properties).getProperties();
+    }
+
+    // ConsoleProperties.getProperty() caches values in a static map for the JVM lifetime;
+    // reset it so one test's mocked properties don't leak into the next.
+    private static void resetStaticPropertiesCache() throws Exception {
+        Field cacheField = ConsoleProperties.class.getDeclaredField("consoleProperties");
+        cacheField.setAccessible(true);
+        cacheField.set(null, null);
     }
 
     @Test
@@ -47,6 +58,25 @@ public class ConsolePropertiesTest {
         String value = properties.getProperty("aProperty");
 
         assertEquals("Cannot retrieve a property", value, "aValue");
+    }
+
+    @Test
+    public void getAllowedAttachmentExtensions_should_return_configured_whitelist() throws IOException {
+        doReturn(getProperties("form.attachment.allowed.extensions=pdf, docx ".getBytes())).when(properties)
+                .getProperties();
+
+        assertThat(properties.getAllowedAttachmentExtensions()).containsExactly("pdf", "docx");
+    }
+
+    @Test
+    public void getAllowedAttachmentExtensions_should_fall_back_to_default_when_configured_value_is_malformed()
+            throws IOException {
+        doReturn(getProperties("form.attachment.allowed.extensions=, ,".getBytes())).when(properties)
+                .getProperties();
+
+        assertThat(properties.getAllowedAttachmentExtensions())
+                .containsExactly("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "json", "jpg",
+                        "jpeg", "png", "gif", "bmp");
     }
 
 }
