@@ -34,15 +34,15 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
     }
 
     @Override
-    public void handle(final long tenantId, final Incident incident) {
+    public void handle(final Incident incident) {
         Marker INCIDENT = MarkerFactory.getMarker("INCIDENT");
-        logger.error(INCIDENT, "An incident on tenant id {} occurred: {}", tenantId, incident.getDescription());
+        logger.error(INCIDENT, "An incident occurred: {}", incident.getDescription());
         logger.error(INCIDENT, "Exception was:", incident.getCause());
         logger.error(INCIDENT, "We were unable to handle the failure on the elements because of",
                 incident.getExceptionWhenHandlingFailure());
         final String recoveryProcedure = incident.getRecoveryProcedure();
         if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
-            logger.error(INCIDENT, "Procedure to recover: " + recoveryProcedure);
+            logger.error(INCIDENT, "Procedure to recover: {}", recoveryProcedure);
         }
     }
 

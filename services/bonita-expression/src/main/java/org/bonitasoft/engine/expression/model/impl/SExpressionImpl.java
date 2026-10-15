@@ -131,9 +131,8 @@ public class SExpressionImpl implements SExpression {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof SExpressionImpl))
+        if (!(o instanceof SExpressionImpl that))
             return false;
-        SExpressionImpl that = (SExpressionImpl) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(content, that.content) &&
                 Objects.equals(returnType, that.returnType) &&

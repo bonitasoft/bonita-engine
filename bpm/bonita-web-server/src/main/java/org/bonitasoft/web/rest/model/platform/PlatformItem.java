@@ -32,8 +32,6 @@ public class PlatformItem extends Item {
 
     public final static String ATTRIBUTE_VERSION = "version";
 
-    public final static String ATTRIBUTE_PRE_VERSION = "previousVersion";
-
     public final static String ATTRIBUTE_INIT_VERSION = "initialVersion";
 
     public final static String ATTRIBUTE_CREATED_DATE = "created";
@@ -42,12 +40,9 @@ public class PlatformItem extends Item {
 
     public final static String ATTRIBUTE_STATE = "state";
 
-    public PlatformItem(final String version, final String preVersion, final String initVersion,
-            final String createdDate, final String createdBy,
-            final String state) {
-
+    public PlatformItem(final String version, final String initVersion, final String createdDate,
+            final String createdBy, final String state) {
         this.setAttribute(ATTRIBUTE_VERSION, version);
-        this.setAttribute(ATTRIBUTE_PRE_VERSION, preVersion);
         this.setAttribute(ATTRIBUTE_INIT_VERSION, initVersion);
         this.setAttribute(ATTRIBUTE_CREATED_DATE, createdDate);
         this.setAttribute(ATTRIBUTE_CREATEDBY, createdBy);

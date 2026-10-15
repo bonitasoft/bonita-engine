@@ -60,10 +60,9 @@ public class TypeConverterUtil {
 
         @Override
         protected <T> T convertToType(Class<T> type, Object value) throws Throwable {
-            if (!(value instanceof String)) {
+            if (!(value instanceof String valueAsString)) {
                 throw conversionException(type, value);
             }
-            String valueAsString = (String) value;
             if (valueAsString.length() > MAX_LOCAL_DATE_LENGTH) {
                 valueAsString = valueAsString.substring(0, MAX_LOCAL_DATE_LENGTH);
             }
@@ -80,10 +79,9 @@ public class TypeConverterUtil {
 
         @Override
         protected <T> T convertToType(Class<T> type, Object value) throws Throwable {
-            if (!(value instanceof String)) {
+            if (!(value instanceof String paramValueString)) {
                 throw conversionException(type, value);
             }
-            String paramValueString = (String) value;
             try {
                 return type.cast(LocalDateTime.parse(paramValueString));
             } catch (DateTimeParseException e) {

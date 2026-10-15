@@ -15,7 +15,6 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.micrometer.core.instrument.Counter;
@@ -30,64 +29,51 @@ public class MonitoringJobListener implements BonitaJobListener {
     public static final String JOB_JOBS_RUNNING = "bonita.bpmengine.job.running";
     public static final String JOB_JOBS_EXECUTED = "bonita.bpmengine.job.executed";
 
-    private final Map<Long, AtomicLong> runningJobs = new ConcurrentHashMap<>();
-    private final Map<Long, Counter> executedCounter = new ConcurrentHashMap<>();
+    private AtomicLong runningJobs;
+    private Counter executedCounter;
 
-    private MeterRegistry meterRegistry;
+    private final MeterRegistry meterRegistry;
 
     public MonitoringJobListener(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
     }
 
     @Override
-    public void jobToBeExecuted(final Map<String, Serializable> context) {
-        final Long tenantId = (Long) context.get(TENANT_ID);
-        initializeOrGetRunningJob(tenantId).incrementAndGet();
+    public void jobToBeExecuted() {
+        initializeOrGetRunningJob().incrementAndGet();
     }
 
-    private AtomicLong initializeOrGetRunningJob(Long tenantId) {
-        AtomicLong counter = runningJobs.get(tenantId);
-        if (counter == null) {
+    private AtomicLong initializeOrGetRunningJob() {
+        if (runningJobs == null) {
             synchronized (this) {
-                if (runningJobs.get(tenantId) == null) {
-                    AtomicLong atomicLong = new AtomicLong();
-                    runningJobs.put(tenantId, atomicLong);
-                    Gauge.builder(JOB_JOBS_RUNNING, atomicLong, AtomicLong::get)
-                            .tag("tenant", tenantId.toString()).baseUnit("jobs")
-                            .description("Number of jobs currently running")
-                            .register(meterRegistry);
-                }
-                counter = runningJobs.get(tenantId);
+                runningJobs = new AtomicLong();
+                Gauge.builder(JOB_JOBS_RUNNING, runningJobs, AtomicLong::get)
+                        .baseUnit("jobs")
+                        .description("Number of jobs currently running")
+                        .register(meterRegistry);
             }
         }
-        return counter;
+        return runningJobs;
     }
 
-    private Counter initializeOrGetExecutedJobs(Long tenantId) {
-        Counter counter = executedCounter.get(tenantId);
-        if (counter == null) {
+    private Counter initializeOrGetExecutedJobs() {
+        if (executedCounter == null) {
             synchronized (this) {
-                if (executedCounter.get(tenantId) == null) {
-                    executedCounter.put(tenantId,
-                            meterRegistry.counter(JOB_JOBS_EXECUTED, "tenant", tenantId.toString()));
-                }
-                counter = executedCounter.get(tenantId);
+                executedCounter = meterRegistry.counter(JOB_JOBS_EXECUTED);
             }
         }
-        return counter;
+        return executedCounter;
     }
 
     @Override
-    public void jobExecutionVetoed(final Map<String, Serializable> context) {
-        final Long tenantId = (Long) context.get(TENANT_ID);
-        initializeOrGetRunningJob(tenantId).decrementAndGet();
+    public void jobExecutionVetoed() {
+        initializeOrGetRunningJob().decrementAndGet();
     }
 
     @Override
     public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
-        final Long tenantId = (Long) context.get(TENANT_ID);
-        initializeOrGetRunningJob(tenantId).decrementAndGet();
-        initializeOrGetExecutedJobs(tenantId).increment();
+        initializeOrGetRunningJob().decrementAndGet();
+        initializeOrGetExecutedJobs().increment();
     }
 
 }

@@ -38,7 +38,7 @@ processResources {
     }
     from("${projectDir}/../../bpm/bonita-core/bonita-process-engine/src/main/resources/bonita-tenant-community.properties") {
         filter(PrefixLines, prefix: "#")
-        rename 'bonita-tenant-community.properties', 'tenant_template_engine/bonita-tenant-community-custom.properties'
+        rename 'bonita-tenant-community.properties', 'tenant_engine/bonita-tenant-community-custom.properties'
     }
 }
 

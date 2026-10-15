@@ -24,7 +24,7 @@ public class MenuIndexValidatorTest {
     private MenuIndexValidator validator = new MenuIndexValidator();
 
     @Test
-    public void isValid_should_return_problem_when_new_index_is_less_than_or_equal_zero() throws Exception {
+    public void isValid_should_return_problem_when_new_index_is_less_than_or_equal_zero() {
         //given
         MenuIndex oldIndex = new MenuIndex(null, 2, 5);
         MenuIndex newIndex = new MenuIndex(null, 0, 5);
@@ -39,8 +39,7 @@ public class MenuIndexValidatorTest {
     }
 
     @Test
-    public void isValid_should_return_problem_when_parent_is_same_and_new_index_is_greater_than_last_used_index()
-            throws Exception {
+    public void isValid_should_return_problem_when_parent_is_same_and_new_index_is_greater_than_last_used_index() {
         //given
         MenuIndex oldIndex = new MenuIndex(null, 5, 5);
         MenuIndex newIndex = new MenuIndex(null, 6, 5);
@@ -55,8 +54,7 @@ public class MenuIndexValidatorTest {
     }
 
     @Test
-    public void isValid_should_return_no_problems_when_parent_is_not_the_same_and_new_index_is_greater_than_last_used_index_by_one()
-            throws Exception {
+    public void isValid_should_return_no_problems_when_parent_is_not_the_same_and_new_index_is_greater_than_last_used_index_by_one() {
         //given
         MenuIndex oldIndex = new MenuIndex(null, 5, 5);
         MenuIndex newIndex = new MenuIndex(2L, 4, 3);
@@ -69,8 +67,7 @@ public class MenuIndexValidatorTest {
     }
 
     @Test
-    public void isValid_should_return_problem_when_parent_is_not_the_same_and_new_index_is_greater_than_last_used_index_by_more_than_one()
-            throws Exception {
+    public void isValid_should_return_problem_when_parent_is_not_the_same_and_new_index_is_greater_than_last_used_index_by_more_than_one() {
         //given
         MenuIndex oldIndex = new MenuIndex(null, 5, 5);
         MenuIndex newIndex = new MenuIndex(2L, 5, 3);
@@ -84,7 +81,7 @@ public class MenuIndexValidatorTest {
     }
 
     @Test
-    public void isValid_should_return_true_when_new_index_is_valid() throws Exception {
+    public void isValid_should_return_true_when_new_index_is_valid() {
         //given
         MenuIndex oldIndex = new MenuIndex(null, 5, 5);
         MenuIndex newIndex = new MenuIndex(null, 4, 5);

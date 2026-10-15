@@ -19,7 +19,6 @@ import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 
 /**
  * @author Matthieu Chaffotte
@@ -29,7 +28,7 @@ import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("TASK")
-public class SATaskContractData extends SAContractData implements ArchivedPersistentObject {
+public class SATaskContractData extends SAContractData {
 
     public SATaskContractData(final SContractData contractData) {
         super(contractData);

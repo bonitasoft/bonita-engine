@@ -60,23 +60,23 @@ public class ArchivedCaseDatastoreIT extends AbstractConsoleTest {
         TestProcess subprocess = TestProcessFactory.getDefaultHumanTaskProcess();
         subprocess.addActor(getInitiator()).enable();
 
-        // start root process case via call activity
+        // start subprocess case via call activity
         TestProcess rootProcess = TestProcessFactory.getCallActivityProcess(subprocess.getProcessDefinition());
         var rootInstance = rootProcess.addActor(getInitiator()).enable().startCase();
-        await().atMost(5, TimeUnit.SECONDS).until(() -> !rootProcess.listOpenCases().isEmpty());
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !subprocess.listAllOpenCases().isEmpty());
 
         // archive process 1 case
         TestCase testCaseRootProcess = rootProcess.listOpenCases().get(0);
-        testCaseRootProcess.getNextHumanTask().assignTo(getInitiator()).archive();
+        testCaseRootProcess.getNextHumanTask().assignTo(getInitiator()).executeUserTask(getInitiator());
         // asynchronous, wait subprocess to be archived
         await().atMost(5, TimeUnit.SECONDS).until(() -> rootInstance.getArchive() != null);
 
         // Search for archived Cases
-        ItemSearchResult<ArchivedCaseItem> searchResult = archivedCaseDatastore.search(0, 100, null, null,
+        ItemSearchResult<ArchivedCaseItem> itemSearchResult = archivedCaseDatastore.search(0, 100, null, null,
                 new HashMap<>());
 
         assertEquals("2 cases started but one via call activity so only 1 should be retrieved", 1,
-                searchResult.getResults().size());
+                itemSearchResult.getResults().size());
 
         // Search for archived Cases with caller any filter
         HashMap<String, String> filters = new HashMap<>();
@@ -86,6 +86,37 @@ public class ArchivedCaseDatastoreIT extends AbstractConsoleTest {
 
         assertEquals("Subprocesses should be retrieved as well", 2,
                 anyCallerSearchResult.getResults().size());
+
+        TestProcessFactory.getInstance().delete(rootProcess);
+        TestProcessFactory.getInstance().delete(subprocess);
+    }
+
+    @Test
+    public void searchArchivedSubCases() throws Exception {
+        TestProcess subprocess = TestProcessFactory.getDefaultHumanTaskProcess();
+        subprocess.addActor(getInitiator()).enable();
+
+        // start subprocess case via call activity
+        TestProcess rootProcess = TestProcessFactory.getCallActivityProcess(subprocess.getProcessDefinition());
+        var rootInstance = rootProcess.addActor(getInitiator()).enable().startCase();
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !subprocess.listAllOpenCases().isEmpty());
+
+        // archive process 1 case
+        TestCase testCaseRootProcess = rootProcess.listOpenCases().get(0);
+        testCaseRootProcess.getNextHumanTask().assignTo(getInitiator()).executeUserTask(getInitiator());
+        await().atMost(5, TimeUnit.SECONDS).until(() -> rootInstance.getArchive() != null);
+
+        // Filters for archived Cases
+        HashMap<String, String> filters = new HashMap<>();
+        filters.put(ArchivedCaseItem.ATTRIBUTE_ROOT_CASE_ID, String.valueOf(testCaseRootProcess.getId()));
+        filters.put(CaseItem.FILTER_CALLER, "any");
+        ItemSearchResult<ArchivedCaseItem> itemSearchResult = archivedCaseDatastore.search(0, 100, null, null,
+                filters);
+
+        assertEquals("Filtering on root case ID, only the subcase should be retrieved", 1,
+                itemSearchResult.getResults().size());
+        assertEquals(subprocess.getProcessDefinition().getId(),
+                itemSearchResult.getResults().get(0).getProcessId().toLong().longValue());
 
         TestProcessFactory.getInstance().delete(rootProcess);
         TestProcessFactory.getInstance().delete(subprocess);

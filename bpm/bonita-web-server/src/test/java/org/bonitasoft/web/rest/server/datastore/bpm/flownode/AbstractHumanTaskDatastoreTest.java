@@ -15,6 +15,7 @@ package org.bonitasoft.web.rest.server.datastore.bpm.flownode;
 
 import static org.bonitasoft.web.rest.model.bpm.flownode.IHumanTaskItem.FILTER_SHOW_ASSIGNED_TO_OTHERS;
 import static org.bonitasoft.web.rest.model.bpm.flownode.IHumanTaskItem.FILTER_USER_ID;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -33,7 +34,6 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.web.rest.model.bpm.flownode.ActivityItem;
 import org.bonitasoft.web.rest.model.bpm.flownode.HumanTaskItem;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -44,8 +44,8 @@ public class AbstractHumanTaskDatastoreTest {
 
     @Mock
     private ProcessAPI processAPI;
-    private APISession session = new APISessionImpl(55L, new Date(), 5000, "john", 44L, "default", 1L);
-    private AbstractHumanTaskDatastore<HumanTaskItem, HumanTaskInstance> datastore = new AbstractHumanTaskDatastore<>(
+    private final APISession session = new APISessionImpl(55L, new Date(), 5000, "john", 44L);
+    private final AbstractHumanTaskDatastore<HumanTaskItem, HumanTaskInstance> datastore = new AbstractHumanTaskDatastore<>(
             session) {
 
         @Override
@@ -84,10 +84,10 @@ public class AbstractHumanTaskDatastoreTest {
         SearchOptionsBuilder builder = datastore.makeSearchOptionBuilder(0, 10, null,
                 ActivityItem.ATTRIBUTE_ROOT_CASE_ID + " " + Order.DESC, new HashMap<>());
 
-        Assert.assertEquals(builder.done().getSorts().size(), 1);
-        Assert.assertEquals(builder.done().getSorts().get(0).getField(),
-                ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
-        Assert.assertEquals(builder.done().getSorts().get(0).getOrder(), Order.DESC);
+        assertEquals(1, builder.done().getSorts().size());
+        assertEquals(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
+                builder.done().getSorts().get(0).getField());
+        assertEquals(Order.DESC, builder.done().getSorts().get(0).getOrder());
     }
 
 }

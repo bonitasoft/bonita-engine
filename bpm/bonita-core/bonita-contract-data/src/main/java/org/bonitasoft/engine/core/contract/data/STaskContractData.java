@@ -22,7 +22,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Nicolas Tith
@@ -34,7 +33,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("TASK")
 @SuperBuilder
-public class STaskContractData extends SContractData implements PersistentObject {
+public class STaskContractData extends SContractData {
 
     public STaskContractData(final long userTaskId, final String name, final Serializable value) {
         super(name, value, userTaskId);

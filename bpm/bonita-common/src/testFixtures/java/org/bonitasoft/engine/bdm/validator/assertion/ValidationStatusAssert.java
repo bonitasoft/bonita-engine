@@ -13,8 +13,11 @@
  **/
 package org.bonitasoft.engine.bdm.validator.assertion;
 
+import java.util.Objects;
+
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
+import org.bonitasoft.engine.api.result.Status;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 public class ValidationStatusAssert extends AbstractAssert<ValidationStatusAssert, ValidationStatus> {
@@ -48,7 +51,10 @@ public class ValidationStatusAssert extends AbstractAssert<ValidationStatusAsser
     }
 
     public ValidationStatusAssert hasError(String errorMessage) {
-        Assertions.assertThat(actual.getErrors()).contains(errorMessage);
+        Assertions.assertThat(
+                actual.getStatuses().stream().filter(status -> Objects.equals(Status.Level.ERROR, status.getLevel()))
+                        .map(Status::getMessage).toList())
+                .contains(errorMessage);
         return this;
     }
 }

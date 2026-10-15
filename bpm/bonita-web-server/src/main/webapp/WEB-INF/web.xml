@@ -23,6 +23,14 @@
         <location>/error/404</location>
     </error-page>
 
+    <!-- 
+        MDC Filter for requests.
+    -->
+    <filter>
+        <filter-name>RequestIdFilter</filter-name>
+        <filter-class>org.bonitasoft.console.common.server.filter.RequestIdFilter</filter-class>
+    </filter>
+
     <!-- No Cache Filter -->
     <filter>
         <filter-name>NoCacheFilter</filter-name>
@@ -188,6 +196,12 @@
         </init-param>
     </filter>
 
+    <filter-mapping>
+        <filter-name>RequestIdFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>NoCacheFilter</filter-name>
         <url-pattern>/portal/formsDocumentDownload</url-pattern>
@@ -745,6 +759,8 @@
         <url-pattern>/API/system/maintenance</url-pattern>
         <url-pattern>/API/bpm/processInfo/*</url-pattern>
         <url-pattern>/API/system/information</url-pattern>
+        <url-pattern>/API/bdm/businessData/*</url-pattern>
+        <url-pattern>/API/tenant/bdm</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>

@@ -53,7 +53,7 @@ public class LoginAPIIT extends CommonAPIIT {
 
     @Test(expected = SessionNotFoundException.class)
     public void testSessionNotFoundExceptionIsThrownAfterSessionDeletion() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         // login to create a session
         final long sessionId = getSession().getId();
 
@@ -91,7 +91,7 @@ public class LoginAPIIT extends CommonAPIIT {
 
     @Test(expected = LoginException.class)
     public void loginFailsWithWrongPassword() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final String userName = "Truc";
         createUser(userName, "goodPassword");
         try {
@@ -99,7 +99,7 @@ public class LoginAPIIT extends CommonAPIIT {
             loginTenant.login(userName, "WrongPassword");
             fail("Should not be reached");
         } finally {
-            loginOnDefaultTenantWithDefaultTechnicalUser();
+            loginWithTechnicalUser();
             getIdentityAPI().deleteUser(userName);
         }
     }
@@ -112,7 +112,7 @@ public class LoginAPIIT extends CommonAPIIT {
 
     @Test
     public void userLoginDefaultTenant() throws BonitaException, InterruptedException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final String userName = "matti";
         final String password = "tervetuloa";
         createUser(userName, password);
@@ -125,12 +125,12 @@ public class LoginAPIIT extends CommonAPIIT {
 
         assertEquals(userName, user.getUserName());
         assertTrue(now.before(user.getLastConnection()));
-        logoutOnTenant();
+        logout();
     }
 
     @Test
     public void loginOnDefaultTenantWithExistingUserAndCheckId() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final String userName = "corvinus";
         final String password = "underworld";
         final User user = createUser(userName, password);
@@ -140,34 +140,34 @@ public class LoginAPIIT extends CommonAPIIT {
         assertEquals(user.getId(), login.getUserId());
 
         getIdentityAPI().deleteUser(user.getId());
-        logoutOnTenant();
+        logout();
     }
 
     @Test
     public void loginOnDefaultTenantWithNonTechnicalUser() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final User user = createUser("matti", "kieli");
-        logoutOnTenant();
+        logout();
 
         loginOnDefaultTenantWith("matti", "kieli");
         assertTrue("Should be logged in as a NON-Technical user", !getSession().isTechnicalUser());
-        logoutOnTenant();
+        logout();
 
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         getIdentityAPI().deleteUser(user.getId());
-        logoutOnTenant();
+        logout();
     }
 
     @Test
     public void loginOnDefaultTenantWithTechnicalUser() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         assertTrue("Should be logged in as Technical user", getSession().isTechnicalUser());
-        logoutOnTenant();
+        logout();
     }
 
     @Test(expected = LoginException.class)
     public void unableToLoginWhenTheUserIsDisable() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final String userName = "matti";
         final String password = "bpm";
         final User user = getIdentityAPI().createUser(userName, password);
@@ -180,7 +180,7 @@ public class LoginAPIIT extends CommonAPIIT {
             fail("It is not possible to login when the user is disable.");
         } finally {
             getIdentityAPI().deleteUser(user.getId());
-            logoutOnTenant();
+            logout();
         }
     }
 

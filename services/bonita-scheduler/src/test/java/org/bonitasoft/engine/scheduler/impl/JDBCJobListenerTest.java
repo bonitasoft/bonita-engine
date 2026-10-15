@@ -59,8 +59,7 @@ public class JDBCJobListenerTest {
         // Given
         context.put(BonitaJobListener.JOB_DESCRIPTOR_ID, JOB_DESCRIPTOR_ID);
         context.put(BonitaJobListener.JOB_NAME, "myJob");
-        context.put(BonitaJobListener.JOB_GROUP, "myGroup");
-        doReturn(false).when(schedulerService).mayFireAgain("myGroup", "myJob");
+        doReturn(false).when(schedulerService).mayFireAgain("myJob");
 
         // When
         jdbcJobListener.jobWasExecuted(context, null);
@@ -75,8 +74,7 @@ public class JDBCJobListenerTest {
         // Given
         context.put(BonitaJobListener.JOB_DESCRIPTOR_ID, JOB_DESCRIPTOR_ID);
         context.put(BonitaJobListener.JOB_NAME, "myJob");
-        context.put(BonitaJobListener.JOB_GROUP, "myGroup");
-        doReturn(true).when(schedulerService).mayFireAgain("myGroup", "myJob");
+        doReturn(true).when(schedulerService).mayFireAgain("myJob");
 
         // When
         jdbcJobListener.jobWasExecuted(context, null);
@@ -112,24 +110,9 @@ public class JDBCJobListenerTest {
     }
 
     @Test
-    public void jobToBeExecuted_should_do_nothing_when_no_job_descriptor_id() throws Exception {
-        // Given
-        context.put(BonitaJobListener.JOB_DESCRIPTOR_ID, null);
-
+    public void jobToBeExecuted_should_do_nothing() {
         // When
-        jdbcJobListener.jobToBeExecuted(context);
-
-        // Then
-        verifyNoInteractions(jobService);
-    }
-
-    @Test
-    public void jobToBeExecuted_should_do_nothing_when_job_descriptor_id_equals_0() throws Exception {
-        // Given
-        context.put(BonitaJobListener.JOB_DESCRIPTOR_ID, 0L);
-
-        // When
-        jdbcJobListener.jobToBeExecuted(context);
+        jdbcJobListener.jobToBeExecuted();
 
         // Then
         verifyNoInteractions(jobService);

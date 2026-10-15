@@ -34,39 +34,16 @@ public class DefaultBonitaExecutorServiceFactoryTest {
     private WorkExecutionCallback workExecutionCallback;
 
     @Test
-    public void threadNameInExecutorService_should_contain_tenantId() {
-        long tenantId = 999;
-        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
-                tenantId,
-                new SimpleMeterRegistry(),
-                new DefaultEngineClock(),
-                workFactory,
-                mock(WorkExecutionAuditor.class),
-                new DefaultExecutorServiceMetricsProvider(),
-                new WorkSingleThreadPoolExecutorFactory(tenantId, 10));
-
-        BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory
-                .createExecutorService(workExecutionCallback);
-        Runnable r = () -> {
-        };
-
-        String name = createExecutorService.getExecutor().getThreadFactory().newThread(r).getName();
-        assertThat(name).as("thread name should contains the tenantId").contains(Long.toString(tenantId));
-    }
-
-    @Test
     public void createExecutorService_should_register_ExecutorServiceMetrics() {
         // given:
-        long tenantId = 97L;
         final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
-                tenantId,
                 meterRegistry,
                 new DefaultEngineClock(),
                 workFactory,
                 mock(WorkExecutionAuditor.class),
                 new DefaultExecutorServiceMetricsProvider(),
-                new WorkSingleThreadPoolExecutorFactory(tenantId, 10));
+                new WorkSingleThreadPoolExecutorFactory(10));
 
         // when:
         defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
@@ -75,23 +52,21 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         assertThat(
                 meterRegistry.find("executor.pool.size")
                         .tag("name", "bonita-work-executor")
-                        .tag("tenant", String.valueOf(tenantId))
-                        .gauge()).isNotNull();
+                        .gauge())
+                .isNotNull();
     }
 
     @Test
     public void should_not_have_metrics_when_unbind_is_called() {
         // given:
-        long tenantId = 97L;
         final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
-                tenantId,
                 meterRegistry,
                 new DefaultEngineClock(),
                 workFactory,
                 mock(WorkExecutionAuditor.class),
                 new DefaultExecutorServiceMetricsProvider(),
-                new WorkSingleThreadPoolExecutorFactory(tenantId, 10));
+                new WorkSingleThreadPoolExecutorFactory(10));
 
         // when:
         defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
@@ -101,7 +76,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         assertThat(
                 meterRegistry.find("executor.pool.size")
                         .tag("name", "bonita-work-executor")
-                        .tag("tenant", String.valueOf(tenantId))
-                        .gauge()).isNull();
+                        .gauge())
+                .isNull();
     }
 }

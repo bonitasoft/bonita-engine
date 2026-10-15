@@ -44,7 +44,6 @@ public class SMappedDocument extends AbstractSMappedDocument {
         this.setIndex(documentMapping.getIndex());
         this.document = SLightDocument.builder()
                 .id(document.getId())
-                .tenantId(document.getTenantId())
                 .fileName(document.getFileName())
                 .hasContent(document.hasContent())
                 .mimeType(document.getMimeType())
@@ -52,38 +51,6 @@ public class SMappedDocument extends AbstractSMappedDocument {
                 .url(document.getUrl())
                 .creationDate(document.getCreationDate())
                 .build();
-    }
-
-    public AbstractSDocument getDocument() {
-        return document;
-    }
-
-    public void setDocument(SLightDocument document) {
-        this.document = document;
-    }
-
-    public long getAuthor() {
-        return document.getAuthor();
-    }
-
-    public long getCreationDate() {
-        return document.getCreationDate();
-    }
-
-    public String getMimeType() {
-        return document.getMimeType();
-    }
-
-    public String getFileName() {
-        return document.getFileName();
-    }
-
-    public boolean hasContent() {
-        return document.hasContent();
-    }
-
-    public String getUrl() {
-        return document.getUrl();
     }
 
 }

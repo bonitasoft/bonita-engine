@@ -66,14 +66,10 @@ public class BonitaHomeFolderAccessor {
         try {
             return temporaryContentAPI.retrieveTempFile(tempFileKey);
         } catch (TemporaryFileNotFoundException e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Unable to find temporary file with key " + tempFileKey);
-            }
+            LOGGER.error("Unable to find temporary file with key {}", tempFileKey);
             throw e;
         } catch (BonitaRuntimeException e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Unable to retrieve temporary file with key " + tempFileKey);
-            }
+            LOGGER.error("Unable to retrieve temporary file with key {}", tempFileKey);
             throw new BonitaException(e);
         }
     }
@@ -83,10 +79,9 @@ public class BonitaHomeFolderAccessor {
             TemporaryContentAPI temporaryContentAPI = PlatformAPIAccessor.getTemporaryContentAPI();
             temporaryContentAPI.removeTempFile(tempFileKey);
         } catch (BonitaException | BonitaRuntimeException e) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Unable to remove temporary file with key " + tempFileKey
-                        + " If still present, it will be cleaned by the scheduler.");
-            }
+            LOGGER.warn(
+                    "Unable to remove temporary file with key {}. If still present, it will be cleaned by the scheduler.",
+                    tempFileKey);
         }
     }
 
@@ -125,13 +120,9 @@ public class BonitaHomeFolderAccessor {
                 throw new UnauthorizedFolderException("Unauthorized access to the file " + file.getPath());
             }
         } catch (final UnauthorizedFolderException e) {
-            final String errorMessage = "Unauthorized access to the file " + file.getAbsolutePath()
-                    + ". For security reasons, access to paths other than "
-                    + parentFolder.getAbsolutePath()
-                    + " is restricted.";
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error(errorMessage, e);
-            }
+            LOGGER.error(
+                    "Unauthorized access to the file {}. For security reasons, access to paths other than {} is restricted.",
+                    file.getAbsolutePath(), parentFolder.getAbsolutePath(), e);
             throw e;
         }
     }
@@ -142,9 +133,7 @@ public class BonitaHomeFolderAccessor {
             FileContent fileContent = temporaryContentAPI.retrieveTempFile(iconKey);
             return new IconDescriptor(fileContent.getFileName(), IOUtils.toByteArray(fileContent.getInputStream()));
         } catch (TemporaryFileNotFoundException e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Unable to find temporary file with key " + iconKey);
-            }
+            LOGGER.error("Unable to find the icon temporary file with key {}", iconKey);
             throw new RuntimeException(e);
         } catch (BonitaException | IOException e) {
             throw new RuntimeException(e);

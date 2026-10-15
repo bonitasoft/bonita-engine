@@ -14,7 +14,6 @@
 package org.bonitasoft.platform.configuration.util;
 
 import static org.bonitasoft.platform.configuration.impl.ConfigurationFields.CONTENT_TYPE;
-import static org.bonitasoft.platform.configuration.impl.ConfigurationFields.TENANT_ID;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,21 +44,21 @@ public class GetMandatoryStructureConfiguration implements TransactionCallback<L
         final List<LightBonitaConfiguration> lightBonitaConfigurations = jdbcTemplate
                 .query(LightBonitaConfigurationRowMapper.SELECT, new LightBonitaConfigurationRowMapper());
 
-        LOGGER.debug("configurations found:" + lightBonitaConfigurations.toString());
+        LOGGER.debug("configurations found:{}", lightBonitaConfigurations);
 
         return lightBonitaConfigurations;
     }
 
     class LightBonitaConfigurationRowMapper implements RowMapper<LightBonitaConfiguration> {
 
-        public static final String SELECT = "SELECT distinct tenant_id, content_type" +
+        public static final String SELECT = "SELECT distinct content_type" +
                 " FROM configuration" +
                 " WHERE content_type <> 'LICENSES'" +
-                " ORDER BY tenant_id, content_type";
+                " ORDER BY content_type";
 
         @Override
         public LightBonitaConfiguration mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new LightBonitaConfiguration(rs.getLong(TENANT_ID), rs.getString(CONTENT_TYPE));
+            return new LightBonitaConfiguration(rs.getString(CONTENT_TYPE));
         }
     }
 

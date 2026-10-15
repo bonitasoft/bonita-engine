@@ -20,6 +20,8 @@ import java.util.concurrent.CompletableFuture;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.ScopedException;
+import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -70,6 +72,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
             Thread.currentThread().setContextClassLoader(processClassloader);
             ServiceAccessor serviceAccessor = getServiceAccessor(context);
             SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(serviceAccessor);
+            context.put("flowNodeInstance", flowNodeInstance);
             log.debug("Processing completion of flowNode '{}' (id={}, state='{}', "
                     + "processInstance={}, processDefinition={})",
                     flowNodeInstance.getName(), flowNodeInstance.getId(), flowNodeInstance.getStateName(),
@@ -125,7 +128,16 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter,
                 serviceAccessor.getActivityInstanceService(),
                 serviceAccessor.getFlowNodeStateManager());
-        userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstanceId));
+        SFlowNodeInstance flowNodeInstance = (SFlowNodeInstance) context.get("flowNodeInstance");
+        userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstance,
+                serviceAccessor.getBpmFailureService(), createFailure(e)));
+    }
+
+    private BPMFailureService.Failure createFailure(Throwable e) {
+        if (e instanceof ScopedException scopedException) {
+            return new BPMFailureService.Failure(scopedException.getScope(), e);
+        }
+        return new BPMFailureService.Failure(ScopedException.UNKNOWN_SCOPE, e);
     }
 
     @Override

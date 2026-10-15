@@ -70,7 +70,7 @@ public class ConfigurationCheckerTest {
         System.setProperty(PlatformSetup.BONITA_DB_VENDOR_PROPERTY, dbVendor);
         final Properties propertiesWithMissingServerName = new PropertyLoader(
                 TEST_DATASOURCE_CONFIG_DIR + "incomplete_database.properties")
-                        .loadProperties();
+                .loadProperties();
 
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("Mandatory property");

@@ -44,9 +44,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThro
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,7 +104,6 @@ public class FlowNodeInstanceTest {
         sProcessDefinitionDeployInfo.setName(processName);
         sProcessDefinitionDeployInfo.setVersion("version");
         sProcessDefinitionDeployInfo.setProcessId(processDefinitionId);
-        sProcessDefinitionDeployInfo.setTenantId(1L);
         repository.add(sProcessDefinitionDeployInfo);
     }
 
@@ -116,10 +113,10 @@ public class FlowNodeInstanceTest {
         repository
                 .add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
                         .build());
-        final SFlowNodeInstance executing = repository
+        repository
                 .add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false)
                         .build());
-        final SFlowNodeInstance notStable = repository.add(
+        repository.add(
                 aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true)
                         .build());
         final SFlowNodeInstance terminal = repository
@@ -154,11 +151,9 @@ public class FlowNodeInstanceTest {
         // then
         assertThat(nodeToRestart.stream()
                 .map(id -> repository.getSession()
-                        .get(SFlowNodeInstance.class,
-                                new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))
-                        .getName()))
-                                .containsOnly("executingTask", "notStableTask", "terminalTask",
-                                        "abortingBoundary", "cancellingBoundary");
+                        .get(SFlowNodeInstance.class, id).getName()))
+                .containsOnly("executingTask", "notStableTask", "terminalTask",
+                        "abortingBoundary", "cancellingBoundary");
     }
 
     @Test
@@ -186,13 +181,12 @@ public class FlowNodeInstanceTest {
 
         // then
         assertThat(nodeToRestart.stream()
-                .map(id -> (repository.getSession().get(SFlowNodeInstance.class,
-                        new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))).getName()))
-                                .containsOnly(
-                                        "gateway_initializing_but_finished",
-                                        "gateway_completed",
-                                        "gateway_aborting",
-                                        "gateway_cancelling");
+                .map(id -> (repository.getSession().get(SFlowNodeInstance.class, id)).getName()))
+                .containsOnly(
+                        "gateway_initializing_but_finished",
+                        "gateway_completed",
+                        "gateway_aborting",
+                        "gateway_cancelling");
     }
 
     @Test
@@ -215,11 +209,10 @@ public class FlowNodeInstanceTest {
 
         // then
         assertThat(nodeToRestart.stream()
-                .map(id -> (repository.getSession().get(SFlowNodeInstance.class,
-                        new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))).getName()))
-                                .containsOnly(
-                                        "gateway_completed",
-                                        "gateway_aborting");
+                .map(id -> (repository.getSession().get(SFlowNodeInstance.class, id)).getName()))
+                .containsOnly(
+                        "gateway_completed",
+                        "gateway_aborting");
     }
 
     @Test
@@ -681,7 +674,7 @@ public class FlowNodeInstanceTest {
     public void should_have_loopCounter_on_loop_Activity() {
         // Given
         final SLoopActivityInstance sLoopActivityInstance = (SLoopActivityInstance) repository
-                .add(aLoopActivity().withLoopCounter(6).build());
+                .add((PersistentObject) aLoopActivity().withLoopCounter(6).build());
         repository.flush();
         final int loopCounter = jdbcTemplate.queryForObject("select loop_counter from flownode_instance",
                 Integer.class);

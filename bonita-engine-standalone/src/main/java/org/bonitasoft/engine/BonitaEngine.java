@@ -42,7 +42,7 @@ import org.springframework.jndi.JndiTemplate;
 @Slf4j
 public class BonitaEngine {
 
-    private BonitaDataSourceInitializer bonitaDataSourceInitializer = new BonitaDataSourceInitializer();
+    private final BonitaDataSourceInitializer bonitaDataSourceInitializer = new BonitaDataSourceInitializer();
     private boolean initialized;
     private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
     private BonitaDatabaseConfiguration businessDataDatabaseConfiguration;

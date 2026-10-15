@@ -41,6 +41,7 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.cases.CaseItem;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
+import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.IItem;
 import org.junit.Before;
 import org.junit.Test;
@@ -464,4 +465,52 @@ public class CaseDatastoreTest {
         assertThat(itemSearchResult).isSameAs(caseSearchResult);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.web.rest.server.datastore.bpm.cases.CaseDatastore#update}.
+     */
+    @Test
+    public void update_should_cancel_instance_and_return_null_when_state_is_cancelled() throws Exception {
+        // Given
+        final APIID id = APIID.makeAPIID(42L);
+        final Map<String, String> attributes = new HashMap<>();
+        attributes.put(CaseItem.ATTRIBUTE_STATE, "CANCELLED");
+
+        // When
+        final CaseItem result = caseDatastore.update(id, attributes);
+
+        // Then
+        verify(processAPI).cancelProcessInstance(42L);
+        assertThat(result).isNull();
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.web.rest.server.datastore.bpm.cases.CaseDatastore#update}.
+     */
+    @Test(expected = APIException.class)
+    public void update_should_throw_APIException_when_state_is_missing() {
+        // Given
+        final APIID id = APIID.makeAPIID(43L);
+        final Map<String, String> attributes = new HashMap<>(); // no state
+
+        // When
+        caseDatastore.update(id, attributes);
+
+        // Then (exception expected)
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.web.rest.server.datastore.bpm.cases.CaseDatastore#update}.
+     */
+    @Test(expected = APIException.class)
+    public void update_should_throw_APIException_when_state_is_not_cancelled() {
+        // Given
+        final APIID id = APIID.makeAPIID(44L);
+        final Map<String, String> attributes = new HashMap<>();
+        attributes.put(CaseItem.ATTRIBUTE_STATE, "STARTED"); // anything != CANCELLED
+
+        // When
+        caseDatastore.update(id, attributes);
+
+        // Then (exception expected)
+    }
 }

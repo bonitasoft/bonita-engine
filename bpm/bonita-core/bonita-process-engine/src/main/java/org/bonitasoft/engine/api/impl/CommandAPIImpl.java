@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +23,24 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.command.DeleteSCommand;
 import org.bonitasoft.engine.api.impl.transaction.command.GetCommands;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.command.*;
+import org.bonitasoft.engine.command.CommandCriterion;
+import org.bonitasoft.engine.command.CommandDescriptor;
+import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
+import org.bonitasoft.engine.command.CommandService;
+import org.bonitasoft.engine.command.CommandUpdater;
 import org.bonitasoft.engine.command.CommandUpdater.CommandField;
+import org.bonitasoft.engine.command.DependencyNotFoundException;
+import org.bonitasoft.engine.command.RuntimeCommand;
+import org.bonitasoft.engine.command.SCommandDeletionException;
+import org.bonitasoft.engine.command.SCommandExecutionException;
+import org.bonitasoft.engine.command.SCommandNotFoundException;
+import org.bonitasoft.engine.command.SCommandParameterizationException;
+import org.bonitasoft.engine.command.SCommandUpdateException;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilder;
@@ -39,7 +51,12 @@ import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchCommands;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -69,10 +86,9 @@ public class CommandAPIImpl implements CommandAPI {
         final DependencyService dependencyService = serviceAccessor.getDependencyService();
         final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
         try {
-            dependencyService.createMappedDependency(name, jar, name + ".jar", serviceAccessor.getTenantId(),
-                    ScopeType.TENANT);
+            dependencyService.createMappedDependency(name, jar, name + ".jar", -1L, ScopeType.TENANT);
             classLoaderService
-                    .refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, serviceAccessor.getTenantId()));
+                    .refreshClassLoaderAfterUpdate(ClassLoaderIdentifier.TENANT);
         } catch (final SDependencyAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
         } catch (final SDependencyException | SClassLoaderException sbe) {
@@ -88,7 +104,7 @@ public class CommandAPIImpl implements CommandAPI {
         try {
             dependencyService.deleteDependency(name);
             classLoaderService
-                    .refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, serviceAccessor.getTenantId()));
+                    .refreshClassLoaderAfterUpdate(ClassLoaderIdentifier.TENANT);
         } catch (final SDependencyNotFoundException e) {
             throw new DependencyNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -355,7 +371,7 @@ public class CommandAPIImpl implements CommandAPI {
         }
     }
 
-    // Utility classes to factorize how we fetch a TenantCommand
+    // Utility classes to factorize how we fetch a RuntimeCommand
     private abstract static class SCommandFetcher {
 
         abstract SCommand fetch(final CommandService commandService) throws SCommandNotFoundException;

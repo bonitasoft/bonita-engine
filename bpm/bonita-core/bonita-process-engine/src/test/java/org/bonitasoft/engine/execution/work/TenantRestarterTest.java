@@ -52,7 +52,7 @@ public class TenantRestarterTest {
 
     @Before
     public void before() throws Exception {
-        tenantRestarter = new TenantRestarter(1L, transactionService, sessionAccessor, platformService,
+        tenantRestarter = new TenantRestarter(transactionService, platformService,
                 asList(tenantRestartHandler1, tenantRestartHandler2));
         when(transactionService.executeInTransaction(any()))
                 .then(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());

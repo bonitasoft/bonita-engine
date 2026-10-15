@@ -56,7 +56,7 @@ public class JobWrapperTest {
 
     @Before
     public void before() {
-        jobWrapper = new JobWrapper(new JobIdentifier(145, 2, "MyJob"), job, 2, eventService, sessionAccessor,
+        jobWrapper = new JobWrapper(new JobIdentifier(145, "MyJob"), job, eventService,
                 transactionService, persistenceService, jobService);
     }
 

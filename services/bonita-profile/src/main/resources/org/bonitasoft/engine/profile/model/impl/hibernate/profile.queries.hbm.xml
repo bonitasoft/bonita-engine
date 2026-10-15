@@ -43,14 +43,14 @@
 	</query>
 
 	<query name="searchSProfileMemberwithSUserForUser">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, user.firstName AS displayNamePart1, user.lastName AS displayNamePart2, user.userName AS displayNamePart3)
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, user.firstName AS displayNamePart1, user.lastName AS displayNamePart2, user.userName AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SUser AS user
 		WHERE pm.userId = user.id
 	</query>
 
 	<query name="searchSProfileMemberForUser">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, user.firstName AS displayNamePart1, user.lastName AS displayNamePart2, user.userName AS displayNamePart3)
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, user.firstName AS displayNamePart1, user.lastName AS displayNamePart2, user.userName AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SUser AS user
 		WHERE pm.userId = user.id
@@ -72,7 +72,7 @@
 	</query>
 
 	<query name="searchSProfileMemberwithSGroupForGroup">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, group_.name AS displayNamePart1, group_.parentPath AS displayNamePart2, ''  AS displayNamePart3) 
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, group_.name AS displayNamePart1, group_.parentPath AS displayNamePart2, ''  AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE pm.groupId = group_.id
@@ -80,7 +80,7 @@
 	</query>
 
 	<query name="searchSProfileMemberForGroup">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, group_.name AS displayNamePart1, group_.parentPath AS displayNamePart2, ''  AS displayNamePart3) 
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, group_.name AS displayNamePart1, group_.parentPath AS displayNamePart2, ''  AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm,
 			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE pm.groupId = group_.id
@@ -104,7 +104,7 @@
 	</query>
 
 	<query name="searchSProfileMemberwithSRoleForRole">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3)
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE pm.roleId = role.id
@@ -112,7 +112,7 @@
 	</query>
 
 	<query name="searchSProfileMemberForRole">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3)
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE pm.roleId = role.id
@@ -136,7 +136,7 @@
 	</query>
 
 	<query name="searchSProfileMemberwithSGroupwithSRoleForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3) 
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SRole AS role,
 			org.bonitasoft.engine.identity.model.SGroup AS group_
@@ -145,7 +145,7 @@
 	</query>
 
 	<query name="searchSProfileMemberwithSGroupForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3) 
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SRole AS role,
 			org.bonitasoft.engine.identity.model.SGroup AS group_
@@ -154,7 +154,7 @@
 	</query>
 
 	<query name="searchSProfileMemberwithSRoleForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3) 
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SRole AS role,
 			org.bonitasoft.engine.identity.model.SGroup AS group_
@@ -163,7 +163,7 @@
 	</query>
 
 	<query name="searchSProfileMemberForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3) 
+		SELECT new org.bonitasoft.engine.profile.model.SProfileMember(pm.id, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm, 
 			org.bonitasoft.engine.identity.model.SRole AS role,
 			org.bonitasoft.engine.identity.model.SGroup AS group_

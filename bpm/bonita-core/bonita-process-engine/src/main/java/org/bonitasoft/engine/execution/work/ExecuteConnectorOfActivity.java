@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -30,6 +31,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefini
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -40,7 +42,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -70,7 +71,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     @Override
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result,
             final SConnectorDefinition sConnectorDefinition)
-            throws STransactionException, SBonitaException {
+            throws SBonitaException {
         evaluateOutput(context, result, sConnectorDefinition, flowNodeInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.name());
     }
@@ -87,15 +88,19 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void setContainerInFail(final Map<String, Object> context) throws SBonitaException {
+    protected void setContainerInFail(final Map<String, Object> context, Throwable t) throws SBonitaException {
         final ServiceAccessor serviceAccessor = getServiceAccessor(context);
         WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(
                 serviceAccessor.getEventInstanceService(),
                 serviceAccessor.getSchedulerService());
+        var activityInstanceService = serviceAccessor.getActivityInstanceService();
         FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter,
-                serviceAccessor.getActivityInstanceService(),
+                activityInstanceService,
                 serviceAccessor.getFlowNodeStateManager());
         failedStateSetter.setAsFailed(flowNodeInstanceId);
+        var failureService = serviceAccessor.getBpmFailureService();
+        failureService.createFlowNodeFailure(activityInstanceService.getFlowNodeInstance(flowNodeInstanceId),
+                new BPMFailureService.Failure(ScopedException.CONNECTOR, t));
     }
 
     @Override

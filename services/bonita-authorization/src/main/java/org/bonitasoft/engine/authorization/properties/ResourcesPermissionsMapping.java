@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.cache.CacheService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -48,9 +47,8 @@ public class ResourcesPermissionsMapping extends ConfigurationFile {
         return PROPERTIES_FILENAME;
     }
 
-    public ResourcesPermissionsMapping(@Value("${tenantId}") long tenantId, CacheService cacheService,
-            ConfigurationFilesManager configurationFilesManager) {
-        super(tenantId, cacheService, configurationFilesManager);
+    public ResourcesPermissionsMapping(CacheService cacheService, ConfigurationFilesManager configurationFilesManager) {
+        super(cacheService, configurationFilesManager);
     }
 
     public Set<String> getResourcePermissions(final String method, final String apiName, final String resourceName,

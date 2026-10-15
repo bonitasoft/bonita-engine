@@ -92,10 +92,6 @@ public class ScriptExecutorIT {
         final Map<String, Object> rowPlatform = jdbcTemplate.queryForMap("select * from platform");
         assertThat("" + rowPlatform.get("id")).isEqualTo("1"); // convert to String as not all RDBMS convert the same way (long, int, bigDecimal...)
         assertThat(rowPlatform).containsEntry("created_by", "platformAdmin");
-
-        final Map<String, Object> rowTenant = jdbcTemplate.queryForMap("select * from tenant");
-        assertThat("" + rowTenant.get("id")).isEqualTo("1"); // convert to String as not all RDBMS convert the same way (long, int, bigDecimal...)
-        assertThat(rowTenant).containsEntry("createdBy", "defaultUser");
     }
 
     @Test

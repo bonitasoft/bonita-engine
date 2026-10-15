@@ -20,19 +20,17 @@ import org.junit.Test;
 public class SATaskContractDataTest {
 
     @Test
-    public void create_should_copy_values() throws Exception {
+    public void create_should_copy_values() {
         long userTaskId = 14444L;
         final STaskContractData taskContractData = new STaskContractData(userTaskId, "id", 15124245748545L);
         taskContractData.setId(7548463269L);
-        taskContractData.setTenantId(1L);
 
         final SATaskContractData saTaskContractData = new SATaskContractData(taskContractData);
 
-        assertThat(saTaskContractData.getTenantId()).isEqualTo(0L);
-        assertThat(saTaskContractData.getId()).isEqualTo(0L);
+        assertThat(saTaskContractData.getId()).isZero();
         assertThat(saTaskContractData.getName()).isEqualTo("id");
         assertThat(saTaskContractData.getScopeId()).isEqualTo(userTaskId);
-        assertThat(saTaskContractData.getArchiveDate()).isEqualTo(0L);
+        assertThat(saTaskContractData.getArchiveDate()).isZero();
         assertThat(saTaskContractData.getSourceObjectId()).isEqualTo(7548463269L);
         assertThat(saTaskContractData.getValue()).isEqualTo(15124245748545L);
     }

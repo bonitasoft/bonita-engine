@@ -24,9 +24,8 @@ public interface IncidentService {
     /**
      * Report an incident
      *
-     * @param incident
-     *        the incident to be reported
+     * @param incident the incident to be reported
      */
-    void report(long tenantId, Incident incident);
+    void report(Incident incident);
 
 }

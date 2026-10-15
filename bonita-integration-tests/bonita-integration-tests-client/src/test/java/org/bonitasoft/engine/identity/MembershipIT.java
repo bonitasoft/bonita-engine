@@ -211,7 +211,7 @@ public class MembershipIT extends TestWithTechnicalUser {
         final User plop = createUser("plop", "bpm");
         final Role roleM = getIdentityAPI().createRole("roleM");
         final Group groupM = getIdentityAPI().createGroup("groupM", null);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(plop.getUserName(), "bpm");
         final Date beforeDate = new Date();
         Thread.sleep(10);
@@ -433,7 +433,7 @@ public class MembershipIT extends TestWithTechnicalUser {
 
     private void createTestedUserMemberships() throws BonitaException, InterruptedException {
         user1 = createUser("userM1", "engine1");
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(user1.getUserName(), "engine1");
         user2 = createUser("userM2", "engine2");
         user3 = createUser("userM3", "engine3");

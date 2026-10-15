@@ -89,7 +89,7 @@ public class PermissionServiceImplTest {
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
                 .getClassLoader(any());
         permissionService = spy(
-                new PermissionServiceImpl(classLoaderService, sessionAccessor, sessionService, TENANT_ID,
+                new PermissionServiceImpl(classLoaderService, sessionAccessor, sessionService,
                         compoundPermissionsMapping, resourcesPermissionsMapping, customPermissionsMapping,
                         dynamicPermissionsChecks, true));
         doReturn(session).when(sessionService).getSession(anyLong());

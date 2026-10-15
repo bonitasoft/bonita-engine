@@ -161,7 +161,7 @@ public class BusinessDataLeftOperandHandlerTest {
 
         given(refBusinessDataRetriever.getRefBusinessDataInstance(
                 new BusinessDataContext(leftOperand.getName(), new Container(45, PROCESS_INSTANCE))))
-                        .willThrow(new SFlowNodeNotFoundException(45));
+                .willThrow(new SFlowNodeNotFoundException(45));
 
         //then
         expectedException.expect(SOperationExecutionException.class);

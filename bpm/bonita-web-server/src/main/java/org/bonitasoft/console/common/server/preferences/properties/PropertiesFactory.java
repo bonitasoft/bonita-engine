@@ -26,8 +26,4 @@ public class PropertiesFactory {
         return new ConsoleProperties();
     }
 
-    public static PlatformTenantConfigProperties getPlatformTenantConfigProperties() {
-        return new PlatformTenantConfigProperties();
-    }
-
 }

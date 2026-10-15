@@ -275,8 +275,6 @@ public class AbstractHumanTaskDatastore<CONSOLE_ITEM extends HumanTaskItem, ENGI
             return convertEngineToConsoleItem(humanTaskInstance);
         } catch (final ActivityInstanceNotFoundException e) {
             throw new APIItemNotFoundException(HumanTaskDefinition.TOKEN, id);
-        } catch (final BonitaException e) {
-            throw new APIException(e);
         }
     }
 

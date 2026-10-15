@@ -32,36 +32,29 @@ public class StoreConfigurationInTransaction extends TransactionCallbackWithoutR
     private final JdbcTemplate jdbcTemplate;
     private final List<BonitaConfiguration> bonitaConfigurations;
     private final ConfigurationType type;
-    private final long tenantId;
     private final String dbVendor;
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(StoreConfigurationInTransaction.class);
 
     public StoreConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor,
-            List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type,
-            long tenantId) {
+            List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type) {
 
         this.jdbcTemplate = jdbcTemplate;
         this.dbVendor = dbVendor;
         this.bonitaConfigurations = bonitaConfigurations;
         this.type = type;
-        this.tenantId = tenantId;
     }
 
     @Override
     protected void doInTransactionWithoutResult(TransactionStatus status) {
-        LOGGER.debug(
-                "delete configurations for type:" + type.name() + " and tenant id:" + tenantId
-                        + " bonitaConfigurations:" + bonitaConfigurations.toString());
+        LOGGER.debug("delete configurations for type:{} bonitaConfigurations:{}", type.name(), bonitaConfigurations);
 
         jdbcTemplate.batchUpdate(BonitaConfigurationPreparedStatementCleaner.DELETE_CONFIGURATION,
-                new BonitaConfigurationPreparedStatementCleaner(bonitaConfigurations, type, tenantId));
+                new BonitaConfigurationPreparedStatementCleaner(bonitaConfigurations, type));
 
-        LOGGER.debug(
-                "store configurations for type:" + type.name() + " and tenant id:" + tenantId + " bonitaConfigurations:"
-                        + bonitaConfigurations.toString());
+        LOGGER.debug("store configurations for type:{} bonitaConfigurations:{}", type.name(), bonitaConfigurations);
         jdbcTemplate.batchUpdate(BonitaConfigurationPreparedStatementSetter.INSERT_CONFIGURATION,
-                new BonitaConfigurationPreparedStatementSetter(bonitaConfigurations, dbVendor, type, tenantId));
+                new BonitaConfigurationPreparedStatementSetter(bonitaConfigurations, dbVendor, type));
 
     }
 

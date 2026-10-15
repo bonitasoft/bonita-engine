@@ -73,12 +73,7 @@ public class SPage extends AbstractSPage {
     }
 
     public SPage(final SPage sPage) {
-        this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(),
-                sPage.getInstalledBy(), sPage.isProvided(), sPage.isEditable(), sPage
-                        .getLastModificationDate(),
-                sPage.getLastUpdatedBy(), sPage.getContentName());
-        setContentType(sPage.getContentType());
-        setProcessDefinitionId(sPage.getProcessDefinitionId());
+        super(sPage);
     }
 
     public SPage(final String name, final long installationDate, final long installedBy, final boolean provided,

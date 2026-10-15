@@ -71,7 +71,6 @@ public class ActorPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -102,7 +101,6 @@ public class ActorPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 
     @Test

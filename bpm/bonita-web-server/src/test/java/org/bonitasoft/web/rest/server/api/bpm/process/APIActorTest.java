@@ -95,7 +95,7 @@ class APIActorTest {
 
         doThrow(new APIItemNotFoundException("process", deletedProcessId,
                 new ProcessDefinitionNotFoundException("process deleted")))
-                        .when(processDatastore).get(deletedProcessId);
+                .when(processDatastore).get(deletedProcessId);
 
         // When the unresolvable process must not fail the whole actor list
         assertThatCode(() -> apiActor.fillDeploys(item, deploys)).doesNotThrowAnyException();

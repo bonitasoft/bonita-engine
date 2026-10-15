@@ -22,7 +22,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 
 @Data
@@ -31,7 +32,11 @@ import org.hibernate.annotations.Type;
 @Builder
 @Entity
 @Table(name = "platform")
-public class SPlatform implements PlatformPersistentObject {
+// Only write the columns that actually changed. The maintenance flag and the platform information are updated by
+// different transactions (pause/resume vs. the background platform-info updater), and a full-row UPDATE from one
+// would overwrite the other with a stale value.
+@DynamicUpdate
+public class SPlatform implements PersistentObject {
 
     public static final String CREATED_BY = "createdBy";
     public static final String CREATED = "created";
@@ -43,6 +48,10 @@ public class SPlatform implements PlatformPersistentObject {
     public static final String APPLICATION_VERSION = "applicationVersion";
     public static final String MAINTENANCE_MESSAGE = "maintenanceMessage";
     public static final String MAINTENANCE_MESSAGE_ACTIVE = "maintenanceMessageActive";
+    public static final String MAINTENANCE_ENABLED = "maintenanceEnabled";
+
+    public static final String PAUSED = "PAUSED";
+    private static final String RESUMED = "RESUMED";
 
     @Id
     private long id;
@@ -61,10 +70,12 @@ public class SPlatform implements PlatformPersistentObject {
     private String maintenanceMessage;
     @Column(name = "maintenance_message_active")
     private boolean maintenanceMessageActive;
+    @Column(name = "maintenance_enabled")
+    private boolean maintenanceEnabled;
 
     public SPlatform(final String dbSchemaVersion, final String initialBonitaVersion, final String applicationVersion,
             final String maintenanceMessage, final boolean maintenanceMessageActive,
-            final String createdBy, final long created) {
+            final String createdBy, final long created, final boolean maintenanceEnabled) {
         this.dbSchemaVersion = dbSchemaVersion;
         this.initialBonitaVersion = initialBonitaVersion;
         this.applicationVersion = applicationVersion;
@@ -72,10 +83,11 @@ public class SPlatform implements PlatformPersistentObject {
         this.maintenanceMessageActive = maintenanceMessageActive;
         this.createdBy = createdBy;
         this.created = created;
+        this.maintenanceEnabled = maintenanceEnabled;
     }
 
-    @Override
-    public void setTenantId(long id) {
-        //no tenant id
+    public String getPausedStatus() {
+        return this.maintenanceEnabled ? PAUSED : RESUMED;
     }
+
 }

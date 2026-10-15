@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2025 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,10 +14,9 @@
 package org.bonitasoft.engine.persistence;
 
 /**
- * All archived SObjects must implement this interface.
+ * Interface for all {@link ArchivedPersistentObject}.
  *
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
+ * @see PersistentObject
  */
 public interface ArchivedPersistentObject extends PersistentObject {
 
@@ -31,5 +30,4 @@ public interface ArchivedPersistentObject extends PersistentObject {
     long getSourceObjectId();
 
     Class<? extends PersistentObject> getPersistentObjectInterface();
-
 }

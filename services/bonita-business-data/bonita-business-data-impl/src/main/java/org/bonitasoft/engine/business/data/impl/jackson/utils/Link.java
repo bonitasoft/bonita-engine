@@ -50,9 +50,8 @@ public class Link {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Link))
+        if (!(o instanceof Link link))
             return false;
-        Link link = (Link) o;
         return Objects.equals(rel, link.rel) &&
                 Objects.equals(href, link.href);
     }

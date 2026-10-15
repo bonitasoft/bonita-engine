@@ -42,7 +42,7 @@ public class SUserLogBuilderImpl extends CRUDELogBuilder implements SUserLogBuil
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
                 && log.getNumericIndex(SUserLogBuilderFactoryImpl.USER_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: Identity User Id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: Identity User Id");
         }
     }
 

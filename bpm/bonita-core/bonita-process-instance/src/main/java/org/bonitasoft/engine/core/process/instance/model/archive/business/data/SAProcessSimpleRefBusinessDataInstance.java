@@ -40,7 +40,6 @@ public class SAProcessSimpleRefBusinessDataInstance extends SASimpleRefBusinessD
     public SRefBusinessDataInstance toSRefBusinessDataInstance() {
         SProcessSimpleRefBusinessDataInstance refBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
         refBusinessDataInstance.setId(getSourceObjectId());
-        refBusinessDataInstance.setTenantId(tenantId);
         refBusinessDataInstance.setName(getName());
         refBusinessDataInstance.setDataClassName(getDataClassName());
         refBusinessDataInstance.setDataId(getDataId());

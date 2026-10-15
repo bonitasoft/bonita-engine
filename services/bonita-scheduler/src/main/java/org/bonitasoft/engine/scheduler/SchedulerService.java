@@ -74,7 +74,7 @@ public interface SchedulerService extends PlatformLifecycleService {
      * Schedules a job.
      *
      * @param jobDescriptor
-     * @param jobParameters
+     * @param parameters
      * @param trigger
      * @throws SSchedulerException
      *         if an exception occurs.
@@ -127,62 +127,48 @@ public interface SchedulerService extends PlatformLifecycleService {
     void deleteJobs() throws SSchedulerException;
 
     /**
-     * Get all jobs on the current tenant
+     * Get all jobs
      *
-     * @return all jobs on the current tenant
+     * @return all jobs
      * @throws SSchedulerException
      *         if an exception occurs.
      */
     List<String> getJobs() throws SSchedulerException;
 
-    /**
-     * Get all jobs on all tenants
-     * \/!\Must be replaced by a platform scheduler/!\
-     *
-     * @return all jobs on the current tenant
-     * @throws SSchedulerException
-     *         if an exception occurs.
-     */
-    List<String> getAllJobs() throws SSchedulerException;
-
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
     /**
-     * Pause all jobs running on the tenant
+     * Pause all running jobs
      *
-     * @param tenantId
      * @throws SSchedulerException
      */
-    void pauseJobs(long tenantId) throws SSchedulerException;
+    void pauseJobs() throws SSchedulerException;
 
     /**
-     * Resume all jobs paused on the tenant
+     * Resume all paused jobs
      *
-     * @param tenantId
      * @throws SSchedulerException
      */
-    void resumeJobs(long tenantId) throws SSchedulerException;
+    void resumeJobs() throws SSchedulerException;
 
     /**
      * Remove (delete) the <code>Trigger</code> with the
      * given key, and store the new given one - which must be associated
-     * with the same job (the new trigger must have the job name & group specified)
+     * with the same job (the new trigger must have the job name specified)
      * - however, the new trigger need not have the same name as the old trigger.
      *
      * @param triggerName
      *        The name of the trigger to replace
-     * @param groupName
-     *        The group name of the trigger to replace
      * @param triggerStartTime
      *        The start date of the new trigger
      * @return <code>null</code> if a <code>Trigger</code> with the given
-     *         name & group was not found and removed from the store (and the
+     *         name was not found and removed from the store (and the
      *         new trigger is therefore not stored), otherwise
      *         the first fire time of the newly scheduled trigger is returned.
      * @throws SSchedulerException
      * @since 6.4.0
      */
-    Date rescheduleJob(String triggerName, String groupName, Date triggerStartTime) throws SSchedulerException;
+    Date rescheduleJob(String triggerName, Date triggerStartTime) throws SSchedulerException;
 
     /**
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
@@ -213,6 +199,6 @@ public interface SchedulerService extends PlatformLifecycleService {
      */
     boolean isExistingJob(String jobName) throws SSchedulerException;
 
-    boolean mayFireAgain(String groupName, String jobName) throws SSchedulerException;
+    boolean mayFireAgain(String jobName) throws SSchedulerException;
 
 }

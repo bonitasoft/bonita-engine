@@ -13,12 +13,15 @@
  **/
 package org.bonitasoft.engine.core.category.model;
 
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Matthieu Chaffotte
@@ -27,12 +30,9 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @NoArgsConstructor
 @Entity
 @Table(name = "processcategorymapping")
-@IdClass(PersistentObjectId.class)
 @Cacheable(false)
 public class SProcessCategoryMapping implements PersistentObject {
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
     @Column

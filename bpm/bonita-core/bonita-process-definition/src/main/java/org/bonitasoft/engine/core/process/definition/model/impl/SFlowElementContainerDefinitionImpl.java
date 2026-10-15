@@ -236,14 +236,13 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             final SActivityDefinitionImpl activity;
             if (activityDefinition instanceof AutomaticTaskDefinitionImpl) {
                 activity = new SAutomaticTaskDefinitionImpl(activityDefinition, transitionsMap);
-            } else if (activityDefinition instanceof HumanTaskDefinitionImpl) {
+            } else if (activityDefinition instanceof HumanTaskDefinitionImpl humanTaskDefinitionImpl) {
                 if (activityDefinition instanceof UserTaskDefinitionImpl) {
                     activity = new SUserTaskDefinitionImpl((UserTaskDefinition) activityDefinition, transitionsMap);
                 } else {
                     activity = new SManualTaskDefinitionImpl((ManualTaskDefinitionImpl) activityDefinition,
                             transitionsMap);
                 }
-                final HumanTaskDefinitionImpl humanTaskDefinitionImpl = (HumanTaskDefinitionImpl) activityDefinition;
                 final UserFilterDefinition userFilter = humanTaskDefinitionImpl.getUserFilter();
                 final SHumanTaskDefinitionImpl sHumanTaskDefinitionImpl = (SHumanTaskDefinitionImpl) activity;
                 if (userFilter != null) {

@@ -21,11 +21,11 @@ import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 public interface BusinessDataModelRepository {
 
     /**
-     * Deploys a Business Data Model / repository on the specified tenant.
+     * Deploys a Business Data Model / repository
      *
      * @param bdmArchive
      *        the Business Data Model, as a jar containing the Business Object classes to deploy.
-     * @param userId the ID of the user installing the BDM, typically tenant admin (id=-1)
+     * @param userId the ID of the user installing the BDM, typically tech admin (id=-1)
      * @return the version of the BDM just deployed.
      * @throws SBusinessDataRepositoryDeploymentException
      *         if a deployment exception occurs.
@@ -34,14 +34,11 @@ public interface BusinessDataModelRepository {
             throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException;
 
     /**
-     * Undeploy Business Data Model from specified tenant
+     * Undeploy Business Data Model
      *
-     * @param tenantId
-     *        the ID of the tenant to undeploy the Business Data Model from
-     * @throws SBusinessDataRepositoryException
-     *         if error occurs during undeployement
+     * @throws SBusinessDataRepositoryException if error occurs during undeployement
      */
-    void uninstall(long tenantId) throws SBusinessDataRepositoryException;
+    void uninstall() throws SBusinessDataRepositoryException;
 
     boolean isBDMDeployed();
 
@@ -54,7 +51,7 @@ public interface BusinessDataModelRepository {
      */
     byte[] getClientBDMZip() throws SBusinessDataRepositoryException;
 
-    void dropAndUninstall(long tenantId) throws SBusinessDataRepositoryException;
+    void dropAndUninstall() throws SBusinessDataRepositoryException;
 
     /**
      * Returns the currently deployed BDM version, or null if no BDM is deployed.

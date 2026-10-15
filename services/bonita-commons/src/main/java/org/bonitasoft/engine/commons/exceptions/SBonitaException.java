@@ -23,7 +23,7 @@ import java.util.TreeMap;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public abstract class SBonitaException extends Exception {
+public abstract class SBonitaException extends Exception implements ExceptionContext, ScopedException {
 
     private static final long serialVersionUID = -500856379312027085L;
 
@@ -31,19 +31,21 @@ public abstract class SBonitaException extends Exception {
 
     private final Object[] arguments;
 
+    private String scope = ScopedException.UNKNOWN_SCOPE;
+
     private final Map<SExceptionContext, Serializable> context = new TreeMap<SExceptionContext, Serializable>();
 
     /**
      * Default constructor
      */
-    public SBonitaException() {
+    protected SBonitaException() {
         this((Object[]) null);
     }
 
     /**
      * @param arguments
      */
-    public SBonitaException(final Object... arguments) {
+    protected SBonitaException(final Object... arguments) {
         super();
         exceptionId = this.getClass().getName();
         this.arguments = arguments;
@@ -52,8 +54,15 @@ public abstract class SBonitaException extends Exception {
     /**
      * @param message
      */
-    public SBonitaException(final String message) {
+    protected SBonitaException(final String message) {
         super(message);
+        exceptionId = this.getClass().getName();
+        arguments = null;
+    }
+
+    protected SBonitaException(final String message, String scope) {
+        super(message);
+        this.scope = scope;
         exceptionId = this.getClass().getName();
         arguments = null;
     }
@@ -62,27 +71,61 @@ public abstract class SBonitaException extends Exception {
      * @param message
      * @param cause
      */
-    public SBonitaException(final String message, final Throwable cause) {
+    protected SBonitaException(final String message, final Throwable cause) {
         super(message, cause);
         exceptionId = this.getClass().getName();
         arguments = null;
+        if (cause instanceof SBonitaException e && e.getContext() != null) {
+            this.context.putAll(e.getContext());
+        }
+        if (cause instanceof ScopedException e) {
+            this.scope = e.getScope();
+        }
+    }
+
+    protected SBonitaException(final String message, String scope, final Throwable cause) {
+        super(message, cause);
+        exceptionId = this.getClass().getName();
+        arguments = null;
+        this.scope = scope;
+        if (cause instanceof SBonitaException e && e.getContext() != null) {
+            this.context.putAll(e.getContext());
+        }
     }
 
     /**
      * @param cause
      */
-    public SBonitaException(final Throwable cause) {
+    protected SBonitaException(final Throwable cause) {
         this(cause, (Object[]) null);
+        if (cause instanceof ScopedException e) {
+            this.scope = e.getScope();
+        }
     }
 
     /**
      * @param cause
      * @param arguments
      */
-    public SBonitaException(final Throwable cause, final Object... arguments) {
+    protected SBonitaException(final Throwable cause, final Object... arguments) {
         super(cause);
         exceptionId = this.getClass().getName();
         this.arguments = arguments;
+        if (cause instanceof SBonitaException e && e.getContext() != null) {
+            this.context.putAll(e.getContext());
+        }
+        if (cause instanceof ScopedException e) {
+            this.scope = e.getScope();
+        }
+    }
+
+    @Override
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
     /**
@@ -105,6 +148,7 @@ public abstract class SBonitaException extends Exception {
      * @return The context of the exception
      * @since 6.3
      */
+    @Override
     public Map<SExceptionContext, Serializable> getContext() {
         return context;
     }
@@ -114,7 +158,8 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the process definition to set
      * @since 6.3
      */
-    public void setProcessDefinitionIdOnContext(final Long id) {
+    @Override
+    public void setProcessDefinitionIdOnContext(final long id) {
         context.put(SExceptionContext.PROCESS_DEFINITION_ID, id);
     }
 
@@ -123,6 +168,7 @@ public abstract class SBonitaException extends Exception {
      *        The name of the process definition to set
      * @since 6.3
      */
+    @Override
     public void setProcessDefinitionNameOnContext(final String name) {
         context.put(SExceptionContext.PROCESS_NAME, name);
     }
@@ -132,6 +178,7 @@ public abstract class SBonitaException extends Exception {
      *        The version of the process definition to set
      * @since 6.3
      */
+    @Override
     public void setProcessDefinitionVersionOnContext(final String version) {
         context.put(SExceptionContext.PROCESS_VERSION, version);
     }
@@ -141,7 +188,8 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the process instance to set
      * @since 6.3
      */
-    public void setProcessInstanceIdOnContext(final Long id) {
+    @Override
+    public void setProcessInstanceIdOnContext(final long id) {
         context.put(SExceptionContext.PROCESS_INSTANCE_ID, id);
     }
 
@@ -150,7 +198,8 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the root process instance to set
      * @since 6.3
      */
-    public void setRootProcessInstanceIdOnContext(final Long id) {
+    @Override
+    public void setRootProcessInstanceIdOnContext(final long id) {
         context.put(SExceptionContext.ROOT_PROCESS_INSTANCE_ID, id);
     }
 
@@ -159,6 +208,7 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the connector definition
      * @since 6.3
      */
+    @Override
     public void setConnectorDefinitionIdOnContext(final String id) {
         context.put(SExceptionContext.CONNECTOR_DEFINITION_ID, id);
     }
@@ -168,6 +218,7 @@ public abstract class SBonitaException extends Exception {
      *        The class name of the implementation of the connector definition to set
      * @since 6.3
      */
+    @Override
     public void setConnectorImplementationClassNameOnContext(final String name) {
         context.put(SExceptionContext.CONNECTOR_IMPLEMENTATION_CLASS_NAME, name);
     }
@@ -177,6 +228,7 @@ public abstract class SBonitaException extends Exception {
      *        The version of the connector definition
      * @since 6.3
      */
+    @Override
     public void setConnectorDefinitionVersionOnContext(final String version) {
         context.put(SExceptionContext.CONNECTOR_DEFINITION_VERSION, version);
     }
@@ -186,6 +238,7 @@ public abstract class SBonitaException extends Exception {
      *        The event which activates the connector to set
      * @since 6.3
      */
+    @Override
     public void setConnectorActivationEventOnContext(final String activationEvent) {
         context.put(SExceptionContext.CONNECTOR_ACTIVATION_EVENT, activationEvent);
     }
@@ -195,6 +248,7 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the connector instance to set
      * @since 6.3
      */
+    @Override
     public void setConnectorInstanceIdOnContext(final long id) {
         context.put(SExceptionContext.CONNECTOR_INSTANCE_ID, id);
     }
@@ -204,6 +258,7 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the flow node definition to set
      * @since 6.3
      */
+    @Override
     public void setFlowNodeDefinitionIdOnContext(final long id) {
         context.put(SExceptionContext.FLOW_NODE_DEFINITION_ID, id);
     }
@@ -213,6 +268,7 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the flow node instance to set
      * @since 6.3
      */
+    @Override
     public void setFlowNodeInstanceIdOnContext(final long id) {
         context.put(SExceptionContext.FLOW_NODE_INSTANCE_ID, id);
     }
@@ -222,6 +278,7 @@ public abstract class SBonitaException extends Exception {
      *        The name of the flow node to set
      * @since 6.3
      */
+    @Override
     public void setFlowNodeNameOnContext(final String name) {
         context.put(SExceptionContext.FLOW_NODE_NAME, name);
     }
@@ -231,6 +288,7 @@ public abstract class SBonitaException extends Exception {
      *        The name of the message instance to set
      * @since 6.3
      */
+    @Override
     public void setMessageInstanceNameOnContext(final String name) {
         context.put(SExceptionContext.MESSAGE_INSTANCE_NAME, name);
     }
@@ -240,6 +298,7 @@ public abstract class SBonitaException extends Exception {
      *        The target process name of the message instance to set
      * @since 6.3
      */
+    @Override
     public void setMessageInstanceTargetProcessOnContext(final String name) {
         context.put(SExceptionContext.MESSAGE_INSTANCE_TARGET_PROCESS_NAME, name);
     }
@@ -249,6 +308,7 @@ public abstract class SBonitaException extends Exception {
      *        The target flow node name of the message instance to set
      * @since 6.3
      */
+    @Override
     public void setMessageInstanceTargetFlowNodeOnContext(final String name) {
         context.put(SExceptionContext.MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, name);
     }
@@ -258,6 +318,7 @@ public abstract class SBonitaException extends Exception {
      *        The event type of the waiting message instance to set
      * @since 6.3
      */
+    @Override
     public void setWaitingMessageEventTypeOnContext(final String eventType) {
         context.put(SExceptionContext.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
     }
@@ -267,6 +328,7 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the document
      * @since 6.3
      */
+    @Override
     public void setDocumentIdOnContext(final long id) {
         context.put(SExceptionContext.DOCUMENT_ID, id);
     }
@@ -276,7 +338,8 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the user
      * @since 6.3
      */
-    public void setUserIdOnContext(final Long userId) {
+    @Override
+    public void setUserIdOnContext(final long userId) {
         context.put(SExceptionContext.USER_ID, userId);
     }
 
@@ -285,7 +348,8 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the group
      * @since 6.3
      */
-    public void setGroupIdOnContext(final Long groupId) {
+    @Override
+    public void setGroupIdOnContext(final long groupId) {
         context.put(SExceptionContext.GROUP_ID, groupId);
     }
 
@@ -294,8 +358,19 @@ public abstract class SBonitaException extends Exception {
      *        The identifier of the role
      * @since 6.3
      */
-    public void setRoleIdOnContext(final Long roleId) {
+    @Override
+    public void setRoleIdOnContext(final long roleId) {
         context.put(SExceptionContext.ROLE_ID, roleId);
+    }
+
+    @Override
+    public void setConnectorInputOnContext(String inputName) {
+        context.put(SExceptionContext.CONNECTOR_INPUT_NAME, inputName);
+    }
+
+    @Override
+    public void setConnectorNameOnContext(String name) {
+        context.put(SExceptionContext.CONNECTOR_NAME, name);
     }
 
     @Override
@@ -311,7 +386,7 @@ public abstract class SBonitaException extends Exception {
         if (message != null && message.isEmpty() && getCause() != null) {
             message = getCause().getMessage();
         }
-        if (message != null && !message.trim().equals("")) {
+        if (message != null && !message.trim().isEmpty()) {
             stringBuilder.append(message);
         }
     }

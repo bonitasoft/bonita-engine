@@ -25,7 +25,7 @@ import org.junit.Test;
 public class SApplicationUpdateBuilderTest {
 
     @Test
-    public void constructorShouldUpdateUpdatedByAndLastUpdateDateFields() throws Exception {
+    public void constructorShouldUpdateUpdatedByAndLastUpdateDateFields() {
         //given
         long homePageId = 4L;
         long updaterUserId = 17L;

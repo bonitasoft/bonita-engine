@@ -13,15 +13,9 @@
  **/
 package org.bonitasoft.platform.configuration.model;
 
-import lombok.Data;
-
 /**
  * @author Emmanuel Duchastenier
  */
-@Data
-public class LightBonitaConfiguration {
-
-    private final Long tenantId;
-    private final String type;
+public record LightBonitaConfiguration(String type) {
 
 }

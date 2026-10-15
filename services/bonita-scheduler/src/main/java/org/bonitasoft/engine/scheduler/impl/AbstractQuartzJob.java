@@ -66,10 +66,9 @@ public abstract class AbstractQuartzJob implements org.quartz.Job {
     }
 
     private JobIdentifier getJobIdentifier(JobDataMap jobDataMap) {
-        final long tenantId = Long.parseLong((String) jobDataMap.get("tenantId"));
         final long jobId = Long.parseLong((String) jobDataMap.get("jobId"));
         final String jobName = (String) jobDataMap.get("jobName");
-        return new JobIdentifier(jobId, tenantId, jobName);
+        return new JobIdentifier(jobId, jobName);
     }
 
     StatelessJob getBosJob() {

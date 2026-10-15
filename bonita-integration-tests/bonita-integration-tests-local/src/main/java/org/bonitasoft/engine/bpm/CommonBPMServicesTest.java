@@ -95,7 +95,6 @@ public class CommonBPMServicesTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
     protected static SessionAccessor sessionAccessor;
     protected static ServiceAccessor serviceAccessor;
-    private static long tenantId;
     @Rule
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
 
@@ -110,10 +109,6 @@ public class CommonBPMServicesTest {
 
     protected ServiceAccessorFactory getServiceAccessorFactory() {
         return ServiceAccessorFactory.getInstance();
-    }
-
-    protected long getDefaultTenantId() {
-        return tenantId;
     }
 
     APISession getAPISession() {
@@ -142,7 +137,6 @@ public class CommonBPMServicesTest {
     @Before
     public void commonSetup() throws Exception {
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
-        tenantId = apiSession.getTenantId();
         if (sessionAccessor == null) {
             sessionAccessor = getServiceAccessorFactory().createSessionAccessor();
         }
@@ -151,8 +145,7 @@ public class CommonBPMServicesTest {
         }
 
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
-        tenantId = apiSession.getTenantId();
-        sessionAccessor.setSessionInfo(apiSession.getId(), tenantId);
+        sessionAccessor.setSessionId(apiSession.getId());
     }
 
     protected Group createGroup(final String groupName) throws CreationException {

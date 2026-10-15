@@ -57,10 +57,8 @@ public class OrderByOption implements Serializable {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof OrderByOption))
+        if (!(o instanceof OrderByOption that))
             return false;
-
-        OrderByOption that = (OrderByOption) o;
 
         if (clazz != null ? !clazz.equals(that.clazz) : that.clazz != null)
             return false;

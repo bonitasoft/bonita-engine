@@ -43,7 +43,7 @@ public class SADataInstanceLogBuilderImpl extends CRUDELogBuilder implements SAD
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SA_DATA_INSTANCE_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "data instance Id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "data instance Id");
         }
     }
 

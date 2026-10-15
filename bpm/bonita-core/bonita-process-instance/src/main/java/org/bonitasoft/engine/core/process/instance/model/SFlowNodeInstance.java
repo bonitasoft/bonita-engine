@@ -15,13 +15,20 @@ package org.bonitasoft.engine.core.process.instance.model;
 
 import java.util.Date;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Feng Hui
@@ -33,15 +40,12 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @NoArgsConstructor
 @Entity
 @Table(name = "flownode_instance")
-@IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class SFlowNodeInstance implements PersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private long flowNodeDefinitionId;
     private long rootContainerId;
     private long parentContainerId;

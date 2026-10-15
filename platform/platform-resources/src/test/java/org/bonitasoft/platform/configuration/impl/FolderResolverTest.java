@@ -39,7 +39,7 @@ public class FolderResolverTest {
 
         FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("licence1.lic",
                 "license content".getBytes(),
-                ConfigurationType.LICENSES.name(), 0L);
+                ConfigurationType.LICENSES.name());
 
         //then
         Assertions.assertThat(folderResolver.getFolder(fullBonitaConfiguration)).isEqualTo(LicFolder.toFile());
@@ -55,7 +55,7 @@ public class FolderResolverTest {
 
         FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("conf.properties",
                 "key=value".getBytes(),
-                ConfigurationType.PLATFORM_ENGINE.name(), 0L);
+                ConfigurationType.PLATFORM_ENGINE.name());
 
         //then
         Assertions.assertThat(folderResolver.getFolder(fullBonitaConfiguration))
@@ -72,11 +72,11 @@ public class FolderResolverTest {
 
         FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("conf.properties",
                 "key=value".getBytes(),
-                ConfigurationType.TENANT_PORTAL.name(), 55L);
+                ConfigurationType.TENANT_PORTAL.name());
 
         //then
         Assertions.assertThat(folderResolver.getFolder(fullBonitaConfiguration))
-                .isEqualTo(confFolder.resolve("tenants").resolve("55").resolve("tenant_portal").toFile());
+                .isEqualTo(confFolder.resolve("tenant_portal").toFile());
 
     }
 

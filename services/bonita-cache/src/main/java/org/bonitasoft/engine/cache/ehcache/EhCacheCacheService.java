@@ -74,7 +74,7 @@ public class EhCacheCacheService implements CacheService, PlatformLifecycleServi
     protected CacheConfiguration getEhCacheConfiguration(
             final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig) {
         final CacheConfiguration ehCacheConfig = new CacheConfiguration();
-        ehCacheConfig.setMaxElementsInMemory(cacheConfig.getMaxElementsInMemory());
+        ehCacheConfig.setMaxEntriesLocalHeap(cacheConfig.getMaxElementsInMemory());
         ehCacheConfig.setMaxElementsOnDisk(cacheConfig.getMaxElementsOnDisk());
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
         ehCacheConfig.setEternal(cacheConfig.isEternal());

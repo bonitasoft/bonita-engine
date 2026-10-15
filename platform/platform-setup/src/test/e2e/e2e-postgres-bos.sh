@@ -29,6 +29,37 @@ echo "Start the Postgres database docker container"
 echo "============================================="
 docker run --rm -p 5432:5432 --name bonita-postgres -d bonitasoft/bonita-postgres:16.4
 
+echo "==================================================="
+echo "Wait for the database to accept TCP connections"
+echo "(the docker-entrypoint init phase runs a temporary"
+echo "server that only listens on the unix socket, so a"
+echo "TCP check cannot return a false positive)"
+echo "==================================================="
+i=0
+until docker exec bonita-postgres pg_isready -h 127.0.0.1 -U bonita -d bonita > /dev/null 2>&1; do
+  # the container is started with --rm: once it exits, it and its logs are gone, and every
+  # further probe would fail with a daemon error. Report that instead of waiting the full timeout.
+  if [ "$(docker inspect -f '{{.State.Running}}' bonita-postgres 2>/dev/null)" != "true" ]; then
+    echo "The postgres container is not running:"
+    docker ps -a --filter name=bonita-postgres
+    testReturnCode 1 "starting the postgres database container"
+  fi
+  i=$((i+1))
+  if [ ${i} -ge 60 ]; then
+    break
+  fi
+  sleep 1
+done
+docker exec bonita-postgres pg_isready -h 127.0.0.1 -U bonita -d bonita
+READY=$?
+if [ ${READY} -ne 0 ]; then
+  # testReturnCode destroys the container below, so dump its logs while they still exist
+  echo "--- postgres container logs (last 100 lines) ---"
+  docker logs bonita-postgres 2>&1 | tail -n 100
+  echo "--- end of postgres container logs ---"
+fi
+testReturnCode ${READY} "waiting for the postgres database to accept connections"
+
 export VERSION="$(cat ../platform-resources/build/resources/main/PLATFORM_ENGINE_VERSION)"
 
 echo "========================================"
@@ -130,7 +161,8 @@ SELECT
             p.created / 1000
         ),
         'DD/MM/YYYY HH24:MI:SS'
-    ) as creation_date
+    ) as creation_date,
+    maintenance_enabled
 FROM
     platform p"
 
@@ -141,46 +173,40 @@ echo "========================================"
 
 docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
 SELECT
-    c.tenant_id,
     c.content_type,
     c.resource_name
 FROM
     configuration c
 ORDER BY
-    c.tenant_id,
     c.content_type,
     c.resource_name"
 
-
-echo "========================================"
-echo "simulation of engine start"
-echo "========================================"
-docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
-INSERT
-    INTO
-        configuration(
-            tenant_id,
-            content_type,
-            resource_name,
-            resource_content
-        ) SELECT
-            1,
-            'TENANT_SECURITY_SCRIPTS',
-            c.resource_name,
-            c.resource_content
-        FROM
-            configuration c
-        WHERE
-            c.tenant_id = 0
-            AND c.content_type ='TENANT_TEMPLATE_SECURITY_SCRIPTS'"
+#
+#echo "========================================"
+#echo "simulation of engine start"
+#echo "========================================"
+#docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
+#INSERT
+#    INTO
+#        configuration(
+#            content_type,
+#            resource_name,
+#            resource_content
+#        ) SELECT
+#            'TENANT_SECURITY_SCRIPTS',
+#            c.resource_name,
+#            c.resource_content
+#        FROM
+#            configuration c
+#        WHERE c.content_type ='TENANT_SECURITY_SCRIPTS'"
 
 echo "================================================================================"
 echo "simulate a version upgrade (configuration files have changed in folder initial/)"
 echo "================================================================================"
 
-echo "dynamic-permissions-checks" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/dynamic-permissions-checks.properties
-echo "resources-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/resources-permissions-mapping.properties
-echo "compound-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/compound-permissions-mapping.properties
+echo "dynamic-permissions-checks" > ${E2E_DIR}/platform_conf/initial/tenant_portal/dynamic-permissions-checks.properties
+echo "resources-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_portal/resources-permissions-mapping.properties
+echo "compound-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_portal/compound-permissions-mapping.properties
 
 ${E2E_DIR}/setup.sh init
 testReturnCode $? "setup.sh init"
@@ -195,13 +221,13 @@ echo "==========================================================================
 echo "verify version upgrade has updated configuration file changes (in folder current/)"
 echo "=================================================================================="
 
-new_content=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/dynamic-permissions-checks.properties`
+new_content=`cat ${E2E_DIR}/platform_conf/current/tenant_portal/dynamic-permissions-checks.properties`
 testValue $new_content "dynamic-permissions-checks"
 
-res_mapp=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/resources-permissions-mapping.properties`
+res_mapp=`cat ${E2E_DIR}/platform_conf/current/tenant_portal/resources-permissions-mapping.properties`
 testValue $res_mapp "resources-permissions-mapping"
 
-compound=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/compound-permissions-mapping.properties`
+compound=`cat ${E2E_DIR}/platform_conf/current/tenant_portal/compound-permissions-mapping.properties`
 testValue $compound "compound-permissions-mapping"
 
 echo "=> Verification Ok"

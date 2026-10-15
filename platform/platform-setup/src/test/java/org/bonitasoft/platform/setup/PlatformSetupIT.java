@@ -17,7 +17,7 @@ import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.platform.configuration.type.ConfigurationType.PLATFORM_ENGINE;
-import static org.bonitasoft.platform.configuration.type.ConfigurationType.TENANT_TEMPLATE_PORTAL;
+import static org.bonitasoft.platform.configuration.type.ConfigurationType.TENANT_PORTAL;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.bonitasoft.platform.setup.PlatformSetup.PLATFORM_CONF_FOLDER_NAME;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
@@ -98,8 +98,6 @@ class PlatformSetupIT {
         final List<String> platformRows = jdbcTemplate.queryForList("SELECT information FROM platform", String.class);
         assertThat(platformRows).hasSize(1);
         assertThat(platformRows.get(0)).isNotBlank(); // In Community, should contain the initial case counter value for information
-        final int tenantRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "tenant");
-        assertThat(tenantRows).isEqualTo(1);
         final int configurationFiles = JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration");
         assertThat(configurationFiles).isGreaterThan(1);
     }
@@ -135,7 +133,7 @@ class PlatformSetupIT {
         //then
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList("SELECT * FROM configuration WHERE content_type= '"
-                        + ConfigurationType.TENANT_TEMPLATE_PORTAL + "' ORDER BY resource_name");
+                        + ConfigurationType.TENANT_PORTAL + "' ORDER BY resource_name");
         assertThat(rows).hasSize(9);
         int rowId = 0;
         assertThat(rows.get(rowId++)).containsEntry("RESOURCE_NAME", "compound-permissions-mapping-custom.properties");
@@ -159,10 +157,9 @@ class PlatformSetupIT {
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList("SELECT * FROM configuration WHERE content_type= '" + ConfigurationType.PLATFORM_PORTAL
                         + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(3);
+        assertThat(rows).hasSize(2);
         assertThat(rows.get(0)).containsEntry("RESOURCE_NAME", "cache-config.xml");
-        assertThat(rows.get(1)).containsEntry("RESOURCE_NAME", "platform-tenant-config.properties");
-        assertThat(rows.get(2)).containsEntry("RESOURCE_NAME", "security-config.properties");
+        assertThat(rows.get(1)).containsEntry("RESOURCE_NAME", "security-config.properties");
     }
 
     @Test
@@ -191,7 +188,6 @@ class PlatformSetupIT {
                 "bonita-platform-community-custom.properties",
                 "bonita-platform-custom.xml",
                 "cache-config.xml",
-                "platform-tenant-config.properties",
                 "security-config.properties",
                 "bonita-tenant-community-custom.properties",
                 "bonita-tenants-custom.xml",
@@ -339,7 +335,7 @@ class PlatformSetupIT {
 
         FileUtils.writeByteArrayToFile(
                 pushPath.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current")
-                        .resolve(TENANT_TEMPLATE_PORTAL.name().toLowerCase())
+                        .resolve(TENANT_PORTAL.name().toLowerCase())
                         .resolve("current.properties").toFile(),
                 "key2=value2".getBytes());
 
@@ -481,7 +477,7 @@ class PlatformSetupIT {
         Path setupFolder = Files.createDirectory(temporaryFolder.resolve("conf"));
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toAbsolutePath().toString());
         final File permissionFile = setupFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
-                .resolve("tenant_template_portal")
+                .resolve("tenant_portal")
                 .resolve("resources-permissions-mapping.properties").toFile();
         FileUtils.write(permissionFile, "default 7.5.4 content", Charset.defaultCharset());
         configurationFolderUtil.buildSqlFolder(setupFolder, dbVendor);
@@ -495,11 +491,10 @@ class PlatformSetupIT {
         platformSetup.init();
 
         //then
-        List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList(
+        Map<String, Object> rows = jdbcTemplate
+                .queryForMap(
                         "SELECT * FROM configuration WHERE resource_name = 'resources-permissions-mapping.properties'");
-        assertThat(rows).hasSize(2)
-                .allSatisfy(row -> assertThat(row).containsEntry("RESOURCE_CONTENT", new_7_6_0_content.getBytes()));
+        assertThat(rows.get("RESOURCE_CONTENT")).isEqualTo(new_7_6_0_content.getBytes());
     }
 
     @Test
@@ -507,9 +502,8 @@ class PlatformSetupIT {
         //given
         platformSetup.init();
         final String countConfigFile = "SELECT * FROM configuration WHERE resource_name = 'bonita-tenant-community-custom.properties'";
-        assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(2)
-                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"))
-                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_TEMPLATE_ENGINE"));
+        assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(1)
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"));
 
         // Delete it to check that init method adds it again:
         jdbcTemplate
@@ -521,9 +515,8 @@ class PlatformSetupIT {
         platformSetup.init();
 
         //then
-        assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(2)
-                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"))
-                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_TEMPLATE_ENGINE"));
+        assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(1)
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"));
         assertThat(capturedOutput.getOut())
                 .contains("New configuration file detected 'bonita-tenant-community-custom.properties'");
     }

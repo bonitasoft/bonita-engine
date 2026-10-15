@@ -22,7 +22,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Haroun EL ALAMI
@@ -33,7 +33,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "temporary_content")
 @Cacheable(false)
-public class STemporaryContent implements PlatformPersistentObject {
+public class STemporaryContent implements PersistentObject {
 
     @Id
     private long id;
@@ -77,10 +77,5 @@ public class STemporaryContent implements PlatformPersistentObject {
         this.content = content;
         this.creationDate = System.currentTimeMillis();
         this.mimeType = mimeType;
-    }
-
-    @Override
-    public void setTenantId(long id) {
-        //no tenant id
     }
 }

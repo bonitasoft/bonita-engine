@@ -39,7 +39,6 @@ import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpd
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
-import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -1488,7 +1487,7 @@ public class IdentityServiceIT extends CommonBPMServicesTest {
         userAllFields.put(SUser.class, fields);
         final QueryOptions queryOptions = new QueryOptions(0, 10,
                 Arrays.asList(new OrderByOption(SUser.class, "userName", OrderByType.ASC)),
-                new ArrayList<FilterOption>(0), new SearchFields(Arrays.asList("#"), userAllFields));
+                new ArrayList<>(0), new SearchFields(Arrays.asList("#"), userAllFields));
         getTransactionService().begin();
         final List<SUser> result = identityService.searchUsers(queryOptions);
         assertEquals(0, result.size());

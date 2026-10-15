@@ -37,7 +37,7 @@ public class PermissionCachingBenchmark {
         engine = TestEngineImpl.getInstance();
         engine.start();
         cacheService = ServiceAccessorSingleton.getInstance().getCacheService();
-        resourcesPermissionsMapping = new ResourcesPermissionsMapping(1L, cacheService,
+        resourcesPermissionsMapping = new ResourcesPermissionsMapping(cacheService,
                 new ConfigurationFilesManager());
     }
 

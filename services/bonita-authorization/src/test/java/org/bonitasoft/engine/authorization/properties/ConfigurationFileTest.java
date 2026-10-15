@@ -62,15 +62,15 @@ public class ConfigurationFileTest {
     @Before
     public void setupMocksAndSpies() {
         resourcesPermissionsMapping = spy(
-                new ResourcesPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
+                new ResourcesPermissionsMapping(cacheService, configurationFilesManager));
         doReturn(resourcesProperties).when(resourcesPermissionsMapping).getProperties();
 
         customPermissionsMapping = spy(
-                new CustomPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
+                new CustomPermissionsMapping(cacheService, configurationFilesManager));
         doReturn(customProperties).when(customPermissionsMapping).getProperties();
 
         compoundPermissionsMapping = spy(
-                new CompoundPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
+                new CompoundPermissionsMapping(cacheService, configurationFilesManager));
         doReturn(compoundProperties).when(compoundPermissionsMapping).getProperties();
     }
 
@@ -129,10 +129,10 @@ public class ConfigurationFileTest {
     public void getTenantProperties_should_get_from_cache_and_store_to_cache_if_not_already_in() throws Exception {
         // given:
         final ResourcesPermissionsMapping configFile = spy(
-                new ResourcesPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
+                new ResourcesPermissionsMapping(cacheService, configurationFilesManager));
         final Properties props = new Properties();
         doReturn(props).when(configurationFilesManager).getTenantProperties("resources-permissions-mapping.properties",
-                TENANT_ID, false);
+                false);
 
         // when:
         configFile.getProperties();

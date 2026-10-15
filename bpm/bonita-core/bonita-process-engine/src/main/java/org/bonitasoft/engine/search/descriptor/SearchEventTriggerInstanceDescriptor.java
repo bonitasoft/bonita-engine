@@ -47,7 +47,8 @@ public class SearchEventTriggerInstanceDescriptor extends SearchEntityDescriptor
                 new FieldDescriptor(STimerEventTriggerInstance.class,
                         "executionDate"));
 
-        eventTriggerInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
+        eventTriggerInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(
+                1);
         eventTriggerInstanceDescriptorAllFields.put(SEventInstance.class, Collections.singleton("name"));
     }
 

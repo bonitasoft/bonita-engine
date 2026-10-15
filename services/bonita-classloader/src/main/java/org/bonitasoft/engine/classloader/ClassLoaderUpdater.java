@@ -25,8 +25,6 @@ import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -43,23 +41,18 @@ class ClassLoaderUpdater {
     final static long DEFAULT_CLASSLOADER_INITIALIZATION_TIMEOUT_MINUTES = 5L;
 
     private final BonitaTaskExecutor bonitaTaskExecutor;
-    private final SessionAccessor sessionAccessor;
     private final UserTransactionService userTransactionService;
 
     @Value("${bonita.runtime.classloader.initialization.timeout-minutes:-1}")
     private long classLoaderInitializationTimeoutMinutes;
 
-    public ClassLoaderUpdater(BonitaTaskExecutor bonitaTaskExecutor,
-            SessionAccessor sessionAccessor, UserTransactionService userTransactionService) {
+    public ClassLoaderUpdater(BonitaTaskExecutor bonitaTaskExecutor, UserTransactionService userTransactionService) {
         this.bonitaTaskExecutor = bonitaTaskExecutor;
-        this.sessionAccessor = sessionAccessor;
         this.userTransactionService = userTransactionService;
     }
 
-    public void refreshClassloaders(ClassLoaderServiceImpl classLoaderService, Long tenantId,
-            Set<ClassLoaderIdentifier> ids) {
-
-        execute(tenantId, () -> {
+    public void refreshClassloaders(ClassLoaderServiceImpl classLoaderService, Set<ClassLoaderIdentifier> ids) {
+        execute(() -> {
             for (ClassLoaderIdentifier id : ids) {
                 classLoaderService.refreshClassLoaderImmediately(id);
             }
@@ -71,12 +64,11 @@ class ClassLoaderUpdater {
             ClassLoaderIdentifier identifier) {
         log.debug("Request creation of classloader in an other thread: {}. A {} minutes timeout will be used.",
                 identifier, classLoaderInitializationTimeoutMinutes);
-        return execute(getTenantId(), () -> classLoaderService.createClassloader(identifier));
+        return execute(() -> classLoaderService.createClassloader(identifier));
     }
 
-    private <T> T execute(Long tenantId, Callable<T> callable) {
-        Future<T> execute = bonitaTaskExecutor.execute(
-                inSession(tenantId, inTransaction(callable)));
+    private <T> T execute(Callable<T> callable) {
+        Future<T> execute = bonitaTaskExecutor.execute(inTransaction(callable));
         try {
             return execute.get(classLoaderInitializationTimeoutMinutes, TimeUnit.MINUTES);
         } catch (InterruptedException | ExecutionException e) {
@@ -92,31 +84,8 @@ class ClassLoaderUpdater {
         }
     }
 
-    private <T> Callable<T> inSession(Long tenantId, Callable<T> callable) {
-        if (tenantId == null) {
-            return callable;
-        }
-        return () -> {
-            sessionAccessor.setTenantId(tenantId);
-            try {
-                return callable.call();
-            } finally {
-                sessionAccessor.deleteTenantId();
-            }
-        };
-    }
-
     private <T> Callable<T> inTransaction(Callable<T> callable) {
         return () -> userTransactionService.executeInTransaction(callable);
-    }
-
-    private Long getTenantId() {
-        try {
-            return sessionAccessor.getTenantId();
-        } catch (STenantIdNotSetException ignored) {
-            //In a platform session
-        }
-        return null;
     }
 
     @PostConstruct

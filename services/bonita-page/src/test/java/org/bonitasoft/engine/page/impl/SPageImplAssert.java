@@ -352,28 +352,4 @@ public class SPageImplAssert extends AbstractAssert<SPageImplAssert, SPage> {
         return this;
     }
 
-    /**
-     * Verifies that the actual SPageImpl's tenantId is equal to the given one.
-     *
-     * @param tenantId the given tenantId to compare the actual SPageImpl's tenantId to.
-     * @return this assertion object.
-     * @throws AssertionError - if the actual SPageImpl's tenantId is not equal to the given one.
-     */
-    public SPageImplAssert hasTenantId(long tenantId) {
-        // check that actual SPageImpl we want to make assertions on is not null.
-        isNotNull();
-
-        // we overrides the default error message with a more explicit one
-        String errorMessage = format("\nExpected <%s> tenantId to be:\n  <%s>\n but was:\n  <%s>", actual, tenantId,
-                actual.getTenantId());
-
-        // check
-        if (actual.getTenantId() != tenantId) {
-            throw new AssertionError(errorMessage);
-        }
-
-        // return the current assertion for method chaining
-        return this;
-    }
-
 }

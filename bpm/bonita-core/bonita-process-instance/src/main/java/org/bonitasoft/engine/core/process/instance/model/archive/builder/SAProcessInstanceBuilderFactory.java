@@ -39,6 +39,8 @@ public interface SAProcessInstanceBuilderFactory {
 
     String getSourceObjectIdKey();
 
+    String getRootProcessInstanceIdKey();
+
     String getEndDateKey();
 
     String getStartDateKey();

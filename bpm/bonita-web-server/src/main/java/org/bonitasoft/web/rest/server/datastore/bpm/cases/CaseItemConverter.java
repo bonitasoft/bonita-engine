@@ -41,6 +41,7 @@ public class CaseItemConverter extends ItemConverter<CaseItem, ProcessInstance> 
         item.setSearchIndex3Value(process.getStringIndex3());
         item.setSearchIndex4Value(process.getStringIndex4());
         item.setSearchIndex5Value(process.getStringIndex5());
+        item.setCallerId(process.getCallerId());
         return item;
     }
 

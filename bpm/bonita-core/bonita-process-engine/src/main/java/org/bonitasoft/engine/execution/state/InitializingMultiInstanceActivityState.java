@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -59,8 +60,7 @@ public class InitializingMultiInstanceActivityState implements FlowNodeState {
             final SActivityDefinition activity = (SActivityDefinition) processContainer
                     .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
             final SLoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
-            if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics) {
-                final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
+            if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics miLoop) {
                 final SExpression loopCardinality = miLoop.getLoopCardinality();
                 int numberOfInstanceMax = -1;
                 if (loopCardinality != null) {
@@ -78,7 +78,8 @@ public class InitializingMultiInstanceActivityState implements FlowNodeState {
                     throw new SActivityStateExecutionException(
                             "The multi instance on activity " + flowNodeInstance.getName() + " of process "
                                     + processDefinition.getName() + " " + processDefinition.getVersion()
-                                    + " did not have loop cardinality nor loop data input ref set");
+                                    + " did not have loop cardinality nor loop data input ref set",
+                            ScopedException.ITERATION);
                 }
                 stateBehaviors.updateOutputData(processDefinition, multiInstanceActivityInstance, miLoop,
                         numberOfInstanceMax);
@@ -91,7 +92,8 @@ public class InitializingMultiInstanceActivityState implements FlowNodeState {
         } catch (final SActivityStateExecutionException e) {
             throw e;
         } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException(e);
+            throw new SActivityStateExecutionException("Failed to execute multi instance activity " + flowNodeInstance,
+                    ScopedException.ITERATION, e);
         }
         return StateCode.DONE;
     }

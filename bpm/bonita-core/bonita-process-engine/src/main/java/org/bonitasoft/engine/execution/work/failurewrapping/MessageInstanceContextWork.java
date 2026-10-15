@@ -15,7 +15,7 @@ package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.ExceptionContext;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -39,7 +39,7 @@ public class MessageInstanceContextWork extends TxInHandleFailureWrappingWork {
     }
 
     @Override
-    protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) {
+    protected void setExceptionContext(final ExceptionContext sBonitaException, final Map<String, Object> context) {
         sBonitaException.setMessageInstanceNameOnContext(messageName);
         sBonitaException.setMessageInstanceTargetProcessOnContext(targetProcess);
         sBonitaException.setMessageInstanceTargetFlowNodeOnContext(targetFlowNode);

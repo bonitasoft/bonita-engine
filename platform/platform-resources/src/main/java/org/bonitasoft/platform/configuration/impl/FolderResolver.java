@@ -22,8 +22,7 @@ import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
  * utility class to map configuration files and licenses to pulling folder.
  * <ul>
  * <li>license files are pulled to licenseFolder</li>
- * <li>tenant files are pulled to configurationFolder/tenants/TENANT_ID/CONFIGURATION_TYPE</li>
- * <li>other files to configurationFolder/CONFIGURATION_TYPE</li>
+ * <li>other files are pulled to configurationFolder/CONFIGURATION_TYPE</li>
  * </ul>
  *
  * @author Laurent Leseigneur
@@ -43,19 +42,13 @@ public class FolderResolver {
         File confFolder = resolveFolder(fullBonitaConfiguration).toFile();
         confFolder.mkdirs();
         return confFolder;
-
     }
 
     private Path resolveSubFolder(Path rootPath, FullBonitaConfiguration fullBonitaConfiguration) {
         if (fullBonitaConfiguration.isLicenseFile()) {
             return rootPath;
         }
-        if (fullBonitaConfiguration.isTenantFile()) {
-            return rootPath.resolve("tenants").resolve(fullBonitaConfiguration.getTenantId().toString())
-                    .resolve(fullBonitaConfiguration.getConfigurationType().toLowerCase());
-        } else {
-            return rootPath.resolve(fullBonitaConfiguration.getConfigurationType().toLowerCase());
-        }
+        return rootPath.resolve(fullBonitaConfiguration.getConfigurationType().toLowerCase());
     }
 
     private Path resolveFolder(FullBonitaConfiguration fullBonitaConfiguration) {

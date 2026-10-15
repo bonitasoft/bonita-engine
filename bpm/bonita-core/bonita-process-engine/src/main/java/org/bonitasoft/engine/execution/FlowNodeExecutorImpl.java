@@ -16,6 +16,9 @@ package org.bonitasoft.engine.execution;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -45,6 +48,8 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
+import org.bonitasoft.engine.mdc.FlowNodeInstanceMDC;
+import org.bonitasoft.engine.mdc.MDCHelper;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
@@ -130,32 +135,40 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     public FlowNodeState stepForward(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId)
             throws SFlowNodeExecutionException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            final long processDefinitionId = flowNodeInstance
-                    .getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
-                            .getProcessDefinitionIndex());
-            final ClassLoader localClassLoader = classLoaderService.getClassLoader(
-                    identifier(ScopeType.PROCESS, processDefinitionId));
-            Thread.currentThread().setContextClassLoader(localClassLoader);
+        Supplier<FlowNodeInstanceMDC> mdc = () -> new FlowNodeInstanceMDC(flowNodeInstance.getId(),
+                Optional.ofNullable(executerId),
+                Optional.ofNullable(executerSubstituteId),
+                flowNodeInstance.getProcessDefinitionId(),
+                flowNodeInstance.getParentProcessInstanceId(),
+                flowNodeInstance.getRootProcessInstanceId());
+        return MDCHelper.tryWithMDC(mdc, () -> {
+            try {
+                final long processDefinitionId = flowNodeInstance
+                        .getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
+                                .getProcessDefinitionIndex());
+                final ClassLoader localClassLoader = classLoaderService.getClassLoader(
+                        identifier(ScopeType.PROCESS, processDefinitionId));
+                Thread.currentThread().setContextClassLoader(localClassLoader);
 
-            if (!flowNodeInstance.isStateExecuting()) {
-                bpmArchiverService.archiveFlowNodeInstance(flowNodeInstance);
-                setExecutedBy(executerId, flowNodeInstance);
-                setExecutedBySubstitute(executerSubstituteId, flowNodeInstance);
+                if (!flowNodeInstance.isStateExecuting()) {
+                    bpmArchiverService.archiveFlowNodeInstance(flowNodeInstance);
+                    setExecutedBy(executerId, flowNodeInstance);
+                    setExecutedBySubstitute(executerSubstituteId, flowNodeInstance);
+                }
+
+                final SProcessDefinition processDefinition = processDefinitionService
+                        .getProcessDefinition(processDefinitionId);
+                final FlowNodeState nextState = executeStateAndReturnNextState(flowNodeInstance, processDefinition);
+                registerWorkIfUnstableOrTerminal(nextState, flowNodeInstance);
+                return nextState;
+            } catch (final SFlowNodeExecutionException e) {
+                throw e;
+            } catch (final SBonitaException e) {
+                throw new SFlowNodeExecutionException(e);
+            } finally {
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-
-            final SProcessDefinition processDefinition = processDefinitionService
-                    .getProcessDefinition(processDefinitionId);
-            final FlowNodeState nextState = executeStateAndReturnNextState(flowNodeInstance, processDefinition);
-            registerWorkIfUnstableOrTerminal(nextState, flowNodeInstance);
-            return nextState;
-        } catch (final SFlowNodeExecutionException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SFlowNodeExecutionException(e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
-        }
+        });
     }
 
     /**

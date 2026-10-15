@@ -19,8 +19,8 @@
   <title>Error 503</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/error-style.css">
+  <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/error-style.css">
  </head> 
  <body>
    <div class="main-container">

@@ -49,15 +49,14 @@ public class EventInstanceServiceImplTest {
 
     private EventInstanceServiceImpl eventInstanceServiceImpl;
 
-    private MeterRegistry meterRegistry = new SimpleMeterRegistry(
+    private final MeterRegistry meterRegistry = new SimpleMeterRegistry(
             // So that micrometer updates its counters every 1 ms:
             k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
             Clock.SYSTEM);
 
     @Before
     public void setUp() {
-        eventInstanceServiceImpl = new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry,
-                1L);
+        eventInstanceServiceImpl = new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry);
     }
 
     @Test
@@ -91,6 +90,6 @@ public class EventInstanceServiceImplTest {
         eventInstanceServiceImpl.createMessageInstance(new SMessageInstance());
         eventInstanceServiceImpl.createMessageInstance(new SMessageInstance());
 
-        assertThat(meterRegistry.find(BONITA_BPMENGINE_MESSAGE_SENT).tag("tenant", "1").counter().count()).isEqualTo(2);
+        assertThat(meterRegistry.find(BONITA_BPMENGINE_MESSAGE_SENT).counter().count()).isEqualTo(2);
     }
 }

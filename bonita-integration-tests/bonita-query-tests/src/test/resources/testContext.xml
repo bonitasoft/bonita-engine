@@ -52,7 +52,6 @@
                 <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
                 <value>org.bonitasoft.engine.platform.model.SPlatform</value>
-                <value>org.bonitasoft.engine.platform.model.STenant</value>
                 <value>org.bonitasoft.engine.platform.command.model.SPlatformCommand</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
@@ -188,7 +187,6 @@
                 <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLog</value>
-                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter</value>
             </list>
         </property>
         <property name="mappingResources">

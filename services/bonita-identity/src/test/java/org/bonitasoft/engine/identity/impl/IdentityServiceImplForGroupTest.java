@@ -128,8 +128,8 @@ public class IdentityServiceImplForGroupTest {
                 .thenReturn(group);
         when(persistenceService
                 .selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, "name", OrderByType.ASC, 0, 10)))
-                        .thenReturn(
-                                Collections.singletonList(child));
+                .thenReturn(
+                        Collections.singletonList(child));
 
         assertEquals(child, identityServiceImpl.getGroupChildren(123l, 0, 10, "name", OrderByType.ASC).get(0));
     }
@@ -141,8 +141,8 @@ public class IdentityServiceImplForGroupTest {
                 .thenReturn(group);
         when(persistenceService
                 .selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, "name", OrderByType.ASC, 0, 10)))
-                        .thenThrow(
-                                new SBonitaReadException(""));
+                .thenThrow(
+                        new SBonitaReadException(""));
 
         identityServiceImpl.getGroupChildren(123l, 0, 10, "name", OrderByType.ASC);
     }
@@ -286,8 +286,8 @@ public class IdentityServiceImplForGroupTest {
         final SGroup group = mock(SGroup.class);
         when(persistenceService
                 .selectList(SelectDescriptorBuilder.getElementsByIds(SGroup.class, "Group", Arrays.asList(123l))))
-                        .thenReturn(
-                                Arrays.asList(group));
+                .thenReturn(
+                        Arrays.asList(group));
 
         assertEquals(group, identityServiceImpl.getGroups(Arrays.asList(123l)).get(0));
     }
@@ -341,8 +341,8 @@ public class IdentityServiceImplForGroupTest {
         final SGroup group = mock(SGroup.class);
         when(persistenceService
                 .selectList(SelectDescriptorBuilder.getElements(SGroup.class, "Group", "name", OrderByType.ASC, 0, 10)))
-                        .thenReturn(
-                                Arrays.asList(group));
+                .thenReturn(
+                        Arrays.asList(group));
 
         assertEquals(group, identityServiceImpl.getGroups(0, 10, "name", OrderByType.ASC).get(0));
     }

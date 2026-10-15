@@ -16,10 +16,6 @@ package org.bonitasoft.engine;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.operation.OperatorType.ASSIGNMENT;
 
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -38,7 +34,6 @@ import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 /**
  * @author Baptiste Mesta.
@@ -47,7 +42,7 @@ public class StringIndexIT extends CommonAPIIT {
 
     @Test
     public void should_set_string_index_of_current_process_using_operation_in_called_process() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         User user = createUser("john", "bpm");
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("mainProcess", "1.0");
         builder.addCallActivity("call", stringConstant("calledProcess"), stringConstant("1.0"));
@@ -100,7 +95,7 @@ public class StringIndexIT extends CommonAPIIT {
 
     @Test
     public void should_initialize_string_index_in_call_activity() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         User user = createUser("john", "bpm");
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("mainProcess", "1.0");
         builder.addCallActivity("call", stringConstant("calledProcess"), stringConstant("1.0"));
@@ -133,7 +128,7 @@ public class StringIndexIT extends CommonAPIIT {
 
     @Test
     public void should_be_able_to_initialize_a_search_index_using_a_business_data() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final String qualifiedName = "com.company.test.Bo";
         final BusinessObjectModel bom = buildSimpleBom(qualifiedName);
         var businessDataModelVersion = installBusinessDataModel(bom);
@@ -170,8 +165,7 @@ public class StringIndexIT extends CommonAPIIT {
         deleteUser(testUser);
     }
 
-    private BusinessObjectModel buildSimpleBom(final String boQualifiedName)
-            throws IOException, JAXBException, SAXException {
+    private BusinessObjectModel buildSimpleBom(final String boQualifiedName) {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
         final SimpleField field = new SimpleField();

@@ -14,24 +14,20 @@
 package org.bonitasoft.engine.page;
 
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.MappedSuperclass;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @MappedSuperclass
-@IdClass(PersistentObjectId.class)
 public class AbstractSPage implements PersistentObject {
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
 
@@ -41,7 +37,9 @@ public class AbstractSPage implements PersistentObject {
     private long installationDate;
     private long installedBy;
     private boolean provided;
+    @Builder.Default
     private boolean editable = true;
+    @Builder.Default
     private boolean removable = true;
     private long lastModificationDate;
     private long lastUpdatedBy;

@@ -25,12 +25,12 @@ public class TestWithTechnicalUser extends CommonAPIIT {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
     }
 
     @After
     public void after() throws Exception {
-        logoutOnTenant();
+        logout();
     }
 
 }

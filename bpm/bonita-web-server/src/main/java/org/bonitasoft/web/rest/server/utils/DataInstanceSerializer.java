@@ -37,7 +37,6 @@ public class DataInstanceSerializer extends JsonSerializer<DataInstanceImpl> {
         jgen.writeObjectField("className", value.getClassName());
         jgen.writeObjectField("containerType", value.getContainerType());
 
-        jacksonSerializerHelper.writeNumberField(jgen, "tenantId", value.getTenantId());
         jacksonSerializerHelper.writeNumberField(jgen, "id", value.getId());
         jacksonSerializerHelper.writeNumberField(jgen, "containerId", value.getContainerId());
         jacksonSerializerHelper.writeNumberField(jgen, "value", value.getValue());

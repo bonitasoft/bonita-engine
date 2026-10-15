@@ -42,15 +42,15 @@ public class SUserMembershipLogBuilderImpl extends CRUDELogBuilder implements SU
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
                 && log.getNumericIndex(SUserMembershipLogBuilderFactoryImpl.USER_MEMBERSHIP_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "UserMembership Id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "UserMembership Id");
         }
 
         if (log.getNumericIndex(SUserMembershipLogBuilderFactoryImpl.ROLE_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Role Id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Role Id");
         }
 
         if (log.getNumericIndex(SUserMembershipLogBuilderFactoryImpl.USER_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "User Id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "User Id");
         }
     }
 

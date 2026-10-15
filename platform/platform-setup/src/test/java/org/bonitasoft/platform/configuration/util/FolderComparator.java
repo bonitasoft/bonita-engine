@@ -76,7 +76,7 @@ public class FolderComparator {
             case XML:
                 final List allDifferences = new DetailedDiff(
                         XMLUnit.compareXML(new FileReader(givenFile), new FileReader(expectedFile)))
-                                .getAllDifferences();
+                        .getAllDifferences();
                 Assertions.assertThat(allDifferences).as("should xml file be equals").isEmpty();
                 break;
             default:

@@ -32,13 +32,12 @@ import org.bonitasoft.web.rest.model.bpm.cases.CaseItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.engineclient.EngineAPIAccessor;
 import org.bonitasoft.web.rest.server.engineclient.EngineClientFactory;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasAdd;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasDelete;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasSearch;
+import org.bonitasoft.web.rest.server.framework.api.*;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.rest.server.framework.utils.SearchOptionsBuilderUtil;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIIncorrectIdException;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemNotFoundException;
 import org.bonitasoft.web.toolkit.client.common.util.MapUtil;
 import org.bonitasoft.web.toolkit.client.data.APIID;
@@ -49,7 +48,7 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
  */
 public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
         implements DatastoreHasGet<CaseItem>, DatastoreHasSearch<CaseItem>,
-        DatastoreHasDelete, DatastoreHasAdd<CaseItem> {
+        DatastoreHasDelete, DatastoreHasAdd<CaseItem>, DatastoreHasUpdate<CaseItem> {
 
     public CaseDatastore(final APISession engineSession) {
         super(engineSession);
@@ -103,10 +102,23 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
                 ProcessInstanceSearchDescriptor.LAST_UPDATE);
         addLongFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_PROCESS_ID,
                 ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID);
+        addLongFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_ROOT_CASE_ID,
+                ProcessInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
+        addAddDifferentFromRootIdFilterIfNecessary(filters, builder);
         addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_PROCESS_NAME,
                 ProcessInstanceSearchDescriptor.NAME);
         addLongFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_STARTED_BY_USER_ID,
                 ProcessInstanceSearchDescriptor.STARTED_BY);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_1_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_1);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_2_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_2);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_3_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_3);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_4_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_4);
+        addStringFilterToSearchBuilder(filters, builder, CaseItem.ATTRIBUTE_SEARCH_INDEX_5_VALUE,
+                ProcessInstanceSearchDescriptor.STRING_INDEX_5);
         addCallerFilterToSearchBuilderIfNecessary(filters, builder);
         builder.differentFrom(ProcessInstanceSearchDescriptor.STATE_ID, ProcessInstanceState.COMPLETED.getId());
         builder.differentFrom(ProcessInstanceSearchDescriptor.STATE_ID, ProcessInstanceState.CANCELLED.getId());
@@ -114,7 +126,19 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
         return builder;
     }
 
-    void addCallerFilterToSearchBuilderIfNecessary(final Map<String, String> filters,
+    protected void addAddDifferentFromRootIdFilterIfNecessary(Map<String, String> filters,
+            SearchOptionsBuilder builder) {
+        /*
+         * When filtering on Root Case Id, we want all the subprocesses of the root case to be returned.
+         * Not the root case itself.
+         */
+        if (filters.containsKey(CaseItem.ATTRIBUTE_ROOT_CASE_ID)) {
+            builder.differentFrom(ProcessInstanceSearchDescriptor.ID,
+                    MapUtil.getValueAsLong(filters, CaseItem.ATTRIBUTE_ROOT_CASE_ID));
+        }
+    }
+
+    protected void addCallerFilterToSearchBuilderIfNecessary(final Map<String, String> filters,
             final SearchOptionsBuilder builder) {
         /*
          * By default we add a caller filter of -1 to avoid having sub processes.
@@ -128,7 +152,7 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
         }
     }
 
-    private SearchResult<ProcessInstance> searchProcessInstances(final Map<String, String> filters,
+    protected SearchResult<ProcessInstance> searchProcessInstances(final Map<String, String> filters,
             final SearchOptions searchOptions) throws BonitaException {
         final ProcessAPI processAPI = getProcessAPI();
 
@@ -194,4 +218,28 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
         return TenantAPIAccessor.getProcessAPI(getEngineSession());
     }
 
+    @Override
+    public CaseItem update(APIID id, Map<String, String> attributes) {
+        final String state = MapUtil.getValue(attributes, CaseItem.ATTRIBUTE_STATE, null);
+        try {
+            final ProcessAPI processApi = getProcessAPI();
+            if (state == null) {
+                throw new APIForbiddenException("Only " + CaseItem.ATTRIBUTE_STATE + "can be updated on a case");
+            }
+            ProcessInstanceState instanceState = ProcessInstanceState.valueOf(state.toUpperCase());
+            if (instanceState == ProcessInstanceState.CANCELLED) {
+                processApi.cancelProcessInstance(id.toLong());
+                return null;
+            }
+            throw new APIForbiddenException("Can't update a case state to \"" + state + "\"");
+        } catch (final BonitaException e) {
+            if (e.getCause() instanceof ProcessInstanceNotFoundException) {
+                throw new APIItemNotFoundException(CaseDefinition.TOKEN);
+            } else {
+                throw new APIException(e);
+            }
+        } catch (final IllegalArgumentException e) {
+            throw new APIIncorrectIdException("Case state \"" + state + "\" doesn't exist");
+        }
+    }
 }

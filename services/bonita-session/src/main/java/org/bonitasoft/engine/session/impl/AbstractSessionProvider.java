@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.session.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -88,14 +87,8 @@ public abstract class AbstractSessionProvider implements SessionProvider {
     }
 
     @Override
-    public synchronized void deleteSessionsOfTenant(final long tenantId, final boolean keepTechnicalSessions) {
-        Iterator<SSession> iterator = getSessions().values().iterator();
-        while (iterator.hasNext()) {
-            SSession sSession = iterator.next();
-            if (tenantId == sSession.getTenantId() && (!keepTechnicalSessions || !sSession.isTechnicalUser())) {
-                iterator.remove();
-            }
-        }
+    public synchronized void deleteSessions(final boolean keepTechnicalSessions) {
+        getSessions().values().removeIf(sSession -> !keepTechnicalSessions || !sSession.isTechnicalUser());
     }
 
 }

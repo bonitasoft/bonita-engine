@@ -47,8 +47,6 @@ public interface DocumentService {
      *
      * @param document the document to store
      * @param processInstanceId the process instance id to attach the document to
-     * @param name
-     * @param description
      * @return The document image from database
      * @throws SObjectCreationException when the storage has failed
      */
@@ -61,8 +59,6 @@ public interface DocumentService {
      *
      * @param document the document to store
      * @param processInstanceId the process instance id to attach the document to
-     * @param name
-     * @param description
      * @param index the index in the list of document
      * @return The document image from database
      * @throws SObjectCreationException when the storage has failed
@@ -74,28 +70,23 @@ public interface DocumentService {
     /**
      * Remove this document.
      * <p>
-     * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database,
-     * use
-     * {@link #deleteContentOfArchivedDocument(long)} to delete the content
+     * This archives and deletes mapping to the process, i.e. the content of the document itself will be kept in
+     * database, use {@link #deleteContentOfArchivedDocument(long)} to delete the content.
      * </p>
      *
      * @param document the document mapping to remove
-     * @throws SObjectModificationException
      */
     void removeCurrentVersion(AbstractSMappedDocument document) throws SObjectModificationException;
 
     /**
-     * Remove the document with the specified process instance and name
+     * Remove the document with the specified process instance and name.
      * <p>
-     * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database,
-     * use
-     * {@link #deleteContentOfArchivedDocument(long)} to delete the content
+     * This archives and deletes mapping to the process, i.e. the content of the document itself will be kept in
+     * database, use {@link #deleteContentOfArchivedDocument(long)} to delete the content.
      * </p>
      *
      * @param processInstanceId id of the process having the document
      * @param documentName name of the document
-     * @throws SObjectNotFoundException
-     * @throws SObjectModificationException
      */
     void removeCurrentVersion(long processInstanceId, String documentName)
             throws SObjectNotFoundException, SObjectModificationException;
@@ -105,7 +96,6 @@ public interface DocumentService {
      *
      * @param documentId identifier of the document
      * @return document content
-     * @throws SObjectNotFoundException
      */
     byte[] getDocumentContent(String documentId) throws SObjectNotFoundException;
 
@@ -114,7 +104,6 @@ public interface DocumentService {
      *
      * @param mappingId identifier of the mapping of the document
      * @return an SDocumentMapping object with id corresponding to the parameter
-     * @throws SObjectNotFoundException
      */
     SMappedDocument getMappedDocument(long mappingId) throws SObjectNotFoundException, SBonitaReadException;
 
@@ -123,7 +112,6 @@ public interface DocumentService {
      *
      * @param documentId identifier of document
      * @return an SDocumentMapping object with id corresponding to the parameter
-     * @throws SObjectNotFoundException
      */
     SLightDocument getDocument(long documentId) throws SObjectNotFoundException, SBonitaReadException;
 
@@ -133,7 +121,6 @@ public interface DocumentService {
      * @param processInstanceId identifier of process instance
      * @param documentName name of process document
      * @return the corresponding SDocumentMapping object
-     * @throws SObjectNotFoundException
      */
     SMappedDocument getMappedDocument(long processInstanceId, String documentName)
             throws SObjectNotFoundException, SBonitaReadException;
@@ -144,8 +131,6 @@ public interface DocumentService {
      * @param processInstanceId identifier of process instance
      * @param fromIndex Index of the record to be retrieved from. First record has index 0
      * @param numberPerPage Number of result we want to get. Maximum number of result returned
-     * @param order
-     * @param field
      * @return a list of SDocumentMapping objects
      */
     List<SMappedDocument> getDocumentsOfProcessInstance(long processInstanceId, int fromIndex, int numberPerPage,
@@ -157,7 +142,6 @@ public interface DocumentService {
      *
      * @param processInstanceId identifier of process instance
      * @return number of documents in the process instance
-     * @throws org.bonitasoft.engine.persistence.SBonitaReadException
      */
     long getNumberOfDocumentsOfProcessInstance(long processInstanceId) throws SBonitaReadException;
 
@@ -168,7 +152,6 @@ public interface DocumentService {
      * @param documentName name of document
      * @param time the archived time of document
      * @return an SDocumentMapping object archived in the specific time or not archived
-     * @throws SObjectNotFoundException
      */
     AbstractSMappedDocument getMappedDocument(long processInstanceId, String documentName, long time)
             throws SObjectNotFoundException, SBonitaReadException;
@@ -178,7 +161,6 @@ public interface DocumentService {
      *
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of document satisfied to the query criteria
-     * @throws SBonitaReadException
      */
     long getNumberOfDocuments(QueryOptions queryOptions) throws SBonitaReadException;
 
@@ -187,7 +169,6 @@ public interface DocumentService {
      *
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SDocumentMapping objects
-     * @throws SBonitaReadException
      */
     List<SMappedDocument> searchDocuments(QueryOptions queryOptions) throws SBonitaReadException;
 
@@ -197,7 +178,6 @@ public interface DocumentService {
      * @param userId identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of documents for the specific supervisor
-     * @throws SBonitaReadException
      */
     long getNumberOfDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
 
@@ -207,7 +187,6 @@ public interface DocumentService {
      * @param userId identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SDocumentMapping objects
-     * @throws SBonitaReadException
      */
     List<SMappedDocument> searchDocumentsSupervisedBy(long userId, QueryOptions queryOptions)
             throws SBonitaReadException;
@@ -217,18 +196,22 @@ public interface DocumentService {
      *
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of archived documents
-     * @throws SBonitaReadException
      */
     long getNumberOfArchivedDocuments(QueryOptions queryOptions) throws SBonitaReadException;
 
-    void removeDocument(AbstractSMappedDocument mappedDocument) throws SObjectModificationException;
+    /**
+     * Delete the given document mapping without removing the document content.
+     *
+     * @param mappedDocument the document mapping to delete
+     * @throws SObjectModificationException if an error occurred during the deletion
+     */
+    void deleteMappedDocument(AbstractSMappedDocument mappedDocument) throws SObjectModificationException;
 
     /**
      * Search all archived documents according to the query criteria.
      *
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SADocumentMapping objects
-     * @throws SBonitaReadException
      */
     List<SAMappedDocument> searchArchivedDocuments(QueryOptions queryOptions) throws SBonitaReadException;
 
@@ -238,7 +221,6 @@ public interface DocumentService {
      * @param userId identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of archived documents for the specific supervisor
-     * @throws SBonitaReadException
      */
     long getNumberOfArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
 
@@ -248,7 +230,6 @@ public interface DocumentService {
      * @param userId identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SADocumentMapping objects
-     * @throws SBonitaReadException
      */
     List<SAMappedDocument> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions)
             throws SBonitaReadException;
@@ -273,25 +254,54 @@ public interface DocumentService {
      */
     SAMappedDocument getArchivedDocument(long archivedProcessDocumentId) throws SObjectNotFoundException;
 
+    /**
+     * Delete a document by its id. It does not delete potential mappings, which might throw an error if they are not
+     * deleted beforehand.
+     *
+     * @param documentId the id of the document to delete
+     * @throws SObjectNotFoundException if the document to delete does not exist
+     * @throws SBonitaReadException if an error occurred while getting the document
+     * @throws SObjectModificationException if an error occurred during the deletion
+     */
+    void deleteDocument(long documentId)
+            throws SObjectNotFoundException, SBonitaReadException, SObjectModificationException;
+
+    /**
+     * Delete the given document. It does not delete potential mappings, which might throw an error if they are not
+     * deleted beforehand.
+     *
+     * @param document the document to delete
+     * @throws SObjectModificationException if an error occurred during the deletion
+     */
     void deleteDocument(SLightDocument document) throws SObjectModificationException;
 
     /**
-     * Delete documents from a specified process instance
+     * Delete documents and their associated mappings to a specified process instance.
      *
-     * @param processInstanceId
-     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
-     * @throws SBonitaReadException
+     * @param processInstanceId the id of the process instance to delete documents from
+     * @throws SBonitaReadException if an error occurred while getting the documents or their mappings
+     * @throws SObjectModificationException if an error occurred during the deletion
+     * @throws SObjectNotFoundException if an element does not exist
      * @since 6.1
      */
     void deleteDocumentsFromProcessInstance(final Long processInstanceId)
-            throws SBonitaReadException, SObjectModificationException;
+            throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException;
+
+    /**
+     * Delete the document content of a process instance. It only deletes the content, not the document mapping.
+     * Note that to reach the document content, the document mapping must still exist at the time of call: indeed, this
+     * is the only way to reach the content from the process instance.
+     * So if you need to call this method and also delete the document mappings, ensure this method is called first.
+     *
+     * @param processInstanceId the process instance id to delete the document contents from
+     */
+    void deleteDocumentContentsForProcessInstance(Long processInstanceId)
+            throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException;
 
     /**
      * delete archived documents mapping and documents links to a set of processes
      *
      * @param processInstanceId ids of the source process instances
-     * @throws SBonitaReadException
-     * @throws SRecorderException
      */
     void deleteArchivedDocuments(List<Long> processInstanceId) throws SBonitaReadException, SRecorderException;
 
@@ -300,7 +310,6 @@ public interface DocumentService {
      *
      * @param documentMapping document mapping will be archived
      * @param archiveDate the archive time
-     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
     void archive(AbstractSDocumentMapping documentMapping, long archiveDate) throws SObjectModificationException;
@@ -309,7 +318,6 @@ public interface DocumentService {
      * @param mappedDocument the document to update
      * @param document the new content
      * @param index the new index
-     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
     void updateDocumentOfList(final AbstractSDocumentMapping mappedDocument, final SDocument document, int index)
@@ -320,7 +328,6 @@ public interface DocumentService {
      *
      * @param mappedDocument the document to update
      * @param index the new index
-     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
     void updateDocumentIndex(final AbstractSDocumentMapping mappedDocument, int index)
@@ -343,8 +350,6 @@ public interface DocumentService {
      * @param documentToUpdate the document mapping to udpate
      * @param sDocument the value to set th emapping with
      * @return the updated document mapping
-     * @throws SRecorderException
-     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      */
     SMappedDocument updateDocument(AbstractSDocumentMapping documentToUpdate, SDocument sDocument)
             throws SObjectModificationException;

@@ -245,7 +245,7 @@ class APIFlowNodeTest {
 
         doThrow(new APIItemNotFoundException(ActorItem.class.getName(), actorId,
                 new ActorNotFoundException("actor deleted")))
-                        .when(actorDatastore).get(actorId);
+                .when(actorDatastore).get(actorId);
 
         // When the unresolvable actor must not fail the whole task list
         assertThatCode(() -> apiFlowNode.fillDeploys(item, deploys)).doesNotThrowAnyException();
@@ -271,7 +271,7 @@ class APIFlowNodeTest {
         // APINotFoundException) - exercises the not-found catch of deploySafely.
         doThrow(new APIItemNotFoundException(ProcessItem.class.getName(), null,
                 new ProcessDefinitionNotFoundException("process deleted")))
-                        .when(processDatastore).get(deletedProcessId);
+                .when(processDatastore).get(deletedProcessId);
 
         // When the unresolvable process must not fail the whole task list
         assertThatCode(() -> apiFlowNode.fillDeploys(item, deploys)).doesNotThrowAnyException();
@@ -302,7 +302,7 @@ class APIFlowNodeTest {
 
         doThrow(new APIItemNotFoundException(ProcessItem.class.getName(), null,
                 new ProcessDefinitionNotFoundException("process deleted")))
-                        .when(processDatastore).get(deletedProcessId);
+                .when(processDatastore).get(deletedProcessId);
 
         // When the unresolvable root-container process must not fail the whole task list
         assertThatCode(() -> apiFlowNode.fillDeploys(item, deploys)).doesNotThrowAnyException();

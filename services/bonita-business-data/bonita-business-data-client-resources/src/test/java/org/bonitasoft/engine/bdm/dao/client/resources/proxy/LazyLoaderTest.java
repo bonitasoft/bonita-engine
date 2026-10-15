@@ -15,9 +15,7 @@ package org.bonitasoft.engine.bdm.dao.client.resources.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -49,7 +47,7 @@ public class LazyLoaderTest {
 
     @Before
     public void setUp() throws Exception {
-        lazyLoader = spy(new LazyLoader(new APISessionImpl(1, new Date(), 3000, "john", 1, "default", 1)));
+        lazyLoader = spy(new LazyLoader(new APISessionImpl(1, new Date(), 3000, "john", 1)));
         doReturn(commandAPI).when(lazyLoader).getCommandAPI();
     }
 

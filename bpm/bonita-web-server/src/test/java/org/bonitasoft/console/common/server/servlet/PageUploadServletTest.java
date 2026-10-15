@@ -97,7 +97,7 @@ public class PageUploadServletTest {
         doReturn(permissions).when(pageUploadServlet).getPermissions(request);
 
         final String responseString = pageUploadServlet.generateResponseJson(request, "fileName", "application/zip",
-                pageUploadServlet.pageTmp.getName());
+                pageUploadServlet.pageTmp.getName(), false);
 
         ObjectReader reader = new ObjectMapper().readerFor(Map.class);
         Map<String, Serializable> responseMap = reader.readValue(responseString);

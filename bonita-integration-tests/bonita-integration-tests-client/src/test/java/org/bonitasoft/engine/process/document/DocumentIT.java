@@ -701,7 +701,8 @@ public class DocumentIT extends TestWithUser {
             assertThat(
                     getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 45).searchTerm("doc1").done())
                             .getResult().get(0)
-                            .getContentFileName()).isEqualTo("doc1.jpg");
+                            .getContentFileName())
+                    .isEqualTo("doc1.jpg");
 
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());
@@ -1185,7 +1186,7 @@ public class DocumentIT extends TestWithUser {
         check(processInstance, 2, 4, 1, 3, 5, DocumentCriterion.URL_DESC);
 
         final User john = createUser("john", "bpm");
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
         assignAndExecuteStep(step1Id, john.getId());
         final long step2Id = waitForUserTask(processInstance, "step2");

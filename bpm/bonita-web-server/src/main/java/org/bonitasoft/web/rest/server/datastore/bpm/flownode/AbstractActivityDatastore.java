@@ -110,7 +110,8 @@ public class AbstractActivityDatastore<CONSOLE_ITEM extends ActivityItem, ENGINE
 
         return new SearchOptionsCreator(page, resultsByPage, search,
                 new Sorts(orders, new ActivityAttributeConverter()), new Filters(filters,
-                        new ActivityFilterCreator())).getBuilder();
+                        new ActivityFilterCreator()))
+                .getBuilder();
     }
 
     @Override

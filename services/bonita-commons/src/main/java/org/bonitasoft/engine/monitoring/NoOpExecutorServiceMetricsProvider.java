@@ -25,19 +25,16 @@ public class NoOpExecutorServiceMetricsProvider implements ExecutorServiceMetric
 
     @Override
     public ExecutorService bind(MeterRegistry meterRegistry, ThreadPoolExecutor executorService,
-            String executorServiceName, long tenantId) {
+            String executorServiceName) {
         return executorService;
-
     }
 
     @Override
     public void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService,
-            String executorServiceName, long tenantId) {
-
+            String executorServiceName) {
     }
 
     @Override
-    public void unbind(MeterRegistry meterRegistry, String executorServiceName, long tenantId) {
-
+    public void unbind(MeterRegistry meterRegistry, String executorServiceName) {
     }
 }

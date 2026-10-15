@@ -40,7 +40,6 @@ public class SAFlowNodeSimpleRefBusinessDataInstance extends SASimpleRefBusiness
     public SRefBusinessDataInstance toSRefBusinessDataInstance() {
         SFlowNodeSimpleRefBusinessDataInstance refBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstance();
         refBusinessDataInstance.setId(getSourceObjectId());
-        refBusinessDataInstance.setTenantId(tenantId);
         refBusinessDataInstance.setName(getName());
         refBusinessDataInstance.setDataClassName(getDataClassName());
         refBusinessDataInstance.setDataId(getDataId());

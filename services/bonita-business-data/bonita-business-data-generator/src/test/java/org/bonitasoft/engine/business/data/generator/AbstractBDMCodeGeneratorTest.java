@@ -36,7 +36,7 @@ public class AbstractBDMCodeGeneratorTest {
         final AbstractBDMCodeGenerator abstractBDMCodeGenerator = mock(AbstractBDMCodeGenerator.class);
         when(abstractBDMCodeGenerator.createMethodForNewInstance(any(BusinessObject.class), any(JDefinedClass.class),
                 any(JDefinedClass.class)))
-                        .thenCallRealMethod();
+                .thenCallRealMethod();
         when(abstractBDMCodeGenerator.addMethodSignature(any(JDefinedClass.class), anyString(), any(JType.class)))
                 .thenCallRealMethod();
         when(abstractBDMCodeGenerator.getModel()).thenReturn(new JCodeModel());

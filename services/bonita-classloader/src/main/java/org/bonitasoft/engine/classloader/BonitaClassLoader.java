@@ -56,7 +56,7 @@ public class BonitaClassLoader extends URLClassLoader {
 
     BonitaClassLoader(ClassLoaderIdentifier id, ClassLoader parent, Set<File> jars, Map<String, File> nonJarResources,
             File temporaryDirectory) {
-        super(id.getType().name() + "__" + id.getId(), jars.stream().map(BonitaClassLoader::toURL).toArray(URL[]::new),
+        super(id.toString(), jars.stream().map(BonitaClassLoader::toURL).toArray(URL[]::new),
                 parent);
         this.id = id;
         //TODO: These non-jar resources might be added along with jars without having to do special handling

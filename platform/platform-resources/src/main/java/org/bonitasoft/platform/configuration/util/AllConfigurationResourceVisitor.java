@@ -37,20 +37,16 @@ public class AllConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllConfigurationResourceVisitor.class);
 
-    private static final List<String> PLATFORM_FOLDERS = Arrays.asList(PLATFORM_PORTAL.name().toLowerCase(),
-            PLATFORM_ENGINE.name().toLowerCase(), TENANT_TEMPLATE_ENGINE.name().toLowerCase(),
-            TENANT_TEMPLATE_SECURITY_SCRIPTS.name().toLowerCase(), TENANT_TEMPLATE_PORTAL.name().toLowerCase());
-
-    private static final List<String> TENANT_FOLDERS = Arrays.asList(TENANT_PORTAL.name().toLowerCase(),
-            TENANT_ENGINE.name().toLowerCase(),
-            TENANT_SECURITY_SCRIPTS.name().toLowerCase());
+    private static final List<String> CONFIGURATION_FOLDERS = Arrays.asList(PLATFORM_PORTAL.name().toLowerCase(),
+            PLATFORM_ENGINE.name().toLowerCase(), TENANT_PORTAL.name().toLowerCase(),
+            TENANT_ENGINE.name().toLowerCase(), TENANT_SECURITY_SCRIPTS.name().toLowerCase());
 
     public AllConfigurationResourceVisitor(List<FullBonitaConfiguration> fullBonitaConfigurations) {
         this.fullBonitaConfigurations = fullBonitaConfigurations;
     }
 
     @Override
-    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         return FileVisitResult.CONTINUE;
     }
 
@@ -58,50 +54,25 @@ public class AllConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
         return dir.getFileName().toString().toUpperCase();
     }
 
-    private boolean isTenantFolder(Path dir) {
-        return TENANT_FOLDERS.contains(dir.getFileName().toString());
-    }
-
-    private Long getTenantId(Path dir) {
-        try {
-            return Long.parseLong(dir.getParent().getFileName().toString());
-        } catch (NumberFormatException e) {
-            return 0L;
-        }
-    }
-
-    private boolean isPlatformFolder(Path dir) {
-        return PLATFORM_FOLDERS.contains(dir.getFileName().toString());
+    private boolean isConfigurationFolder(Path dir) {
+        return CONFIGURATION_FOLDERS.contains(dir.getFileName().toString());
     }
 
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
         if (isConfigurationFile(path)) {
-            final Long tenantId = getTenantId(path.getParent());
             final String configurationType = getFolderName(path.getParent());
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(buildMessage(path, tenantId, configurationType));
+                LOGGER.debug("found file: {}/{}", configurationType.toLowerCase(), path.getFileName());
             }
             fullBonitaConfigurations.add(new FullBonitaConfiguration(path.getFileName().toString(),
-                    Files.readAllBytes(path), configurationType, tenantId));
+                    Files.readAllBytes(path), configurationType));
         }
         return FileVisitResult.CONTINUE;
     }
 
-    private String buildMessage(Path path, Long tenantId, String configurationType) {
-        final StringBuilder message = new StringBuilder("found file: ");
-        if (tenantId > 0) {
-            message.append("tenants/").append(tenantId).append("/").append(configurationType.toLowerCase());
-        } else {
-            message.append(configurationType.toLowerCase());
-        }
-        message.append("/").append(path.getFileName());
-        return message.toString();
-    }
-
     private boolean isConfigurationFile(Path path) {
-        final Path parentFolder = path.getParent();
-        return path.toFile().isFile() && (isTenantFolder(parentFolder) || isPlatformFolder(parentFolder));
+        return path.toFile().isFile() && isConfigurationFolder(path.getParent());
     }
 
 }

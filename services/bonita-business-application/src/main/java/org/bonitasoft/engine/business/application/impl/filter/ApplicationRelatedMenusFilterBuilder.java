@@ -51,10 +51,8 @@ public class ApplicationRelatedMenusFilterBuilder implements FilterBuilder {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ApplicationRelatedMenusFilterBuilder))
+        if (!(o instanceof ApplicationRelatedMenusFilterBuilder that))
             return false;
-
-        ApplicationRelatedMenusFilterBuilder that = (ApplicationRelatedMenusFilterBuilder) o;
 
         if (applicationId != that.applicationId)
             return false;

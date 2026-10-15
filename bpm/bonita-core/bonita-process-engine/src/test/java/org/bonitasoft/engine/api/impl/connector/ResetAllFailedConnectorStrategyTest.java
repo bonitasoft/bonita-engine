@@ -58,11 +58,13 @@ public class ResetAllFailedConnectorStrategyTest {
         given(
                 connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE,
                         ConnectorState.FAILED.name(), 0,
-                        MAX_RESULTS)).willReturn(Arrays.asList(instance1, instance2));
+                        MAX_RESULTS))
+                .willReturn(Arrays.asList(instance1, instance2));
         given(
                 connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE,
                         ConnectorState.FAILED.name(), MAX_RESULTS,
-                        MAX_RESULTS)).willReturn(Arrays.asList(instance3));
+                        MAX_RESULTS))
+                .willReturn(Arrays.asList(instance3));
 
         //when
         strategy.resetConnectorsOf(20L);
@@ -80,7 +82,8 @@ public class ResetAllFailedConnectorStrategyTest {
         given(
                 connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE,
                         ConnectorState.FAILED.name(), 0,
-                        MAX_RESULTS)).willThrow(new SConnectorInstanceReadException(new Exception()));
+                        MAX_RESULTS))
+                .willThrow(new SConnectorInstanceReadException(new Exception()));
 
         //when
         strategy.resetConnectorsOf(20L);

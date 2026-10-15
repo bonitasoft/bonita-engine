@@ -524,7 +524,7 @@ public class FormMappingAndPageArtifactManagerTest {
                         "task1"),
                 withFormMapping("myPage4", PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL,
                         "task2")))
-                                .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
+                .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
         //when
         formMappingAndPageArtifactManager.exportToBusinessArchive(PROCESS_DEFINITION_ID, businessArchiveBuilder);
         //then
@@ -548,7 +548,7 @@ public class FormMappingAndPageArtifactManagerTest {
                         .addUserTask("task1", "actor").addUserTask("task2", "actor").getProcess());
         doReturn(Collections.singletonList(withFormMapping(null, PROCESS_DEFINITION_ID, FormMappingType.TASK,
                 FormMappingTarget.INTERNAL, "task2")))
-                        .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
+                .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
         //when
         formMappingAndPageArtifactManager.exportToBusinessArchive(PROCESS_DEFINITION_ID, businessArchiveBuilder);
         //then

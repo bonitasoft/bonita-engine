@@ -86,8 +86,7 @@ public class TestEntity implements Entity {
             return true;
         if (obj == null)
             return false;
-        if (obj instanceof TestEntity) {
-            TestEntity other = (TestEntity) obj;
+        if (obj instanceof TestEntity other) {
             if (entity == null) {
                 if (other.entity != null)
                     return false;

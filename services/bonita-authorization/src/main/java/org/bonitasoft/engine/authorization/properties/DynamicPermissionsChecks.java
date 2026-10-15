@@ -17,7 +17,6 @@ import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.cache.CacheService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -36,9 +35,8 @@ public class DynamicPermissionsChecks extends ResourcesPermissionsMapping {
      */
     public static final String PROPERTIES_FILENAME = "dynamic-permissions-checks.properties";
 
-    public DynamicPermissionsChecks(@Value("${tenantId}") long tenantId, CacheService cacheService,
-            ConfigurationFilesManager configurationFilesManager) {
-        super(tenantId, cacheService, configurationFilesManager);
+    public DynamicPermissionsChecks(CacheService cacheService, ConfigurationFilesManager configurationFilesManager) {
+        super(cacheService, configurationFilesManager);
     }
 
     @Override

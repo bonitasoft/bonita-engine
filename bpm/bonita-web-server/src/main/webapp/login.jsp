@@ -72,7 +72,7 @@
 <link rel="icon" type="image/png" href="<%= styleUrl %>/images/favicon2.ico" />
 <link rel="stylesheet" type="text/css" href="<%= styleUrl %>/css/login.css"/>
 
-<script>
+<script type="text/javascript">
   document.addEventListener("DOMContentLoaded", function() {
 		if (window != window.top) {
 			try {

@@ -13,14 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
-import javax.persistence.*;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Zhao Na
@@ -31,15 +35,12 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(PersistentObjectId.class)
 @Table(name = "waiting_event")
 @DiscriminatorColumn(name = "kind")
 public abstract class SWaitingEvent implements PersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Enumerated(EnumType.STRING)
     private SBPMEventType eventType;
     private String processName;

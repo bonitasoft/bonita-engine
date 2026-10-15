@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.console.common.server.login.utils;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
@@ -37,8 +36,7 @@ public class RedirectUrlHandler {
                 : (redirectURL != null || loginPageURL != null);
     }
 
-    public static String retrieveRedirectUrl(final HttpServletRequestAccessor request, String... parametersToRemove)
-            throws ServletException {
+    public static String retrieveRedirectUrl(final HttpServletRequestAccessor request, String... parametersToRemove) {
         final String redirectUrlFromRequest = request.getRedirectUrl();
         String redirectUrl = redirectUrlFromRequest != null ? redirectUrlFromRequest : getDefaultRedirectUrl();
         RedirectUrlBuilder redirectUrlBuilder = new RedirectUrlBuilder(redirectUrl);

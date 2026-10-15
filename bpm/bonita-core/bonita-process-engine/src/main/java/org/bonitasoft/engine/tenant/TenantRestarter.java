@@ -17,10 +17,8 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.impl.StarterThread;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,16 +29,11 @@ public class TenantRestarter {
 
     private final UserTransactionService transactionService;
     private final List<TenantRestartHandler> tenantRestartHandlers;
-    private final Long tenantId;
-    private final SessionAccessor sessionAccessor;
     private final PlatformService platformService;
 
-    public TenantRestarter(@Value("${tenantId}") Long tenantId, UserTransactionService transactionService,
-            SessionAccessor sessionAccessor, PlatformService platformService,
+    public TenantRestarter(UserTransactionService transactionService, PlatformService platformService,
             List<TenantRestartHandler> tenantRestartHandlers) {
-        this.tenantId = tenantId;
         this.transactionService = transactionService;
-        this.sessionAccessor = sessionAccessor;
         this.platformService = platformService;
         this.tenantRestartHandlers = tenantRestartHandlers;
     }
@@ -55,7 +48,7 @@ public class TenantRestarter {
     }
 
     public void executeAfterServicesStart() {
-        new StarterThread(tenantId, sessionAccessor, transactionService, platformService,
+        new StarterThread(transactionService, platformService,
                 tenantRestartHandlers).start();
     }
 

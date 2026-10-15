@@ -40,8 +40,7 @@ import lombok.NoArgsConstructor;
 public class SProcessMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
 
     @ElementCollection
-    @CollectionTable(name = "multi_biz_data", joinColumns = { @JoinColumn(name = "id", referencedColumnName = "id"),
-            @JoinColumn(name = "tenantid", referencedColumnName = "tenantid") })
+    @CollectionTable(name = "multi_biz_data", joinColumns = { @JoinColumn(name = "id", referencedColumnName = "id") })
     @OrderColumn(name = "idx")
     @Column(name = "data_id")
     private List<Long> dataIds;

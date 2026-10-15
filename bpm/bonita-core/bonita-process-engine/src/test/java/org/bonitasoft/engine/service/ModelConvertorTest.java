@@ -284,7 +284,6 @@ class ModelConvertorTest {
         sProcessInstance.setStringIndex3("stringIndex3");
         sProcessInstance.setStringIndex4("stringIndex4");
         sProcessInstance.setStringIndex5("stringIndex5");
-        sProcessInstance.setTenantId(514L);
 
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("name", "version");
         sProcessDefinition.setStringIndex(1, "label1", null);
@@ -343,7 +342,6 @@ class ModelConvertorTest {
         sProcessInstance.setStringIndex3("stringIndex3");
         sProcessInstance.setStringIndex4("stringIndex4");
         sProcessInstance.setStringIndex5("stringIndex5");
-        sProcessInstance.setTenantId(514L);
 
         // Then
         final ProcessInstance processInstance = ModelConvertor
@@ -396,7 +394,6 @@ class ModelConvertorTest {
         saProcessInstance.setStringIndex3("stringIndex3");
         saProcessInstance.setStringIndex4("stringIndex4");
         saProcessInstance.setStringIndex5("stringIndex5");
-        saProcessInstance.setTenantId(514L);
 
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("name", "version");
         sProcessDefinition.setStringIndex(1, "label1", null);
@@ -458,7 +455,6 @@ class ModelConvertorTest {
         saProcessInstance.setStringIndex3("stringIndex3");
         saProcessInstance.setStringIndex4("stringIndex4");
         saProcessInstance.setStringIndex5("stringIndex5");
-        saProcessInstance.setTenantId(514L);
 
         // Then
         final ArchivedProcessInstance archivedProcessInstance = ModelConvertor
@@ -699,7 +695,7 @@ class ModelConvertorTest {
         final SASendTaskInstance sendTaskInstance = new SASendTaskInstance();
         assertThat(
                 ModelConvertor.toArchivedFlowNodeInstance(sendTaskInstance, flowNodeStateManager).getReachedStateDate())
-                        .isNotNull();
+                .isNotNull();
     }
 
     @Test
@@ -800,7 +796,7 @@ class ModelConvertorTest {
     void should_set_the_parentPath_when_creating_a_UserMembership() {
         //given
         SUserMembership sUserMembership = new SUserMembership(257L, 157L, 357L, 457L, 557L, 190119993L,
-                "dummy rolename", "dummy groupname", "dummy username", "Bonita/dummy");
+                "Bonita/dummy", "dummy rolename", "dummy groupname", "dummy username");
 
         //when
         UserMembershipImpl userMembership = (UserMembershipImpl) toUserMembership(sUserMembership);

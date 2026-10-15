@@ -123,11 +123,9 @@ public class TreeIndexed<VALUE_CLASS> extends AbstractTreeNode<VALUE_CLASS> {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof TreeIndexed)) {
+        if (!(o instanceof TreeIndexed<?> tree)) {
             return false;
         }
-
-        final TreeIndexed<?> tree = (TreeIndexed<?>) o;
 
         if (tree.size() != this.size()) {
             return false;

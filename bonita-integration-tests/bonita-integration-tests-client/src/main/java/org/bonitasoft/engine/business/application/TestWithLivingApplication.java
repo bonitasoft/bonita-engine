@@ -46,9 +46,9 @@ public class TestWithLivingApplication extends CommonAPIIT {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         user = createUser("john", "bpm");
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
     }
 
@@ -61,7 +61,7 @@ public class TestWithLivingApplication extends CommonAPIIT {
         }
         logoutThenlogin();
         deleteUser(user);
-        logoutOnTenant();
+        logout();
     }
 
     protected Profile getProfileUser() throws SearchException {

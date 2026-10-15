@@ -53,7 +53,6 @@ public class RetryingWorkExecutorServiceTest {
     private static final int WORK_TERMINATION_TIMEOUT = 30;
     private static final int DELAY = 1000;
     private static final int DELAY_FACTOR = 2;
-    public static final long TENANT_ID = 12L;
 
     @Rule
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
@@ -90,7 +89,7 @@ public class RetryingWorkExecutorServiceTest {
         workExecutorService = new RetryingWorkExecutorService(
                 bonitaExecutorServiceFactory, engineClock, WORK_TERMINATION_TIMEOUT, MAX_RETRY, DELAY, DELAY_FACTOR,
                 retryabilityEvaluator,
-                workExecutionAuditor, meterRegistry, incidentService, TENANT_ID);
+                workExecutionAuditor, meterRegistry, incidentService);
         doReturn(true).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
         workExecutorService.start();
     }
@@ -403,7 +402,7 @@ public class RetryingWorkExecutorServiceTest {
                 rootCause);
 
         verify(bonitaWork).handleFailure(any(), anyMap());
-        verify(incidentService).report(anyLong(), any());
+        verify(incidentService).report(any());
     }
 
     @Test
@@ -417,7 +416,7 @@ public class RetryingWorkExecutorServiceTest {
         workExecutorService.onFailure(workDescriptor, bonitaWork, context, new Exception("rootCause"));
 
         verify(bonitaWork).handleFailure(any(), anyMap());
-        verify(incidentService, never()).report(anyLong(), any());
+        verify(incidentService, never()).report(any());
     }
 
     @Test
@@ -533,12 +532,6 @@ public class RetryingWorkExecutorServiceTest {
         verify(bonitaExecutorService).submit(eq(workDescriptor));
         verify(bonitaWork, never()).handleFailure(rootCause, emptyMap());
         assertThat(workDescriptor.getRetryCount()).isEqualTo(1);
-    }
-
-    @Test
-    public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(NUMBER_OF_WORKS_RETRIED).tag("tenant", String.valueOf(TENANT_ID)).gauge())
-                .isNotNull();
     }
 
     protected double getNumberOfRetries() {

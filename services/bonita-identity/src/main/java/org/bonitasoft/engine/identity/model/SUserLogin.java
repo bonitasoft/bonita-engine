@@ -16,7 +16,6 @@ package org.bonitasoft.engine.identity.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -28,7 +27,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Baptiste Mesta
@@ -41,13 +39,10 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_login")
-@IdClass(PersistentObjectId.class)
 public class SUserLogin implements PersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private Long lastConnection;
     @OneToOne

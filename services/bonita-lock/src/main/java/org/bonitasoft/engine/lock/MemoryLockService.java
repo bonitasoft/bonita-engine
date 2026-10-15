@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(LockService.class)
 public class MemoryLockService implements LockService {
 
-    private Logger logger = LoggerFactory.getLogger(MemoryLockService.class);
+    private final Logger logger = LoggerFactory.getLogger(MemoryLockService.class);
 
     // need to have a synchronized map to synchronize the get with map modifications
     private final Map<String, ReentrantLock> locks = synchronizedMap(new HashMap<>());
@@ -42,8 +42,8 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public void unlock(BonitaLock lock, long tenantId) throws SLockException {
-        String key = buildKey(lock.getObjectToLockId(), lock.getObjectType(), tenantId);
+    public void unlock(BonitaLock lock) throws SLockException {
+        String key = buildKey(lock.getObjectToLockId(), lock.getObjectType());
         locks.computeIfPresent(key, (k, l) -> {
             if (l.hasQueuedThreads()) {
                 logger.debug("Lock released {}, keeping it, some other threads are requesting it", lock);
@@ -62,23 +62,23 @@ public class MemoryLockService implements LockService {
         });
     }
 
-    private String buildKey(final long objectToLockId, final String objectType, final long tenantId) {
-        return String.format("%s_%s_%s", objectType, objectToLockId, tenantId);
+    private String buildKey(final long objectToLockId, final String objectType) {
+        return String.format("%s_%s", objectType, objectToLockId);
     }
 
     @Override
-    public BonitaLock lock(long objectToLockId, String objectType, long tenantId)
+    public BonitaLock lock(long objectToLockId, String objectType)
             throws SLockException, SLockTimeoutException {
-        BonitaLock bonitaLock = tryLock(objectToLockId, objectType, lockTimeoutSeconds, SECONDS, tenantId);
+        BonitaLock bonitaLock = tryLock(objectToLockId, objectType, lockTimeoutSeconds, SECONDS);
         if (bonitaLock == null) {
-            throw new SLockTimeoutException(String.format("Unable to acquire lock %s,%s,%s in %s seconds",
-                    objectToLockId, objectType, tenantId, lockTimeoutSeconds));
+            throw new SLockTimeoutException(String.format("Unable to acquire lock %s,%s in %s seconds",
+                    objectToLockId, objectType, lockTimeoutSeconds));
         }
         return bonitaLock;
     }
 
-    private ReentrantLock createLock(long objectToLockId, String objectType, long tenantId) {
-        String key = buildKey(objectToLockId, objectType, tenantId);
+    private ReentrantLock createLock(long objectToLockId, String objectType) {
+        String key = buildKey(objectToLockId, objectType);
         return locks.computeIfAbsent(key, k -> {
             ReentrantLock lock = new ReentrantLock();
             logger.debug("Created new lock for key {}", key);
@@ -87,10 +87,10 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId)
+    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit)
             throws SLockException {
-        String key = buildKey(objectToLockId, objectType, tenantId);
-        ReentrantLock lock = createLock(objectToLockId, objectType, tenantId);
+        String key = buildKey(objectToLockId, objectType);
+        ReentrantLock lock = createLock(objectToLockId, objectType);
         try {
             if (lock.tryLock(timeout, timeUnit)) {
                 //this get need to be synchronized with the unlock that can change the map
@@ -103,7 +103,7 @@ public class MemoryLockService implements LockService {
                             "Lock for key {} was acquired but it was replaced due to a race condition. We will retry.",
                             key);
                     lock.unlock();
-                    return tryLock(objectToLockId, objectType, timeout, timeUnit, tenantId);
+                    return tryLock(objectToLockId, objectType, timeout, timeUnit);
                 }
 
                 logger.debug("Locked acquired for key {}", key);

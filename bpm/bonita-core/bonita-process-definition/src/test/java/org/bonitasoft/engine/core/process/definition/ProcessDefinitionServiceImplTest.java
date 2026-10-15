@@ -557,7 +557,7 @@ public class ProcessDefinitionServiceImplTest {
         final long startedBy = 9;
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "StartedBy", options,
                 Collections.singletonMap("startedBy", (Object) startedBy)))
-                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
@@ -683,7 +683,7 @@ public class ProcessDefinitionServiceImplTest {
         final long userId = 9;
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UserCanStart", options,
                 Collections.singletonMap("userId", (Object) userId)))
-                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
@@ -750,7 +750,7 @@ public class ProcessDefinitionServiceImplTest {
         final long userId = 9;
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart", options,
                 Collections.singletonMap("managerUserId", (Object) userId)))
-                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
@@ -820,7 +820,7 @@ public class ProcessDefinitionServiceImplTest {
         final String querySuffix = "suffix";
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, querySuffix, options,
                 Collections.singletonMap("userId", (Object) userId)))
-                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
@@ -953,7 +953,7 @@ public class ProcessDefinitionServiceImplTest {
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UncategorizedAndWithSupervisor",
                 options,
                 Collections.singletonMap("userId", (Object) userId)))
-                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
@@ -1023,7 +1023,7 @@ public class ProcessDefinitionServiceImplTest {
         final long userId = 9;
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UncategorizedUserCanStart", options,
                 Collections.singletonMap("userId", (Object) userId)))
-                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
@@ -1414,7 +1414,7 @@ public class ProcessDefinitionServiceImplTest {
         final long processDefinitionId = 9;
         when(persistenceService.searchEntity(SUser.class, "WhoCanStartProcess", options,
                 Collections.singletonMap("processId", (Object) processDefinitionId)))
-                        .thenReturn(new ArrayList<SUser>());
+                .thenReturn(new ArrayList<SUser>());
 
         // When
         final List<SUser> result = processDefinitionServiceImpl
@@ -1431,7 +1431,7 @@ public class ProcessDefinitionServiceImplTest {
         final long processDefinitionId = 9;
         when(persistenceService.searchEntity(SUser.class, "WhoCanStartProcess", options,
                 Collections.singletonMap("processId", (Object) processDefinitionId)))
-                        .thenThrow(new SBonitaReadException(""));
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.searchUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, options);
@@ -1465,7 +1465,7 @@ public class ProcessDefinitionServiceImplTest {
         final long processDefinitionId = 9;
         when(persistenceService.getNumberOfEntities(SUser.class, "WhoCanStartProcess", options,
                 Collections.singletonMap("processId", (Object) processDefinitionId)))
-                        .thenThrow(new SBonitaReadException(""));
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.getNumberOfUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, options);
@@ -1484,7 +1484,7 @@ public class ProcessDefinitionServiceImplTest {
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor",
                 options,
                 Collections.singletonMap("userId", (Object) userId)))
-                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
@@ -1558,7 +1558,7 @@ public class ProcessDefinitionServiceImplTest {
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class,
                 "WithAssignedOrPendingHumanTasksSupervisedBy", options,
                 Collections.singletonMap("userId", (Object) userId)))
-                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl

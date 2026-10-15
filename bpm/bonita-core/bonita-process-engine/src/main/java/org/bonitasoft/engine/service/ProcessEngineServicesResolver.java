@@ -21,7 +21,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 public class ProcessEngineServicesResolver implements ServicesLookup {
 
     @Override
-    public <T> T lookupOnPlatform(String serviceName) {
+    public <T> T lookupService(String serviceName) {
         try {
             return ServiceAccessorFactory.getInstance().createServiceAccessor().lookup(serviceName);
         } catch (Exception e) {
@@ -29,15 +29,4 @@ public class ProcessEngineServicesResolver implements ServicesLookup {
         }
     }
 
-    @Override
-    public <T> T lookupOnTenant(Long tenantId, final String serviceName) {
-        if (tenantId == null) {
-            return lookupOnPlatform(serviceName);
-        }
-        try {
-            return ServiceAccessorSingleton.getInstance().lookup(serviceName);
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to find the service " + serviceName, e);
-        }
-    }
 }

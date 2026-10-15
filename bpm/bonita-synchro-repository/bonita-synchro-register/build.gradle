@@ -6,6 +6,4 @@ dependencies {
     api project(':services:bonita-commons')
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)
-    compileOnly libs.jakartaJmsApi
-    compileOnly libs.activemqClient
 }

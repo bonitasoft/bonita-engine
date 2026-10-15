@@ -37,6 +37,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.AopTestUtils;
 
 /**
  * Integration tests for EntityManager lifecycle under various JTA transaction outcomes.
@@ -52,15 +53,16 @@ public class TransactionTimeoutEntityManagerIT extends CommonAPIIT {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         // Deploy a minimal BDM so the EntityManagerFactory is created
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         installBusinessDataModel(converter.zip(buildMinimalBOM()));
 
         // Get the real JPABusinessDataRepositoryImpl from the engine
+        // Unwrap Spring AOP proxy (created by BusinessDataRepositoryEventAspect) to access internal fields via reflection
         ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
-        bdmRepository = (JPABusinessDataRepositoryImpl) serviceAccessor.getBusinessDataRepository();
+        bdmRepository = AopTestUtils.getTargetObject(serviceAccessor.getBusinessDataRepository());
         transactionService = serviceAccessor.getTransactionService();
     }
 
@@ -70,7 +72,7 @@ public class TransactionTimeoutEntityManagerIT extends CommonAPIIT {
         clearManagersThreadLocal();
 
         cleanAndUninstallBusinessDataModel();
-        logoutOnTenant();
+        logout();
     }
 
     /**

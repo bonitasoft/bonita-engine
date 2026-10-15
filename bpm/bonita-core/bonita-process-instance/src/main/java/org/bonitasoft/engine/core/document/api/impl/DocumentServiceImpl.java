@@ -157,14 +157,27 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public void deleteDocumentsFromProcessInstance(final Long processInstanceId)
-            throws SBonitaReadException, SObjectModificationException {
+            throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
         List<SMappedDocument> mappedDocuments;
         do {
             mappedDocuments = persistenceService
                     .selectList(SelectDescriptorBuilder.getDocumentMappingsForProcessInstance(
                             processInstanceId, 0, 100, null, null));
             for (final SMappedDocument mappedDocument : mappedDocuments) {
-                removeDocument(mappedDocument);
+                deleteMappedDocument(mappedDocument);
+            }
+        } while (!mappedDocuments.isEmpty());
+    }
+
+    @Override
+    public void deleteDocumentContentsForProcessInstance(final Long processInstanceId)
+            throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
+        List<SMappedDocument> mappedDocuments;
+        do {
+            mappedDocuments = getDocumentsOfProcessInstance(processInstanceId, 0, 100, null, null);
+            for (final SMappedDocument mappedDocument : mappedDocuments) {
+                // remove the document itself
+                deleteDocument(mappedDocument.getDocumentId());
             }
         } while (!mappedDocuments.isEmpty());
     }
@@ -330,8 +343,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void removeCurrentVersion(final AbstractSMappedDocument document) throws SObjectModificationException {
         archive(document, System.currentTimeMillis());
-        removeDocument(document);
-
+        deleteMappedDocument(document);
     }
 
     @Override
@@ -345,20 +357,22 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    public void deleteDocument(long documentId)
+            throws SObjectNotFoundException, SBonitaReadException, SObjectModificationException {
+        deleteDocument(getDocument(documentId));
+    }
+
+    @Override
     public void deleteDocument(final SLightDocument document) throws SObjectModificationException {
         try {
-            delete(document);
+            recorder.recordDelete(new DeleteRecord(document), "SDocument");
         } catch (final SRecorderException e) {
             throw new SObjectModificationException(e);
         }
     }
 
-    private void delete(final SLightDocument document) throws SRecorderException {
-        recorder.recordDelete(new DeleteRecord(document), "SDocument");
-    }
-
     @Override
-    public void removeDocument(final AbstractSMappedDocument mappedDocument) throws SObjectModificationException {
+    public void deleteMappedDocument(final AbstractSMappedDocument mappedDocument) throws SObjectModificationException {
         try {
             recorder.recordDelete(new DeleteRecord(mappedDocument), "SDocumentMapping");
         } catch (final SBonitaException e) {

@@ -16,8 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.slf4j.Logger;
@@ -34,52 +33,42 @@ public class StarterThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(StarterThread.class);
 
     private final List<TenantRestartHandler> tenantRestartHandlers;
-    private final Long tenantId;
-    private final SessionAccessor sessionAccessor;
     private final UserTransactionService transactionService;
     private final PlatformService platformService;
 
-    public StarterThread(Long tenantId, SessionAccessor sessionAccessor,
-            UserTransactionService transactionService, PlatformService platformService,
+    public StarterThread(UserTransactionService transactionService, PlatformService platformService,
             List<TenantRestartHandler> tenantRestartHandlers) {
-        super("Tenant " + tenantId + " starter Thread");
+        super("Starter Thread created");
         this.tenantRestartHandlers = tenantRestartHandlers;
-        this.tenantId = tenantId;
-        this.sessionAccessor = sessionAccessor;
         this.transactionService = transactionService;
         this.platformService = platformService;
     }
 
     @Override
     public void run() {
-        STenant tenant = getTenant();
-        logger.info("Restarting elements of tenant {} that were not finished at the last shutdown", tenant.getId());
-        if (!tenant.isActivated()) {
-            logger.warn("Unable to restart elements of tenant because tenant is {}", tenant.getStatus());
+        SPlatform platform = getPlatform();
+        logger.info("Restarting elements of platform that were not finished at the last shutdown");
+        if (platform.isMaintenanceEnabled()) {
+            logger.warn("Unable to restart elements of platform because platform is {}", platform.getPausedStatus());
             return;
         }
-        executeHandlers(sessionAccessor);
+        executeHandlers();
     }
 
-    private void executeHandlers(SessionAccessor sessionAccessor) {
-        sessionAccessor.setTenantId(tenantId);
-        try {
-            for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {
-                try {
-                    logger.info("Executing Restart Handler " + restartHandler.getClass().getName());
-                    restartHandler.afterServicesStart();
-                } catch (Exception e) {
-                    logger.error("The Restart Handler " + restartHandler.getClass().getName() + " failed", e);
-                }
+    private void executeHandlers() {
+        for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {
+            try {
+                logger.info("Executing Restart Handler {}", restartHandler.getClass().getName());
+                restartHandler.afterServicesStart();
+            } catch (Exception e) {
+                logger.error("The Restart Handler {} failed", restartHandler.getClass().getName(), e);
             }
-        } finally {
-            sessionAccessor.deleteTenantId();
         }
     }
 
-    STenant getTenant() {
+    SPlatform getPlatform() {
         try {
-            return transactionService.executeInTransaction(platformService::getDefaultTenant);
+            return transactionService.executeInTransaction(platformService::getPlatform);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

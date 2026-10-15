@@ -65,8 +65,7 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
         try {
             if (loggedUserFromSession <= 0 && DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(containerType)) {
                 SActivityInstance activityInstance = activityInstanceService.getActivityInstance(containerId);
-                if (activityInstance instanceof SHumanTaskInstance) {
-                    SHumanTaskInstance instance = (SHumanTaskInstance) activityInstance;
+                if (activityInstance instanceof SHumanTaskInstance instance) {
                     return instance.getAssigneeId();
                 }
             }

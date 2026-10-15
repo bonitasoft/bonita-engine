@@ -15,7 +15,12 @@ package org.bonitasoft.engine.core.process.instance.model;
 
 import java.util.Date;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +28,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.persistence.PlatformPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -38,7 +43,7 @@ import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 @Builder
 @Entity
 @Table(name = "process_instance")
-public class SProcessInstance implements PlatformPersistentObject {
+public class SProcessInstance implements PersistentObject {
 
     private static final long DEFAULT_INTERRUPTING_EVENT_ID = -1L;
     public static final String STRING_INDEX_KEY = "stringIndex";
@@ -50,6 +55,7 @@ public class SProcessInstance implements PlatformPersistentObject {
     public static final String LAST_UPDATE_KEY = "lastUpdate";
     public static final String INTERRUPTING_EVENT_ID_KEY = "interruptingEventId";
     public static final String ID_KEY = "id";
+    public static final String ROOT_PROCESS_INSTANCE_ID_KEY = "rootProcessInstanceId";
     public static final String NAME_KEY = "name";
     public static final String PROCESSDEF_ID_KEY = "processDefinitionId";
     public static final String STATE_ID_KEY = "stateId";

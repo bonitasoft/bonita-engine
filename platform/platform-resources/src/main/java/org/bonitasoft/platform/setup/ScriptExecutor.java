@@ -83,7 +83,7 @@ public class ScriptExecutor {
 
     public void createTables() throws PlatformException {
         try {
-            executeSQLResources(asList("createTables.sql", "createQuartzTables.sql", "postCreateStructure.sql"),
+            executeSQLResources(asList("createTables.sql", "createQuartzTables.sql"),
                     FAIL_ON_ERROR);
         } catch (final IOException e) {
             throw new PlatformException(e);
@@ -101,7 +101,6 @@ public class ScriptExecutor {
             createTables();
             initializePlatformStructure();
             insertPlatform();
-            insertTenant();
         } else {
             log.info("Bonita platform already exists. Nothing to do. Stopping.");
         }
@@ -112,11 +111,11 @@ public class ScriptExecutor {
         String databaseSchemaVersion = versionService.getSupportedDatabaseSchemaVersion();
 
         final String sql = "INSERT INTO platform (id, version, initial_bonita_version, application_version, " +
-                "maintenance_message_active, created, created_by, information) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "maintenance_message_active, created, created_by, information, maintenance_enabled) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         new JdbcTemplate(datasource).update(sql, 1L, databaseSchemaVersion, version, "0.0.0", false,
-                System.currentTimeMillis(), "platformAdmin", getInformationInitialValue());
+                System.currentTimeMillis(), "platformAdmin", getInformationInitialValue(), false);
     }
 
     protected String getInformationInitialValue() {
@@ -126,14 +125,6 @@ public class ScriptExecutor {
             log.debug(e.getMessage(), e);
             throw new IllegalStateException("Cannot properly setup Bonita platform");
         }
-    }
-
-    protected void insertTenant() {
-        final String sql = "INSERT INTO tenant (id, created, createdBy, description, defaultTenant, name, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        new JdbcTemplate(datasource).update(sql, 1L, System.currentTimeMillis(),
-                "defaultUser", "Default tenant", true, "default", "ACTIVATED");
     }
 
     public boolean isPlatformAlreadyCreated() {
@@ -205,7 +196,7 @@ public class ScriptExecutor {
         populate.setIgnoreFailedDrops(true);
         populate.addScript(sqlResource);
         populate.execute(datasource);
-        log.info("Executed SQL script " + sqlResource.getURL().getFile());
+        log.info("Executed SQL script {}", sqlResource.getURL().getFile());
     }
 
     public void initializePlatformStructure() throws PlatformException {

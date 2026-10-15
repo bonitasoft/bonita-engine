@@ -104,7 +104,6 @@ public class ProcessSupervisorPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -132,7 +131,6 @@ public class ProcessSupervisorPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isFalse()
-
     }
 
     @Test
@@ -145,6 +143,5 @@ public class ProcessSupervisorPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 }

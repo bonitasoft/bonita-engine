@@ -46,6 +46,7 @@ import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -66,7 +67,6 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.IconService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
@@ -94,11 +94,8 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.InstallationService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.ServicesResolver;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -115,8 +112,7 @@ import org.bonitasoft.engine.work.WorkService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
-public class SpringServiceAccessor
-        implements ServiceAccessor, TenantServiceAccessor, PlatformServiceAccessor, PlatformInitServiceAccessor {
+public class SpringServiceAccessor implements ServiceAccessor {
 
     protected final SpringBeanAccessor beanAccessor;
 
@@ -185,6 +181,11 @@ public class SpringServiceAccessor
     }
 
     @Override
+    public BPMFailureService getBpmFailureService() {
+        return beanAccessor.getService(BPMFailureService.class);
+    }
+
+    @Override
     public BPMInstancesCreator getBPMInstancesCreator() {
         return beanAccessor.getService(BPMInstancesCreator.class);
     }
@@ -238,15 +239,6 @@ public class SpringServiceAccessor
     @Override
     public DependencyService getPlatformDependencyService() {
         return beanAccessor.getService("platformDependencyService", DependencyService.class);
-    }
-
-    @Override
-    public long getTenantId() {
-        try {
-            return ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -337,11 +329,6 @@ public class SpringServiceAccessor
     @Override
     public ContainerRegistry getContainerRegistry() {
         return beanAccessor.getService(ContainerRegistry.class);
-    }
-
-    @Override
-    public ExternalIdentityMappingService getExternalIdentityMappingService() {
-        return beanAccessor.getService(ExternalIdentityMappingService.class);
     }
 
     @Override
@@ -574,11 +561,6 @@ public class SpringServiceAccessor
     @Override
     public PlatformService getPlatformService() {
         return beanAccessor.getService(PlatformService.class);
-    }
-
-    @Override
-    public TenantServiceAccessor getTenantServiceAccessor() {
-        return TenantServiceSingleton.getInstance();
     }
 
     @Override

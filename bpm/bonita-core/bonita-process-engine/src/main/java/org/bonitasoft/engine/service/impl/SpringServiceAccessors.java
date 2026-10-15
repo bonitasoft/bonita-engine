@@ -13,34 +13,25 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Baptiste Mesta.
  */
 public class SpringServiceAccessors implements ServiceAccessors {
 
-    private SpringBeanAccessor platform;
+    private SpringBeanAccessor springBeanAccessor;
 
     //----  Initialize spring contexts
     protected synchronized SpringBeanAccessor getBeanAccessor() {
-        if (platform == null) {
-            platform = createBeanAccessor();
+        if (springBeanAccessor == null) {
+            springBeanAccessor = createBeanAccessor();
         }
-        return platform;
+        return springBeanAccessor;
     }
 
     protected SpringBeanAccessor createBeanAccessor() {
         return new SpringBeanAccessor();
-    }
-
-    //---- Wrap context with service accessors
-
-    @Override
-    public PlatformInitServiceAccessor getPlatformInitServiceAccessor() {
-        return new SpringPlatformInitServiceAccessor(getBeanAccessor());
     }
 
     @Override
@@ -49,20 +40,10 @@ public class SpringServiceAccessors implements ServiceAccessors {
     }
 
     @Override
-    public PlatformServiceAccessor getPlatformServiceAccessor() {
-        return new SpringPlatformServiceAccessor(getBeanAccessor());
-    }
-
-    @Override
-    public TenantServiceAccessor getTenantServiceAccessor() {
-        return new SpringTenantServiceAccessor(getBeanAccessor());
-    }
-
-    @Override
     public void destroy() {
-        if (platform != null) {
-            platform.destroy();
-            platform = null;
+        if (springBeanAccessor != null) {
+            springBeanAccessor.destroy();
+            springBeanAccessor = null;
         }
     }
 }

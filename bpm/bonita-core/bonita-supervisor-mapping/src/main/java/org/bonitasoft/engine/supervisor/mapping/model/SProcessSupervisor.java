@@ -13,14 +13,16 @@
  **/
 package org.bonitasoft.engine.supervisor.mapping.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +30,6 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "processsupervisor")
-@IdClass(PersistentObjectId.class)
 public class SProcessSupervisor implements PersistentObject {
 
     public static final String ID_KEY = "id";
@@ -38,8 +39,6 @@ public class SProcessSupervisor implements PersistentObject {
     public static final String PROCESS_DEF_ID_KEY = "processDefId";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private long processDefId;
     @Builder.Default

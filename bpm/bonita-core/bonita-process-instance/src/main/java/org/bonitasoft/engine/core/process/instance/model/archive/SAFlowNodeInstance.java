@@ -17,7 +17,6 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
@@ -27,21 +26,17 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "arch_flownode_instance")
-@IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class SAFlowNodeInstance implements ArchivedPersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private long archiveDate;
     private long sourceObjectId;
     private String name;

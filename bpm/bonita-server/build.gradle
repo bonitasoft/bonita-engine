@@ -28,7 +28,6 @@ dependencies {
     api project(':services:bonita-data-instance')
     api project(':services:bonita-events')
     api project(':services:bonita-expression')
-    api project(':services:bonita-external-identity-mapping')
     api project(':bpm:bonita-core:bonita-form-mapping')
     api project(':services:bonita-incident')
     api project(':services:bonita-identity')

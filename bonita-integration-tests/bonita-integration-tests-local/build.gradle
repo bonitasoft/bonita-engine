@@ -13,6 +13,7 @@ dependencies {
     testAnnotationProcessor libs.lombok
     testImplementation libs.lombok
     testImplementation libs.awaitility
+    testImplementation libs.springTest
     testImplementation libs.systemLambda
 }
 

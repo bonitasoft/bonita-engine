@@ -57,7 +57,8 @@ public class PageCreatorTest {
         // given
         final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME)
                 .setDescription(DESCRIPTION)
-                .setProcessDefinitionId(PROCESS_DEFINITION_ID).setContentType(ContentType.FORM);
+                .setProcessDefinitionId(PROCESS_DEFINITION_ID)
+                .setContentType(ContentType.FORM);
 
         // when
         final Map<PageField, Serializable> fields = pageCreator.getFields();
@@ -66,7 +67,6 @@ public class PageCreatorTest {
         assertThat(fields).as("should set content type").containsOnly(entry(PageField.NAME, NAME),
                 entry(PageField.DISPLAY_NAME, DISPLAY_NAME),
                 entry(PageField.DESCRIPTION, DESCRIPTION),
-                entry(PageField.CONTENT_TYPE, ContentType.PAGE),
                 entry(PageField.CONTENT_NAME, ZIP_FILE_NAME),
                 entry(PageField.CONTENT_TYPE, ContentType.FORM),
                 entry(PageField.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID));
@@ -104,8 +104,8 @@ public class PageCreatorTest {
         final Map<PageField, Serializable> fields = pageCreator.getFields();
 
         // then
-        assertThat(pageCreator.toString()).as("should print human readable to string")
-                .isEqualTo("PageCreator [fields=" + fields + "]");
+        assertThat(pageCreator).as("should print human readable to string")
+                .hasToString("PageCreator [fields=" + fields + "]");
 
     }
 }

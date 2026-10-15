@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.session.impl;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
@@ -34,72 +34,41 @@ public class SessionProviderImplTest {
 
     @Test
     public void testAddSession() throws Exception {
-        sessionProvider.addSession(SSession.builder().id(12L).tenantId(1).userName("john").userId(12).build());
+        sessionProvider.addSession(SSession.builder().id(12L).userName("john").userId(12).build());
         assertNotNull(sessionProvider.getSession(12));
     }
 
-    @Test(expected = SSessionNotFoundException.class)
-    public void removeSession_should_not_be_able_to_delete_sessions_of_other_tenants() throws Exception {
-        final SessionProvider sessionProvider1 = new SessionProviderImpl();
-        final SessionProvider sessionProvider2 = new SessionProviderImpl();
-
-        sessionProvider1.addSession(SSession.builder().id(19L).tenantId(1).userName("john").userId(12).build());
-        sessionProvider2.addSession(SSession.builder().id(20L).tenantId(2).userName("john").userId(12).build());
-
-        sessionProvider1.removeSession(20);
-    }
-
-    @Test(expected = SSessionNotFoundException.class)
+    @Test
     public void testRemoveSession() throws Exception {
-        sessionProvider.addSession(SSession.builder().id(12L).tenantId(1).userName("john").userId(12).build());
-        sessionProvider.removeSession(12);
-        sessionProvider.getSession(12);
-    }
-
-    @Test(expected = SSessionNotFoundException.class)
-    public void testGetUnexistingSession() throws Exception {
-        sessionProvider.getSession(10L);
+        sessionProvider.addSession(SSession.builder().id(12L).userName("john").userId(12).build());
+        sessionProvider.removeSession(12L);
+        assertThatThrownBy(() -> sessionProvider.getSession(12L)).isInstanceOf(SSessionNotFoundException.class);
     }
 
     @Test
-    public void testDeleteSessionsOfTenantKeepTechnical() throws Exception {
+    public void get_non_existing_session_should_throw_exception() {
+        assertThatThrownBy(() -> sessionProvider.getSession(10L)).isInstanceOf(SSessionNotFoundException.class);
+    }
+
+    @Test
+    public void should_deleteSessions_keep_technical_sessions() throws Exception {
         sessionProvider.removeSessions();
-        sessionProvider.addSession(SSession.builder().id(54L).tenantId(3).userName("john").userId(12).build());
-        sessionProvider.addSession(
-                SSession.builder().id(55L).tenantId(3).userName("john").userId(12).technicalUser(true).build());
-        sessionProvider.addSession(SSession.builder().id(56L).tenantId(1).userName("john").userId(12).build());
-        sessionProvider.deleteSessionsOfTenant(3, true /* keep technical sessions */);
+        sessionProvider.addSession(SSession.builder().id(54L).userName("john").userId(12).build());
+        sessionProvider.addSession(SSession.builder().id(55L).userName("john").userId(12).technicalUser(true).build());
+        sessionProvider.deleteSessions(true /* keep technical sessions */);
         sessionProvider.getSession(55);
-        sessionProvider.getSession(56);
-        try {
-            sessionProvider.getSession(54);
-            fail("session 54 should be deleted because it is on tenant 3");
-        } catch (SSessionNotFoundException e) {
-
-        }
+        assertThatThrownBy(() -> sessionProvider.getSession(54L)).isInstanceOf(SSessionNotFoundException.class);
     }
 
     @Test
-    public void testDeleteSessionsOfTenant() throws Exception {
+    public void should_delete_all_sessions() throws Exception {
         sessionProvider.removeSessions();
-        sessionProvider.addSession(SSession.builder().id(54L).tenantId(3).userName("john").userId(12).build());
-        sessionProvider.addSession(
-                SSession.builder().id(55L).tenantId(3).userName("tech").userId(13).technicalUser(true).build());
-        sessionProvider.addSession(SSession.builder().id(56L).tenantId(1).userName("john").userId(14).build());
-        sessionProvider.deleteSessionsOfTenant(3, false /* keep technical sessions */);
-        sessionProvider.getSession(56);
-        try {
-            sessionProvider.getSession(55);
-            fail("session 55 should be deleted because it is on tenant 3");
-        } catch (SSessionNotFoundException e) {
+        sessionProvider.addSession(SSession.builder().id(55L).userName("tech").userId(13).technicalUser(true).build());
+        sessionProvider.addSession(SSession.builder().id(56L).userName("john").userId(14).build());
+        sessionProvider.deleteSessions(false /* keep technical sessions */);
 
-        }
-        try {
-            sessionProvider.getSession(54);
-            fail("session 54 should be deleted because it is on tenant 3");
-        } catch (SSessionNotFoundException e) {
-
-        }
+        assertThatThrownBy(() -> sessionProvider.getSession(55L)).isInstanceOf(SSessionNotFoundException.class);
+        assertThatThrownBy(() -> sessionProvider.getSession(56L)).isInstanceOf(SSessionNotFoundException.class);
     }
 
 }

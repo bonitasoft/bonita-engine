@@ -127,8 +127,7 @@ public class Proxyfier {
         }
 
         private boolean isAListOfEntities(final Object invocationResult) {
-            if (invocationResult instanceof List) {
-                final List<?> list = (List<?>) invocationResult;
+            if (invocationResult instanceof List<?> list) {
                 if (!list.isEmpty() && list.get(0) instanceof Entity) {
                     return true;
                 }

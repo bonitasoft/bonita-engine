@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -42,7 +42,7 @@ public class StarterThreadTest {
     @Rule
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
-    private final STenant tenant = createTenant();
+    private final SPlatform platform = createPlatform();
     @Mock
     private UserTransactionService transactionService;
     @Mock
@@ -61,21 +61,19 @@ public class StarterThreadTest {
     public void before() throws Exception {
         doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService)
                 .executeInTransaction(any());
-        starterThread = new StarterThread(1L, sessionAccessor, transactionService,
+        starterThread = new StarterThread(transactionService,
                 platformService, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
-        doReturn(tenant).when(platformService).getDefaultTenant();
+        doReturn(platform).when(platformService).getPlatform();
     }
 
-    private STenant createTenant() {
-        STenant sTenant = new STenant("tenant1", "system", 12345, "ACTIVATED", true);
-        sTenant.setId(1L);
-        return sTenant;
+    private SPlatform createPlatform() {
+        return new SPlatform("10.3", "10.3.0", "0.0.0", null, false, "system", 123455, false);
     }
 
     @Test
-    public void should_call_all_restart_handlers() throws Exception {
+    public void should_call_all_restart_handlers() {
         //given
-        tenant.setStatus("ACTIVATED");
+        platform.setMaintenanceEnabled(false);
         //when
         starterThread.run();
         //then
@@ -84,9 +82,9 @@ public class StarterThreadTest {
     }
 
     @Test
-    public void should_not_call_restart_handlers_on_paused_tenant() throws Exception {
+    public void should_not_call_restart_handlers_on_paused_tenant() {
         //given
-        tenant.setStatus("PAUSED");
+        platform.setMaintenanceEnabled(true);
         //when
         starterThread.run();
         //then
@@ -95,20 +93,9 @@ public class StarterThreadTest {
     }
 
     @Test
-    public void should_not_call_restart_handlers_on_deactivated_tenant() throws Exception {
+    public void should_call_all_restart_handlers_even_when_one_handler_fails() {
         //given
-        tenant.setStatus("DEACTIVATED");
-        //when
-        starterThread.run();
-        //then
-        verify(tenantRestartHandler1, never()).afterServicesStart();
-        verify(tenantRestartHandler2, never()).afterServicesStart();
-    }
-
-    @Test
-    public void should_call_all_restart_handlers_even_when_one_handler_fails() throws Exception {
-        //given
-        tenant.setStatus("ACTIVATED");
+        platform.setMaintenanceEnabled(false);
         doThrow(new RuntimeException("test")).when(tenantRestartHandler1).afterServicesStart();
         //when
         starterThread.run();
@@ -122,10 +109,9 @@ public class StarterThreadTest {
     }
 
     @Test
-    public void should_call_all_restart_handlers_even_when_one_handler_fails_with_a_runtime_exception()
-            throws Exception {
+    public void should_call_all_restart_handlers_even_when_one_handler_fails_with_a_runtime_exception() {
         //given
-        tenant.setStatus("ACTIVATED");
+        platform.setMaintenanceEnabled(false);
         doThrow(new RuntimeException("test", new Exception())).when(tenantRestartHandler1).afterServicesStart();
         //when
         starterThread.run();

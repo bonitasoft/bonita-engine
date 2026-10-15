@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.test.toolkit.bpm;
 
+import java.util.Collections;
+
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
@@ -123,6 +125,14 @@ public class TestHumanTask extends AbstractManualTask {
     // ////////////////////////////////////////////////////////////////////////////
     // / Execute
     // ////////////////////////////////////////////////////////////////////////////
+    public void executeUserTask(final TestUser executor) {
+        final ProcessAPI processAPI = TestProcess.getProcessAPI(executor.getSession());
+        try {
+            processAPI.executeUserTask(humanTaskInstance.getId(), Collections.emptyMap());
+        } catch (final Exception e) {
+            throw new TestToolkitException("Can't execute user task <" + humanTaskInstance.getId() + ">.", e);
+        }
+    }
 
     public void execute(final APISession apiSession) {
         final ProcessAPI processAPI = TestProcess.getProcessAPI(apiSession);

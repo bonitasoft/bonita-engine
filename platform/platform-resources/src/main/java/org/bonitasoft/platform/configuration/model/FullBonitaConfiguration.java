@@ -13,66 +13,32 @@
  **/
 package org.bonitasoft.platform.configuration.model;
 
-import java.util.Arrays;
-import java.util.Objects;
-
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
 
 /**
  * @author Laurent Leseigneur
  */
+@Getter
+@EqualsAndHashCode(callSuper = true)
 public class FullBonitaConfiguration extends BonitaConfiguration {
 
     private final String configurationType;
 
-    private final Long tenantId;
-
-    public FullBonitaConfiguration(String resourceName, byte[] resourceContent, String configurationType,
-            Long tenantId) {
+    public FullBonitaConfiguration(String resourceName, byte[] resourceContent, String configurationType) {
         super(resourceName, resourceContent);
         this.configurationType = configurationType;
-        this.tenantId = tenantId;
-    }
-
-    public String getConfigurationType() {
-        return configurationType;
-    }
-
-    public Long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        FullBonitaConfiguration that = (FullBonitaConfiguration) o;
-        return Objects.equals(getResourceName(), that.getResourceName()) &&
-                Arrays.equals(getResourceContent(), that.getResourceContent()) &&
-                Objects.equals(getResourceName(), that.getResourceName()) &&
-                Objects.equals(getTenantId(), that.getTenantId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getResourceName(), getResourceContent(), configurationType);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("FullBonitaConfiguration{ resourceName='%s' , configurationType='%s' , tenantId=%d }",
-                getResourceName(),
-                getConfigurationType(),
-                getTenantId());
     }
 
     public boolean isLicenseFile() {
         return getConfigurationType().equals(ConfigurationType.LICENSES.name());
     }
 
-    public boolean isTenantFile() {
-        return getTenantId() > 0;
+    @Override
+    public String toString() {
+        return String.format("FullBonitaConfiguration{ resourceName='%s' , configurationType='%s' }",
+                getResourceName(), getConfigurationType());
     }
+
 }

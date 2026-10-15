@@ -202,11 +202,10 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof FlowNodeInstanceImpl))
+        if (!(o instanceof FlowNodeInstanceImpl that))
             return false;
         if (!super.equals(o))
             return false;
-        FlowNodeInstanceImpl that = (FlowNodeInstanceImpl) o;
         return Objects.equals(parentContainerId, that.parentContainerId) &&
                 Objects.equals(rootContainerId, that.rootContainerId) &&
                 Objects.equals(processDefinitionId, that.processDefinitionId) &&

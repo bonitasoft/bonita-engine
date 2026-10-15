@@ -123,8 +123,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
                 final Properties pageProperties = pageService.readPageZip(pageContent);
                 final PageCreator pageCreator = new PageCreator(pageName, contentName, ContentType.FORM,
                         processDefinitionId)
-                                .setDisplayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME))
-                                .setDescription(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION));
+                        .setDisplayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME))
+                        .setDescription(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION));
                 final SPage newPage = new PageModelConverter().constructSPage(pageCreator, userId);
                 pageService.addPage(newPage, pageContent);
             }

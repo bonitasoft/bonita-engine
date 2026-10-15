@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.data;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that the Business Data Model is invalid. So it cannot be deployed.
  *
@@ -22,6 +24,7 @@ package org.bonitasoft.engine.business.data;
  */
 public class InvalidBusinessDataModelException extends BusinessDataRepositoryException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

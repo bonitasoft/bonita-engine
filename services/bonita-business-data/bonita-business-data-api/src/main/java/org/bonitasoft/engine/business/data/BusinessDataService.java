@@ -41,5 +41,4 @@ public interface BusinessDataService {
 
     Serializable getJsonEntities(String entityClassName, List<Long> identifiers, String businessDataURIPattern)
             throws SBusinessDataRepositoryException;
-
 }

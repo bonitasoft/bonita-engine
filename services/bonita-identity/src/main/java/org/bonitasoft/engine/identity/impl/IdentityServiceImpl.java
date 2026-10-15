@@ -186,7 +186,6 @@ public class IdentityServiceImpl implements IdentityService {
         hashedUser.setSUserLogin(sUserLogin);
         sUserLogin.setSUser(hashedUser);
         sUserLogin.setId(hashedUser.getId());
-        sUserLogin.setTenantId(hashedUser.getTenantId());
         recorder.recordInsert(new InsertRecord(sUserLogin), USER_LOGIN);
         log(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
     }

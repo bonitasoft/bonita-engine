@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.sequence;
 
-import java.sql.SQLException;
-
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 
@@ -24,22 +22,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
  */
 public interface SequenceManager {
 
-    void reset();
-
-    long getNextId(String entityName, long tenantId) throws SObjectNotFoundException, SObjectModificationException;
-
-    /**
-     * clear all in memory sequence
-     */
-    void clear();
-
-    /**
-     * clear in memory sequence for only one tenant
-     *
-     * @param tenantId
-     */
-    void clear(long tenantId);
-
-    void close() throws SQLException;
+    long getNextId(String entityName) throws SObjectNotFoundException, SObjectModificationException;
 
 }

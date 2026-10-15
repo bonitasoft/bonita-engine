@@ -16,7 +16,7 @@ package org.bonitasoft.engine.execution.work;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -54,7 +54,8 @@ public class ExecuteFlowNodeWorkTest {
 
     @Before
     public void before() throws Exception {
-        context = Collections.singletonMap(TenantAwareBonitaWork.SERVICE_ACCESSOR, serviceAccessor);
+        context = new HashMap<>();
+        context.put(TenantAwareBonitaWork.SERVICE_ACCESSOR, serviceAccessor);
         doReturn(activityInstanceService).when(serviceAccessor).getActivityInstanceService();
         doReturn(flowNodeExecutor).when(serviceAccessor).getFlowNodeExecutor();
         sHumanTaskInstance = new SUserTaskInstance();

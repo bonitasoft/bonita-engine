@@ -33,4 +33,12 @@ public class SActivityStateExecutionException extends SFlowNodeExecutionExceptio
         super(message, cause);
     }
 
+    public SActivityStateExecutionException(final String message, String scope, final Throwable cause) {
+        super(message, scope, cause);
+    }
+
+    public SActivityStateExecutionException(final String message, String scope) {
+        super(message, scope);
+    }
+
 }

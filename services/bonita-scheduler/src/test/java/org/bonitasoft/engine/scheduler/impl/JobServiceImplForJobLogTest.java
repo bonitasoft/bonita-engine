@@ -224,7 +224,7 @@ public class JobServiceImplForJobLogTest {
         final SJobLog sJobLog = mock(SJobLog.class);
         when(readPersistenceService
                 .selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", jobLogId)))
-                        .thenReturn(sJobLog);
+                .thenReturn(sJobLog);
 
         // When
         final SJobLog result = jobServiceImpl.getJobLog(jobLogId);

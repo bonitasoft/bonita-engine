@@ -14,12 +14,14 @@
 package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bonitasoft.test.toolkit.bpm.TestCase;
 import org.bonitasoft.test.toolkit.bpm.TestHumanTask;
 import org.bonitasoft.test.toolkit.bpm.TestProcessFactory;
 import org.bonitasoft.test.toolkit.organization.TestUser;
@@ -110,7 +112,7 @@ public class APIHumanTaskIT extends AbstractConsoleTest {
     /**
      * Check that the paging system works fine
      */
-    public void testHumanTaskItemSearchPaging() {
+    public void testHumanTaskItemSearchPaging() throws InterruptedException {
 
         final long before = apiHumanTask.runSearch(0, 10, null,
                 apiHumanTask.defineDefaultSearchOrder(),
@@ -118,13 +120,16 @@ public class APIHumanTaskIT extends AbstractConsoleTest {
                 new ArrayList<>(), new ArrayList<>()).getTotal();
 
         // Setup : insert enough tasks to have 2 pages
+        var instances = new ArrayList<TestCase>();
         for (int i = 0; i < 15; i++) {
             try {
-                TestProcessFactory.getDefaultHumanTaskProcess().startCase();
+                instances.add(TestProcessFactory.getDefaultHumanTaskProcess().startCase());
             } catch (final Exception e) {
                 fail("Can't start process [" + e.getLocalizedMessage() + "]");
             }
         }
+        await("Wait for the tasks to be created")
+                .until(() -> instances.stream().allMatch(testCase -> testCase.getNextHumanTask() != null));
 
         // Setup: retrieve the needed APIs
         // this.apiHumanTask = new APIHumanTask();
@@ -137,7 +142,7 @@ public class APIHumanTaskIT extends AbstractConsoleTest {
                 new HashMap<>(),
                 new ArrayList<>(), new ArrayList<>());
 
-        assertThat(search.getResults().size()).isGreaterThan(2);
+        assertThat(search.getResults()).hasSizeGreaterThan(2);
         assertThat(search.getTotal()).isGreaterThan(before);
     }
 

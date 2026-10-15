@@ -56,6 +56,8 @@ class CasePermissionRule implements PermissionRule {
             return checkGetMethod(apiCallContext, apiAccessor, currentUserId, logger)
         } else if (apiCallContext.isPOST()) {
             return checkPostMethod(apiCallContext, apiAccessor, currentUserId, logger)
+        } else if (apiCallContext.isPUT()) {
+            return checkPutMethod(apiCallContext, apiAccessor, currentUserId, logger)
         }
         return false
     }
@@ -135,5 +137,12 @@ class CasePermissionRule implements PermissionRule {
             return true
         }
         return false
+    }
+
+    private boolean checkPutMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
+        def processAPI = apiAccessor.getProcessAPI()
+        def processInstanceId = Long.valueOf(apiCallContext.getResourceId())
+        def processDefinitionId = processAPI.getProcessInstance(processInstanceId).getProcessDefinitionId()
+        return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
     }
 }

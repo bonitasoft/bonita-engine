@@ -50,7 +50,7 @@ public class AddUserMembership implements TransactionContentWithResult<SUserMemb
 
     @Override
     public void execute() throws SBonitaException {
-        // FIXME: if RDBMS has foreign keys, getUser, getRole, getGroup can be ommitted:
+        // FIXME: if RDBMS has foreign keys, getUser, getRole, getGroup can be omitted:
         final SUser user = identityService.getUser(userId);
         final SRole role = identityService.getRole(roleId);
         final SGroup group = identityService.getGroup(groupId);

@@ -76,7 +76,7 @@ public class ExpressionResolverServiceImplTest {
     }
 
     @Test
-    public void evaluate_should_not_load_class_loader_when_no_defintion_is_defined() throws Exception {
+    public void evaluate_should_not_load_class_loader_when_no_definition_is_defined() throws Exception {
         final SExpressionContext context = new SExpressionContext();
 
         resolverService.evaluate(expression, context);

@@ -22,7 +22,16 @@ import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchiveReader;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationInstaller;
-import org.bonitasoft.engine.api.impl.application.installer.detector.*;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.BdmDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.CustomPageDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.IconDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.LayoutDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.LivingApplicationDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.OrganizationDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.PageAndFormDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ProcessDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ThemeDetector;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -41,7 +50,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
     }
 
     @After
@@ -51,7 +60,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
             getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
             getTenantAdministrationAPI().resume();
         }
-        logoutOnTenant();
+        logout();
     }
 
     @Test

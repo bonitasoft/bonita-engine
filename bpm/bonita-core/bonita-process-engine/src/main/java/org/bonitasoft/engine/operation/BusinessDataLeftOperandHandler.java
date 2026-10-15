@@ -89,8 +89,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
                             new Container(containerId, containerType)));
             final Class<Entity> dataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader()
                     .loadClass(reference.getDataClassName());
-            if (reference instanceof SSimpleRefBusinessDataInstance) {
-                final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
+            if (reference instanceof SSimpleRefBusinessDataInstance simpleRef) {
                 final Long dataId = simpleRef.getDataId();
                 if (dataId != null) {
                     return businessDataRepository.findById(dataClass, dataId);
@@ -127,8 +126,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             throws ClassNotFoundException, SBusinessDataNotFoundException {
         final Class<Entity> dataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader()
                 .loadClass(reference.getDataClassName());
-        if (reference instanceof SSimpleRefBusinessDataInstance) {
-            final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
+        if (reference instanceof SSimpleRefBusinessDataInstance simpleRef) {
             final Entity entity = businessDataRepository.findById(dataClass, simpleRef.getDataId());
             businessDataRepository.remove(entity);
         } else {

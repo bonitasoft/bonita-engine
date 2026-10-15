@@ -42,6 +42,7 @@ import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.MaintenanceAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -211,10 +212,10 @@ public class APITestUtil extends PlatformTestUtil {
     @After
     public void clearSynchroRepository() {
         try {
-            loginOnDefaultTenantWithDefaultTechnicalUser();
+            loginWithTechnicalUser();
             resumeTenantIfPaused();
             ClientEventUtil.clearRepo(getCommandAPI());
-            logoutOnTenant();
+            logout();
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -224,7 +225,7 @@ public class APITestUtil extends PlatformTestUtil {
         getApiClient().login(userName, password);
     }
 
-    public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
+    public void loginWithTechnicalUser() throws BonitaException {
         getApiClient().login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
     }
 
@@ -232,17 +233,17 @@ public class APITestUtil extends PlatformTestUtil {
         return getApiClient().getBusinessDataAPI();
     }
 
-    public void logoutOnTenant() throws BonitaException {
+    public void logout() throws BonitaException {
         getApiClient().logout();
     }
 
     public void logoutThenlogin() throws BonitaException {
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
     }
 
     public void logoutThenloginAs(final String userName, final String password) throws BonitaException {
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(userName, password);
     }
 
@@ -313,7 +314,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public User createUserAndLogin(final String userName, final String password) throws BonitaException {
         final User user = getIdentityAPI().createUser(userName, password);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(userName, password);
         return user;
     }
@@ -1581,6 +1582,10 @@ public class APITestUtil extends PlatformTestUtil {
 
     public TenantAdministrationAPI getTenantAdministrationAPI() {
         return getApiClient().getTenantAdministrationAPI();
+    }
+
+    public MaintenanceAPI getMaintenanceAPI() {
+        return getApiClient().getMaintenanceAPI();
     }
 
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {

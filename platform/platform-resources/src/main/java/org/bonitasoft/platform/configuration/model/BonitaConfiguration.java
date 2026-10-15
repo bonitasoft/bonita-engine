@@ -17,9 +17,14 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Emmanuel Duchastenier
  */
+@Setter
+@Getter
 public class BonitaConfiguration implements Serializable {
 
     private String resourceName;
@@ -30,22 +35,6 @@ public class BonitaConfiguration implements Serializable {
         this.resourceContent = resourceContent;
     }
 
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
-
-    public byte[] getResourceContent() {
-        return resourceContent;
-    }
-
-    public void setResourceContent(byte[] resourceContent) {
-        this.resourceContent = resourceContent;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -53,19 +42,16 @@ public class BonitaConfiguration implements Serializable {
         if (o == null || getClass() != o.getClass())
             return false;
         BonitaConfiguration that = (BonitaConfiguration) o;
-        return Objects.equals(resourceName, that.resourceName) &&
-                Arrays.equals(resourceContent, that.resourceContent);
+        return Objects.equals(resourceName, that.resourceName) && Arrays.equals(resourceContent, that.resourceContent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(resourceName, resourceContent);
+        return Objects.hash(resourceName, Arrays.hashCode(resourceContent));
     }
 
     @Override
     public String toString() {
-        return "BonitaConfiguration{" +
-                "resourceName='" + resourceName + '\'' +
-                '}';
+        return "BonitaConfiguration{resourceName='" + resourceName + "'}";
     }
 }

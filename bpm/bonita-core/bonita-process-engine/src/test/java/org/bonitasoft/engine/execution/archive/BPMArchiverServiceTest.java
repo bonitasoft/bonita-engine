@@ -27,10 +27,13 @@ import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.BPMFailureService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
@@ -72,6 +75,8 @@ public class BPMArchiverServiceTest {
     private DataInstanceService dataInstanceService;
     @Mock
     private ActivityInstanceService activityInstanceService;
+    @Mock
+    private BPMFailureService failureService;
     @Spy
     @InjectMocks
     private BPMArchiverService bpmArchiverService;
@@ -102,6 +107,17 @@ public class BPMArchiverServiceTest {
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref1);
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref2);
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref3);
+    }
+
+    @Test
+    public void archiveAndDeleteFlowNodeInstance_should_archive_failures() throws Exception {
+        var flowNodeInstance = mock(SFlowNodeInstance.class);
+        when(flowNodeInstance.getId()).thenReturn(123L);
+        when(flowNodeInstance.getType()).thenReturn(SFlowNodeType.END_EVENT);
+
+        bpmArchiverService.archiveAndDeleteFlowNodeInstance(flowNodeInstance, 1L);
+
+        verify(failureService).archiveFlowNodeFailures(eq(123L), any(long.class));
     }
 
 }

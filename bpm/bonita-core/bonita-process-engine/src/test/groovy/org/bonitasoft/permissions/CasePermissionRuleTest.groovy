@@ -289,7 +289,6 @@ public class CasePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         Assertions.assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -324,6 +323,47 @@ public class CasePermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         Assertions.assertThat(isAuthorized).isTrue()
+    }
 
+    @Test
+    public void should_allow_on_PUT_when_user_is_process_supervisor() {
+        // given
+        doReturn(true).when(apiCallContext).isPUT()
+        doReturn("case").when(apiCallContext).getResourceName()
+        doReturn("45").when(apiCallContext).getResourceId()
+
+        def processInstance = mock(ProcessInstance.class)
+        doReturn(processInstance).when(processAPI).getProcessInstance(45l)
+        doReturn(1024l).when(processInstance).getProcessDefinitionId()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(1024l, currentUserId)
+
+        // when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+
+        // then
+        Assertions.assertThat(isAuthorized).isTrue()
+        verify(processAPI).getProcessInstance(45l)
+        verify(processAPI).isUserProcessSupervisor(1024l, currentUserId)
+    }
+
+    @Test
+    public void should_deny_on_PUT_when_user_is_not_process_supervisor() {
+        // given
+        doReturn(true).when(apiCallContext).isPUT()
+        doReturn("case").when(apiCallContext).getResourceName()
+        doReturn("45").when(apiCallContext).getResourceId()
+
+        def processInstance = mock(ProcessInstance.class)
+        doReturn(processInstance).when(processAPI).getProcessInstance(45l)
+        doReturn(1024l).when(processInstance).getProcessDefinitionId()
+        doReturn(false).when(processAPI).isUserProcessSupervisor(1024l, currentUserId)
+
+        // when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+
+        // then
+        Assertions.assertThat(isAuthorized).isFalse()
+        verify(processAPI).getProcessInstance(45l)
+        verify(processAPI).isUserProcessSupervisor(1024l, currentUserId)
     }
 }

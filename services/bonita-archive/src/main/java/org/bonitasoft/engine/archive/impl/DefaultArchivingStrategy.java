@@ -40,6 +40,7 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance", true);
         archives.put("org.bonitasoft.engine.core.contract.data.SContractData", true);
+        archives.put("org.bonitasoft.engine.core.process.instance.model.SBPMFailure", true);
         for (Map.Entry<String, Boolean> entry : additionalConfiguration.entrySet()) {
             if (!archives.containsKey(entry.getKey())) {
                 archives.put(entry.getKey(), entry.getValue());

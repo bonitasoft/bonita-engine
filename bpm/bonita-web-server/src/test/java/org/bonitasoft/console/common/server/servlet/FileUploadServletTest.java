@@ -20,9 +20,13 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +39,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.engine.api.TemporaryContentAPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -59,7 +64,8 @@ public class FileUploadServletTest {
 
         final String jsonResponse = fileUploadServlet.generateResponseJson(request, "originalFileName",
                 "application/json",
-                uploadedFile.getName());
+                uploadedFile.getName(),
+                false);
         ObjectMapper mapper = new ObjectMapper();
         @SuppressWarnings("unchecked")
         Map<String, String> jsonResponseMap = mapper.readValue(jsonResponse, Map.class);
@@ -150,6 +156,56 @@ public class FileUploadServletTest {
         // then
         verify(response).setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
         verify(fileUploadServlet, never()).storeTempFile(anyString(), any());
+    }
+
+    @Test
+    public void doPost_should_return_jarlessBar_indicator() throws Exception {
+        // given
+        // a bar zip file with a .jarless file inside
+        final File barFile = File.createTempFile("app", ".bar");
+        try (FileOutputStream fos = new FileOutputStream(barFile); ZipOutputStream zos = new ZipOutputStream(fos)) {
+            ZipEntry jarlessEntry = new ZipEntry(".jarless");
+            zos.putNextEntry(jarlessEntry);
+            zos.closeEntry();
+        }
+
+        final FileItem fileItem = mock(FileItem.class);
+        final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final PrintWriter printer = mock(PrintWriter.class);
+        final File tempFolder = File.createTempFile("upload", "");
+        tempFolder.mkdir();
+
+        //manage spy
+        fileUploadServlet.uploadDirectoryPath = tempFolder.getAbsolutePath();
+        doNothing().when(fileUploadServlet).defineUploadDirectoryPath(request);
+        doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(FileItemFactory.class));
+        TemporaryContentAPI tempContentApi = mock(TemporaryContentAPI.class);
+        doReturn("key").when(fileUploadServlet).storeTempFile(anyString(), any());
+        doReturn(tempContentApi).when(fileUploadServlet).getTemporaryContentAPI();
+
+        when(fileItem.getInputStream()).then(invoc -> new FileInputStream(barFile));
+        when(fileItem.getName()).then(invoc -> barFile.getName());
+        when(serviceFileUpload.parseRequest(request)).thenReturn(List.of(fileItem));
+        when(request.getMethod()).thenReturn("post");
+        when(request.getContentType()).thenReturn("multipart/");
+        when(response.getWriter()).thenReturn(printer);
+
+        when(fileUploadServlet.getServletConfig()).thenReturn(mock(ServletConfig.class));
+        when(fileUploadServlet.getInitParameter(FileUploadServlet.RESPONSE_CONTENT_TYPE_PARAM))
+                .thenReturn(FileUploadServlet.JSON_CONTENT_TYPE);
+        when(fileUploadServlet.getInitParameter(FileUploadServlet.SUPPORTED_EXTENSIONS_PARAM))
+                .thenReturn("bar");
+
+        // when
+        fileUploadServlet.init();
+        fileUploadServlet.doPost(request, response);
+
+        // then
+        verify(response, never()).setStatus(anyInt());
+        ArgumentMatcher<String> isStringWithJarless = s -> s
+                .contains(String.format("\"%s\":true", FileUploadServlet.JARLESS_BAR_ATTRIBUTE));
+        verify(printer).print(argThat(isStringWithJarless));
     }
 
     @Test

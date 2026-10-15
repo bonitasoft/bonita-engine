@@ -31,7 +31,12 @@ import java.util.regex.Pattern;
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
-import org.bonitasoft.engine.api.*;
+import org.bonitasoft.engine.api.ApiAccessType;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -82,10 +87,10 @@ public class BPMLocalIT extends CommonAPILocalIT {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         john = createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         setSessionInfo(getSession());
     }
@@ -94,7 +99,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
     public void after() throws Exception {
         VariableStorage.clearAll();
         deleteUser(USERNAME);
-        logoutOnTenant();
+        logout();
         cleanSession();
     }
 
@@ -103,8 +108,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final LoginAPI loginAPI = getLoginAPI();
         final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
         final APISession fakeSession = new APISessionImpl(session.getId() + 1, session.getCreationDate(),
-                session.getDuration(), session.getUserName(), session.getUserId(), session.getTenantName(),
-                session.getTenantId());
+                session.getDuration(), session.getUserName(), session.getUserId());
 
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(fakeSession);
         identityAPI.getGroup(12);
@@ -391,7 +395,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         waitForUserTaskAndExecuteIt(pi1, "step1", john);
         waitForUserTaskAndExecuteIt(pi2, "step1", john);
         waitForUserTaskAndExecuteIt(pi3, "step1", john);
-        logoutOnTenant();
+        logout();
         final PlatformSession loginPlatform = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         // stop node and in the same time release the semaphores to unlock works
@@ -412,7 +416,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         Thread.sleep(50);
         platformAPI.startNode();
         logoutOnPlatform(loginPlatform);
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         //during stop node some flow node can be put in failed state
         retryFailedFlowNodes();
@@ -456,7 +460,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
 
     @Test
     public void getPlatformVersion() throws BonitaException, IOException {
-        logoutOnTenant();
+        logout();
         final PlatformSession platformSession = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         final Platform platform = platformAPI.getPlatform();

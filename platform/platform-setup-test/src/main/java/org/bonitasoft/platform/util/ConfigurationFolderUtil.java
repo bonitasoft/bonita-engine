@@ -31,7 +31,6 @@ public class ConfigurationFolderUtil {
             "dropQuartzTables.sql",
             "dropTables.sql",
             "initTables.sql",
-            "postCreateStructure.sql",
             "preDropStructure.sql" };
 
     public Path buildPlatformConfFolder(Path rootFolder) throws IOException {

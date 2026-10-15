@@ -148,7 +148,8 @@ public class FormMappingIT extends TestWithUser {
                 processConfigurationAPI
                         .searchFormMappings(new SearchOptionsBuilder(0, 100)
                                 .sort(FormMappingSearchDescriptor.ID, Order.DESC).done())
-                        .getResult()).isEmpty();
+                        .getResult())
+                .isEmpty();
 
     }
 

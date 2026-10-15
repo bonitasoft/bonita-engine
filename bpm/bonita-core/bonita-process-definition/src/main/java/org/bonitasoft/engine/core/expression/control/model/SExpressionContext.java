@@ -210,9 +210,8 @@ public class SExpressionContext implements Serializable {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof SExpressionContext))
+        if (!(o instanceof SExpressionContext that))
             return false;
-        SExpressionContext that = (SExpressionContext) o;
         return Objects.equals(time, that.time) &&
                 Objects.equals(evaluateInDefinition, that.evaluateInDefinition) &&
                 Objects.equals(containerId, that.containerId) &&

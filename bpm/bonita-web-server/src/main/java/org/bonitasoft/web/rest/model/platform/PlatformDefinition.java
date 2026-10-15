@@ -47,7 +47,6 @@ public class PlatformDefinition extends ItemDefinition<PlatformItem> {
     protected void defineAttributes() {
         createAttribute(PlatformItem.ATTRIBUTE_CREATED_DATE, ItemAttribute.TYPE.STRING);
         createAttribute(PlatformItem.ATTRIBUTE_INIT_VERSION, ItemAttribute.TYPE.STRING);
-        createAttribute(PlatformItem.ATTRIBUTE_PRE_VERSION, ItemAttribute.TYPE.STRING);
         createAttribute(PlatformItem.ATTRIBUTE_VERSION, ItemAttribute.TYPE.STRING);
         createAttribute(PlatformItem.ATTRIBUTE_CREATEDBY, ItemAttribute.TYPE.STRING);
         createAttribute(PlatformItem.ATTRIBUTE_STATE, ItemAttribute.TYPE.STRING);

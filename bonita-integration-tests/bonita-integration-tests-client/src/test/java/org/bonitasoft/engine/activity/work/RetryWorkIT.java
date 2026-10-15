@@ -29,7 +29,7 @@ public class RetryWorkIT extends CommonAPIIT {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
     }
 
     @Test

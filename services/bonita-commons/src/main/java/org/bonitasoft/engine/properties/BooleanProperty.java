@@ -13,46 +13,30 @@
  **/
 package org.bonitasoft.engine.properties;
 
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Emmanuel Duchastenier
  */
-@Slf4j
-public class BooleanProperty {
+public class BooleanProperty extends BonitaConfigProperty {
 
-    private final String displayName;
-    /*
-     * System property version of the property (lowercase, with dots):
-     */
-    private final String propertyKey;
     private final boolean propertyValue;
 
     public BooleanProperty(String displayName, String propertyKey, boolean defaultValue) {
-        this.propertyKey = propertyKey;
-        this.displayName = displayName;
-        propertyValue = initBooleanProperty(defaultValue);
-    }
-
-    boolean initBooleanProperty(boolean dynamicPermissionsEnabled) {
-        boolean enabled = Boolean.parseBoolean(
-                System.getProperty(propertyKey,
-                        System.getenv().getOrDefault(envProperty(), valueOf(dynamicPermissionsEnabled))));
-        log.info(
-                "{} {}, you may {} it using env property {} or System property -D{} [=true/false]",
-                displayName, enabled ? "enabled" : "disabled", enabled ? "disable" : "enable", envProperty(),
-                propertyKey);
-        return enabled;
-    }
-
-    private String envProperty() {
-        return propertyKey.toUpperCase().replace(".", "_").replaceAll("-", "");
+        super(displayName, propertyKey);
+        propertyValue = Boolean.parseBoolean(getProperty(valueOf(defaultValue)));
+        logInitializationMessagesIfFirstTime();
     }
 
     public boolean isEnabled() {
         return propertyValue;
     }
 
+    @Override
+    String getInitializationMessage() {
+        return format("%s %s, you may %s it using env property %s or System property -D%s [=true/false]",
+                displayName, isEnabled() ? "enabled" : "disabled", isEnabled() ? "disable" : "enable", envPropertyKey(),
+                propertyKey);
+    }
 }

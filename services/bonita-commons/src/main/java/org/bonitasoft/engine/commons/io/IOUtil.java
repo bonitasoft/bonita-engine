@@ -597,7 +597,6 @@ public class IOUtil {
 
     public static void writeMD5(File file, byte[] bytes) throws NoSuchAlgorithmException, IOException {
         write(file, md5(bytes).getBytes());
-
     }
 
     public static boolean checkMD5(File md5File, byte[] contentToCheck) throws NoSuchAlgorithmException {

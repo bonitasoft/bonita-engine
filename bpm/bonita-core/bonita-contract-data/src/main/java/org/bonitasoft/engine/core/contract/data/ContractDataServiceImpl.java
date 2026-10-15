@@ -351,7 +351,8 @@ public class ContractDataServiceImpl implements ContractDataService {
         final SAProcessContractData contractData = readPersistenceService.selectOne(descriptor);
         if (contractData == null) {
             throw new SContractDataNotFoundException(
-                    "No contract data found named: " + dataName + " of process instance: " + processInstanceId);
+                    "No archived contract data found named: " + dataName + " of process instance: "
+                            + processInstanceId);
         }
         return contractData.getValue();
     }

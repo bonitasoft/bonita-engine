@@ -17,9 +17,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.iterate;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.EVENT_SUB_PROCESS;
-import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.INTERMEDIATE_CATCH_EVENT;
-import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.START_EVENT;
+import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.*;
 import static org.bonitasoft.engine.message.MessagesHandlingService.*;
 import static org.mockito.Mockito.*;
 
@@ -80,7 +78,7 @@ public class MessagesHandlingServiceTest {
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
                 Clock.SYSTEM);
         messagesHandlingService = spy(new MessagesHandlingService(eventInstanceService, workService, lockService,
-                TENANT_ID, userTransactionService, sessionAccessor, workFactory, meterRegistry));
+                userTransactionService, workFactory, meterRegistry));
     }
 
     @Test
@@ -179,10 +177,10 @@ public class MessagesHandlingServiceTest {
     }
 
     @Test
-    public void should_have_tenant_id_in_all_meters() {
-        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_EXECUTED)).isNotNull();
-        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)).isNotNull();
-        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)).isNotNull();
+    public void should_counters_be_present() {
+        assertThat(counter(NUMBER_OF_MESSAGES_EXECUTED)).isNotNull();
+        assertThat(counter(NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)).isNotNull();
+        assertThat(counter(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)).isNotNull();
     }
 
     @Test
@@ -204,7 +202,7 @@ public class MessagesHandlingServiceTest {
     }
 
     @Test
-    public void should_increment_metric_on_retriggered_taskls_when_matching_more_couples_than_the_maximum()
+    public void should_increment_metric_on_retriggered_tasks_when_matching_more_couples_than_the_maximum()
             throws Exception {
         doReturn(new SWaitingMessageEvent()).when(eventInstanceService).getWaitingMessage(anyLong());
         doReturn(new SMessageInstance()).when(eventInstanceService).getMessageInstance(anyLong());
@@ -222,8 +220,8 @@ public class MessagesHandlingServiceTest {
     // UTILS
     // =================================================================================================================
 
-    private Counter counterForDefaultTenant(String counterName) {
-        return meterRegistry.find(counterName).tag("tenant", String.valueOf(TENANT_ID)).counter();
+    private Counter counter(String counterName) {
+        return meterRegistry.find(counterName).counter();
     }
 
     private double counterValue(String counterName) {

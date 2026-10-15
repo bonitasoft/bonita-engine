@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.monitoring;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 
 /**
@@ -28,35 +28,33 @@ public class DefaultExecutorServiceMetricsProvider implements ExecutorServiceMet
 
     @Override
     public ExecutorService bind(MeterRegistry meterRegistry, ThreadPoolExecutor executorService,
-            String executorServiceName, long tenantId) {
+            String executorServiceName) {
         return ExecutorServiceMetrics.monitor(meterRegistry, executorService, executorServiceName,
-                Tags.of("tenant", String.valueOf(tenantId)));
+                List.of());
     }
 
     @Override
     public void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService,
-            String executorServiceName, long tenantId) {
-        new ExecutorServiceMetrics(executorService, executorServiceName, Tags.of("tenant", String.valueOf(tenantId)))
-                .bindTo(meterRegistry);
+            String executorServiceName) {
+        new ExecutorServiceMetrics(executorService, executorServiceName, List.of()).bindTo(meterRegistry);
     }
 
     @Override
-    public void unbind(MeterRegistry meterRegistry, String executorServiceName, long tenantId) {
-        Tags tags = Tags.of("name", executorServiceName, "tenant", String.valueOf(tenantId));
+    public void unbind(MeterRegistry meterRegistry, String executorServiceName) {
         //right now, there is no unbind method on the MeterBinder, manually unbind them
-        Optional.ofNullable(meterRegistry.find("executor").tags(tags).timer()).ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.active").tags(tags).gauge()).ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.pool.size").tags(tags).gauge())
+        Optional.ofNullable(meterRegistry.find("executor").timer()).ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.active").gauge()).ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.pool.size").gauge())
                 .ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.pool.max").tags(tags).gauge())
+        Optional.ofNullable(meterRegistry.find("executor.pool.max").gauge())
                 .ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.pool.core").tags(tags).gauge())
+        Optional.ofNullable(meterRegistry.find("executor.pool.core").gauge())
                 .ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.queue.remaining").tags(tags).gauge())
+        Optional.ofNullable(meterRegistry.find("executor.queue.remaining").gauge())
                 .ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.queued").tags(tags).gauge()).ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.completed").tags(tags).functionCounter())
+        Optional.ofNullable(meterRegistry.find("executor.queued").gauge()).ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.completed").functionCounter())
                 .ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.idle").tags(tags).timer()).ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.idle").timer()).ifPresent(meterRegistry::remove);
     }
 }

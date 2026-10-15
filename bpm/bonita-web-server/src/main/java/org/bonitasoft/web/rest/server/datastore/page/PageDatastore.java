@@ -86,8 +86,6 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
 
     private final CustomPageContentValidator pageContentValidator;
 
-    private static boolean hasShownIsHiddenLog = false;
-
     public PageDatastore(final APISession engineSession, final WebBonitaConstantsUtils constantsValue,
             final PageAPI pageAPI,
             final CustomPageService customPageService,
@@ -107,6 +105,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
     @Deprecated(since = "9.0.0")
     public PageItem add(final PageItem pageItem) {
         final String zipFileAttribute = pageItem.getAttributeValue(UNMAPPED_ATTRIBUTE_ZIP_FILE);
+        // Name pattern: "TokenID::originalFileName"
         final String[] filenames = zipFileAttribute.split(FileUploadServlet.RESPONSE_SEPARATOR);
         final String filename = filenames[0];
         String originalFileName = getOriginalFilename(filenames, filename, pageItem.getAttributes());
@@ -256,14 +255,6 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
     protected SearchOptionsCreator makeSearchOptionCreator(final int page, final int resultsByPage, final String search,
             final String orders,
             final Map<String, String> filters) {
-        if (filters.containsKey(PageItem.ATTRIBUTE_IS_HIDDEN)) {
-            if (!hasShownIsHiddenLog && LOGGER.isWarnEnabled()) {
-                LOGGER.warn(
-                        "Parameter \"isHidden\" for page search is deprecated and will be removed in a future release");
-                hasShownIsHiddenLog = true;
-            }
-            filters.remove(PageItem.ATTRIBUTE_IS_HIDDEN);
-        }
         final SearchOptionsCreator searchOptionsCreator = new SearchOptionsCreator(page, resultsByPage, search,
                 new Sorts(orders,
                         getSearchDescriptorConverter()),

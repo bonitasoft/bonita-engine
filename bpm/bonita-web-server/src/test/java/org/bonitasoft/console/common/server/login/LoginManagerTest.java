@@ -267,6 +267,6 @@ public class LoginManagerTest {
 
         assertThatThrownBy(
                 () -> managerWithoutTracker.loginInternal(requestAccessor, response, userLogger, credentials))
-                        .isInstanceOf(LoginFailedException.class);
+                .isInstanceOf(LoginFailedException.class);
     }
 }

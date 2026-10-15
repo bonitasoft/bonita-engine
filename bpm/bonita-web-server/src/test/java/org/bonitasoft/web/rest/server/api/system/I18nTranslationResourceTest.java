@@ -13,14 +13,13 @@
  **/
 package org.bonitasoft.web.rest.server.api.system;
 
-import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.bonitasoft.web.rest.server.utils.ResponseAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import net.javacrumbs.jsonunit.JsonAssert;
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import net.javacrumbs.jsonunit.core.Option;
 import org.bonitasoft.console.common.server.i18n.I18n;
 import org.bonitasoft.web.rest.server.utils.RestletTest;
@@ -60,13 +59,13 @@ public class I18nTranslationResourceTest extends RestletTest {
 
         assertThat(response).hasStatus(Status.SUCCESS_OK);
 
-        assertJsonEquals("[" +
+        JsonAssertions.assertThatJson("[" +
                 "{\"key\": \"key1\", \"value\": \"<strong>message 1</strong>\"}," +
                 "{\"key\": \"key2\", \"value\": \"autre méssage\"}," +
                 "{\"key\": \"key3\", \"value\": \"~%^*µ\"}" +
-                "]",
-                response.getEntityAsText(),
-                JsonAssert.when(Option.IGNORING_ARRAY_ORDER));
+                "]")
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo(response.getEntityAsText());
     }
 
     @Test

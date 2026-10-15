@@ -62,7 +62,6 @@ import org.bonitasoft.web.rest.server.api.profile.APIProfile;
 import org.bonitasoft.web.rest.server.api.profile.APIProfileMember;
 import org.bonitasoft.web.rest.server.api.system.APII18nLocale;
 import org.bonitasoft.web.rest.server.api.system.APISession;
-import org.bonitasoft.web.rest.server.api.tenant.APITenantAdmin;
 import org.bonitasoft.web.rest.server.datastore.application.ApplicationDataStoreCreator;
 import org.bonitasoft.web.rest.server.datastore.applicationmenu.ApplicationMenuDataStoreCreator;
 import org.bonitasoft.web.rest.server.engineclient.CustomUserInfoEngineClientCreator;
@@ -106,8 +105,6 @@ public class BonitaRestAPIFactory extends RestAPIFactory {
                 return new APII18nLocale();
             } else if ("session".equals(resourceToken)) {
                 return new APISession();
-            } else if ("tenant".equals(resourceToken)) {
-                return new APITenantAdmin();
             }
 
         } else if ("portal".equals(apiToken)) {

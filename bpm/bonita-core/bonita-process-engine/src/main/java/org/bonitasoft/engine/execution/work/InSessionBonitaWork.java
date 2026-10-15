@@ -18,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessorSingleton;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -42,26 +41,13 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final ServiceAccessor serviceAccessor = getServiceAccessor();
-        final SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
         context.put(SERVICE_ACCESSOR, serviceAccessor);
-        try {
-            sessionAccessor.setTenantId(getTenantId());
-            return getWrappedWork().work(context);
-        } finally {
-            sessionAccessor.deleteTenantId();
-        }
+        return getWrappedWork().work(context);
     }
 
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        ServiceAccessor serviceAccessor = getServiceAccessor();
-        SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
-        sessionAccessor.setTenantId(getTenantId());
-        try {
-            getWrappedWork().handleFailure(e, context);
-        } finally {
-            sessionAccessor.deleteTenantId();
-        }
+        getWrappedWork().handleFailure(e, context);
 
     }
 

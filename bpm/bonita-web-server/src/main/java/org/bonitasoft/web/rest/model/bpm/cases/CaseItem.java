@@ -54,6 +54,8 @@ public class CaseItem extends Item implements ItemHasLastUpdateDate, ItemHasUniq
 
     public static final String COUNTER_ACTIVE_FLOW_NODES = "activeFlowNodes";
 
+    public static final String COUNTER_PENDING_FLOW_NODES = "pendingFlowNodes";
+
     public static final String ATTRIBUTE_SEARCH_INDEX_1_LABEL = "searchIndex1Label";
     public static final String ATTRIBUTE_SEARCH_INDEX_1_VALUE = "searchIndex1Value";
     public static final String ATTRIBUTE_SEARCH_INDEX_2_LABEL = "searchIndex2Label";
@@ -64,6 +66,8 @@ public class CaseItem extends Item implements ItemHasLastUpdateDate, ItemHasUniq
     public static final String ATTRIBUTE_SEARCH_INDEX_4_VALUE = "searchIndex4Value";
     public static final String ATTRIBUTE_SEARCH_INDEX_5_LABEL = "searchIndex5Label";
     public static final String ATTRIBUTE_SEARCH_INDEX_5_VALUE = "searchIndex5Value";
+
+    public static final String ATTRIBUTE_CALLER_ID = "callerId";
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ATTRIBUTES VALUES
@@ -207,6 +211,10 @@ public class CaseItem extends Item implements ItemHasLastUpdateDate, ItemHasUniq
         return getAttributeValue(ATTRIBUTE_SEARCH_INDEX_5_VALUE);
     }
 
+    public APIID getCallerId() {
+        return getAttributeValueAsAPIID(ATTRIBUTE_CALLER_ID);
+    }
+
     // SETTERS
 
     @Override
@@ -330,6 +338,10 @@ public class CaseItem extends Item implements ItemHasLastUpdateDate, ItemHasUniq
 
     public void setSearchIndex5Value(final String attributeSearchIndex5Value) {
         setAttribute(ATTRIBUTE_SEARCH_INDEX_5_VALUE, attributeSearchIndex5Value);
+    }
+
+    public void setCallerId(final long attributeCallerId) {
+        setAttribute(ATTRIBUTE_CALLER_ID, attributeCallerId);
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

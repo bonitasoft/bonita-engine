@@ -46,12 +46,12 @@ public class LocalTimerEventIT extends CommonAPILocalIT {
 
     @Before
     public void setUp() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
     }
 
     @After
     public void tearDown() throws BonitaException {
-        logoutOnTenant();
+        logout();
     }
 
     @Test

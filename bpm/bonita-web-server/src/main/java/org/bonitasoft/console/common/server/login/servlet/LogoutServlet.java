@@ -72,12 +72,19 @@ public class LogoutServlet extends HttpServlet {
      */
     protected void logout(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Logging out from Bonita");
+        }
         final HttpServletRequestAccessor requestAccessor = new HttpServletRequestAccessor(request);
         final HttpSession session = requestAccessor.getHttpSession();
         final APISession apiSession = requestAccessor.getApiSession();
         try {
             engineLogout(apiSession);
             SessionUtil.sessionLogout(session);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Logged out from Bonita");
+            }
 
             if (RedirectUrlHandler.shouldRedirectAfterLogout(request)) {
                 final String loginPage = getURLToRedirectTo(requestAccessor);

@@ -41,8 +41,7 @@ public class MultipleAggregationToItselfValidationRule extends ValidationRule<Bu
         for (BusinessObject bo : bom.getBusinessObjects()) {
             List<Field> boFields = bo.getFields();
             for (Field boField : boFields) {
-                if (boField instanceof RelationField) {
-                    RelationField relationField = (RelationField) boField;
+                if (boField instanceof RelationField relationField) {
                     String fieldReferenceQualifiedName = relationField.getReference().getQualifiedName();
                     String boQualifiedName = bo.getQualifiedName();
                     if (relationField.getType() == AGGREGATION && fieldReferenceQualifiedName.equals(boQualifiedName)

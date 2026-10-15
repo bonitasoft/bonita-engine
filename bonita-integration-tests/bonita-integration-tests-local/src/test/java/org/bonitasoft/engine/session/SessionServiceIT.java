@@ -64,23 +64,18 @@ public class SessionServiceIT extends CommonBPMServicesTest {
         assertEquals(sessionService.getSessionDuration(), session.getDuration());
         assertEquals(session.getLastRenewDate().getTime() + session.getDuration(),
                 session.getExpirationDate().getTime());
-        assertEquals(getDefaultTenantId(), session.getTenantId());
         assertEquals(username, session.getUserName());
     }
 
     private SSession createSession(final String username) throws SBonitaException {
-        return createSession(username, getDefaultTenantId());
-    }
-
-    private SSession createSession(final String username, final long tenantId) throws SBonitaException {
         getTransactionService().begin();
-        final SSession session = sessionService.createSession(tenantId, username);
+        final SSession session = sessionService.createSession(username);
         getTransactionService().complete();
         return session;
     }
 
     @Test
-    public void testIsValid() throws Exception {
+    public void should_session_be_valid() throws Exception {
         final String username = "john";
         sessionService.setSessionDuration(1000);
         final SSession session = createSession(username);
@@ -142,7 +137,7 @@ public class SessionServiceIT extends CommonBPMServicesTest {
             sessionService.getSession(session.getId());
         } finally {
             // restore deleted session:
-            createSession(username, getDefaultTenantId());
+            createSession(username);
         }
     }
 

@@ -45,8 +45,7 @@ public class CleanAndStoreAllConfigurationInTransaction extends TransactionCallb
 
     @Override
     protected void doInTransactionWithoutResult(TransactionStatus status) {
-        LOGGER.debug(
-                "delete existing configurations " + bonitaConfigurations.toString());
+        LOGGER.debug("delete existing configurations {}", bonitaConfigurations);
 
         jdbcTemplate.batchUpdate(BonitaAllConfigurationContentTypeCleaner.DELETE_CONFIGURATION,
                 new BonitaAllConfigurationContentTypeCleaner(bonitaConfigurations));

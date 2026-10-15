@@ -106,7 +106,7 @@ public class ApplicationImporterTest {
 
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
 
         long homePageId = 222L;
         SApplicationPage applicationPage = new SApplicationPage(app.getId(), homePageId, "home");
@@ -174,7 +174,7 @@ public class ApplicationImporterTest {
 
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
 
         long homePageId = 222L;
 
@@ -220,7 +220,7 @@ public class ApplicationImporterTest {
         applicationNode.addApplicationPage(pageNode1);
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
 
         given(applicationService.createApplication(app)).willReturn(app);
 
@@ -250,7 +250,7 @@ public class ApplicationImporterTest {
         applicationNode.setToken("app");
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
@@ -281,7 +281,7 @@ public class ApplicationImporterTest {
 
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
         given(applicationService.createApplication(app)).willReturn(app);
 
         given(applicationService.getApplicationPage("app", "home")).willThrow(new SObjectNotFoundException(""));
@@ -313,7 +313,7 @@ public class ApplicationImporterTest {
         ApplicationNode applicationNode = mock(ApplicationNode.class);
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
         given(strategy.whenApplicationExists(any(), any())).willReturn(ApplicationImportStrategy.ImportStrategy.SKIP);
         //when
@@ -341,7 +341,7 @@ public class ApplicationImporterTest {
         ApplicationNode applicationNode = mock(ApplicationNode.class);
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
 
         //when
@@ -376,7 +376,7 @@ public class ApplicationImporterTest {
         ApplicationNode applicationNode = mock(ApplicationNode.class);
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
 
         //when - then exception
@@ -404,7 +404,7 @@ public class ApplicationImporterTest {
         ApplicationNode applicationNode = mock(ApplicationNode.class);
         given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy,
                 editable))
-                        .willReturn(importResult);
+                .willReturn(importResult);
 
         given(applicationService.createApplication(app1)).willThrow(new SObjectCreationException(""));
 

@@ -15,7 +15,13 @@ package org.bonitasoft.engine.classloader;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -37,8 +43,6 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -64,8 +68,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private boolean shuttingDown = false;
     private final EventService eventService;
     private final PlatformDependencyService platformDependencyService;
-    private final Map<Long, TenantDependencyService> dependencyServicesByTenant = new HashMap<>();
-    private final SessionAccessor sessionAccessor;
+    private TenantDependencyService dependencyService;
     private final UserTransactionService userTransactionService;
     private final BroadcastService broadcastService;
     private final ClassLoaderUpdater classLoaderUpdater;
@@ -73,13 +76,11 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver,
             @Qualifier("platformEventService") EventService eventService,
             PlatformDependencyService platformDependencyService,
-            SessionAccessor sessionAccessor,
             UserTransactionService userTransactionService, BroadcastService broadcastService,
             ClassLoaderUpdater classLoaderUpdater, List<PlatformClassLoaderListener> platformClassLoaderListeners) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.eventService = eventService;
         this.platformDependencyService = platformDependencyService;
-        this.sessionAccessor = sessionAccessor;
         this.userTransactionService = userTransactionService;
         this.broadcastService = broadcastService;
         this.classLoaderUpdater = classLoaderUpdater;
@@ -87,13 +88,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public void registerDependencyServiceOfTenant(Long tenantId, TenantDependencyService tenantDependencyService) {
-        dependencyServicesByTenant.put(tenantId, tenantDependencyService);
+    public void registerDependencyService(TenantDependencyService tenantDependencyService) {
+        dependencyService = tenantDependencyService;
     }
 
     private void warnOnShuttingDown(final ClassLoaderIdentifier key) {
         if (shuttingDown) {
-            log.warn("Using local classloader after ClassLoaderService has already shut down: " + key);
+            log.warn("Using local classloader after ClassLoaderService has already shut down: {}", key);
         }
     }
 
@@ -174,14 +175,20 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     URI getLocalTemporaryFolder(ClassLoaderIdentifier identifier) throws IOException {
-        return BonitaHomeServer.getInstance().getLocalTemporaryFolder(identifier.getType().name(), identifier.getId());
+        if (identifier.isGlobalClassloader() || identifier.isTenantClassloader()) {
+            // For tenant and platform (=GLOBAL), no need to have a sub-folder with the identifier:
+            return BonitaHomeServer.getInstance().getLocalTemporaryFolder(identifier.getType().name());
+        } else {
+            // For process-level classloader, store jar files in sub-folder named with the identifier:
+            return BonitaHomeServer.getInstance().getLocalTemporaryFolder(identifier.getType().name(),
+                    identifier.getId());
+        }
     }
 
     BonitaClassLoader createClassloader(ClassLoaderIdentifier id) throws IOException, SClassLoaderException {
         log.debug("Creating classloader {}", id);
         BonitaClassLoader classLoader = BonitaClassLoaderFactory.createClassLoader(getDependencies(id), id,
-                getLocalTemporaryFolder(id),
-                getParentClassLoader(id));
+                getLocalTemporaryFolder(id), getParentClassLoader(id));
         log.info("Created classloader {}: {}", id, classLoader);
         return classLoader;
     }
@@ -230,14 +237,14 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public boolean addListener(ClassLoaderIdentifier identifier, SingleClassLoaderListener singleClassLoaderListener) {
-        log.debug("Added listener {} on {}", singleClassLoaderListener, identifier);
+        log.debug("Added listener {} on {}", singleClassLoaderListener, identifier.toString());
         return getListeners(identifier).add(singleClassLoaderListener);
     }
 
     @Override
     public boolean removeListener(ClassLoaderIdentifier identifier,
             SingleClassLoaderListener singleClassLoaderListener) {
-        log.debug("Removed listener {} on {}", singleClassLoaderListener, identifier);
+        log.debug("Removed listener {} on {}", singleClassLoaderListener, identifier.toString());
         return getListeners(identifier).remove(singleClassLoaderListener);
     }
 
@@ -255,7 +262,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             l.onDestroy(classLoader);
         });
         platformClassLoaderListeners.forEach(l -> {
-            log.debug("Notify listener that classloader {} was destroyed: {}", classLoader.getIdentifier(), l);
+            log.debug("Notify listener that platform classloader {} was destroyed: {}", classLoader.getIdentifier(), l);
             l.onDestroy(classLoader);
         });
     }
@@ -270,7 +277,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             l.onUpdate(newClassLoader);
         });
         platformClassLoaderListeners.forEach(l -> {
-            log.debug("Notify listener that classloader {} was updated: {}", newClassLoader.getIdentifier(), l);
+            log.debug("Notify listener that platform classloader {} was updated: {}", newClassLoader.getIdentifier(),
+                    l);
             l.onUpdate(newClassLoader);
         });
     }
@@ -286,7 +294,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void refreshClassLoaderImmediately(ClassLoaderIdentifier identifier) throws SClassLoaderException {
         try {
-            log.info("Refreshing classloader {}", identifier);
+            log.info("Refreshing classloader {}", identifier.toString());
             BonitaClassLoader newClassloader = createClassloader(identifier);
             BonitaClassLoader previous = classLoaders.put(identifier, newClassloader);
             // Destroy and remove all children classloaders of the `previous` classloader. They need to be recreated
@@ -317,17 +325,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         try {
             userTransactionService.registerBonitaSynchronization((BonitaTransactionSynchronization) i -> {
                 if (i != Status.STATUS_COMMITTED) {
-                    try {
-                        log.warn("The transaction was not committed. Refreshing classloader on tenantId "
-                                + sessionAccessor.getTenantId() + " to return to a clean state.");
-                        classLoaderUpdater.refreshClassloaders(this, sessionAccessor.getTenantId(),
-                                Collections.singleton(identifier));
-                    } catch (STenantIdNotSetException e) {
-                        //sessionAccessor.getTenantId() is called by getDependencies in refreshClassLoaderImmediately
-                        // In other words this should never happen
-                        log.error("Cannot find the tenantID to refresh classloader on. This should not happen.");
-                        throw new BonitaRuntimeException(e);
-                    }
+                    log.warn(
+                            "The transaction was not committed. Refreshing classloader on platform to return to a clean state.");
+                    classLoaderUpdater.refreshClassloaders(this, Collections.singleton(identifier));
                 }
             });
         } catch (STransactionNotFoundException e) {
@@ -342,16 +342,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 resources = platformDependencyService.getDependenciesResources(identifier.getType(),
                         identifier.getId());
             } else {
-                long tenantId = sessionAccessor.getTenantId();
-                TenantDependencyService tenantDependencyService = dependencyServicesByTenant.get(tenantId);
-                if (tenantDependencyService == null) {
-                    log.warn("No dependency service is initialized on tenant {}. Initializing empty classloader",
-                            tenantId);
+                if (dependencyService == null) {
+                    log.warn("No dependency service is initialized. Initializing empty classloader");
                     return Stream.empty();
                 }
-                resources = tenantDependencyService.getDependenciesResources(identifier.getType(), identifier.getId());
+                resources = dependencyService.getDependenciesResources(identifier.getType(), identifier.getId());
             }
-        } catch (STenantIdNotSetException | SDependencyException e) {
+        } catch (SDependencyException e) {
             throw new SClassLoaderException(e);
         }
         return resources;
@@ -361,7 +358,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     public void refreshClassLoaderAfterUpdate(ClassLoaderIdentifier identifier) throws SClassLoaderException {
         try {
             registerRefreshOnAllNodes(identifier);
-        } catch (STransactionNotFoundException | STenantIdNotSetException e) {
+        } catch (STransactionNotFoundException e) {
             throw new SClassLoaderException(e);
         }
     }
@@ -377,9 +374,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                         }
                         Map<String, TaskResult<Void>> execute;
                         try {
-                            execute = broadcastService.executeOnOthersAndWait(new RefreshClassLoaderTask(identifier),
-                                    getTenantId(identifier.getType()));
-                        } catch (TimeoutException | STenantIdNotSetException | ExecutionException
+                            execute = broadcastService.executeOnOthersAndWait(new RefreshClassLoaderTask(identifier));
+                        } catch (TimeoutException | ExecutionException
                                 | InterruptedException e) {
                             throw new BonitaRuntimeException(e);
                         }
@@ -394,28 +390,19 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    private void registerRefreshOnAllNodes(ClassLoaderIdentifier identifier)
-            throws STransactionNotFoundException, STenantIdNotSetException {
+    private void registerRefreshOnAllNodes(ClassLoaderIdentifier identifier) throws STransactionNotFoundException {
         synchronized (synchroLock) {
             RefreshClassloaderSynchronization refreshTaskSynchronization = currentRefreshTask.get();
             if (refreshTaskSynchronization == null) {
                 RefreshClassLoaderTask callable = new RefreshClassLoaderTask(identifier);
                 refreshTaskSynchronization = new RefreshClassloaderSynchronization(this, broadcastService, callable,
-                        classLoaderUpdater, getTenantId(identifier.getType()), identifier);
+                        classLoaderUpdater, identifier);
                 userTransactionService.registerBonitaSynchronization(refreshTaskSynchronization);
                 currentRefreshTask.set(refreshTaskSynchronization);
             } else {
                 refreshTaskSynchronization.addClassloaderToRefresh(identifier);
             }
         }
-    }
-
-    private Long getTenantId(ScopeType type) throws STenantIdNotSetException {
-        Long tenantId = null;
-        if (ScopeType.GLOBAL != type) {
-            tenantId = sessionAccessor.getTenantId();
-        }
-        return tenantId;
     }
 
     @Override

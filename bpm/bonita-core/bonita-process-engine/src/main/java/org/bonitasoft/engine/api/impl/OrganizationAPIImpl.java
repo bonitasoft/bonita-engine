@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
@@ -75,15 +74,12 @@ public class OrganizationAPIImpl {
         final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
         final ProfileService profileService = serviceAccessor.getProfileService();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
-        final ExternalIdentityMappingService externalIdentityMappingService = serviceAccessor
-                .getExternalIdentityMappingService();
 
         deleteCustomUserInfo(identityService);
         actorMappingService.deleteAllActorMembers();
         profileService.deleteAllProfileMembers();
         activityInstanceService.deleteAllPendingMappings();
         supervisorService.deleteAllProcessSupervisors();
-        externalIdentityMappingService.deleteAllExternalIdentityMappings();
         identityService.deleteAllUserMemberships();
         identityService.deleteAllGroups();
         identityService.deleteAllRoles();

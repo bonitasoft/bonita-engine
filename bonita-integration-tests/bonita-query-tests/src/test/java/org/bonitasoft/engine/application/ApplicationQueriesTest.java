@@ -19,7 +19,6 @@ import static org.bonitasoft.engine.test.persistence.builder.ApplicationMenuBuil
 import static org.bonitasoft.engine.test.persistence.builder.ApplicationPageBuilder.anApplicationPage;
 import static org.bonitasoft.engine.test.persistence.builder.GroupBuilder.aGroup;
 import static org.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileBuilder.aProfile;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileMemberBuilder.aProfileMember;
 import static org.bonitasoft.engine.test.persistence.builder.RoleBuilder.aRole;
@@ -73,8 +72,7 @@ public class ApplicationQueriesTest {
         final SApplication retrievedApp = repository.getApplicationByToken("app2");
 
         //then
-        assertThat(retrievedApp)
-                .isEqualTo(repository.getById(SApplication.class, application2.getId(), DEFAULT_TENANT_ID));
+        assertThat(retrievedApp).isEqualTo(repository.getById(SApplication.class, application2.getId()));
     }
 
     @Test
@@ -89,8 +87,7 @@ public class ApplicationQueriesTest {
                 .withVersion("1.0").withPath("app1").build());
 
         //when
-        final SApplicationWithIcon retrievedApp = repository.getById(SApplicationWithIcon.class, application2.getId(),
-                DEFAULT_TENANT_ID);
+        final SApplicationWithIcon retrievedApp = repository.getById(SApplicationWithIcon.class, application2.getId());
 
         //then
         assertThat(retrievedApp).isEqualTo(application2);

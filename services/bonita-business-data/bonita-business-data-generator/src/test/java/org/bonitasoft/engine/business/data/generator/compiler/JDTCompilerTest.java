@@ -28,6 +28,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import javax.persistence.Entity;
+
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -72,7 +74,7 @@ public class JDTCompilerTest {
         writeTestSrcDir(srcDir, "org", "bonitasoft", "CompilableOne.java");
         writeTestSrcDir(srcDir, "org", "bonitasoft", "CompilableTwo.java");
 
-        jdtCompiler.compile(srcDir, outputDirectory, currentThread().getContextClassLoader());
+        jdtCompiler.compile(srcDir, outputDirectory);
 
         assertThat(new File(outputDirectory, "org/bonitasoft/CompilableOne.class")).exists();
         assertThat(new File(outputDirectory, "org/bonitasoft/CompilableTwo.class")).exists();
@@ -90,7 +92,7 @@ public class JDTCompilerTest {
         File srcDir = temporaryFolder.newFolder();
         writeTestSrcDir(srcDir, "com", "bonitasoft", "CannotBeResolvedToATypeError.java");
 
-        jdtCompiler.compile(srcDir, outputDirectory, currentThread().getContextClassLoader());
+        jdtCompiler.compile(srcDir, outputDirectory);
     }
 
     @Test
@@ -99,7 +101,7 @@ public class JDTCompilerTest {
         writeTestSrcDir(srcDir, "com", "bonitasoft", "CannotBeResolvedToATypeError.java");
 
         try {
-            jdtCompiler.compile(srcDir, outputDirectory, currentThread().getContextClassLoader());
+            jdtCompiler.compile(srcDir, outputDirectory);
         } catch (final CompilationException e) {
             assertThat(e.getMessage()).contains("cannot be resolved to a type");
         }
@@ -110,10 +112,7 @@ public class JDTCompilerTest {
         File srcDir = temporaryFolder.newFolder();
         writeTestSrcDir(srcDir, "DependenciesNeeded.java");
         final File externalLib = getTestResourceAsFile("external-lib.jar");
-        final URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { externalLib.toURI().toURL() },
-                currentThread().getContextClassLoader());
-
-        jdtCompiler.compile(srcDir, outputDirectory, urlClassLoader);
+        jdtCompiler.compile(srcDir, outputDirectory, externalLib, JDTCompiler.lookupJarContaining(Entity.class));
     }
 
     @Test
@@ -121,7 +120,7 @@ public class JDTCompilerTest {
         File srcDir = temporaryFolder.newFolder();
         writeTestSrcDir(srcDir, "org", "bonitasoft", "employee.java");
 
-        jdtCompiler.compile(srcDir, outputDirectory, currentThread().getContextClassLoader());
+        jdtCompiler.compile(srcDir, outputDirectory);
 
         assertThat(new File(outputDirectory, "org/bonitasoft/employee.class")).exists();
 

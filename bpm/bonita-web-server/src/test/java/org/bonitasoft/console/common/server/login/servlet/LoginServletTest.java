@@ -39,6 +39,7 @@ import javax.servlet.http.HttpSession;
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
+import org.bonitasoft.console.common.server.auth.impl.standard.StandardAuthenticationManagerImpl;
 import org.bonitasoft.console.common.server.login.AccountLockedException;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
 import org.bonitasoft.console.common.server.login.LoginManager;
@@ -269,6 +270,8 @@ public class LoginServletTest {
         final LoginManager loginManager = mock(LoginManager.class);
         final ServletContext servletContext = mock(ServletContext.class);
         RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
+        doReturn(new StandardAuthenticationManagerImpl()).when(servlet).getAuthenticationManager();
+        doReturn("/bonita").when(req).getContextPath();
         doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
         doReturn("anyurl").when(req).getParameter(AuthenticationManager.REDIRECT_URL);
         doReturn(httpSession).when(req).getSession();
@@ -359,24 +362,20 @@ public class LoginServletTest {
         final LoginServlet servlet = spy(new LoginServlet());
         final ServletContext servletContext = mock(ServletContext.class);
         RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
+        doReturn("").when(req).getContextPath();
         doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
         // Malicious loginUrl using semicolon-based path traversal
-        doReturn("/apps/..;/..;/serverAPI").when(req).getParameter(LoginServlet.LOGIN_URL_PARAM_NAME);
-        doReturn(servletContext).when(servlet).getServletContext();
-        doReturn(requestDispatcher).when(servletContext).getRequestDispatcher(anyString());
+        doReturn("/login.jsp;/..;/serverAPI").when(req).getParameter(AuthenticationManager.LOGIN_URL_PARAM_NAME);
         doThrow(new LoginFailedException("")).when(servlet).doLogin(req, resp);
 
         servlet.doPost(req, resp);
 
         // Verify the dispatched path has semicolons stripped and is normalized.
-        // After sanitization: /apps/..;/..;/serverAPI -> /apps/../../serverAPI
-        // After normalization: /apps/../../serverAPI -> /../serverAPI (.. past root kept by URI.normalize())
-        // The HttpAPIServlet FORWARD guard is the final defense that blocks this dispatch.
-        ArgumentCaptor<String> pathCaptor = ArgumentCaptor.forClass(String.class);
-        verify(servletContext).getRequestDispatcher(pathCaptor.capture());
-        String dispatchedPath = pathCaptor.getValue();
-        assertThat(dispatchedPath).doesNotContain(";");
-        assertThat(dispatchedPath).doesNotStartWith("/apps/");
+        // After sanitization: /login.jsp;/..;/serverAPI -> /login.jsp/../serverAPI
+        // After normalization: /login.jsp/../serverAPI -> /serverAPI
+        // The HttpAPIServlet FORWARD does not happen if it does not start with context path + login.jsp
+        verify(servletContext, never()).getRequestDispatcher(anyString());
+        verify(resp).setStatus(HttpServletResponse.SC_UNAUTHORIZED, "loginFailMessage");
     }
 
     @Test
@@ -386,7 +385,7 @@ public class LoginServletTest {
         RequestDispatcher requestDispatcher = mock(RequestDispatcher.class);
         doReturn("true").when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
         // loginUrl with characters invalid for URI (curly braces trigger URISyntaxException)
-        doReturn("/apps/{invalid}/page").when(req).getParameter(LoginServlet.LOGIN_URL_PARAM_NAME);
+        doReturn("/apps/{invalid}/page").when(req).getParameter(AuthenticationManager.LOGIN_URL_PARAM_NAME);
         doReturn(servletContext).when(servlet).getServletContext();
         doReturn(requestDispatcher).when(servletContext).getRequestDispatcher(anyString());
         doThrow(new LoginFailedException("")).when(servlet).doLogin(req, resp);

@@ -42,7 +42,7 @@ public class TransactionalSimpleJobFactoryTest {
 
     @Test
     public void should_inject_scheduler_and_job_details_on_new_job() throws Exception {
-        JobDetailImpl jobDetails = createJobDetails(1, 2);
+        JobDetailImpl jobDetails = createJobDetails(2);
         jobDetails.setJobClass(ConcurrentQuartzJob.class);
         given(bundle.getJobDetail()).willReturn(jobDetails);
 

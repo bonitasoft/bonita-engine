@@ -16,12 +16,8 @@ package org.bonitasoft.web.rest.server;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataFindByIdsResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataModelResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataQueryResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferenceResource;
 import org.bonitasoft.web.rest.server.api.bdm.BusinessDataReferencesResource;
-import org.bonitasoft.web.rest.server.api.bdm.BusinessDataResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseContextResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariableResource;
 import org.bonitasoft.web.rest.server.api.bpm.cases.ArchivedCaseVariablesResource;
@@ -59,8 +55,6 @@ import org.restlet.routing.Template;
 public class BonitaRestletApplication extends Application {
 
     public static final String ROUTER_EXTENSION_PREFIX = "/extension/";
-
-    public static final String BDM_DEFINITION_URL = "/tenant/bdm";
 
     public static final String BDM_BUSINESS_DATA_URL = "/bdm/businessData";
 
@@ -171,17 +165,6 @@ public class BonitaRestletApplication extends Application {
 
         // GET to search form mappings:
         router.attach(FORM_MAPPING_URL, factory.create(FormMappingResource.class));
-
-        // GET the BDM status
-        router.attach(BDM_DEFINITION_URL, factory.create(BusinessDataModelResource.class));
-
-        //GET a BusinessData
-        router.attach(BDM_BUSINESS_DATA_URL + "/{className}/findByIds",
-                factory.create(BusinessDataFindByIdsResource.class));
-        router.attach(BDM_BUSINESS_DATA_URL + "/{className}", factory.create(BusinessDataQueryResource.class));
-        router.attach(BDM_BUSINESS_DATA_URL + "/{className}/{id}", factory.create(BusinessDataResource.class));
-        router.attach(BDM_BUSINESS_DATA_URL + "/{className}/{id}/{fieldName}",
-                factory.create(BusinessDataResource.class));
 
         // GET a Multiple BusinessDataReference
         router.attach(BDM_BUSINESS_DATA_REFERENCE_URL, factory.create(BusinessDataReferencesResource.class));

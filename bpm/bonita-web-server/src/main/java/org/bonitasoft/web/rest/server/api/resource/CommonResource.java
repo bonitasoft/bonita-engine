@@ -18,7 +18,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +33,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
+import org.bonitasoft.web.rest.server.QueryParameterUtils;
 import org.bonitasoft.web.rest.server.datastore.filter.Filters;
 import org.bonitasoft.web.rest.server.datastore.utils.SearchOptionsCreator;
 import org.bonitasoft.web.rest.server.datastore.utils.Sorts;
@@ -97,19 +97,7 @@ public class CommonResource extends ServerResource {
      * @return a map of the form: [key1: value1, key2: value2].
      */
     protected Map<String, String> parseFilters(final List<String> parameters) {
-        if (parameters == null) {
-            return null;
-        }
-        final Map<String, String> results = new HashMap<>();
-        for (final String parameter : parameters) {
-            final String[] split = parameter.split("=");
-            if (split.length < 2) {
-                results.put(split[0], null);
-            } else {
-                results.put(split[0], parameter.substring(split[0].length() + 1));
-            }
-        }
-        return results;
+        return QueryParameterUtils.parseFilters(parameters);
     }
 
     protected String getSearchOrder() {

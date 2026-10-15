@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.dependency.impl;
 
+import static java.util.Collections.emptyMap;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -204,8 +206,13 @@ public class TenantDependencyService extends AbstractDependencyService {
     @Override
     protected SelectListDescriptor<Long> getSelectDescriptorForDependencyIds(QueryOptions queryOptions,
             Map<String, Object> parameters) {
-        return new SelectListDescriptor<>("getDependencyIds", parameters, SDependencyMapping.class, Long.class,
-                queryOptions);
+        if (parameters.get("artifactType") == ScopeType.TENANT) {
+            return new SelectListDescriptor<>("getDependencyIdsForTenant", emptyMap(), SDependencyMapping.class,
+                    Long.class, queryOptions);
+        } else {
+            return new SelectListDescriptor<>("getDependencyIds", parameters, SDependencyMapping.class, Long.class,
+                    queryOptions);
+        }
     }
 
     @Override
@@ -326,23 +333,34 @@ public class TenantDependencyService extends AbstractDependencyService {
     @Override
     public SDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName)
             throws SBonitaReadException {
-        final Map<String, Object> inputParameters = new HashMap<>(3);
-        inputParameters.put("artifactId", artifactId);
-        inputParameters.put("artifactType", artifactType);
-        inputParameters.put("fileName", fileName);
-        return persistenceService
-                .selectOne(new SelectOneDescriptor<>("getDependencyOfArtifact", inputParameters, SDependency.class));
+        if (artifactType == ScopeType.TENANT) {
+            return getTenantDependencyByFilename(fileName);
+        } else {
+            final Map<String, Object> inputParameters = new HashMap<>(3);
+            inputParameters.put("artifactId", artifactId);
+            inputParameters.put("artifactType", artifactType);
+            inputParameters.put("fileName", fileName);
+            return persistenceService
+                    .selectOne(
+                            new SelectOneDescriptor<>("getDependencyOfArtifact", inputParameters, SDependency.class));
+        }
     }
 
-    @Override
-    public Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName)
+    public SDependency getTenantDependencyByFilename(String fileName)
+            throws SBonitaReadException {
+        final Map<String, Object> inputParameters = new HashMap<>();
+        inputParameters.put("fileName", fileName);
+        return persistenceService
+                .selectOne(new SelectOneDescriptor<>("getTenantDependencyByFilename", inputParameters,
+                        SDependency.class));
+    }
+
+    public Optional<Long> getIdOfDependencyOfArtifactForTenant(String fileName)
             throws SBonitaReadException {
         final Map<String, Object> inputParameters = new HashMap<>(3);
-        inputParameters.put("artifactId", artifactId);
-        inputParameters.put("artifactType", artifactType);
         inputParameters.put("fileName", fileName);
         Long idOfDependencyOfArtifact = persistenceService.selectOne(
-                new SelectOneDescriptor<>("getIdOfDependencyOfArtifact", inputParameters, SDependency.class));
+                new SelectOneDescriptor<>("getIdOfDependencyOfArtifactForTenant", inputParameters, SDependency.class));
         return Optional.ofNullable(idOfDependencyOfArtifact);
     }
 }

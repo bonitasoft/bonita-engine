@@ -29,51 +29,41 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.event.AbstractEventIT;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.junit.Before;
 import org.junit.Test;
 
 public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
     private static final String TIMER_EVENT_PREFIX = "Timer_Ev_";
 
+    private ServiceAccessor serviceAccessor;
+
     protected static void setSessionInfo(final APISession session) throws Exception {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-        sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+        sessionAccessor.setSessionId(session.getId());
     }
 
-    protected ServiceAccessor getServiceAccessor() {
-        try {
-            return ServiceAccessorFactory.getInstance().createServiceAccessor();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
+    @Before
+    public void setUp() throws Exception {
+        serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
     }
 
     private boolean containsTimerJob(final String jobName) throws Exception {
         setSessionInfo(getSession());
-        final SchedulerService schedulerService = getServiceAccessor().getSchedulerService();
-        final TransactionService transactionService = getServiceAccessor().getTransactionService();
-        transactionService.begin();
-        try {
-            final List<String> jobs = schedulerService.getJobs();
-            for (final String serverJobName : jobs) {
-                if (serverJobName.contains(jobName)) {
-                    return true;
-                }
-            }
-        } finally {
-            transactionService.complete();
-        }
-        return false;
+        return serviceAccessor.getTransactionService().executeInTransaction(() -> serviceAccessor.getSchedulerService()
+                .getJobs().stream().anyMatch(serverJobName -> serverJobName.contains(jobName)));
+    }
+
+    private List<String> getJobs() throws Exception {
+        return serviceAccessor.getTransactionService()
+                .executeInTransaction(() -> serviceAccessor.getSchedulerService().getJobs());
     }
 
     private String getJobName(final long eventInstanceId) {
@@ -91,7 +81,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);
-        final Long boundaryId = timer.getId();
+        final long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -128,7 +118,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);
-        final Long boundaryId = timer.getId();
+        final long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -160,7 +150,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);
-        final Long boundaryId = timer.getId();
+        final long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -192,7 +182,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);
-        final Long boundaryId = timer.getId();
+        final long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -221,7 +211,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);
-        final Long boundaryId = timer.getId();
+        final long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -266,16 +256,10 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         // start P3, the call activities will start instances of P2 a and P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
         waitForUserTask(rootProcessInstance, simpleStepName);
-        List<String> allJobs = getServiceAccessor().getSchedulerService().getAllJobs();
+        List<String> allJobs = getJobs();
 
-        boolean timer_ev_isCreated = false;
-        for (String job : allJobs) {
-            if (job.contains("Timer_Ev")) {
-                timer_ev_isCreated = true;
-            }
-        }
         //make sure timer events are created
-        assertThat(timer_ev_isCreated).isTrue();
+        assertThat(allJobs.stream().anyMatch(job -> job.contains(TIMER_EVENT_PREFIX))).isTrue();
 
         // delete the root process instance
         getProcessAPI().deleteProcessInstance(rootProcessInstance.getId());
@@ -283,16 +267,16 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         // check that the instances of p1 and p2 were deleted
         List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
                 ProcessInstanceCriterion.NAME_ASC);
-        assertThat(processInstances.size()).isEqualTo(0);
+        assertThat(processInstances).isEmpty();
 
         // check that archived flow nodes were deleted.
         List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
                 rootProcessInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
-        assertThat(taskInstances.size()).isEqualTo(0);
+        assertThat(taskInstances).isEmpty();
 
         //check the quartz events got deleted correctly
-        allJobs = getServiceAccessor().getSchedulerService().getAllJobs();
+        allJobs = getJobs();
 
         for (String job : allJobs) {
             // There might be a few of those left in the DB, it should be the only ones
@@ -341,7 +325,6 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
     @Test
     public void timerBoundaryEvent_should_not_trigger_and_be_deleted_at_flownode_abortion() throws Exception {
         final int timerDuration = 20_000;//long enough not to trigger
-        SchedulerService schedulerService = getServiceAccessor().getSchedulerService();
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("pTimerBoundary", "2.0");
@@ -370,7 +353,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         waitForUserTask(processInstance.getId(), "step1");
         waitForUserTaskAssignAndExecuteIt(processInstance, "step2", user, Map.of());
         waitForProcessToFinish(processInstance);
-        assertThat(schedulerService.getAllJobs()).isEmpty();
+        assertThat(getJobs()).isEmpty();
         disableAndDeleteProcess(processDefinition);
     }
 

@@ -51,12 +51,12 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @After
     public void afterTest() throws BonitaException {
-        logoutOnTenant();
+        logout();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
     }
 
     @Test

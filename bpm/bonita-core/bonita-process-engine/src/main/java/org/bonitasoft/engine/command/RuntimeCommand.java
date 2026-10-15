@@ -15,6 +15,7 @@ package org.bonitasoft.engine.command;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.bonitasoft.engine.service.ServiceAccessor;
 
@@ -31,6 +32,17 @@ public abstract class RuntimeCommand implements Command<ServiceAccessor> {
             return (T) parameters.get(parameterName);
         } catch (final Exception e) {
             throw new SCommandParameterizationException(message);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> T getParameter(final Map<String, Serializable> parameters, final String parameterName,
+            final Supplier<String> messageSupplier)
+            throws SCommandParameterizationException {
+        try {
+            return (T) parameters.get(parameterName);
+        } catch (final Exception e) {
+            throw new SCommandParameterizationException(messageSupplier.get());
         }
     }
 
@@ -61,6 +73,13 @@ public abstract class RuntimeCommand implements Command<ServiceAccessor> {
         return getMandatoryParameter(parameters, field, message);
     }
 
+    protected Map<String, Serializable> getMapMandatoryParameter(final Map<String, Serializable> parameters,
+            final String field)
+            throws SCommandParameterizationException {
+        return getMandatoryParameter(parameters, field, () -> "Parameters map must contain an entry " + field
+                + " with a value of type Map<String, Serializable>.");
+    }
+
     protected <T> T getMandatoryParameter(final Map<String, Serializable> parameters, final String field,
             final String message)
             throws SCommandParameterizationException {
@@ -71,4 +90,12 @@ public abstract class RuntimeCommand implements Command<ServiceAccessor> {
         return value;
     }
 
+    protected <T> T getMandatoryParameter(final Map<String, Serializable> parameters, final String field,
+            final Supplier<String> messageSupplier) throws SCommandParameterizationException {
+        final T value = getParameter(parameters, field, messageSupplier);
+        if (value == null) {
+            throw new SCommandParameterizationException(messageSupplier.get());
+        }
+        return value;
+    }
 }

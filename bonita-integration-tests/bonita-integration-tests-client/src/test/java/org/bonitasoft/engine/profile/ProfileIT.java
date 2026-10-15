@@ -42,7 +42,7 @@ public class ProfileIT extends AbstractProfileIT {
         List<String> profilesOfUser3 = getProfilesFromSession(this.user3, "User3Pwd");
         List<String> profilesOfUser4 = getProfilesFromSession(this.user4, "User4Pwd");
         List<String> profilesOfUser5 = getProfilesFromSession(this.user5, "User5Pwd");
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         //Theses profiles are the one mapped in the AbstractProfileIT's before
         assertThat(profilesOfUser1).containsExactlyInAnyOrder("Administrator", "User");
@@ -126,7 +126,7 @@ public class ProfileIT extends AbstractProfileIT {
         Thread.sleep(5);
 
         // when
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("userName3", "User3Pwd");
         Thread.sleep(10);
         final ProfileMember createProfileMember = getProfileAPI().createProfileMember(creator);
@@ -139,7 +139,7 @@ public class ProfileIT extends AbstractProfileIT {
         Thread.sleep(5);
 
         // when
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("userName1", "User1Pwd");
         getProfileAPI().deleteProfileMember(createProfileMember.getId());
 

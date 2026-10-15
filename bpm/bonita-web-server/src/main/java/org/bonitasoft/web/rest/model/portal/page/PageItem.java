@@ -49,13 +49,6 @@ public class PageItem extends Item implements ItemHasUniqueId {
 
     public static final String ATTRIBUTE_CONTENT_TYPE = "contentType";
 
-    /**
-     * @deprecated Since 7.14.0, parameter "isHidden" for page search is deprecated and will be removed in a future
-     *             release
-     */
-    @Deprecated(since = "7.14.0", forRemoval = true)
-    public static final String ATTRIBUTE_IS_HIDDEN = "isHidden";
-
     public static final String ATTRIBUTE_IS_EDITABLE = "isEditable";
 
     public static final String ATTRIBUTE_IS_REMOVABLE = "isRemovable";
@@ -206,15 +199,6 @@ public class PageItem extends Item implements ItemHasUniqueId {
 
     public APIID getUpdatedByUserId() {
         return getAttributeValueAsAPIID(ATTRIBUTE_UPDATED_BY_USER_ID);
-    }
-
-    /**
-     * @deprecated Since 7.14.0, parameter "isHidden" for page search is deprecated and will be removed in a future
-     *             release
-     */
-    @Deprecated(since = "7.14.0", forRemoval = true)
-    public boolean isHidden() {
-        return Boolean.parseBoolean(getAttributeValue(ATTRIBUTE_IS_HIDDEN));
     }
 
     public APIID getProcessId() {

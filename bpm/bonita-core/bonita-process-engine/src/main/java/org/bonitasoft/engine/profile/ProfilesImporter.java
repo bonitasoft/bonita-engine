@@ -25,7 +25,6 @@ import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.ImportStatus.Status;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -67,22 +66,14 @@ public class ProfilesImporter {
     }
 
     private static ProfileImportStrategy getStrategy(final ProfileService profileService, final ImportPolicy policy) {
-        switch (policy) {
-            case DELETE_EXISTING:
-                return new DeleteExistingImportStrategy(profileService);
-            case FAIL_ON_DUPLICATES:
-                return new FailOnDuplicateImportStrategy(profileService);
-            case IGNORE_DUPLICATES:
-                return new IgnoreDuplicateImportStrategy(profileService);
-            case REPLACE_DUPLICATES:
-                return new ReplaceDuplicateImportStrategy(profileService);
-            case UPDATE_DEFAULTS:
-                return new UpdateDefaultsImportStrategy(profileService);
-            case UPDATE_DEFAULTS_AND_CREATE_NEW:
-                return new UpdateDefaultsAndCreateNewImportStrategy(profileService);
-            default:
-                throw new IllegalStateException("No strategy defined for policy: " + policy);
-        }
+        return switch (policy) {
+            case DELETE_EXISTING -> new DeleteExistingImportStrategy(profileService);
+            case FAIL_ON_DUPLICATES -> new FailOnDuplicateImportStrategy(profileService);
+            case IGNORE_DUPLICATES -> new IgnoreDuplicateImportStrategy(profileService);
+            case REPLACE_DUPLICATES -> new ReplaceDuplicateImportStrategy(profileService);
+            case UPDATE_DEFAULTS -> new UpdateDefaultsImportStrategy(profileService);
+            case UPDATE_DEFAULTS_AND_CREATE_NEW -> new UpdateDefaultsAndCreateNewImportStrategy(profileService);
+        };
     }
 
     public List<ImportStatus> importProfiles(ProfilesNode profiles, ImportPolicy policy, final long importerId)
@@ -216,17 +207,6 @@ public class ProfilesImporter {
                 .lastUpdatedBy(importerId).description(profileNode.getDescription()).build();
     }
 
-    public List<String> toWarnings(final List<ImportStatus> importProfiles) {
-        final ArrayList<String> warns = new ArrayList<>();
-        for (final ImportStatus importStatus : importProfiles) {
-            for (final ImportError error : importStatus.getErrors()) {
-                warns.add("Unable to find the " + error.getType().name().toLowerCase() + " " + error.getName() + " on "
-                        + importStatus.getName());
-            }
-        }
-        return warns;
-    }
-
     public ProfilesNode convertFromXml(final String xmlContent) throws IOException {
         try {
             return profilesParser.convert(xmlContent);
@@ -235,8 +215,8 @@ public class ProfilesImporter {
         }
     }
 
-    static File getFileContainingMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
-        return BonitaHomeServer.getInstance().getTenantStorage().getProfileMD5(tenantId);
+    static File getFileContainingMD5() throws IOException {
+        return BonitaHomeServer.getInstance().getProfileStorage().getProfileMD5();
     }
 
 }

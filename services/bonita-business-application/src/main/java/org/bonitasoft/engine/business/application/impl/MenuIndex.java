@@ -46,10 +46,8 @@ public class MenuIndex {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof MenuIndex))
+        if (!(o instanceof MenuIndex menuIndex))
             return false;
-
-        MenuIndex menuIndex = (MenuIndex) o;
 
         if (lastUsedIndex != menuIndex.lastUsedIndex)
             return false;

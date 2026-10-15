@@ -82,9 +82,9 @@ public class PlatformAPIImplTest {
     @Test
     public void should_updateTenantPortalConfigurationFile_call_bonitaHomeServer() throws Exception {
         //when
-        platformAPI.updateClientTenantConfigurationFile(TENANT_ID, "myProps.properties", "updated content".getBytes());
+        platformAPI.updateClientTenantConfigurationFile("myProps.properties", "updated content".getBytes());
         //then
-        verify(bonitaHomeServer).updateTenantPortalConfigurationFile(TENANT_ID, "myProps.properties",
+        verify(bonitaHomeServer).updateTenantPortalConfigurationFile("myProps.properties",
                 "updated content".getBytes());
     }
 
@@ -92,15 +92,15 @@ public class PlatformAPIImplTest {
     public void should_getTenantPortalConfigurationFile_call_bonitaHomeServer() {
         //given
         final String configurationFile = "a file";
-        doReturn("content".getBytes()).when(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID,
+        doReturn("content".getBytes()).when(bonitaHomeServer).getTenantPortalConfiguration(
                 configurationFile);
 
         //when
-        final byte[] configuration = platformAPI.getClientTenantConfiguration(TENANT_ID, configurationFile);
+        final byte[] configuration = platformAPI.getClientTenantConfiguration(configurationFile);
 
         //then
         assertThat(configuration).as("should return file content").isEqualTo("content".getBytes());
-        verify(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID, configurationFile);
+        verify(bonitaHomeServer).getTenantPortalConfiguration(configurationFile);
     }
 
     @Test(expected = StartNodeException.class)

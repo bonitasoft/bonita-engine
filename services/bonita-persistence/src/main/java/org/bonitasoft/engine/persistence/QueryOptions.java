@@ -180,11 +180,9 @@ public class QueryOptions implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof QueryOptions)) {
+        if (!(o instanceof QueryOptions that)) {
             return false;
         }
-
-        final QueryOptions that = (QueryOptions) o;
 
         if (fromIndex != that.fromIndex) {
             return false;
