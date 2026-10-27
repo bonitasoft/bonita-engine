@@ -24,6 +24,7 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
@@ -102,6 +103,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     private static final String HUMAN_TASK_INSTANCE_ASSIGNEE = "HUMAN_TASK_INSTANCE_ASSIGNEE";
 
     private static final String QUERY_HUMAN_TASK_INSTANCE_ASSIGNEE = "updateStrictHuman";
+
+    private static final String QUERY_UPDATE_HUMAN_TASK_ASSIGNEE = "updateHumanTaskAssignee";
 
     private static final String WHOCANSTART_PENDING_TASK_SUFFIX = "WhoCanStartPendingTask";
 
@@ -366,26 +369,110 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         }
     }
 
+    /**
+     * Writes only the assignee columns ({@code assigneeId}, {@code claimedDate}, {@code lastUpdateDate}) through
+     * an atomic named query, then refreshes the entity (BPA-167).
+     * <p>
+     * Must not be called in a transaction that has already modified this task's entity from a possibly stale
+     * read: with {@code FlushMode.AUTO}, the bulk UPDATE first flushes the entity's pending changes, and that flush
+     * writes the whole row from the in-memory snapshot, which would bring back the lost update this method avoids.
+     */
     @Override
     public void assignHumanTask(final long userTaskId, final long userId)
             throws SFlowNodeNotFoundException, SFlowNodeReadException,
             SActivityModificationException {
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance(userTaskId);
-        if (flowNodeInstance instanceof SHumanTaskInstance) {
+        if (flowNodeInstance instanceof SHumanTaskInstance humanTaskInstance) {
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+            descriptor.addField(sUserTaskInstanceBuilder.getIdKey(), userTaskId);
+            descriptor.addField(TENANT_ID_KEY, flowNodeInstance.getTenantId());
             descriptor.addField(sUserTaskInstanceBuilder.getAssigneeIdKey(), userId);
             if (userId > 0) {
                 // if this action is a Assign action:
                 descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), System.currentTimeMillis());
             } else {
                 // if this action is a Release action:
-                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0);
+                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0L);
             }
             setLastUpdateDate(descriptor);
+            final String action = userId > 0 ? "assignment" : "release";
+            // BPA-167: every assignment is traced at DEBUG, not INFO: takes and releases are among the most
+            // frequent user actions, and one line per click would flood bonita.log on busy tenants (and put user
+            // ids in it at default level). With DEBUG enabled on this class, the previous assignee, the state and
+            // stateExecuting let support reconstruct the sequence of assignments. They are the values this
+            // request read when it loaded the task: a submission committed after that load is not reflected in
+            // them. Keep this line before the update below: its refresh replaces the previous assignee.
+            log.debug("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): applying {} "
+                    + "(assigneeId {} -> {}; as read when this request loaded the task: state=<{}: {}>, "
+                    + "stateExecuting={})",
+                    flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                    action, humanTaskInstance.getAssigneeId(), userId, flowNodeInstance.getStateId(),
+                    flowNodeInstance.getStateName(), flowNodeInstance.isStateExecuting());
+            if (flowNodeInstance.isStateExecuting()) {
+                // A take landing while the task is executing: a submission was committed and its execution work
+                // is still pending, or an asynchronous connector of the task is running. Benign since this method
+                // writes only the assignee columns, through an atomic query that cannot carry a stale snapshot of
+                // the other columns - hence INFO, not WARN. Note that it does NOT fire in the overlap that
+                // corrupted the row before BPA-167: there, this request loads the task before the submission
+                // commits and reads stateExecuting=false.
+                log.info("Human task '{}' (id={}, rootProcessInstance={}): {} requested while the task is executing "
+                        + "(stateExecuting=true: a submission is pending, or an asynchronous connector is running). "
+                        + "Only the assignee columns are written, the execution flag is preserved (BPA-167).",
+                        flowNodeInstance.getName(), flowNodeInstance.getId(),
+                        flowNodeInstance.getRootProcessInstanceId(), action);
+            }
             try {
-                getRecorder().recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
-                        HUMAN_TASK_INSTANCE_ASSIGNEE);
+                final int updatedRows = getRecorder().recordUpdateWithQuery(
+                        UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
+                        HUMAN_TASK_INSTANCE_ASSIGNEE, QUERY_UPDATE_HUMAN_TASK_ASSIGNEE);
+                if (updatedRows != 1) {
+                    log.error("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                            + "failed to update {} (assigneeId={}) — no human task row matched id={} and "
+                            + "tenantId={} (expected 1 updated row but got {}); the row was deleted or archived "
+                            + "concurrently. assigneeId, claimedDate and lastUpdateDate were NOT applied",
+                            flowNodeInstance.getName(), flowNodeInstance.getId(),
+                            flowNodeInstance.getRootProcessInstanceId(),
+                            flowNodeInstance.getProcessDefinitionId(),
+                            action, userId, flowNodeInstance.getId(), flowNodeInstance.getTenantId(),
+                            updatedRows);
+                    throw new SActivityModificationException(
+                            String.format("Failed to update %s of human task %d (assigneeId %d): "
+                                    + "no human task row matched id %d and tenantId %d (updated rows: %d)",
+                                    action, flowNodeInstance.getId(), userId, flowNodeInstance.getId(),
+                                    flowNodeInstance.getTenantId(), updatedRows),
+                            // Marked retryable unconditionally: inside the instanceof guard above, the only way to
+                            // match no row is that it was archived or deleted after this transaction read
+                            // it, which is transient. Before BPA-167 the same situation surfaced as
+                            // Hibernate's StaleStateException, itself retryable, so this restores it.
+                            new SRetryableException(
+                                    "the human task row was archived or deleted after this transaction read it"));
+                }
+                // Refresh entity from DB to sync in-memory state with the atomic SQL update.
+                // This prevents Hibernate dirty-checking from overwriting the atomic values
+                // (BPA-167: the stale in-memory snapshot would otherwise be flushed back over the
+                // whole row at commit, silently reverting both the assignment and stateExecuting),
+                // and keeps the entity managed in the session so that callers re-reading it in the
+                // same transaction (e.g. assignAndExecuteUserTask) see the new assignee.
+                getPersistenceService().refresh(flowNodeInstance);
             } catch (final SRecorderException e) {
+                // No stack trace here: the exception is rethrown, and its caller (e.g. the REST layer) logs it.
+                // This line adds the task context that the caller's log does not have.
+                log.error("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                        + "failed to update {} (assigneeId={}) — {}",
+                        flowNodeInstance.getName(), flowNodeInstance.getId(),
+                        flowNodeInstance.getRootProcessInstanceId(),
+                        flowNodeInstance.getProcessDefinitionId(),
+                        action, userId, e.getMessage());
+                throw new SActivityModificationException(e);
+            } catch (final SPersistenceException e) {
+                log.error("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                        + "{} (assigneeId={}) was written, but re-reading the task afterwards failed — {}; "
+                        + "the request fails and the transaction is rolled back, so the new value is NOT persisted",
+                        flowNodeInstance.getName(), flowNodeInstance.getId(),
+                        flowNodeInstance.getRootProcessInstanceId(),
+                        flowNodeInstance.getProcessDefinitionId(),
+                        action, userId, e.getMessage());
                 throw new SActivityModificationException(e);
             }
         } else {

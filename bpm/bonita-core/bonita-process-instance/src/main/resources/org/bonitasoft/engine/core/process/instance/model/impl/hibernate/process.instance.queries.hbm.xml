@@ -168,6 +168,58 @@
 		)
 	</query>
 
+	<!-- BPA-167: atomic update of the assignment columns of a human task.
+	Only the assignment columns are written, so this UPDATE cannot clobber columns written
+	concurrently on the same row (typically `stateExecuting`), unlike the whole-row UPDATE that the
+	dirty-check flush of the managed entity emits from a possibly stale in-memory snapshot.
+	Note: this is `updateStrictHuman` without its assignee guard, because it backs the unconditional
+	assign/release writer `ActivityInstanceServiceImpl.assignHumanTask`; the conditional variant
+	`assignHumanTaskIfNotAssigned` keeps using `updateStrictHuman`.
+	Note: the WHERE clause carries BOTH halves of the composite identifier, `tenantId` and `id`. The primary
+	key of `flownode_instance` is (tenantid, id) and no index starts with `id`, so filtering on `id` alone
+	leaves MySQL/InnoDB no access path: under REPEATABLE READ it then scans the whole clustered index and
+	holds a next-key lock on every row of the table until commit, which deadlocks against the engine's
+	concurrent work transactions. -->
+	<query name="updateHumanTaskAssignee">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance
+		SET assigneeId = :assigneeId,
+		claimedDate = :claimedDate,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+		AND tenantId = :tenantId
+	</query>
+
+	<!-- BPA-167: atomic update of the priority of a human task.
+	Only the priority column is written, so this UPDATE cannot clobber columns written concurrently
+	on the same row, unlike the whole-row UPDATE that the dirty-check flush of the managed entity
+	emits from a possibly stale in-memory snapshot.
+	Targets SHumanTaskInstance because `priority` is declared there, not on SFlowNodeInstance.
+	The WHERE clause carries both halves of the composite identifier — see `updateHumanTaskAssignee`. -->
+	<query name="updateHumanTaskPriority">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance
+		SET priority = :priority,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+		AND tenantId = :tenantId
+	</query>
+
+	<!-- BPA-167: atomic update of the expected end date (due date) of a human task.
+	Only the expectedEndDate column is written, so this UPDATE cannot clobber columns written
+	concurrently on the same row, unlike the whole-row UPDATE that the dirty-check flush of the
+	managed entity emits from a possibly stale in-memory snapshot.
+	Targets SHumanTaskInstance because `expectedEndDate` is declared there, not on SFlowNodeInstance.
+	The WHERE clause carries both halves of the composite identifier — see `updateHumanTaskAssignee`. -->
+	<query name="updateHumanTaskExpectedEndDate">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance
+		SET expectedEndDate = :expectedEndDate,
+		lastUpdateDate = :lastUpdateDate
+		WHERE id = :id
+		AND tenantId = :tenantId
+	</query>
+
 	<query name="getAssignedUserTasks">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
