@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -371,20 +373,28 @@ public class ActivityInstanceServiceImplTest {
 
     @Test
     public void should_update_due_date_on_right_flownode_with_right_update_event_message() throws Exception {
+        //given
+        when(recorder.recordUpdateWithQuery(any(UpdateRecord.class),
+                eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED),
+                eq("updateHumanTaskExpectedEndDate"))).thenReturn(1);
+
         //when
         activityInstanceServiceImpl.setExpectedEndDate(sFlowNodeInstance, 123L);
 
         ArgumentCaptor<UpdateRecord> updateRecordArgumentCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
 
         //then
-        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(),
-                eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED));
+        verify(recorder).recordUpdateWithQuery(updateRecordArgumentCaptor.capture(),
+                eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED),
+                eq("updateHumanTaskExpectedEndDate"));
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity")
                 .isEqualTo(sFlowNodeInstance);
-        assertThat(updateRecordArgumentCaptor.getValue().getFields())
-                .as("should update expectedEndDate and lastUpdateDate fields")
-                .containsKey("expectedEndDate")
-                .containsKey("lastUpdateDate");
+        // the atomic update must touch ONLY the intended columns: expectedEndDate, lastUpdateDate and the
+        // two halves of the composite identifier used as the WHERE parameters. Fails if anyone reverts to a
+        // whole-row recordUpdate, or drops tenantId and leaves MySQL without an access path (BPA-167).
+        assertThat(updateRecordArgumentCaptor.getValue().getFields().keySet())
+                .as("should update only the expectedEndDate and lastUpdateDate fields, plus the id and tenantId parameters")
+                .containsExactlyInAnyOrder("id", "tenantId", "expectedEndDate", "lastUpdateDate");
         assertThat(updateRecordArgumentCaptor.getValue().getFields().get("expectedEndDate"))
                 .as("expectedEndDate should have the new value")
                 .isEqualTo(123L);
@@ -394,7 +404,11 @@ public class ActivityInstanceServiceImplTest {
     public void should_updateExpectedEndDate_throw_SFlowNodeModificationException_when_recorder_fails()
             throws Exception {
         //given
-        doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), anyString());
+        // the matchers are deliberately loose so that the stub matches whatever event and query name the
+        // writer uses: the expected exception then provably comes from the recorder failure and never from
+        // the row-count guard, which would raise the very same exception type
+        doThrow(SRecorderException.class).when(recorder).recordUpdateWithQuery(any(UpdateRecord.class), anyString(),
+                anyString());
 
         //expect
         expectedException.expect(SFlowNodeModificationException.class);
@@ -479,16 +493,108 @@ public class ActivityInstanceServiceImplTest {
     public void should_assignHumanTask_update_lastUpdateDate() throws Exception {
         // Given
         SHumanTaskInstance humanTask = mock(SHumanTaskInstance.class);
+        when(humanTask.getTenantId()).thenReturn(101L);
         when(persistenceService.selectById(any())).thenReturn(humanTask);
+        when(recorder.recordUpdateWithQuery(any(UpdateRecord.class), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
+                eq("updateHumanTaskAssignee"))).thenReturn(1);
 
         // When
         activityInstanceServiceImpl.assignHumanTask(123L, 456L);
 
         // Then
         ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder).recordUpdate(captor.capture(), anyString());
+        verify(recorder).recordUpdateWithQuery(captor.capture(), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
+                eq("updateHumanTaskAssignee"));
+        // the atomic update must touch ONLY the intended columns: assigneeId, claimedDate, lastUpdateDate
+        // and the two halves of the composite identifier used as the WHERE parameters. Fails if anyone reverts
+        // to a whole-row recordUpdate, or drops tenantId and leaves MySQL without an access path (BPA-167).
         assertThat(captor.getValue().getFields().keySet())
-                .contains("assigneeId", "claimedDate", "lastUpdateDate");
+                .as("should update only the assignee fields, plus the id and tenantId parameters")
+                .containsExactlyInAnyOrder("id", "tenantId", "assigneeId", "claimedDate", "lastUpdateDate");
+        // A migrated customer's tenant id is NOT 1: installations that ran multi-tenant before 8.0.0 kept
+        // their original id when their databases were split (e.g. 101). Binding a literal here would break
+        // exactly those customers, so the value is asserted, not just the key.
+        assertThat(captor.getValue().getFields())
+                .as("tenantId must be the value read from the task, never a literal")
+                .containsEntry("tenantId", 101L);
+        // The bulk HQL update never touches the managed entity, so the in-memory copy is stale. Without
+        // this refresh the commit flush writes the stale snapshot back over the whole row -- reverting the
+        // assignment on the engine path, and making assignAndExecuteUserTask re-read a stale assignee.
+        // This is the load-bearing defence of the fix; pinned so that deleting it cannot pass silently.
+        verify(persistenceService).refresh(humanTask);
+    }
+
+    @Test
+    public void should_releaseHumanTask_update_only_the_assignee_fields() throws Exception {
+        // Given the release branch (userId == 0), whose descriptor must pair with the SAME named query.
+        // The descriptor/query pairing is enforced only at runtime, so both branches need an oracle.
+        SHumanTaskInstance humanTask = mock(SHumanTaskInstance.class);
+        when(humanTask.getTenantId()).thenReturn(101L);
+        when(persistenceService.selectById(any())).thenReturn(humanTask);
+        when(recorder.recordUpdateWithQuery(any(UpdateRecord.class), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
+                eq("updateHumanTaskAssignee"))).thenReturn(1);
+
+        // When
+        activityInstanceServiceImpl.assignHumanTask(123L, 0L);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdateWithQuery(captor.capture(), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
+                eq("updateHumanTaskAssignee"));
+        assertThat(captor.getValue().getFields().keySet())
+                .as("the release branch must carry exactly the same key set as the assign branch")
+                .containsExactlyInAnyOrder("id", "tenantId", "assigneeId", "claimedDate", "lastUpdateDate");
+        assertThat(captor.getValue().getFields())
+                .containsEntry("assigneeId", 0L)
+                .containsEntry("claimedDate", 0L)
+                .containsEntry("tenantId", 101L);
+        verify(persistenceService).refresh(humanTask);
+    }
+
+    @Test
+    public void should_assignHumanTaskIfNotAssigned_keep_the_descriptor_free_of_tenantId() throws Exception {
+        // The conditional assign stays on `updateStrictHuman`, which filters on `WHERE id = :id` alone and is
+        // deliberately NOT keyed on tenantId by BPA-167 (pre-existing, out of this fix's scope). The two
+        // sides of that asymmetry must be pinned, because the descriptor key set and the named query's
+        // parameters have to match exactly -- `setParameters` binds every descriptor key, so an extra key with
+        // no matching HQL parameter throws at runtime, not at compile time.
+        SHumanTaskInstance humanTask = mock(SHumanTaskInstance.class);
+        when(persistenceService.selectById(any())).thenReturn(humanTask);
+        when(recorder.recordUpdateWithQuery(any(UpdateRecord.class), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
+                eq("updateStrictHuman"))).thenReturn(1);
+
+        // When
+        activityInstanceServiceImpl.assignHumanTaskIfNotAssigned(123L, 456L);
+
+        // Then
+        ArgumentCaptor<UpdateRecord> captor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder).recordUpdateWithQuery(captor.capture(), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
+                eq("updateStrictHuman"));
+        assertThat(captor.getValue().getFields().keySet())
+                .as("updateStrictHuman declares no :tenantId parameter, so the descriptor must not carry one")
+                .containsExactlyInAnyOrder("id", "assigneeId", "claimedDate", "lastUpdateDate");
+    }
+
+    @Test
+    public void should_assignHumanTask_throw_SActivityModificationException_when_no_row_was_updated() throws Exception {
+        // Given the atomic update matches no row (task concurrently deleted, or an id that no longer exists)
+        SHumanTaskInstance humanTask = mock(SHumanTaskInstance.class);
+        when(persistenceService.selectById(any())).thenReturn(humanTask);
+        when(recorder.recordUpdateWithQuery(any(UpdateRecord.class), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
+                eq("updateHumanTaskAssignee"))).thenReturn(0);
+
+        // When
+        final Throwable thrown = catchThrowable(() -> activityInstanceServiceImpl.assignHumanTask(123L, 456L));
+
+        // Then the guard must fail loud, never swallow a missed update and report success
+        assertThat(thrown)
+                .as("assignHumanTask should fail loud when the atomic update updated no row")
+                .isInstanceOf(SActivityModificationException.class)
+                // A concurrently archived or deleted task is transient. The work retryability evaluator walks
+                // the whole cause chain and classifies a message-only exception NOT_RETRYABLE, which puts the
+                // flow node in FAILED state instead of retrying it -- a regression against the pre-BPA-167
+                // behaviour, where Hibernate's own StaleStateException (a retryable class) surfaced here.
+                .hasCauseInstanceOf(SRetryableException.class);
     }
 
     @Test
@@ -553,8 +659,13 @@ public class ActivityInstanceServiceImplTest {
         verify(recorder).recordUpdateWithQuery(captor.capture(),
                 eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
                 eq("updateMultiInstanceActiveCounters"));
+        // Exact, not `contains`: these three counter queries deliberately stay on `WHERE id = :id` without
+        // tenantId (pre-existing, out of the scope of BPA-167). Pinning the key set
+        // exactly is what stops a later "harmonisation" from adding the descriptor key without the matching
+        // HQL parameter, which compiles, passes a loose assertion, and throws QueryParameterException in
+        // production.
         assertThat(captor.getValue().getFields().keySet())
-                .contains("id", "number", "lastUpdateDate");
+                .containsExactlyInAnyOrder("id", "number", "lastUpdateDate");
     }
 
     @Test
@@ -573,8 +684,13 @@ public class ActivityInstanceServiceImplTest {
         verify(recorder).recordUpdateWithQuery(captor.capture(),
                 eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
                 eq("updateMultiInstanceTerminatedCounters"));
+        // Exact, not `contains`: these three counter queries deliberately stay on `WHERE id = :id` without
+        // tenantId (pre-existing, out of the scope of BPA-167). Pinning the key set
+        // exactly is what stops a later "harmonisation" from adding the descriptor key without the matching
+        // HQL parameter, which compiles, passes a loose assertion, and throws QueryParameterException in
+        // production.
         assertThat(captor.getValue().getFields().keySet())
-                .contains("id", "number", "lastUpdateDate");
+                .containsExactlyInAnyOrder("id", "number", "lastUpdateDate");
     }
 
     @Test
@@ -593,8 +709,13 @@ public class ActivityInstanceServiceImplTest {
         verify(recorder).recordUpdateWithQuery(captor.capture(),
                 eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
                 eq("updateMultiInstanceCompletedCounters"));
+        // Exact, not `contains`: these three counter queries deliberately stay on `WHERE id = :id` without
+        // tenantId (pre-existing, out of the scope of BPA-167). Pinning the key set
+        // exactly is what stops a later "harmonisation" from adding the descriptor key without the matching
+        // HQL parameter, which compiles, passes a loose assertion, and throws QueryParameterException in
+        // production.
         assertThat(captor.getValue().getFields().keySet())
-                .contains("id", "number", "lastUpdateDate");
+                .containsExactlyInAnyOrder("id", "number", "lastUpdateDate");
     }
 
     @Test

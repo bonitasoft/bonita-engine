@@ -68,6 +68,7 @@ import org.bonitasoft.engine.core.process.definition.model.impl.*;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
@@ -129,6 +130,7 @@ import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.*;
@@ -154,6 +156,8 @@ public class ProcessAPIImplTest {
     public ExpectedException expectedEx = ExpectedException.none();
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     @Mock
     private ProcessManagementAPIImplDelegate managementAPIImplDelegate;
     @Mock
@@ -1395,6 +1399,65 @@ public class ProcessAPIImplTest {
                 "User task is not executable (currently in state 'executing ready'), this might be because someone else already executed it.");
         processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap());
         //then exception
+    }
+
+    @Test
+    public void executeUserTask_should_log_a_warning_when_the_submission_is_refused() throws Exception {
+        //given a task whose execution is already in progress, i.e. a concurrent submission won the race
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateName("ready");
+        sUserTaskInstance.setStateExecuting(true);
+        sUserTaskInstance.setAssigneeId(543L);
+        systemOutRule.clearLog();
+        //when
+        assertThatThrownBy(() -> processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap()))
+                .isInstanceOf(UserTaskNotFoundException.class);
+        //then the refusal must be diagnosable from the first log bundle (BPA-167):
+        // UserTaskNotFoundException is a NotFoundException, which the REST layer logs at DEBUG only, so without
+        // this WARN a user being refused a submission leaves no trace at default log level at all.
+        assertThat(systemOutRule.getLog())
+                .contains("Refused the submission of user task <userTaskName>")
+                .contains("id = <" + FLOW_NODE_INSTANCE_ID + ">")
+                .contains("stateExecuting = <true>")
+                .contains("assignee = <543>");
+    }
+
+    @Test
+    public void executeUserTask_should_log_a_warning_when_the_refused_task_no_longer_exists() throws Exception {
+        //given the submission fails, and the task is gone when its state is read back (already archived)
+        userTransactionService.failFirstTx();
+        when(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID))
+                .thenThrow(new SFlowNodeNotFoundException(FLOW_NODE_INSTANCE_ID));
+        systemOutRule.clearLog();
+        //when: the caller still gets the exception it has always got, wrapping the original failure
+        assertThatThrownBy(() -> processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap()))
+                .isInstanceOf(FlowNodeExecutionException.class)
+                .hasCauseInstanceOf(STransactionCommitException.class);
+        //then the expected not-found case is named, without a stack trace
+        assertThat(systemOutRule.getLog())
+                .contains("Refused the submission of the user task with id = <" + FLOW_NODE_INSTANCE_ID + ">")
+                .contains("does not exist anymore")
+                .doesNotContain("cannot be classified")
+                .doesNotContain(SFlowNodeNotFoundException.class.getName());
+    }
+
+    @Test
+    public void executeUserTask_should_log_a_warning_with_the_cause_when_the_refused_task_cannot_be_read_back()
+            throws Exception {
+        //given the submission fails, and reading the task's state back fails unexpectedly
+        userTransactionService.failFirstTx();
+        when(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID))
+                .thenThrow(new IllegalStateException("state read failure"));
+        systemOutRule.clearLog();
+        //when
+        assertThatThrownBy(() -> processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap()))
+                .isInstanceOf(FlowNodeExecutionException.class)
+                .hasCauseInstanceOf(STransactionCommitException.class);
+        //then the unexpected failure is logged with its cause and stack trace
+        assertThat(systemOutRule.getLog())
+                .contains("Refused the submission of the user task with id = <" + FLOW_NODE_INSTANCE_ID + ">")
+                .contains("cannot be classified")
+                .contains(IllegalStateException.class.getName() + ": state read failure");
     }
 
     @Test

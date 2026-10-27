@@ -29,4 +29,14 @@ public class SFlowNodeModificationException extends SBonitaException {
     public SFlowNodeModificationException(String message) {
         super(message);
     }
+
+    /**
+     * Keeps a cause alongside the diagnostic message. Needed so that a transient failure can carry an
+     * {@link org.bonitasoft.engine.commons.exceptions.SRetryableException} cause: the work retryability
+     * evaluator walks the whole cause chain, and a message-only exception is classified NOT_RETRYABLE,
+     * which fails the flow node instead of retrying it (BPA-167).
+     */
+    public SFlowNodeModificationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
