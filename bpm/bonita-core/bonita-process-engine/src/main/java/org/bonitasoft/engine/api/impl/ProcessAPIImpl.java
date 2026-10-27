@@ -6130,8 +6130,42 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    /**
+     * The requesting user's name for a log line, or {@code "unknown"} if the session cannot be read. Never throws:
+     * it is used while classifying another failure, and losing that failure to a logging lookup would be worse
+     * than losing the user name.
+     */
+    private String userNameForLogOrUnknown() {
+        try {
+            return getUserNameFromSession();
+        } catch (RuntimeException e) {
+            log.trace("Unable to read the requesting user's name from the session, logging it as unknown", e);
+            return "unknown";
+        }
+    }
+
+    /**
+     * Classifies a user task submission that failed and rethrows it as the matching API exception.
+     * <p>
+     * Every exit of this method is a <b>customer-visible refusal</b>: the submission was rejected and nothing was
+     * executed. {@link UserTaskNotFoundException} is a {@code NotFoundException}, which the REST layer logs at DEBUG
+     * only, so without the WARN traces below such a refusal leaves no trace at default log level and support cannot
+     * tell, from the first log bundle, that a user was refused at all (BPA-167).
+     * <p>
+     * <b>Absence of a WARN does not mean no refusal happened.</b> Two sibling catches elsewhere in this class map
+     * {@code SFlowNodeNotFoundException} to {@link UserTaskNotFoundException} without logging, so the most ordinary
+     * refusal — the task was already executed and archived — can still reach the client as a silent 404. Those are
+     * pre-existing and out of this fix's scope; they are why this trace must not be read as exhaustive. The exits
+     * that throw a {@link FlowNodeExecutionException} (the state could not be read back, or the task is ready and
+     * not executing) are already logged at ERROR by the REST layer; the WARN traces add the classification.
+     */
     private void verifyIfTheActivityWasInTheCorrectStateAndThrowException(long flownodeInstanceId, Exception e)
             throws UserTaskNotFoundException, FlowNodeExecutionException {
+        // Resolved once, before the try: getUserNameFromSession() reads the session and can itself throw
+        // (SessionInfos wraps any non-session failure in a BonitaRuntimeException). Called inside a catch, its
+        // arguments are evaluated before log.warn runs, so a failure there would replace the exception being
+        // classified and the original cause would be lost.
+        final String requestingUser = userNameForLogOrUnknown();
         SFlowNodeInstance flowNodeInstance;
         try {
             flowNodeInstance = inTx(
@@ -6140,9 +6174,40 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new UserTaskNotFoundException(
                     String.format("User task %s is not found, it might already be executed", flownodeInstanceId));
         } catch (Exception e1) {
+            if (e1 instanceof SFlowNodeNotFoundException) {
+                // getFlowNodeInstance throws SFlowNodeNotFoundException, which the catch above does not match: the
+                // caller still gets the FlowNodeExecutionException it has always got (mapping it to
+                // UserTaskNotFoundException is a separate, pre-existing issue). Only the classification is logged
+                // here, without a stack trace: a task archived in between is an expected case.
+                log.warn("Refused the submission of the user task with id = <{}> requested by user <{}>: the flow"
+                        + " node instance does not exist anymore, it has most likely already been executed and"
+                        + " archived. Nothing was executed and the submitted inputs were discarded.",
+                        flownodeInstanceId, requestingUser);
+            } else {
+                log.warn("Refused the submission of the user task with id = <{}> requested by user <{}>: its state"
+                        + " could not be read back after the execution failed, so the refusal cannot be classified."
+                        + " The original execution failure is reported to the caller; the state read failed with:",
+                        flownodeInstanceId, requestingUser, e1);
+            }
             throw new FlowNodeExecutionException(e);
         }
         if (flowNodeInstance.getStateId() != FlowNodeState.ID_ACTIVITY_READY || flowNodeInstance.isStateExecuting()) {
+            final long assigneeId = flowNodeInstance instanceof SHumanTaskInstance humanTaskInstance
+                    ? humanTaskInstance.getAssigneeId()
+                    : -1L;
+            final String likelyCause = flowNodeInstance.getStateId() == FlowNodeState.ID_ACTIVITY_READY
+                    ? "Another submission of the same task has most likely been accepted already."
+                    : "The task has left the ready state: it has most likely been executed by another submission,"
+                            + " or it was aborted, cancelled or failed.";
+            log.warn("Refused the submission of user task <{}> (id = <{}>, process instance = <{}>, root process"
+                    + " instance = <{}>) requested by user <{}>: the task is not in a submittable state"
+                    + " (state = <{}: {}>, stateExecuting = <{}>, assignee = <{}>). {}"
+                    + " Nothing was executed and the submitted inputs were discarded. Execution failure reported"
+                    + " by the engine: {}",
+                    flowNodeInstance.getName(), flownodeInstanceId, flowNodeInstance.getParentProcessInstanceId(),
+                    flowNodeInstance.getRootProcessInstanceId(), requestingUser,
+                    flowNodeInstance.getStateId(), flowNodeInstance.getStateName(),
+                    flowNodeInstance.isStateExecuting(), assigneeId, likelyCause, e.getMessage());
             //this in a not found because that task was not visible anymore
             throw new UserTaskNotFoundException(
                     String.format(
