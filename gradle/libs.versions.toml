@@ -54,7 +54,7 @@ antlr4RuntimeVersion = "4.7.2"
 casClientCoreVersion = "4.0.4"
 jtidyVersion = "r938"
 squigglyFilterJacksonVersion = "1.3.18"
-aspectjVersion = "1.9.25.1"
+aspectjVersion = "1.9.26"
 
 # bonita-web specific dependencies:
 jsonSimpleVersion = "1.1.1"
