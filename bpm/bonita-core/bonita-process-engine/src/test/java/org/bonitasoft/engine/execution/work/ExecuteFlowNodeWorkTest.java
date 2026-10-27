@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -90,6 +92,88 @@ public class ExecuteFlowNodeWorkTest {
         expectedException.expect(SWorkPreconditionException.class);
         executeFlowNodeWork.work(context);
         //then exception
+    }
+
+    @Test
+    public void should_name_the_lost_update_when_only_the_execution_flag_was_cleared() {
+        //given: the work expects the task ready and executing, the row is ready but no longer executing
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, true, false,
+                false);
+        sHumanTaskInstance.setStateId(4);
+        sHumanTaskInstance.setStateName("ready");
+        sHumanTaskInstance.setStateExecuting(false);
+        sHumanTaskInstance.setAssigneeId(12L);
+        sHumanTaskInstance.setClaimedDate(1000L);
+        sHumanTaskInstance.setLastUpdateDate(2000L);
+        //when then
+        assertThatThrownBy(() -> executeFlowNodeWork.work(context))
+                .isInstanceOf(SWorkPreconditionException.class)
+                .hasMessageContaining("The execution flag was cleared while the state did not change")
+                .hasMessageContaining("This work is dropped and is NOT retried")
+                .hasMessageContaining("if the database row shows stateExecuting=false, the flow node is stuck")
+                .hasMessageContaining("Current state name: ready.")
+                .hasMessageContaining(
+                        "Last writer trace: lastUpdateDate=2000, assigneeId=12, claimedDate=1000, tokenCount=0")
+                .hasMessageNotContaining("Someone probably already called execute on it.");
+    }
+
+    @Test
+    public void should_not_name_a_lost_update_when_the_state_changed_too() {
+        //given: the execution flag is cleared, but the state moved on as well: another execution ran it
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, true, false,
+                false);
+        sHumanTaskInstance.setStateId(2);
+        sHumanTaskInstance.setStateExecuting(false);
+        //when then
+        assertThatThrownBy(() -> executeFlowNodeWork.work(context))
+                .isInstanceOf(SWorkPreconditionException.class)
+                .hasMessageContaining("Someone probably already called execute on it.")
+                .hasMessageNotContaining("The execution flag was cleared")
+                .hasMessageNotContaining("NOT retried");
+    }
+
+    @Test
+    public void should_not_name_a_lost_update_when_the_aborting_flag_changed_too() {
+        //given
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, true, false,
+                false);
+        sHumanTaskInstance.setStateId(4);
+        sHumanTaskInstance.setStateExecuting(false);
+        sHumanTaskInstance.setStateCategory(SStateCategory.ABORTING);
+        //when then
+        assertThatThrownBy(() -> executeFlowNodeWork.work(context))
+                .isInstanceOf(SWorkPreconditionException.class)
+                .hasMessageContaining("Someone probably already called execute on it.")
+                .hasMessageNotContaining("The execution flag was cleared");
+    }
+
+    @Test
+    public void should_not_name_a_lost_update_when_the_canceling_flag_changed_too() {
+        //given
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, true, false,
+                false);
+        sHumanTaskInstance.setStateId(4);
+        sHumanTaskInstance.setStateExecuting(false);
+        sHumanTaskInstance.setStateCategory(SStateCategory.CANCELLING);
+        //when then
+        assertThatThrownBy(() -> executeFlowNodeWork.work(context))
+                .isInstanceOf(SWorkPreconditionException.class)
+                .hasMessageContaining("Someone probably already called execute on it.")
+                .hasMessageNotContaining("The execution flag was cleared");
+    }
+
+    @Test
+    public void should_not_name_a_lost_update_when_the_execution_flag_was_set_instead_of_cleared() {
+        //given: the work expects the task not executing, the row is executing
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, false, false,
+                false);
+        sHumanTaskInstance.setStateId(4);
+        sHumanTaskInstance.setStateExecuting(true);
+        //when then
+        assertThatThrownBy(() -> executeFlowNodeWork.work(context))
+                .isInstanceOf(SWorkPreconditionException.class)
+                .hasMessageContaining("Someone probably already called execute on it.")
+                .hasMessageNotContaining("The execution flag was cleared");
     }
 
     @Test
