@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
@@ -38,6 +39,7 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
@@ -57,6 +59,7 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.SPersistenceException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -67,6 +70,22 @@ import org.bonitasoft.engine.services.PersistenceService;
 public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceService {
 
     private static final String SUPERVISED_BY = "SupervisedBy";
+
+    /**
+     * Name of the second half of the composite identifier, as the atomic update queries bind it. The primary key
+     * of {@code flownode_instance} is (tenantid, id) and no index starts with {@code id}, so an update filtering
+     * on {@code id} alone has no access path on MySQL/InnoDB: it scans the whole clustered index and locks every
+     * row of the table until commit (BPA-167).
+     * <p>
+     * 10.2.x only: remove on 10.3.x and later, where {@code flownode_instance} has no {@code tenantid} column and
+     * {@code id} is the whole primary key. Remove the {@code AND tenantId = :tenantId} clauses of the three
+     * BPA-167 update queries in {@code process.instance.queries.hbm.xml} in the same change.
+     */
+    protected static final String TENANT_ID_KEY = "tenantId";
+
+    private static final String QUERY_UPDATE_HUMAN_TASK_PRIORITY = "updateHumanTaskPriority";
+
+    private static final String QUERY_UPDATE_HUMAN_TASK_EXPECTED_END_DATE = "updateHumanTaskExpectedEndDate";
 
     private final SUserTaskInstanceBuilderFactory activityInstanceKeyProvider;
 
@@ -204,12 +223,65 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         }
     }
 
+    /**
+     * Writes only the {@code priority} and {@code lastUpdateDate} columns through an atomic named query (BPA-167).
+     * <p>
+     * Must not be called in a transaction that has already modified this task's entity from a possibly stale
+     * read: with {@code FlushMode.AUTO}, the bulk UPDATE first flushes the entity's pending changes, and that flush
+     * writes the whole row from the in-memory snapshot, which would bring back the lost update this method avoids.
+     */
     @Override
     public void setTaskPriority(final SFlowNodeInstance flowNodeInstance, final STaskPriority priority)
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
+        descriptor.addField(TENANT_ID_KEY, flowNodeInstance.getTenantId());
         descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
-        updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
+        setLastUpdateDate(descriptor);
+        log.debug("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                + "setting priority to {} (atomic SQL update)",
+                flowNodeInstance.getName(), flowNodeInstance.getId(),
+                flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                priority);
+        try {
+            final int updatedRows = getRecorder().recordUpdateWithQuery(
+                    UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
+                    ACTIVITYINSTANCE_STATE, QUERY_UPDATE_HUMAN_TASK_PRIORITY);
+            if (updatedRows != 1) {
+                log.error("{} '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                        + "failed to set priority to {} — no human task row matched id={} and tenantId={} "
+                        + "(expected 1 updated row but got {}); either the row was deleted or archived "
+                        + "concurrently, or this id does not refer to a human task. "
+                        + "No column was written and the request fails",
+                        flowNodeInstance.getType(), flowNodeInstance.getName(),
+                        flowNodeInstance.getId(),
+                        flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                        priority, flowNodeInstance.getId(), flowNodeInstance.getTenantId(), updatedRows);
+                throw new SFlowNodeModificationException(
+                        String.format("Failed to set the priority of flow node %d (%s) to %s: "
+                                + "no human task row matched id %d and tenantId %d — either it was deleted or "
+                                + "archived concurrently, or this id does not refer to a human task "
+                                + "(updated rows: %d)",
+                                flowNodeInstance.getId(), flowNodeInstance.getType(), priority,
+                                flowNodeInstance.getId(), flowNodeInstance.getTenantId(), updatedRows),
+                        rowCountGuardCause(flowNodeInstance));
+            }
+            // No refresh() here, deliberately: the only caller is
+            // org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority, which loads the task, calls this
+            // method and returns. That transaction neither re-reads nor mutates the entity afterwards, and holds
+            // no un-flushed mutation on it, so there is nothing to re-synchronise. Do not add a refresh() for
+            // uniformity: it costs an extra SELECT and it discards un-flushed mutations on the entity. Add one
+            // only if a caller starts reading or mutating the flow node after this call in the same transaction.
+        } catch (final SRecorderException e) {
+            // No stack trace here: the exception is rethrown, and its caller (e.g. the REST layer) logs it.
+            // This line adds the task context that the caller's log does not have.
+            log.error("{} '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                    + "failed to set priority to {} — {}",
+                    flowNodeInstance.getType(), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                    priority, e.getMessage());
+            throw new SFlowNodeModificationException(e);
+        }
     }
 
     @Override
@@ -351,12 +423,82 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         updateFlowNode(flowNodeInstance, EXECUTED_BY_SUBSTITUTE_MODIFIED, descriptor);
     }
 
+    /**
+     * Writes only the {@code expectedEndDate} and {@code lastUpdateDate} columns through an atomic named query
+     * (BPA-167).
+     * <p>
+     * Must not be called in a transaction that has already modified this task's entity from a possibly stale
+     * read: with {@code FlushMode.AUTO}, the bulk UPDATE first flushes the entity's pending changes, and that flush
+     * writes the whole row from the in-memory snapshot, which would bring back the lost update this method avoids.
+     * The state execution ({@code StateBehaviors.updateExpectedDuration}) sets the display name and description
+     * just before calling it; that is acceptable there because that transaction owns the execution of the task.
+     */
     @Override
     public void setExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final Long dueDate)
             throws SFlowNodeModificationException {
+        // dueDate may legitimately be null: it means "no expected end date" (see
+        // StateBehaviors.updateExpectedDuration and SetExpectedEndDate.convertToLong).
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
+        descriptor.addField(TENANT_ID_KEY, flowNodeInstance.getTenantId());
         descriptor.addField(activityInstanceKeyProvider.getExpectedEndDateKey(), dueDate);
-        updateFlowNode(flowNodeInstance, EXPECTED_END_DATE_MODIFIED, descriptor);
+        setLastUpdateDate(descriptor);
+        log.debug("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                + "setting expected end date to {} (atomic SQL update)",
+                flowNodeInstance.getName(), flowNodeInstance.getId(),
+                flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                dueDate);
+        try {
+            final int updatedRows = getRecorder().recordUpdateWithQuery(
+                    UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
+                    EXPECTED_END_DATE_MODIFIED, QUERY_UPDATE_HUMAN_TASK_EXPECTED_END_DATE);
+            if (updatedRows != 1) {
+                log.error("{} '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                        + "failed to set expected end date to {} — no human task row matched id={} and tenantId={} "
+                        + "(expected 1 updated row but got {}); either the row was deleted or archived "
+                        + "concurrently, or this id does not refer to a human task. "
+                        + "No column was written and the request fails",
+                        flowNodeInstance.getType(), flowNodeInstance.getName(),
+                        flowNodeInstance.getId(),
+                        flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                        dueDate, flowNodeInstance.getId(), flowNodeInstance.getTenantId(), updatedRows);
+                throw new SFlowNodeModificationException(
+                        String.format("Failed to set the expected end date of flow node %d (%s) to %s: "
+                                + "no human task row matched id %d and tenantId %d — either it was deleted or "
+                                + "archived concurrently, or this id does not refer to a human task "
+                                + "(updated rows: %d)",
+                                flowNodeInstance.getId(), flowNodeInstance.getType(), dueDate,
+                                flowNodeInstance.getId(), flowNodeInstance.getTenantId(), updatedRows),
+                        rowCountGuardCause(flowNodeInstance));
+            }
+            // Refresh entity from DB to sync in-memory state with the atomic SQL update.
+            // This prevents Hibernate dirty-checking from overwriting the atomic value: this method is called
+            // from within the state execution (StateBehaviors.updateExpectedDuration), which is immediately
+            // followed by setState() re-dirtying this same entity - the commit flush would then write the
+            // pre-update expectedEndDate back. It also keeps the entity managed for downstream operations.
+            // The refresh is safe even though it discards un-flushed changes of the entity: with FlushMode.AUTO
+            // the bulk UPDATE above has already flushed them (e.g. the display name and description set just
+            // before by StateBehaviors.updateDisplayNameAndDescription), so nothing pending is lost
+            // (HumanTaskFieldPersistenceIT guards this).
+            getPersistenceService().refresh(flowNodeInstance);
+        } catch (final SRecorderException e) {
+            // No stack trace here: the exception is rethrown, and its caller (e.g. the REST layer) logs it.
+            // This line adds the task context that the caller's log does not have.
+            log.error("{} '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                    + "failed to set expected end date to {} — {}",
+                    flowNodeInstance.getType(), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                    dueDate, e.getMessage());
+            throw new SFlowNodeModificationException(e);
+        } catch (final SPersistenceException e) {
+            log.error("{} '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
+                    + "expected end date {} was written, but re-reading the task afterwards failed — {}; "
+                    + "the request fails and the transaction is rolled back, so the new value is NOT persisted",
+                    flowNodeInstance.getType(), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
+                    dueDate, e.getMessage());
+            throw new SFlowNodeModificationException(e);
+        }
     }
 
     protected void updateFlowNode(final SFlowNodeInstance flowNodeInstance, final String eventName,
@@ -580,4 +722,24 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
                 new SelectListDescriptor<>("getFlowNodeInstancesByNameAndParentContainerId", parameters,
                         SFlowNodeInstance.class, QueryOptions.ALL_RESULTS));
     }
+
+    /**
+     * Builds the cause for a row-count guard failure on the atomic human-task updates.
+     * <p>
+     * Marked retryable <em>only</em> for an actual human task: there, matching no row means the row was
+     * archived or deleted after this transaction read it, which is transient — and before BPA-167 the same
+     * situation surfaced as Hibernate's {@code StaleStateException}, which is itself retryable, so a
+     * work-borne caller retried instead of failing the flow node. For any other flow node type the update
+     * can never match, so the failure is permanent and must not be retried: these two methods accept any
+     * {@link SFlowNodeInstance} from the public API, and the retry budget is 10 attempts with a doubling
+     * delay (about 17 minutes) before the flow node is failed anyway.
+     */
+    private Throwable rowCountGuardCause(final SFlowNodeInstance flowNodeInstance) {
+        if (flowNodeInstance instanceof SHumanTaskInstance) {
+            return new SRetryableException(
+                    "the human task row was archived or deleted after this transaction read it");
+        }
+        return null;
+    }
+
 }
