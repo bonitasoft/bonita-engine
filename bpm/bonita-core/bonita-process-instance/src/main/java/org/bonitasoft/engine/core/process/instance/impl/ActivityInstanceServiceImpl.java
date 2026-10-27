@@ -385,7 +385,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         if (flowNodeInstance instanceof SHumanTaskInstance humanTaskInstance) {
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
             descriptor.addField(sUserTaskInstanceBuilder.getIdKey(), userTaskId);
-            descriptor.addField(TENANT_ID_KEY, flowNodeInstance.getTenantId());
             descriptor.addField(sUserTaskInstanceBuilder.getAssigneeIdKey(), userId);
             if (userId > 0) {
                 // if this action is a Assign action:
@@ -428,19 +427,18 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
                         HUMAN_TASK_INSTANCE_ASSIGNEE, QUERY_UPDATE_HUMAN_TASK_ASSIGNEE);
                 if (updatedRows != 1) {
                     log.error("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
-                            + "failed to update {} (assigneeId={}) — no human task row matched id={} and "
-                            + "tenantId={} (expected 1 updated row but got {}); the row was deleted or archived "
+                            + "failed to update {} (assigneeId={}) — no human task row matched id={} "
+                            + "(expected 1 updated row but got {}); the row was deleted or archived "
                             + "concurrently. assigneeId, claimedDate and lastUpdateDate were NOT applied",
                             flowNodeInstance.getName(), flowNodeInstance.getId(),
                             flowNodeInstance.getRootProcessInstanceId(),
                             flowNodeInstance.getProcessDefinitionId(),
-                            action, userId, flowNodeInstance.getId(), flowNodeInstance.getTenantId(),
-                            updatedRows);
+                            action, userId, flowNodeInstance.getId(), updatedRows);
                     throw new SActivityModificationException(
                             String.format("Failed to update %s of human task %d (assigneeId %d): "
-                                    + "no human task row matched id %d and tenantId %d (updated rows: %d)",
+                                    + "no human task row matched id %d (updated rows: %d)",
                                     action, flowNodeInstance.getId(), userId, flowNodeInstance.getId(),
-                                    flowNodeInstance.getTenantId(), updatedRows),
+                                    updatedRows),
                             // Marked retryable unconditionally: inside the instanceof guard above, the only way to
                             // match no row is that it was archived or deleted after this transaction read
                             // it, which is transient. Before BPA-167 the same situation surfaced as
