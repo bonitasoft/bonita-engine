@@ -71,18 +71,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     private static final String SUPERVISED_BY = "SupervisedBy";
 
-    /**
-     * Name of the second half of the composite identifier, as the atomic update queries bind it. The primary key
-     * of {@code flownode_instance} is (tenantid, id) and no index starts with {@code id}, so an update filtering
-     * on {@code id} alone has no access path on MySQL/InnoDB: it scans the whole clustered index and locks every
-     * row of the table until commit (BPA-167).
-     * <p>
-     * 10.2.x only: remove on 10.3.x and later, where {@code flownode_instance} has no {@code tenantid} column and
-     * {@code id} is the whole primary key. Remove the {@code AND tenantId = :tenantId} clauses of the three
-     * BPA-167 update queries in {@code process.instance.queries.hbm.xml} in the same change.
-     */
-    protected static final String TENANT_ID_KEY = "tenantId";
-
     private static final String QUERY_UPDATE_HUMAN_TASK_PRIORITY = "updateHumanTaskPriority";
 
     private static final String QUERY_UPDATE_HUMAN_TASK_EXPECTED_END_DATE = "updateHumanTaskExpectedEndDate";
@@ -235,7 +223,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
-        descriptor.addField(TENANT_ID_KEY, flowNodeInstance.getTenantId());
         descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
         setLastUpdateDate(descriptor);
         log.debug("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
@@ -249,21 +236,21 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
                     ACTIVITYINSTANCE_STATE, QUERY_UPDATE_HUMAN_TASK_PRIORITY);
             if (updatedRows != 1) {
                 log.error("{} '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
-                        + "failed to set priority to {} — no human task row matched id={} and tenantId={} "
+                        + "failed to set priority to {} — no human task row matched id={} "
                         + "(expected 1 updated row but got {}); either the row was deleted or archived "
                         + "concurrently, or this id does not refer to a human task. "
                         + "No column was written and the request fails",
                         flowNodeInstance.getType(), flowNodeInstance.getName(),
                         flowNodeInstance.getId(),
                         flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
-                        priority, flowNodeInstance.getId(), flowNodeInstance.getTenantId(), updatedRows);
+                        priority, flowNodeInstance.getId(), updatedRows);
                 throw new SFlowNodeModificationException(
                         String.format("Failed to set the priority of flow node %d (%s) to %s: "
-                                + "no human task row matched id %d and tenantId %d — either it was deleted or "
+                                + "no human task row matched id %d — either it was deleted or "
                                 + "archived concurrently, or this id does not refer to a human task "
                                 + "(updated rows: %d)",
                                 flowNodeInstance.getId(), flowNodeInstance.getType(), priority,
-                                flowNodeInstance.getId(), flowNodeInstance.getTenantId(), updatedRows),
+                                flowNodeInstance.getId(), updatedRows),
                         rowCountGuardCause(flowNodeInstance));
             }
             // No refresh() here, deliberately: the only caller is
@@ -440,7 +427,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         // StateBehaviors.updateExpectedDuration and SetExpectedEndDate.convertToLong).
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getIdKey(), flowNodeInstance.getId());
-        descriptor.addField(TENANT_ID_KEY, flowNodeInstance.getTenantId());
         descriptor.addField(activityInstanceKeyProvider.getExpectedEndDateKey(), dueDate);
         setLastUpdateDate(descriptor);
         log.debug("Human task '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
@@ -454,21 +440,21 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
                     EXPECTED_END_DATE_MODIFIED, QUERY_UPDATE_HUMAN_TASK_EXPECTED_END_DATE);
             if (updatedRows != 1) {
                 log.error("{} '{}' (id={}, rootProcessInstance={}, processDefinition={}): "
-                        + "failed to set expected end date to {} — no human task row matched id={} and tenantId={} "
+                        + "failed to set expected end date to {} — no human task row matched id={} "
                         + "(expected 1 updated row but got {}); either the row was deleted or archived "
                         + "concurrently, or this id does not refer to a human task. "
                         + "No column was written and the request fails",
                         flowNodeInstance.getType(), flowNodeInstance.getName(),
                         flowNodeInstance.getId(),
                         flowNodeInstance.getRootProcessInstanceId(), flowNodeInstance.getProcessDefinitionId(),
-                        dueDate, flowNodeInstance.getId(), flowNodeInstance.getTenantId(), updatedRows);
+                        dueDate, flowNodeInstance.getId(), updatedRows);
                 throw new SFlowNodeModificationException(
                         String.format("Failed to set the expected end date of flow node %d (%s) to %s: "
-                                + "no human task row matched id %d and tenantId %d — either it was deleted or "
+                                + "no human task row matched id %d — either it was deleted or "
                                 + "archived concurrently, or this id does not refer to a human task "
                                 + "(updated rows: %d)",
                                 flowNodeInstance.getId(), flowNodeInstance.getType(), dueDate,
-                                flowNodeInstance.getId(), flowNodeInstance.getTenantId(), updatedRows),
+                                flowNodeInstance.getId(), updatedRows),
                         rowCountGuardCause(flowNodeInstance));
             }
             // Refresh entity from DB to sync in-memory state with the atomic SQL update.

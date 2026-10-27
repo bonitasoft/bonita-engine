@@ -390,11 +390,10 @@ public class ActivityInstanceServiceImplTest {
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity")
                 .isEqualTo(sFlowNodeInstance);
         // the atomic update must touch ONLY the intended columns: expectedEndDate, lastUpdateDate and the
-        // two halves of the composite identifier used as the WHERE parameters. Fails if anyone reverts to a
-        // whole-row recordUpdate, or drops tenantId and leaves MySQL without an access path (BPA-167).
+        // id used as the WHERE parameter. Fails if anyone reverts to a whole-row recordUpdate (BPA-167).
         assertThat(updateRecordArgumentCaptor.getValue().getFields().keySet())
-                .as("should update only the expectedEndDate and lastUpdateDate fields, plus the id and tenantId parameters")
-                .containsExactlyInAnyOrder("id", "tenantId", "expectedEndDate", "lastUpdateDate");
+                .as("should update only the expectedEndDate and lastUpdateDate fields, plus the id parameter")
+                .containsExactlyInAnyOrder("id", "expectedEndDate", "lastUpdateDate");
         assertThat(updateRecordArgumentCaptor.getValue().getFields().get("expectedEndDate"))
                 .as("expectedEndDate should have the new value")
                 .isEqualTo(123L);
@@ -493,7 +492,6 @@ public class ActivityInstanceServiceImplTest {
     public void should_assignHumanTask_update_lastUpdateDate() throws Exception {
         // Given
         SHumanTaskInstance humanTask = mock(SHumanTaskInstance.class);
-        when(humanTask.getTenantId()).thenReturn(101L);
         when(persistenceService.selectById(any())).thenReturn(humanTask);
         when(recorder.recordUpdateWithQuery(any(UpdateRecord.class), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
                 eq("updateHumanTaskAssignee"))).thenReturn(1);
@@ -506,17 +504,10 @@ public class ActivityInstanceServiceImplTest {
         verify(recorder).recordUpdateWithQuery(captor.capture(), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
                 eq("updateHumanTaskAssignee"));
         // the atomic update must touch ONLY the intended columns: assigneeId, claimedDate, lastUpdateDate
-        // and the two halves of the composite identifier used as the WHERE parameters. Fails if anyone reverts
-        // to a whole-row recordUpdate, or drops tenantId and leaves MySQL without an access path (BPA-167).
+        // and the id used as the WHERE parameter. Fails if anyone reverts to a whole-row recordUpdate (BPA-167).
         assertThat(captor.getValue().getFields().keySet())
-                .as("should update only the assignee fields, plus the id and tenantId parameters")
-                .containsExactlyInAnyOrder("id", "tenantId", "assigneeId", "claimedDate", "lastUpdateDate");
-        // A migrated customer's tenant id is NOT 1: installations that ran multi-tenant before 8.0.0 kept
-        // their original id when their databases were split (e.g. 101). Binding a literal here would break
-        // exactly those customers, so the value is asserted, not just the key.
-        assertThat(captor.getValue().getFields())
-                .as("tenantId must be the value read from the task, never a literal")
-                .containsEntry("tenantId", 101L);
+                .as("should update only the assignee fields, plus the id parameter")
+                .containsExactlyInAnyOrder("id", "assigneeId", "claimedDate", "lastUpdateDate");
         // The bulk HQL update never touches the managed entity, so the in-memory copy is stale. Without
         // this refresh the commit flush writes the stale snapshot back over the whole row -- reverting the
         // assignment on the engine path, and making assignAndExecuteUserTask re-read a stale assignee.
@@ -529,7 +520,6 @@ public class ActivityInstanceServiceImplTest {
         // Given the release branch (userId == 0), whose descriptor must pair with the SAME named query.
         // The descriptor/query pairing is enforced only at runtime, so both branches need an oracle.
         SHumanTaskInstance humanTask = mock(SHumanTaskInstance.class);
-        when(humanTask.getTenantId()).thenReturn(101L);
         when(persistenceService.selectById(any())).thenReturn(humanTask);
         when(recorder.recordUpdateWithQuery(any(UpdateRecord.class), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
                 eq("updateHumanTaskAssignee"))).thenReturn(1);
@@ -543,19 +533,16 @@ public class ActivityInstanceServiceImplTest {
                 eq("updateHumanTaskAssignee"));
         assertThat(captor.getValue().getFields().keySet())
                 .as("the release branch must carry exactly the same key set as the assign branch")
-                .containsExactlyInAnyOrder("id", "tenantId", "assigneeId", "claimedDate", "lastUpdateDate");
+                .containsExactlyInAnyOrder("id", "assigneeId", "claimedDate", "lastUpdateDate");
         assertThat(captor.getValue().getFields())
                 .containsEntry("assigneeId", 0L)
-                .containsEntry("claimedDate", 0L)
-                .containsEntry("tenantId", 101L);
+                .containsEntry("claimedDate", 0L);
         verify(persistenceService).refresh(humanTask);
     }
 
     @Test
-    public void should_assignHumanTaskIfNotAssigned_keep_the_descriptor_free_of_tenantId() throws Exception {
-        // The conditional assign stays on `updateStrictHuman`, which filters on `WHERE id = :id` alone and is
-        // deliberately NOT keyed on tenantId by BPA-167 (pre-existing, out of this fix's scope). The two
-        // sides of that asymmetry must be pinned, because the descriptor key set and the named query's
+    public void should_assignHumanTaskIfNotAssigned_update_only_the_assignee_fields() throws Exception {
+        // The conditional assign stays on `updateStrictHuman`. The descriptor key set and the named query's
         // parameters have to match exactly -- `setParameters` binds every descriptor key, so an extra key with
         // no matching HQL parameter throws at runtime, not at compile time.
         SHumanTaskInstance humanTask = mock(SHumanTaskInstance.class);
@@ -571,7 +558,7 @@ public class ActivityInstanceServiceImplTest {
         verify(recorder).recordUpdateWithQuery(captor.capture(), eq("HUMAN_TASK_INSTANCE_ASSIGNEE"),
                 eq("updateStrictHuman"));
         assertThat(captor.getValue().getFields().keySet())
-                .as("updateStrictHuman declares no :tenantId parameter, so the descriptor must not carry one")
+                .as("should update only the assignee fields, plus the id parameter")
                 .containsExactlyInAnyOrder("id", "assigneeId", "claimedDate", "lastUpdateDate");
     }
 
@@ -659,9 +646,8 @@ public class ActivityInstanceServiceImplTest {
         verify(recorder).recordUpdateWithQuery(captor.capture(),
                 eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
                 eq("updateMultiInstanceActiveCounters"));
-        // Exact, not `contains`: these three counter queries deliberately stay on `WHERE id = :id` without
-        // tenantId (pre-existing, out of the scope of BPA-167). Pinning the key set
-        // exactly is what stops a later "harmonisation" from adding the descriptor key without the matching
+        // Exact, not `contains`: these three counter queries filter on `WHERE id = :id`. Pinning the key set
+        // exactly is what stops a later change from adding a descriptor key without the matching
         // HQL parameter, which compiles, passes a loose assertion, and throws QueryParameterException in
         // production.
         assertThat(captor.getValue().getFields().keySet())
@@ -684,9 +670,8 @@ public class ActivityInstanceServiceImplTest {
         verify(recorder).recordUpdateWithQuery(captor.capture(),
                 eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
                 eq("updateMultiInstanceTerminatedCounters"));
-        // Exact, not `contains`: these three counter queries deliberately stay on `WHERE id = :id` without
-        // tenantId (pre-existing, out of the scope of BPA-167). Pinning the key set
-        // exactly is what stops a later "harmonisation" from adding the descriptor key without the matching
+        // Exact, not `contains`: these three counter queries filter on `WHERE id = :id`. Pinning the key set
+        // exactly is what stops a later change from adding a descriptor key without the matching
         // HQL parameter, which compiles, passes a loose assertion, and throws QueryParameterException in
         // production.
         assertThat(captor.getValue().getFields().keySet())
@@ -709,9 +694,8 @@ public class ActivityInstanceServiceImplTest {
         verify(recorder).recordUpdateWithQuery(captor.capture(),
                 eq(FlowNodeInstanceService.MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED),
                 eq("updateMultiInstanceCompletedCounters"));
-        // Exact, not `contains`: these three counter queries deliberately stay on `WHERE id = :id` without
-        // tenantId (pre-existing, out of the scope of BPA-167). Pinning the key set
-        // exactly is what stops a later "harmonisation" from adding the descriptor key without the matching
+        // Exact, not `contains`: these three counter queries filter on `WHERE id = :id`. Pinning the key set
+        // exactly is what stops a later change from adding a descriptor key without the matching
         // HQL parameter, which compiles, passes a loose assertion, and throws QueryParameterException in
         // production.
         assertThat(captor.getValue().getFields().keySet())
