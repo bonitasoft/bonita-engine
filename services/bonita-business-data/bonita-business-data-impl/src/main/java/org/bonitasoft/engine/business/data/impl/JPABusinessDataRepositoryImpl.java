@@ -82,18 +82,30 @@ public class JPABusinessDataRepositoryImpl
 
     private final DataRetentionBdmTrackingService dataRetentionBdmTrackingService;
 
+    private final boolean dataRetentionEnabled;
+
     public JPABusinessDataRepositoryImpl(
             final UserTransactionService transactionService,
             final BusinessDataModelRepository businessDataModelRepository,
             final Map<String, Object> configuration,
             ClassLoaderService classLoaderService,
-            DataRetentionBdmTrackingService dataRetentionBdmTrackingService) {
+            DataRetentionBdmTrackingService dataRetentionBdmTrackingService,
+            boolean dataRetentionEnabled) {
         this.transactionService = transactionService;
         this.businessDataModelRepository = businessDataModelRepository;
         this.configuration = new HashMap<>(configuration);
         this.configuration.put("hibernate.archive.scanner", DisabledScanner.class.getName());
         classLoaderService.addListener(ClassLoaderIdentifier.TENANT, this);
         this.dataRetentionBdmTrackingService = dataRetentionBdmTrackingService;
+        this.dataRetentionEnabled = dataRetentionEnabled;
+        if (!dataRetentionEnabled) {
+            log.warn("Data retention is disabled ({}=false): BDM changes are not tracked and the retention cleanup "
+                    + "job is not scheduled. If retention is re-enabled later, business data created while disabled "
+                    + "will not be eligible for deletion, and data modified while disabled keeps its previous "
+                    + "last-modification date. See "
+                    + "https://documentation.ofelia.com/bonita/latest/runtime/bdm-data-retention#legacy-data "
+                    + "before re-enabling.", DataRetentionBdmTrackingService.DATA_RETENTION_ENABLED_PROPERTY);
+        }
     }
 
     @Override
@@ -479,6 +491,11 @@ public class JPABusinessDataRepositoryImpl
      * Any orphan tracking record will be cleaned up later by the data retention job.
      */
     private void deleteTrackingRecord(long entityId, String entityClassname) {
+        if (!dataRetentionEnabled) {
+            log.trace("Data retention disabled, skipping tracking deletion for removed BDM entity {}#{}",
+                    entityClassname, entityId);
+            return;
+        }
         log.debug("Deleting data retention tracking record for removed BDM entity {}#{}", entityClassname, entityId);
         try {
             dataRetentionBdmTrackingService.delete(entityId, entityClassname);
@@ -549,6 +566,11 @@ public class JPABusinessDataRepositoryImpl
      * are rolled back together if either fails.
      */
     private void trackCreation(long entityId, String entityClassname) {
+        if (!dataRetentionEnabled) {
+            log.trace("Data retention disabled, skipping tracking creation for new BDM entity {}#{}",
+                    entityClassname, entityId);
+            return;
+        }
         log.debug("Tracking creation of new BDM entity {}#{}", entityClassname, entityId);
         try {
             dataRetentionBdmTrackingService.create(entityId, entityClassname);
@@ -566,6 +588,11 @@ public class JPABusinessDataRepositoryImpl
      * the tracking feature was deployed), a new one is created instead.
      */
     private void trackUpdate(long entityId, String entityClassname) {
+        if (!dataRetentionEnabled) {
+            log.trace("Data retention disabled, skipping tracking update for existing BDM entity {}#{}",
+                    entityClassname, entityId);
+            return;
+        }
         log.debug("Tracking update of existing BDM entity {}#{}", entityClassname, entityId);
         try {
             dataRetentionBdmTrackingService.upsert(entityId, entityClassname);
