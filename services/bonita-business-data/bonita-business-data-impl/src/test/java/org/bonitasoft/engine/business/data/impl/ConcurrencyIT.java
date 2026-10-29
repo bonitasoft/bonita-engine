@@ -83,7 +83,7 @@ public class ConcurrencyIT {
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,
                         configuration.getJpaConfiguration(), classLoaderService,
-                        mock(DataRetentionBdmTrackingService.class)));
+                        mock(DataRetentionBdmTrackingService.class), true));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
 
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();

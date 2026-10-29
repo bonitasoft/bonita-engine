@@ -88,7 +88,7 @@ class JPABusinessDataRepositoryImplTest {
     @BeforeEach
     void setUp() {
         realJPABusinessDataRepository = new JPABusinessDataRepositoryImpl(transactionService,
-                businessDataModelRepository, configuration, classLoaderService, bdmTrackingService);
+                businessDataModelRepository, configuration, classLoaderService, bdmTrackingService, true);
         repository = spy(
                 realJPABusinessDataRepository);
         doReturn(manager).when(repository).getEntityManager();
@@ -533,6 +533,69 @@ class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
+    void persist_should_not_track_when_data_retention_is_disabled() {
+        //given
+        var disabledRepository = repositoryWithDataRetentionDisabled();
+        var newEntity = new EntityPojo();
+        doAnswer(invocation -> {
+            ((EntityPojo) invocation.getArgument(0)).setPersistenceId(42L);
+            return null;
+        }).when(manager).persist(newEntity);
+
+        //when
+        disabledRepository.persist(newEntity);
+        disabledRepository.persist(new EntityPojo(99L));
+
+        //then
+        verify(manager, times(2)).persist(any());
+        verifyNoInteractions(bdmTrackingService);
+    }
+
+    @Test
+    void merge_should_not_track_when_data_retention_is_disabled() {
+        //given
+        var disabledRepository = repositoryWithDataRetentionDisabled();
+        var newEntity = new EntityPojo();
+        var existingEntity = new EntityPojo(10L);
+        when(manager.merge(newEntity)).thenReturn(new EntityPojo(55L));
+        when(manager.merge(existingEntity)).thenReturn(existingEntity);
+
+        //when
+        disabledRepository.merge(newEntity);
+        disabledRepository.merge(existingEntity);
+
+        //then
+        verify(manager, times(2)).merge(any());
+        verifyNoInteractions(bdmTrackingService);
+    }
+
+    @Test
+    void remove_should_not_delete_tracking_record_when_data_retention_is_disabled() throws Exception {
+        //given
+        var disabledRepository = repositoryWithDataRetentionDisabled();
+        var entity = new EntityPojo(42L);
+        var otherEntity = new EntityPojo(43L);
+        doReturn(mock(EntityGraph.class)).when(manager).createEntityGraph(EntityPojo.class);
+        when(manager.find(eq(EntityPojo.class), eq(43L), anyMap())).thenReturn(otherEntity);
+
+        //when
+        disabledRepository.remove(entity);
+        disabledRepository.removeById(EntityPojo.class, 43L);
+
+        //then
+        verify(manager).remove(entity);
+        verify(manager).remove(otherEntity);
+        verifyNoInteractions(bdmTrackingService);
+    }
+
+    private JPABusinessDataRepositoryImpl repositoryWithDataRetentionDisabled() {
+        var disabledRepository = spy(new JPABusinessDataRepositoryImpl(transactionService,
+                businessDataModelRepository, configuration, classLoaderService, bdmTrackingService, false));
+        doReturn(manager).when(disabledRepository).getEntityManager();
+        return disabledRepository;
+    }
+
+    @Test
     void checkParameterValue_should_transform_query_parameter_values_from_string_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new String[] { "v1", "v2" });
@@ -589,7 +652,7 @@ class JPABusinessDataRepositoryImplTest {
             throws Exception {
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingService));
+                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingService, true));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         // Inject the stale EM into the private ThreadLocal
@@ -681,7 +744,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingService));
+                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingService, true));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         // Inject the active EM
@@ -714,7 +777,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingService));
+                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingService, true));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         doThrow(new STransactionNotFoundException("no active transaction"))
@@ -741,7 +804,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingService));
+                        businessDataModelRepository, configuration, classLoaderService, bdmTrackingService, true));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         //when + then

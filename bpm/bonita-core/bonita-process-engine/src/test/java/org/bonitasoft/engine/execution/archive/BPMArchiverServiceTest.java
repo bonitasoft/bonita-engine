@@ -41,11 +41,10 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessM
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -80,9 +79,20 @@ public class BPMArchiverServiceTest {
     private BPMFailureService failureService;
     @Mock
     private DataRetentionBdmTrackingService dataRetentionBdmTrackingService;
-    @Spy
-    @InjectMocks
+
     private BPMArchiverService bpmArchiverService;
+
+    @Before
+    public void setUp() {
+        bpmArchiverService = createBpmArchiverService(true);
+    }
+
+    private BPMArchiverService createBpmArchiverService(boolean dataRetentionEnabled) {
+        return spy(new BPMArchiverService(archiveService, processInstanceService, documentService, commentService,
+                processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService,
+                contractDataService, dataInstanceService, activityInstanceService, failureService,
+                dataRetentionBdmTrackingService, dataRetentionEnabled));
+    }
 
     @Test
     public void archiveProcessInstance_should_archive_SRefBusinessDataInstances() throws Exception {
@@ -124,6 +134,38 @@ public class BPMArchiverServiceTest {
         // Verify tracking upsert for multi ref (each data ID)
         verify(dataRetentionBdmTrackingService).upsert(300L, "com.company.model.LineItem");
         verify(dataRetentionBdmTrackingService).upsert(301L, "com.company.model.LineItem");
+    }
+
+    @Test
+    public void archiveProcessInstance_should_not_track_SRefBusinessDataInstances_when_data_retention_is_disabled()
+            throws Exception {
+        //given
+        bpmArchiverService = createBpmArchiverService(false);
+        final SProcessSimpleRefBusinessDataInstance simpleRef = new SProcessSimpleRefBusinessDataInstance();
+        simpleRef.setId(1L);
+        simpleRef.setDataId(100L);
+        simpleRef.setDataClassName("com.company.model.Invoice");
+        final SProcessMultiRefBusinessDataInstance multiRef = new SProcessMultiRefBusinessDataInstance();
+        multiRef.setId(2L);
+        multiRef.setDataIds(Arrays.asList(300L, 301L));
+        multiRef.setDataClassName("com.company.model.LineItem");
+        SProcessInstance processInstance = new SProcessInstance();
+        processInstance.setId(451L);
+
+        doReturn(mock(SAProcessInstance.class)).when(bpmArchiverService).buildArchiveProcessInstance(processInstance);
+        doNothing().when(bpmArchiverService).archiveConnectorInstancesIfAny(eq(processInstance),
+                nullable(SProcessDefinition.class),
+                anyLong());
+        doReturn(Arrays.asList(simpleRef, multiRef)).when(refBusinessDataService)
+                .getRefBusinessDataInstances(eq(processInstance.getId()), eq(0), anyInt());
+
+        //when
+        bpmArchiverService.archiveAndDeleteProcessInstance(processInstance);
+
+        //then
+        verify(refBusinessDataService).archiveRefBusinessDataInstance(simpleRef);
+        verify(refBusinessDataService).archiveRefBusinessDataInstance(multiRef);
+        verifyNoInteractions(dataRetentionBdmTrackingService);
     }
 
     @Test

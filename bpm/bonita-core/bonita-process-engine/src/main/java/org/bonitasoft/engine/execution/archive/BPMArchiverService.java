@@ -104,6 +104,7 @@ public class BPMArchiverService {
     private final ActivityInstanceService activityInstanceService;
     private final BPMFailureService bpmFailureService;
     private final DataRetentionBdmTrackingService dataRetentionBdmTrackingService;
+    private final boolean dataRetentionEnabled;
 
     private static final int BATCH_SIZE = 100;
 
@@ -119,7 +120,8 @@ public class BPMArchiverService {
             DataInstanceService dataInstanceService,
             ActivityInstanceService activityInstanceService,
             BPMFailureService bpmFailureService,
-            DataRetentionBdmTrackingService dataRetentionBdmTrackingService) {
+            DataRetentionBdmTrackingService dataRetentionBdmTrackingService,
+            boolean dataRetentionEnabled) {
         this.archiveService = archiveService;
         this.processInstanceService = processInstanceService;
         this.documentService = documentService;
@@ -133,6 +135,7 @@ public class BPMArchiverService {
         this.activityInstanceService = activityInstanceService;
         this.bpmFailureService = bpmFailureService;
         this.dataRetentionBdmTrackingService = dataRetentionBdmTrackingService;
+        this.dataRetentionEnabled = dataRetentionEnabled;
     }
 
     public void archiveAndDeleteProcessInstance(final SProcessInstance processInstance) throws SArchivingException {
@@ -222,6 +225,11 @@ public class BPMArchiverService {
      */
     private void upsertTrackingForRefBusinessData(SRefBusinessDataInstance refBusinessDataInstance)
             throws SDataRetentionBdmTrackingException {
+        if (!dataRetentionEnabled) {
+            log.trace("Data retention disabled, skipping tracking upsert for archived business data reference {}",
+                    refBusinessDataInstance.getName());
+            return;
+        }
         String dataClassname = refBusinessDataInstance.getDataClassName();
         if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance simpleRef) {
             Long dataId = simpleRef.getDataId();

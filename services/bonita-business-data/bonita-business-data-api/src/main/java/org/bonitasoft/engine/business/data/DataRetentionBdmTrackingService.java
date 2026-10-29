@@ -28,6 +28,11 @@ package org.bonitasoft.engine.business.data;
 public interface DataRetentionBdmTrackingService {
 
     /**
+     * Platform property enabling BDM data retention (tracking and scheduled cleanup). Defaults to {@code true}.
+     */
+    String DATA_RETENTION_ENABLED_PROPERTY = "bonita.runtime.retention.enabled";
+
+    /**
      * Persists a new tracking record.
      *
      * @param dataId the persistence ID of the tracked BDM object instance
