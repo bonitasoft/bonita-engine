@@ -1904,6 +1904,7 @@
             </map>
         </constructor-arg>
         <constructor-arg name="dataRetentionBdmTrackingService" ref="dataRetentionBdmTrackingService" />
+        <constructor-arg name="dataRetentionEnabled" value="${bonita.runtime.retention.enabled:true}" />
     </bean>
 
 
@@ -2078,6 +2079,7 @@
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
         <constructor-arg name="dataRetentionBdmTrackingService" ref="dataRetentionBdmTrackingService" />
+        <constructor-arg name="dataRetentionEnabled" value="${bonita.runtime.retention.enabled:true}" />
     </bean>
 
 </beans>
