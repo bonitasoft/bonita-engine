@@ -19,18 +19,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerFactory;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
+import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.login.credentials.UserLogger;
 import org.bonitasoft.console.common.server.login.utils.LoginUrl;
 import org.bonitasoft.console.common.server.login.utils.RedirectUrlBuilder;
 import org.bonitasoft.console.common.server.login.utils.RedirectUrlHandler;
-import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,11 +75,8 @@ public class LogoutServlet extends HttpServlet {
             LOGGER.debug("Logging out from Bonita");
         }
         final HttpServletRequestAccessor requestAccessor = new HttpServletRequestAccessor(request);
-        final HttpSession session = requestAccessor.getHttpSession();
-        final APISession apiSession = requestAccessor.getApiSession();
         try {
-            engineLogout(apiSession);
-            SessionUtil.sessionLogout(session);
+            getLoginManager().logout(requestAccessor, getUserLogger(), true);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Logged out from Bonita");
@@ -138,6 +134,13 @@ public class LogoutServlet extends HttpServlet {
         return new RedirectUrlBuilder(new URLProtector().protectRedirectUrl(loginURL)).build().getUrl();
     }
 
+    /**
+     * @deprecated no longer called by {@link #logout(HttpServletRequest, HttpServletResponse)}: the engine logout is
+     *             performed by {@link LoginManager#logout(HttpServletRequestAccessor, UserLogger, boolean)} with the
+     *             {@link UserLogger} returned by {@link #getUserLogger()}, which is the method to override to customize
+     *             it. Kept for compatibility only.
+     */
+    @Deprecated(since = "10.3.12")
     protected void engineLogout(final APISession apiSession) throws LoginFailedException {
         if (apiSession != null) {
             getUserLogger().doLogout(apiSession);
@@ -146,5 +149,11 @@ public class LogoutServlet extends HttpServlet {
 
     protected UserLogger getUserLogger() {
         return new UserLogger();
+    }
+
+    // protected for test stubbing
+    protected LoginManager getLoginManager() {
+        // The login failure tracker is only used to log in
+        return new LoginManager(null);
     }
 }

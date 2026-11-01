@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 
+import org.bonitasoft.console.common.server.login.AuthenticationAuditLogger;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.credentials.Credentials;
 
@@ -64,6 +65,12 @@ public interface AuthenticationManager {
     String INVALIDATE_SESSION = "authentication.session.invalidate";
 
     /**
+     * Key of the user name in the map of credentials returned by
+     * {@link #authenticate(HttpServletRequestAccessor, Credentials)}
+     */
+    String USERNAME_CREDENTIAL = "authentication.username";
+
+    /**
      * Get Login Page URL
      *
      * @param redirectURL
@@ -99,4 +106,28 @@ public interface AuthenticationManager {
      */
     String getLogoutPageURL(final HttpServletRequestAccessor requestAccessor, final String redirectURL)
             throws ServletException;
+
+    /**
+     * Name of the authentication method written in the authentication audit log for the logins performed with the
+     * map of credentials returned by {@link #authenticate(HttpServletRequestAccessor, Credentials)} (SSO). The logins
+     * performed with the username and password of the request are always written as
+     * {@link AuthenticationAuditLogger#METHOD_STANDARD}.
+     *
+     * @return the name of the authentication method
+     */
+    default String getAuthMethod() {
+        return AuthenticationAuditLogger.METHOD_STANDARD;
+    }
+
+    /**
+     * Name of the identity provider written in the authentication audit log for the logins performed with the map of
+     * credentials returned by {@link #authenticate(HttpServletRequestAccessor, Credentials)} (SSO), when the
+     * authentication method can use several identity providers (e.g. OIDC with several providers configured).
+     *
+     * @param requestAccessor the request of the login
+     * @return the name of the identity provider, or null when there is none to report
+     */
+    default String getAuthProvider(final HttpServletRequestAccessor requestAccessor) {
+        return null;
+    }
 }
