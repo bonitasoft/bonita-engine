@@ -39,6 +39,16 @@ public class SessionUtil {
      */
     public static final String USERNAME_SESSION_PARAM = "username";
 
+    /**
+     * the session param for the authentication method of an audited login, so that its logout is audited too
+     */
+    public static final String AUDITED_LOGIN_METHOD_SESSION_PARAM = "auditedLoginMethod";
+
+    /**
+     * the session param for the identity provider of an audited login, so that its logout is audited with it
+     */
+    public static final String AUDITED_LOGIN_PROVIDER_SESSION_PARAM = "auditedLoginProvider";
+
     public static void sessionLogin(final User user, final APISession apiSession, final HttpSession session) {
         session.setAttribute(USERNAME_SESSION_PARAM, user.getUsername());
         session.setAttribute(USER_SESSION_PARAM_KEY, user);
@@ -53,6 +63,8 @@ public class SessionUtil {
         session.removeAttribute(API_SESSION_PARAM_KEY);
         session.removeAttribute(USERNAME_SESSION_PARAM);
         session.removeAttribute(USER_SESSION_PARAM_KEY);
+        session.removeAttribute(AUDITED_LOGIN_METHOD_SESSION_PARAM);
+        session.removeAttribute(AUDITED_LOGIN_PROVIDER_SESSION_PARAM);
         if (invalidateHTTPSession) {
             session.invalidate();
         }

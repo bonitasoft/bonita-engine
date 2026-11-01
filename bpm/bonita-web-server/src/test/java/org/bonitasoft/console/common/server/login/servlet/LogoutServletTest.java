@@ -14,17 +14,27 @@
 package org.bonitasoft.console.common.server.login.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import java.net.URISyntaxException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
+import org.bonitasoft.console.common.server.login.LoginFailedException;
+import org.bonitasoft.console.common.server.login.LoginManager;
+import org.bonitasoft.console.common.server.login.credentials.UserLogger;
+import org.bonitasoft.engine.session.APISession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +53,18 @@ public class LogoutServletTest {
 
     @Mock
     AuthenticationManager authenticationManager;
+
+    @Mock
+    HttpServletResponse response;
+
+    @Mock
+    UserLogger userLogger;
+
+    @Mock
+    LoginManager loginManager;
+
+    @Mock
+    APISession apiSession;
 
     @Spy
     LogoutServlet logoutServlet = new LogoutServlet();
@@ -130,6 +152,35 @@ public class LogoutServletTest {
         String redirectURL = logoutServlet.createRedirectUrl(requestAccessor);
 
         assertThat(redirectURL).isEqualTo("redirectURL");
+    }
+
+    @Test
+    public void logout_should_log_out_through_the_login_manager_with_the_servlet_user_logger() throws Exception {
+        doReturn(loginManager).when(logoutServlet).getLoginManager();
+        doReturn(userLogger).when(logoutServlet).getUserLogger();
+
+        logoutServlet.logout(request, response);
+
+        verify(loginManager).logout(any(HttpServletRequestAccessor.class), eq(userLogger), eq(true));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void engineLogout_should_still_log_out_from_the_engine_when_called() throws Exception {
+        doReturn(userLogger).when(logoutServlet).getUserLogger();
+
+        logoutServlet.engineLogout(apiSession);
+
+        verify(userLogger).doLogout(apiSession);
+    }
+
+    @Test
+    public void logout_should_throw_a_servlet_exception_when_the_logout_fails() throws Exception {
+        doReturn(loginManager).when(logoutServlet).getLoginManager();
+        doThrow(LoginFailedException.class).when(loginManager).logout(any(HttpServletRequestAccessor.class),
+                any(UserLogger.class), eq(true));
+
+        assertThatThrownBy(() -> logoutServlet.logout(request, response)).isInstanceOf(ServletException.class);
     }
 
 }
