@@ -22,10 +22,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
+import org.bonitasoft.console.common.server.login.AuthenticationAuditLogger;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.web.server.login.AuthenticationAuditLoggerAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,8 +86,10 @@ public class PlatformLogoutServlet extends HttpServlet {
                 .getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
         if (platformSession != null) {
             try {
-                final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+                final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
                 platformLoginAPI.logout(platformSession);
+                getAuthenticationAuditLogger(request).loggedOut(request, platformSession.getUserName(),
+                        AuthenticationAuditLogger.METHOD_PLATFORM, platformSession.getId());
             } catch (final BonitaException e) {
                 if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("Error while performing the logout", e);
@@ -96,5 +103,14 @@ public class PlatformLogoutServlet extends HttpServlet {
         if (Boolean.parseBoolean(redirectStr)) {
             response.sendRedirect(PLATFORM_LOGIN_PAGE);
         }
+    }
+
+    PlatformLoginAPI getPlatformLoginAPI()
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return PlatformAPIAccessor.getPlatformLoginAPI();
+    }
+
+    AuthenticationAuditLogger getAuthenticationAuditLogger(final HttpServletRequest request) {
+        return AuthenticationAuditLoggerAccessor.getAuthenticationAuditLogger(request.getServletContext());
     }
 }
