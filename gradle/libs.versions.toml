@@ -89,7 +89,7 @@ jbossLoggingVersion = "3.6.3.Final"
 jsonassertVersion = "1.5.3"
 commonsExecVersion = "1.6.0"
 jmockitVersion = "1.50"
-mockServerJunitVersion = "9.1.0"
+mockServerJunitVersion = "9.2.0"
 
 
 [libraries]
