@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2026 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,29 +15,31 @@ package org.bonitasoft.platform.configuration.util;
 
 import java.util.List;
 
-import org.bonitasoft.platform.configuration.impl.BonitaAllConfigurationContentTypeCleaner;
 import org.bonitasoft.platform.configuration.impl.BonitaAllConfigurationPreparedStatementSetter;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
+import org.bonitasoft.platform.configuration.type.ConfigurationType;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 /**
- * @author Laurent Leseigneur
+ * Replaces all the configuration except licenses in a single transaction, so that a concurrent reader never sees an
+ * empty configuration. Licenses are replaced separately.
  */
-public class CleanAndStoreAllConfigurationInTransaction extends TransactionCallbackWithoutResult {
+public class ReplaceConfigurationInTransaction extends TransactionCallbackWithoutResult {
+
+    public static final String DELETE_ALL_NON_LICENSE_CONFIGURATION = "DELETE FROM configuration WHERE content_type <> ?";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReplaceConfigurationInTransaction.class);
 
     private final JdbcTemplate jdbcTemplate;
-    private final List<FullBonitaConfiguration> bonitaConfigurations;
     private final String dbVendor;
+    private final List<FullBonitaConfiguration> bonitaConfigurations;
 
-    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
-
-    public CleanAndStoreAllConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor,
+    public ReplaceConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor,
             List<FullBonitaConfiguration> bonitaConfigurations) {
-
         this.jdbcTemplate = jdbcTemplate;
         this.dbVendor = dbVendor;
         this.bonitaConfigurations = bonitaConfigurations;
@@ -45,15 +47,10 @@ public class CleanAndStoreAllConfigurationInTransaction extends TransactionCallb
 
     @Override
     protected void doInTransactionWithoutResult(TransactionStatus status) {
-        LOGGER.debug(
-                "delete existing configurations " + bonitaConfigurations.toString());
-
-        jdbcTemplate.batchUpdate(BonitaAllConfigurationContentTypeCleaner.DELETE_CONFIGURATION,
-                new BonitaAllConfigurationContentTypeCleaner(bonitaConfigurations));
-
+        LOGGER.debug("Atomically replacing all non-license configuration with {} entries (single transaction)",
+                bonitaConfigurations.size());
+        jdbcTemplate.update(DELETE_ALL_NON_LICENSE_CONFIGURATION, ConfigurationType.LICENSES.name());
         jdbcTemplate.batchUpdate(BonitaAllConfigurationPreparedStatementSetter.INSERT_CONFIGURATION,
                 new BonitaAllConfigurationPreparedStatementSetter(bonitaConfigurations, dbVendor));
-
     }
-
 }
