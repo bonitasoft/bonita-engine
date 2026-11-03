@@ -20,6 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,6 @@ import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
 import org.bonitasoft.platform.configuration.util.AllConfigurationResourceVisitor;
 import org.bonitasoft.platform.configuration.util.AutoUpdateConfigurationVisitor;
-import org.bonitasoft.platform.configuration.util.CleanAndStoreAllConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.CleanAndStoreConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.ConfigurationResourceVisitor;
 import org.bonitasoft.platform.configuration.util.DeleteAllConfigurationInTransaction;
@@ -40,6 +41,7 @@ import org.bonitasoft.platform.configuration.util.GetConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.GetConfigurationsInTransaction;
 import org.bonitasoft.platform.configuration.util.GetMandatoryStructureConfiguration;
 import org.bonitasoft.platform.configuration.util.LicensesResourceVisitor;
+import org.bonitasoft.platform.configuration.util.ReplaceConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.StoreConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.StoreConfigurationsIfNotExist;
 import org.bonitasoft.platform.configuration.util.UpdateConfigurationInTransaction;
@@ -47,8 +49,16 @@ import org.bonitasoft.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.NestedExceptionUtils;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.dao.QueryTimeoutException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.transaction.TransactionTimedOutException;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -56,6 +66,9 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @Service
 public class ConfigurationServiceImpl implements ConfigurationService {
+
+    /** Standard SQL state of a statement cancelled by its query timeout (PostgreSQL, H2). */
+    private static final String QUERY_CANCELED_SQL_STATE = "57014";
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
@@ -98,12 +111,67 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         AllConfigurationResourceVisitor allConfigurationResourceVisitor = new AllConfigurationResourceVisitor(
                 fullBonitaConfigurations);
         try {
+            // read the files outside the transaction, so that it holds its locks only for the database work
             Files.walkFileTree(configurationRootFolder, allConfigurationResourceVisitor);
-            transactionTemplate.execute(
-                    new CleanAndStoreAllConfigurationInTransaction(jdbcTemplate, dbVendor, fullBonitaConfigurations));
         } catch (IOException e) {
             throw new PlatformException(e);
         }
+        if (fullBonitaConfigurations.isEmpty()) {
+            LOGGER.warn("Pushing 0 configuration files from {}: this replaces the platform configuration in the "
+                    + "database with an empty set (licenses are preserved).", configurationRootFolder);
+        }
+        // delete and insert in one transaction, so a concurrent reader never sees an empty configuration
+        executeConfigurationWrite(
+                new ReplaceConfigurationInTransaction(jdbcTemplate, dbVendor, fullBonitaConfigurations),
+                "store the platform configuration");
+    }
+
+    /**
+     * Runs a destructive configuration write and turns any database failure into a {@link PlatformException} whose
+     * message names the cause, as the setup tool only logs the message.
+     */
+    private void executeConfigurationWrite(TransactionCallbackWithoutResult callback, String operation)
+            throws PlatformException {
+        try {
+            transactionTemplate.execute(callback);
+        } catch (DataAccessException | TransactionException e) {
+            Throwable failure = originalFailure(e);
+            Throwable cause = NestedExceptionUtils.getMostSpecificCause(failure);
+            if (isLockOrTimeoutFailure(failure)) {
+                throw new PlatformException("Unable to " + operation + ": the database did not complete the write in "
+                        + "time (lock wait or transaction timeout). If another 'setup' process or Bonita node is "
+                        + "writing the configuration, retry once it has finished; otherwise increase '"
+                        + TRANSACTION_TIMEOUT_PROPERTY + "'. This step was rolled back. Cause: " + cause, e);
+            }
+            throw new PlatformException("Unable to " + operation + ": " + cause + ". This step was rolled back.", e);
+        }
+    }
+
+    /** When the rollback fails too, Spring throws the rollback failure and keeps the original one aside. */
+    private static Throwable originalFailure(RuntimeException e) {
+        if (e instanceof TransactionSystemException transactionSystemException
+                && transactionSystemException.getApplicationException() != null) {
+            return transactionSystemException.getApplicationException();
+        }
+        return e;
+    }
+
+    /**
+     * Spring does not translate a statement cancelled by its timeout the same way on every database (e.g. PostgreSQL
+     * gives a {@code DataAccessResourceFailureException}), so the underlying {@link SQLException} is checked too.
+     */
+    static boolean isLockOrTimeoutFailure(Throwable failure) {
+        for (Throwable cause = failure; cause != null; cause = cause.getCause()) {
+            if (cause instanceof PessimisticLockingFailureException || cause instanceof QueryTimeoutException
+                    || cause instanceof TransactionTimedOutException || cause instanceof SQLTimeoutException) {
+                return true;
+            }
+            if (cause instanceof SQLException sqlException
+                    && QUERY_CANCELED_SQL_STATE.equals(sqlException.getSQLState())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -189,9 +257,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 new StoreConfigurationInTransaction(jdbcTemplate, dbVendor, bonitaConfigurations, type));
     }
 
-    private void cleanAndStoreLicenseConfiguration(List<BonitaConfiguration> bonitaConfigurations) {
-        transactionTemplate.execute(new CleanAndStoreConfigurationInTransaction(jdbcTemplate, dbVendor,
-                bonitaConfigurations, ConfigurationType.LICENSES));
+    private void cleanAndStoreLicenseConfiguration(List<BonitaConfiguration> bonitaConfigurations)
+            throws PlatformException {
+        executeConfigurationWrite(new CleanAndStoreConfigurationInTransaction(jdbcTemplate, dbVendor,
+                bonitaConfigurations, ConfigurationType.LICENSES),
+                "store the platform licenses");
     }
 
     @Override
