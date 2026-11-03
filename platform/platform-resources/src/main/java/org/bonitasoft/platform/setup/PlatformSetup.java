@@ -207,7 +207,7 @@ public class PlatformSetup {
         pull(backupConfigurationFolder, backupLicensesFolder);
         LOGGER.info("Backup directory created: {}", backupConfigurationFolder);
         var hasLicenses = !getConfigurationService().getLicenses().isEmpty();
-        clean();
+        // no separate clean(): the configuration is replaced in one transaction, so a concurrent pull never sees it empty
         pushFromFolder(currentConfigurationFolder);
         pushLicenses(hasLicenses);
         LOGGER.info(
@@ -268,12 +268,18 @@ public class PlatformSetup {
             List<File> files = configurationService.writeAllConfigurationToFolder(configurationFolder.toFile(),
                     licensesFolder.toFile());
             LOGGER.info("Retrieved following files in {}", configurationFolder);
+            int configurationFileCount = 0;
             for (File file : files) {
                 if (file.toPath().getParent().equals(licensesFolder)) {
                     licenses.add(file);
                 } else {
+                    configurationFileCount++;
                     LOGGER.info(configurationFolder.relativize(file.toPath()).toString());
                 }
+            }
+            if (configurationFileCount == 0) {
+                LOGGER.warn("Pulled 0 configuration files from the database into {}: the platform configuration in "
+                        + "the database is empty.", configurationFolder);
             }
             if (!licenses.isEmpty()) {
                 LOGGER.info("Retrieved following licenses in {}", licensesFolder);
