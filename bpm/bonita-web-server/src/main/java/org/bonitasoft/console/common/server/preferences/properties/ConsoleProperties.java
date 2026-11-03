@@ -52,9 +52,9 @@ public class ConsoleProperties {
     private static final int DEFAULT_PAGE_LAST_UPDATE_CHECK_INTERVAL_MILLIS = 3000;
 
     /**
-     * Whitelist of file extensions accepted by generic file upload widgets/forms
+     * Whitelist of file extensions accepted by generic file upload widgets/forms ("*" accepts any extension)
      */
-    private static final String ALLOWED_ATTACHMENT_EXTENSIONS = "form.attachment.allowed.extensions";
+    public static final String ALLOWED_ATTACHMENT_EXTENSIONS = "form.attachment.allowed.extensions";
 
     // ponytail: functional whitelist scoped to common business document/image formats; extend via
     // form.attachment.allowed.extensions if the business needs others.
