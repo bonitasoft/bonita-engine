@@ -41,10 +41,10 @@ public class DocumentUtil {
      */
     public static final List<String> DEFAULT_ALLOWED_EXTENSIONS = List.of(
             "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "json", "jpg", "jpeg", "png", "gif",
-            "bmp");
+            "bmp", "xml");
 
     // ponytail: only extensions with a reliable magic number get a binary signature check below;
-    // text-based formats (txt, csv, json) have none, so besides the declared Content-Type they also
+    // text-based formats (txt, csv, json, xml) have none, so besides the declared Content-Type they also
     // accept application/octet-stream -- the generic fallback many OSes/browsers send when they don't
     // recognize the extension -- to avoid rejecting legitimate uploads on an already-weak check (content
     // of these formats can't be verified anyway: any byte sequence is "valid" text).
@@ -59,6 +59,7 @@ public class DocumentUtil {
             Map.entry("csv",
                     List.of("text/csv", "application/vnd.ms-excel", "text/plain", "application/octet-stream")),
             Map.entry("json", List.of("application/json", "text/plain", "application/octet-stream")),
+            Map.entry("xml", List.of("application/xml", "text/xml", "text/plain", "application/octet-stream")),
             Map.entry("doc", List.of("application/msword")),
             Map.entry("docx", List.of("application/vnd.openxmlformats-officedocument.wordprocessingml.document")),
             Map.entry("xls", List.of("application/vnd.ms-excel")),

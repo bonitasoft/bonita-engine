@@ -194,5 +194,24 @@ public class DocumentUtilTest {
                 new ByteArrayInputStream("a,b,c".getBytes()))).isTrue();
         assertThat(DocumentUtil.isContentConsistentWithExtension("data.json", "application/octet-stream",
                 new ByteArrayInputStream("{}".getBytes()))).isTrue();
+        assertThat(DocumentUtil.isContentConsistentWithExtension("data.xml", "application/octet-stream",
+                new ByteArrayInputStream("<a/>".getBytes()))).isTrue();
+    }
+
+    @Test
+    public void isContentConsistentWithExtension_should_accept_xml_declared_with_xml_content_types()
+            throws Exception {
+        //when-then
+        assertThat(DocumentUtil.isContentConsistentWithExtension("data.xml", "application/xml",
+                new ByteArrayInputStream("<a/>".getBytes()))).isTrue();
+        assertThat(DocumentUtil.isContentConsistentWithExtension("data.xml", "text/xml; charset=UTF-8",
+                new ByteArrayInputStream("<a/>".getBytes()))).isTrue();
+    }
+
+    @Test
+    public void isContentConsistentWithExtension_should_reject_xml_declared_as_html() throws Exception {
+        //when-then
+        assertThat(DocumentUtil.isContentConsistentWithExtension("data.xml", "text/html",
+                new ByteArrayInputStream("<html><body>evil</body></html>".getBytes()))).isFalse();
     }
 }
