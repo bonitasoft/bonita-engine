@@ -16,9 +16,10 @@ package org.bonitasoft.console.common.server.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Servlet allowing to view process instances attachments as images
+ * Servlet allowing to view process instances attachments as images.
+ * Only raster images and PDF are displayed inline, any other file is downloaded as an attachment.
  * TODO refactor to remove duplicate code with {@link DocumentDownloadServlet}
  *
  * @author Anthony Birembaut
@@ -48,6 +50,23 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
      * UID
      */
     private static final long serialVersionUID = -2397573068771431608L;
+
+    /**
+     * Content types displayed inline, by lower-case file extension. Explicit list rather than
+     * {@code URLConnection.guessContentTypeFromName}, whose answers differ between JDKs.
+     */
+    private static final Map<String, String> INLINE_CONTENT_TYPES = Map.ofEntries(
+            Map.entry("png", "image/png"),
+            Map.entry("jpg", "image/jpeg"),
+            Map.entry("jpeg", "image/jpeg"),
+            Map.entry("gif", "image/gif"),
+            Map.entry("bmp", "image/bmp"),
+            Map.entry("webp", "image/webp"),
+            Map.entry("avif", "image/avif"),
+            Map.entry("tif", "image/tiff"),
+            Map.entry("tiff", "image/tiff"),
+            Map.entry("ico", "image/x-icon"),
+            Map.entry("pdf", "application/pdf"));
 
     /**
      * Logger
@@ -151,21 +170,20 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
             }
             throw new ServletException(errorMessage);
         }
-        final String contentType = URLConnection.guessContentTypeFromName(fileName);
-        if (contentType != null) {
-            response.setContentType(contentType);
-        }
+        final String inlineContentType = getInlineContentType(fileName);
+        response.setContentType(inlineContentType != null ? inlineContentType : "application/octet-stream");
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         if (fileName != null) {
             try {
+                final String disposition = inlineContentType != null ? "inline" : "attachment";
                 final String encodedfileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+",
                         "%20");
                 final String userAgent = request.getHeader("User-Agent");
                 if (userAgent != null && userAgent.contains("Firefox")) {
-                    response.setHeader("Content-Disposition", "inline; filename*=UTF-8''" + encodedfileName);
+                    response.setHeader("Content-Disposition", disposition + "; filename*=UTF-8''" + encodedfileName);
                 } else {
                     response.setHeader("Content-Disposition",
-                            "inline; filename=\"" + encodedfileName + "\"; filename*=UTF-8''"
+                            disposition + "; filename=\"" + encodedfileName + "\"; filename*=UTF-8''"
                                     + encodedfileName);
                 }
                 if (content != null) {
@@ -180,5 +198,18 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
                 throw new ServletException(e.getMessage(), e);
             }
         }
+    }
+
+    /**
+     * @return the content type to display the file inline, or null when it must be downloaded as an attachment.
+     *         The file name may come from the request or from a submitted contract, so only formats a browser
+     *         cannot execute are displayed inline (see CVE-68): never HTML, SVG or XML.
+     */
+    private static String getInlineContentType(final String fileName) {
+        final int extensionDot = fileName == null ? -1 : fileName.lastIndexOf('.');
+        if (extensionDot < 0) {
+            return null;
+        }
+        return INLINE_CONTENT_TYPES.get(fileName.substring(extensionDot + 1).toLowerCase(Locale.ROOT));
     }
 }

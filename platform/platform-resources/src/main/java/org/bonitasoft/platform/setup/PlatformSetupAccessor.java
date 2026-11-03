@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.platform.setup;
 
+import java.time.temporal.ChronoUnit;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -22,6 +24,9 @@ import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.version.VersionService;
 import org.bonitasoft.platform.version.impl.VersionServiceImpl;
+import org.springframework.boot.convert.DurationStyle;
+import org.springframework.core.env.PropertyResolver;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -68,14 +73,60 @@ public class PlatformSetupAccessor {
      * @return a NEW instance of Platform Setup
      */
     public PlatformSetup createNewPlatformSetup(DataSource dataSource, String dbVendor, String bdmDbVendor) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
-        TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
+        int timeout = timeoutSeconds(new StandardEnvironment());
+        JdbcTemplate jdbcTemplate = createJdbcTemplate(dataSource, timeout);
         VersionService versionService = new VersionServiceImpl(jdbcTemplate);
         return createPlatformSetup(
                 createScriptExecutor(dataSource, dbVendor, versionService),
-                new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, dbVendor),
+                new ConfigurationServiceImpl(jdbcTemplate, createTransactionTemplate(dataSource, timeout), dbVendor),
                 versionService, dataSource, dbVendor, bdmDbVendor);
+    }
+
+    /**
+     * Transaction timeout (seconds): Java system property first, then environment variable (e.g.
+     * BONITA_PLATFORM_SETUP_TRANSACTION_TIMEOUT). Read before the platform configuration is loaded, so it cannot be
+     * set in the platform configuration files.
+     */
+    static int timeoutSeconds(PropertyResolver environment) {
+        return timeoutSeconds(environment.getProperty(ConfigurationService.TRANSACTION_TIMEOUT_PROPERTY));
+    }
+
+    /**
+     * @param value a duration, in seconds if no unit is given
+     */
+    static int timeoutSeconds(String value) {
+        if (value == null || value.isBlank()) {
+            return ConfigurationService.DEFAULT_TRANSACTION_TIMEOUT_SECONDS;
+        }
+        long seconds;
+        try {
+            seconds = DurationStyle.detectAndParse(value.trim(), ChronoUnit.SECONDS).getSeconds();
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(invalidTimeoutMessage(value), e);
+        }
+        // 0 would mean "already expired" for transactions but "no timeout" for statements
+        if (seconds < 1 || seconds > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(invalidTimeoutMessage(value));
+        }
+        return (int) seconds;
+    }
+
+    private static String invalidTimeoutMessage(String value) {
+        return "Invalid value '" + value + "' for property '" + ConfigurationService.TRANSACTION_TIMEOUT_PROPERTY
+                + "': expected a duration of at least 1 second, e.g. '60s' or '60'";
+    }
+
+    static JdbcTemplate createJdbcTemplate(DataSource dataSource, int timeout) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        // bounds statements run outside a transaction; inside one, the remaining transaction time applies
+        jdbcTemplate.setQueryTimeout(timeout);
+        return jdbcTemplate;
+    }
+
+    static TransactionTemplate createTransactionTemplate(DataSource dataSource, int timeout) {
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
+        transactionManager.setDefaultTimeout(timeout);
+        return new TransactionTemplate(transactionManager);
     }
 
     protected PlatformSetup createPlatformSetup(ScriptExecutor scriptExecutor,
@@ -99,10 +150,8 @@ public class PlatformSetupAccessor {
 
     public static ConfigurationService getConfigurationService() throws NamingException {
         final DataSource dataSource = lookupDataSource();
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
-        TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-        return new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate,
-                PlatformSetup.getPropertyBonitaDbVendor());
+        int timeout = timeoutSeconds(new StandardEnvironment());
+        return new ConfigurationServiceImpl(createJdbcTemplate(dataSource, timeout),
+                createTransactionTemplate(dataSource, timeout), PlatformSetup.getPropertyBonitaDbVendor());
     }
 }
