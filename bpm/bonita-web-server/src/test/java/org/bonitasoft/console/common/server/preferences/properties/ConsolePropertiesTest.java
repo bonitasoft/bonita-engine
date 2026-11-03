@@ -76,7 +76,7 @@ public class ConsolePropertiesTest {
 
         assertThat(properties.getAllowedAttachmentExtensions())
                 .containsExactly("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "json", "jpg",
-                        "jpeg", "png", "gif", "bmp");
+                        "jpeg", "png", "gif", "bmp", "xml");
     }
 
 }
