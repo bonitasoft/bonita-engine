@@ -32,6 +32,17 @@ import org.bonitasoft.platform.exception.PlatformException;
 public interface ConfigurationService {
 
     /**
+     * Maximum duration of each transaction on the platform configuration, also applied to queries run outside a
+     * transaction.
+     */
+    String TRANSACTION_TIMEOUT_PROPERTY = "bonita.platform.setup.transaction-timeout";
+
+    /**
+     * Value of {@link #TRANSACTION_TIMEOUT_PROPERTY} when it is not set.
+     */
+    int DEFAULT_TRANSACTION_TIMEOUT_SECONDS = 60;
+
+    /**
      * Retrieves the portal configuration at platform-level.
      *
      * @return a list of BonitaConfiguration that represents each file
@@ -111,7 +122,8 @@ public interface ConfigurationService {
     void storePlatformConfiguration(File configurationRootFolder) throws PlatformException;
 
     /**
-     * store whole configuration files for engine and portal, excluding licenses files
+     * replace the whole configuration for engine and portal with the files of the given folder, in a single
+     * transaction: configuration absent from the folder is deleted. Licenses are not modified.
      *
      * @param configurationRootFolder path to root folder
      */

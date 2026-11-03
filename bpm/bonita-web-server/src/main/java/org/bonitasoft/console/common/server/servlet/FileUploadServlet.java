@@ -22,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -40,6 +41,7 @@ import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
+import org.bonitasoft.console.common.server.preferences.properties.ConsoleProperties;
 import org.bonitasoft.console.common.server.utils.DocumentUtil;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.TemporaryContentAPI;
@@ -69,6 +71,16 @@ public abstract class FileUploadServlet extends HttpServlet {
     protected static final String SUPPORTED_EXTENSIONS_PARAM = "SupportedExtensions";
 
     protected static final String SUPPORTED_EXTENSIONS_SEPARATOR = ",";
+
+    /**
+     * Allowed extension meaning that any extension is allowed, files without an extension included. The content of
+     * the extensions {@link DocumentUtil} knows is still checked.
+     */
+    protected static final String ANY_EXTENSION = "*";
+
+    protected static final String EXTENSION_NOT_SUPPORTED_MESSAGE = "Extension not supported.";
+
+    protected static final String CONTENT_MISMATCH_MESSAGE = "File content does not match its extension.";
 
     protected static final String RETURN_ORIGINAL_FILENAME_PARAM = "ReturnOriginalFilename";
 
@@ -199,7 +211,8 @@ public abstract class FileUploadServlet extends HttpServlet {
 
                 // Check if extension is allowed
                 if (!isSupportedExtension(fileName)) {
-                    outputMediaTypeError(response, responsePW);
+                    logRejectedExtension(request, fileName);
+                    outputMediaTypeError(response, responsePW, EXTENSION_NOT_SUPPORTED_MESSAGE);
                     return;
                 }
 
@@ -207,7 +220,10 @@ public abstract class FileUploadServlet extends HttpServlet {
                 try (InputStream itemContent = item.getInputStream()) {
                     if (!DocumentUtil.isContentConsistentWithExtension(fileName, item.getContentType(),
                             itemContent)) {
-                        outputMediaTypeError(response, responsePW);
+                        LOGGER.warn("Upload of file '{}' to {} rejected: its content or its declared Content-Type "
+                                + "'{}' does not match its extension.", forLog(fileName), request.getRequestURI(),
+                                forLog(item.getContentType()));
+                        outputMediaTypeError(response, responsePW, CONTENT_MISMATCH_MESSAGE);
                         return;
                     }
                 }
@@ -215,17 +231,13 @@ public abstract class FileUploadServlet extends HttpServlet {
                 // Make unique file name
                 final String uploadedFileKey = storeTempFile(fileName, item);
 
-                //Clean multiread wrapper temp file if it exists
-                if (request instanceof MultiReadHttpServletRequest) {
-                    ((MultiReadHttpServletRequest) request).cleanMultipartTempContent();
-                }
-
                 // Response
                 final String responseString;
                 if (JSON_CONTENT_TYPE.equals(responseContentType)) {
                     // just check whether it's a jarless bar to display a warning
                     boolean isJarlessBar = isJarLessBar(fileName, item);
-                    responseString = generateResponseJson(request, fileName, item.getContentType(), uploadedFileKey,
+                    responseString = generateResponseJson(request, fileName,
+                            DocumentUtil.resolveContentType(fileName, item.getContentType()), uploadedFileKey,
                             isJarlessBar);
                 } else if (TEXT_CONTENT_TYPE.equals(responseContentType)) {
                     responseString = generateResponseString(request, fileName, uploadedFileKey);
@@ -256,6 +268,10 @@ public abstract class FileUploadServlet extends HttpServlet {
             }
             throw new ServletException(theErrorMessage, e);
         } finally {
+            //Clean multiread wrapper temp file if it exists, whether the upload succeeded or not
+            if (request instanceof MultiReadHttpServletRequest) {
+                ((MultiReadHttpServletRequest) request).cleanMultipartTempContent();
+            }
             if (responsePW != null) {
                 responsePW.close();
             }
@@ -264,22 +280,27 @@ public abstract class FileUploadServlet extends HttpServlet {
 
     protected String storeTempFile(final String fileName, final FileItem item)
             throws Exception {
-        temporaryContentAPI = PlatformAPIAccessor.getTemporaryContentAPI();
-        return temporaryContentAPI
-                .storeTempFile(new FileContent(fileName, item.getInputStream(), item.getContentType()));
+        temporaryContentAPI = getTemporaryContentAPI();
+        return temporaryContentAPI.storeTempFile(new FileContent(fileName, item.getInputStream(),
+                DocumentUtil.resolveContentType(fileName, item.getContentType())));
     }
 
     private void generateFileTooBigError(final HttpServletResponse response, final PrintWriter responsePW,
             final String message) throws JsonProcessingException {
         response.setStatus(HttpURLConnection.HTTP_ENTITY_TOO_LARGE);
         if (JSON_CONTENT_TYPE.equals(responseContentType)) {
-            final Map<String, Serializable> errorResponse = new HashMap<>();
-            errorResponse.put("type", "EntityTooLarge");
-            errorResponse.put("message", message);
-            errorResponse.put("statusCode", HttpURLConnection.HTTP_ENTITY_TOO_LARGE);
-            responsePW.print(objectMapper.writeValueAsString(errorResponse));
-            responsePW.flush();
+            printJsonError(responsePW, "EntityTooLarge", message, HttpURLConnection.HTTP_ENTITY_TOO_LARGE);
         }
+    }
+
+    private void printJsonError(final PrintWriter responsePW, final String type, final String message,
+            final int statusCode) throws JsonProcessingException {
+        final Map<String, Serializable> errorResponse = new HashMap<>();
+        errorResponse.put("type", type);
+        errorResponse.put("message", message);
+        errorResponse.put("statusCode", statusCode);
+        responsePW.print(objectMapper.writeValueAsString(errorResponse));
+        responsePW.flush();
     }
 
     //for test purpose
@@ -324,10 +345,33 @@ public abstract class FileUploadServlet extends HttpServlet {
         return fileName.substring(slashPos + 1);
     }
 
-    protected void outputMediaTypeError(final HttpServletResponse response, final PrintWriter responsePW) {
+    /**
+     * Rejects the upload with a 415 status. The message is shown to end users by the upload widget, so it must
+     * not contain configuration details: those go to the server log.
+     */
+    protected void outputMediaTypeError(final HttpServletResponse response, final PrintWriter responsePW,
+            final String message) throws JsonProcessingException {
         response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-        responsePW.print("Extension not supported.");
-        responsePW.flush();
+        if (JSON_CONTENT_TYPE.equals(responseContentType)) {
+            printJsonError(responsePW, "UnsupportedMediaType", message, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+        } else {
+            responsePW.print(message);
+            responsePW.flush();
+        }
+    }
+
+    private void logRejectedExtension(final HttpServletRequest request, final String fileName) {
+        final String configurationHint = supportedExtensionsList.length > 0 ? ""
+                : " (property " + ConsoleProperties.ALLOWED_ATTACHMENT_EXTENSIONS + " of console-config.properties)";
+        LOGGER.warn("Upload of file '{}' to {} rejected: its extension is not one of {}{}.", forLog(fileName),
+                request.getRequestURI(), String.join(",", getAllowedExtensions()), configurationHint);
+    }
+
+    /**
+     * Client-provided values are logged on a single line, so that they cannot forge log entries.
+     */
+    private static String forLog(final String value) {
+        return value == null ? null : value.replaceAll("[\\r\\n]", "_");
     }
 
     protected boolean isSupportedExtension(final String fileName) {
@@ -335,8 +379,7 @@ public abstract class FileUploadServlet extends HttpServlet {
             return false;
         }
 
-        final String[] extensions = supportedExtensionsList.length > 0 ? supportedExtensionsList
-                : getDefaultAllowedExtensions();
+        final String[] extensions = getAllowedExtensions();
 
         // if no extension whitelist applies at all, every extension is allowed
         if (extensions.length < 1) {
@@ -344,12 +387,17 @@ public abstract class FileUploadServlet extends HttpServlet {
         }
 
         for (final String extension : extensions) {
-            if (fileName.toLowerCase().endsWith("." + extension.toLowerCase())) {
+            if (ANY_EXTENSION.equals(extension.trim())
+                    || fileName.toLowerCase(Locale.ROOT).endsWith("." + extension.toLowerCase(Locale.ROOT))) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private String[] getAllowedExtensions() {
+        return supportedExtensionsList.length > 0 ? supportedExtensionsList : getDefaultAllowedExtensions();
     }
 
     private static final String[] DEFAULT_ALLOWED_EXTENSIONS = DocumentUtil.DEFAULT_ALLOWED_EXTENSIONS
