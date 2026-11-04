@@ -30,20 +30,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.console.common.server.filter.PathSanitizer;
+import org.bonitasoft.engine.audit.AuditCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Writes one JSON line per authentication event (login success, login failure, logout) to a dedicated logger, so
- * that it can be routed to a SIEM. The logger is on by default (INFO) and can be switched off by setting
- * {@link #LOGGER_NAME} to OFF in the logging configuration.
+ * Writes one JSON line per authentication event (login success, login failure, logout) to the audit log, so that it
+ * can be routed to a SIEM. The events go to the logger of the {@link AuditCategory#AUTHENTICATION} category
+ * ({@link #LOGGER_NAME}), a child of {@value AuditCategory#PARENT_LOGGER_NAME}: the logging configuration
+ * routes the parent logger, and can switch off the whole audit log or only the authentication events by setting
+ * their logger to OFF. The loggers are on by default (INFO).
  * <p>
  * The event never contains the password, the request body, the query string or the path parameters (such as a
  * jsessionid). The values coming from the request are truncated, so that a client cannot inflate the audit log.
  */
 public class AuthenticationAuditLogger {
 
-    public static final String LOGGER_NAME = "org.bonitasoft.runtime.audit.authentication";
+    /**
+     * The audit log category of the events, which gives their {@code event.category} and their logger.
+     */
+    private static final AuditCategory CATEGORY = AuditCategory.AUTHENTICATION;
+
+    public static final String LOGGER_NAME = CATEGORY.getLoggerName();
 
     public static final String METHOD_STANDARD = "standard";
 
@@ -197,6 +205,7 @@ public class AuthenticationAuditLogger {
         final ObjectNode event = OBJECT_MAPPER.createObjectNode();
         event.put("@timestamp", formatTimestamp(Instant.now()));
         event.put("schema_version", SCHEMA_VERSION);
+        putIfNotEmpty(event, CATEGORY.getValue(), "event", "category");
         putIfNotEmpty(event, action, "event", "action");
         putIfNotEmpty(event, outcome, "event", "outcome");
         putIfNotEmpty(event, reason, "event", "reason");
