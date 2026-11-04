@@ -78,6 +78,7 @@ class AuthenticationAuditLoggerTest {
         final JsonNode event = loggedEvent();
         assertThat(event.path("@timestamp").asText()).matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z");
         assertThat(event.path("schema_version").asText()).isEqualTo("1");
+        assertThat(event.path("event").path("category").asText()).isEqualTo("authentication");
         assertThat(event.path("event").path("action").asText()).isEqualTo("login");
         assertThat(event.path("event").path("outcome").asText()).isEqualTo("success");
         assertThat(event.path("event").has("reason")).isFalse();
@@ -92,6 +93,13 @@ class AuthenticationAuditLoggerTest {
                 .isEqualTo(AuthenticationAuditLogger.hash(42L))
                 .hasSize(64)
                 .isNotEqualTo("42");
+    }
+
+    @Test
+    void logger_name_should_stay_under_the_audit_logger_routed_by_the_distribution() {
+        // The distribution routes org.bonitasoft.runtime.audit (log4j2-appenders.xml): under another name, the events
+        // would be written with the regular logs, and not to the audit log
+        assertThat(AuthenticationAuditLogger.LOGGER_NAME).isEqualTo("org.bonitasoft.runtime.audit.authentication");
     }
 
     @Test
@@ -245,6 +253,7 @@ class AuthenticationAuditLoggerTest {
         auditLogger.loginFailed(request, "walter.bates", AuthenticationAuditLogger.METHOD_STANDARD, null);
 
         final JsonNode event = loggedEvent();
+        assertThat(event.path("event").path("category").asText()).isEqualTo("authentication");
         assertThat(event.path("event").path("action").asText()).isEqualTo("login");
         assertThat(event.path("event").path("outcome").asText()).isEqualTo("failure");
         assertThat(event.path("event").has("reason")).isFalse();
@@ -270,6 +279,7 @@ class AuthenticationAuditLoggerTest {
         auditLogger.loggedOut(request, "walter.bates", "oidc", 42L);
 
         final JsonNode event = loggedEvent();
+        assertThat(event.path("event").path("category").asText()).isEqualTo("authentication");
         assertThat(event.path("event").path("action").asText()).isEqualTo("logout");
         assertThat(event.path("event").path("outcome").asText()).isEqualTo("success");
         assertThat(event.path("user").path("name").asText()).isEqualTo("walter.bates");
