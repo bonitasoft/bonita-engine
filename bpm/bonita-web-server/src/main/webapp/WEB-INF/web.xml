@@ -248,15 +248,19 @@
         <url-pattern>/portal/custom-page/API/*</url-pattern>
         <url-pattern>/services/*</url-pattern>
         <url-pattern>/portal/formsDocumentDownload</url-pattern>
+        <url-pattern>/portal/formsDocumentImage</url-pattern>
         <url-pattern>/portal/documentDownload</url-pattern>
         <url-pattern>/portal/downloadDocument</url-pattern>
         <url-pattern>/portal/pageDownload</url-pattern>
         <url-pattern>/portal/exportOrganization</url-pattern>
+        <url-pattern>/portal/exportActors</url-pattern>
+        <url-pattern>/portal/exportApplications</url-pattern>
         <url-pattern>/portal/fileUpload</url-pattern>
         <url-pattern>/portal/processUpload</url-pattern>
         <url-pattern>/portal/organizationUpload</url-pattern>
         <url-pattern>/portal/actorsUpload</url-pattern>
         <url-pattern>/portal/applicationsUpload</url-pattern>
+        <url-pattern>/portal/bdmUpload</url-pattern>
         <url-pattern>/portal/pageUpload</url-pattern>
         <url-pattern>/portal/imageUpload</url-pattern>
         <!--  Add more servlet mappings here -->
