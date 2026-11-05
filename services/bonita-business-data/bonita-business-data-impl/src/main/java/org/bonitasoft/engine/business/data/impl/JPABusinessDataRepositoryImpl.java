@@ -98,14 +98,6 @@ public class JPABusinessDataRepositoryImpl
         classLoaderService.addListener(ClassLoaderIdentifier.TENANT, this);
         this.dataRetentionBdmTrackingService = dataRetentionBdmTrackingService;
         this.dataRetentionEnabled = dataRetentionEnabled;
-        if (!dataRetentionEnabled) {
-            log.warn("Data retention is disabled ({}=false): BDM changes are not tracked and the retention cleanup "
-                    + "job is not scheduled. If retention is re-enabled later, business data created while disabled "
-                    + "will not be eligible for deletion, and data modified while disabled keeps its previous "
-                    + "last-modification date. See "
-                    + "https://documentation.ofelia.com/bonita/latest/runtime/bdm-data-retention#legacy-data "
-                    + "before re-enabling.", DataRetentionBdmTrackingService.DATA_RETENTION_ENABLED_PROPERTY);
-        }
     }
 
     @Override

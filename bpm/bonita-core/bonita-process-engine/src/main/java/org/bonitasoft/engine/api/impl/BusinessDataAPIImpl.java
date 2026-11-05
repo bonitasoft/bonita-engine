@@ -86,4 +86,10 @@ public class BusinessDataAPIImpl implements BusinessDataAPI {
         }
     }
 
+    @Override
+    @AvailableInMaintenanceMode
+    public boolean isDataRetentionEnabled() {
+        return getServiceAccessor().getDataRetentionSettings().isEnabled();
+    }
+
 }
