@@ -77,4 +77,14 @@ public interface BusinessDataAPI {
     List<BusinessDataReference> getProcessBusinessDataReferences(long processInstanceId, int startIndex,
             int maxResults);
 
+    /**
+     * Tells whether data retention is enabled on the engine ({@code bonita.runtime.retention.enabled}, read at
+     * startup). When it is disabled, BDM changes are not tracked and no business data is deleted by data retention.
+     * In Subscription editions, retention rules can then no longer be created, updated or deleted.
+     *
+     * @return {@code true} if data retention is enabled
+     * @since 11.0.4
+     */
+    boolean isDataRetentionEnabled();
+
 }

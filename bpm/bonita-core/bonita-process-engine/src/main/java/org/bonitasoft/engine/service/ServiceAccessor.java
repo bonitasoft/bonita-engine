@@ -25,6 +25,7 @@ import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
+import org.bonitasoft.engine.business.data.DataRetentionSettings;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -245,6 +246,8 @@ public interface ServiceAccessor {
     BusinessDataRepository getBusinessDataRepository();
 
     BusinessDataService getBusinessDataService();
+
+    DataRetentionSettings getDataRetentionSettings();
 
     BusinessDataModelRepository getBusinessDataModelRepository();
 
