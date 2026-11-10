@@ -38,6 +38,7 @@ import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeploymentInfoUpdateException;
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameVersion;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
@@ -1838,6 +1839,28 @@ public class ProcessDefinitionServiceImplTest {
         final OrderByOption orderByOption = captor.getValue().getQueryOptions().getOrderByOptions().get(0);
         assertThat(orderByOption.getFieldName()).isEqualTo("deploymentDate");
         assertThat(orderByOption.getOrderByType()).isEqualTo(OrderByType.DESC);
+    }
+
+    @Test
+    public void getVersionsForProcessNames_chunks_the_in_clause_to_stay_within_db_limits() throws Exception {
+        // given 250 names -> 3 IN batches (100, 100, 50)
+        final List<String> names = new ArrayList<>();
+        for (int i = 0; i < 250; i++) {
+            names.add("process" + i);
+        }
+        doReturn(List.of(new ProcessNameVersion("process", "Process", "1.0"))).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<ProcessNameVersion>> any());
+
+        // when
+        final List<ProcessNameVersion> versions = processDefinitionServiceImpl.getVersionsForProcessNames(names, "");
+
+        // then: one query per batch, results concatenated
+        final ArgumentCaptor<SelectListDescriptor> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
+        verify(persistenceService, times(3)).selectList(captor.capture());
+        assertThat(versions).hasSize(3);
+        assertThat(captor.getAllValues())
+                .extracting(descriptor -> ((List<?>) descriptor.getInputParameters().get("names")).size())
+                .containsExactly(100, 100, 50);
     }
 
 }

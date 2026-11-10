@@ -26,11 +26,15 @@ import org.bonitasoft.engine.session.APISession
 
 /**
  *
- * Let the user access and modify only himself
+ * Let the user access and modify only himself.
+ * <p>
+ * On identity/userSummary it additionally lets any user granted organization_visualization list the lightweight user
+ * summaries, provided the search is restricted to enabled users only ({@code f=enabled=true}).
  *
  * can be added to
  * <ul>
  *     <li>identity/user</li>
+ *     <li>identity/userSummary</li>
  *     <li>identity/professionalcontactdata</li>
  *     <li>identity/personalcontactdata</li>
  * </ul>
@@ -57,6 +61,10 @@ class UserPermissionRule implements PermissionRule {
                 return false
             }
             def filters = apiCallContext.getFilters()
+            //allow listing the lightweight user summaries when restricted to enabled users only
+            if ("userSummary".equals(apiCallContext.getResourceName()) && "true".equalsIgnoreCase(filters.get("enabled"))) {
+                return true
+            }
             //search by task id for the do for
             if (filters.containsKey("task_id")) {
                 def taskId = Long.valueOf(filters.get("task_id"))

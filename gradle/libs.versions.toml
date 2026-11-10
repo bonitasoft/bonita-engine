@@ -6,8 +6,8 @@ springSessionVersion = "2.7.4"
 springBootVersion = "2.7.18"
 commonsLangVersion = "3.20.0"
 bonitaArtifactsModelVersion = "1.2.3"
-bonitaSecurityVersion = "1.30.1"
-commonsIOVersion = "2.21.0"
+bonitaSecurityVersion = "1.31.2"
+commonsIOVersion = "2.22.0"
 commonsFileUploadVersion = "1.6.0"
 commonsBeanutilsVersion = "1.11.0"
 commonsCollectionsVersion = "4.5.0"
@@ -31,7 +31,7 @@ javaxServletVersion = "4.0.1"
 httpComponentsVersion = "4.5.14"
 xstreamVersion = "1.4.21"
 ehCacheVersion = "3.11.1"
-eclipseCompilerVersion = "3.45.0"
+eclipseCompilerVersion = "3.46.0"
 jakartaActivationVersion = "1.2.2"
 jakartaValidationApiVersion = "3.1.1"
 quartzVersion = "2.3.2"
@@ -39,7 +39,7 @@ micrometerVersion = "1.16.5"
 # DB drivers:
 mysqlVersion = "8.4.0"
 msSqlServerVersion = "12.10.2.jre11"
-oracleVersion = "23.26.1.0.0"
+oracleVersion = "23.26.2.0.0"
 # Keep 42.7.12 for now: it prevents the PostgreSQL warnings "there is already a transaction in progress" raised with 42.7.13
 postgresqlVersion = "42.7.12"
 
@@ -64,7 +64,7 @@ jakartaJstlApiVersion = "1.2.7"
 xbeanClassloaderVersion = "4.30"
 jgettextVersion = "0.15.1"
 hamcrestVersion = "3.0"
-woodstoxCoreVersion = "7.1.1"
+woodstoxCoreVersion = "7.2.1"
 # When updating Keycloak version, if necessary, make sure to update the code in
 # subscription/bpm/bonita-web-server-sp package org.bonitasoft.console.common.server.auth.impl
 keycloakVersion = "21.1.2"
@@ -75,12 +75,12 @@ owaspHtmlSanitizerVersion = "20261031.1"
 
 # Test dependency versions
 junit4Version = "4.13.2"
-junit5Version = "6.0.3"
+junit5Version = "6.1.0"
 awaitilityVersion = "4.3.0"
 assertjVersion = "3.27.7"
 xmlunitVersion = "1.6"
 mockitoVersion = "5.23.0"
-jsonUnitVersion = "5.1.1"
+jsonUnitVersion = "5.1.2"
 systemRulesVersion = "1.19.0"
 systemLambdaVersion = "1.2.1"
 concurrentUnitVersion = "0.4.6"
@@ -89,7 +89,7 @@ jbossLoggingVersion = "3.6.3.Final"
 jsonassertVersion = "1.5.3"
 commonsExecVersion = "1.6.0"
 jmockitVersion = "1.50"
-mockServerJunitVersion = "5.15.0"
+mockServerJunitVersion = "7.0.0"
 
 
 [libraries]
@@ -200,7 +200,7 @@ msSqlServer = { group = "com.microsoft.sqlserver", name = "mssql-jdbc", version.
 oracle = { group = "com.oracle.database.jdbc", name = "ojdbc11", version.ref = "oracleVersion" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
 
-lombok = "org.projectlombok:lombok:1.18.44"
+lombok = "org.projectlombok:lombok:1.18.46"
 
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 
@@ -263,6 +263,6 @@ groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx",
 
 [plugins]
 bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "1.0.1" }
-dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.53.0" } # used by "List out-of-date dependencies" script
+dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.54.0" } # used by "List out-of-date dependencies" script
 taskInfo = { id = "org.barfuin.gradle.taskinfo", version = "3.0.2" } # Adds a 'tiTree' task to display Gradle task-graph
-testRetry = { id = "org.gradle.test-retry", version = "1.6.4" } # used to retry flaky tests automatically
+testRetry = { id = "org.gradle.test-retry", version = "1.6.5" } # used to retry flaky tests automatically

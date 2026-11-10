@@ -43,6 +43,7 @@ public class CacheConfigurationIT extends CommonBPMServicesTest {
                 "parameters",
                 "DEFAULT_PLATFORM",
                 "CONNECTOR",
-                "application-token");
+                "application-token",
+                "active_delegation_rules");
     }
 }

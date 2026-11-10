@@ -452,7 +452,7 @@ public class UserIT extends TestWithTechnicalUser {
         proDataUpDescr.setPhoneNumber("04-76-111111");
         proDataUpDescr.setRoom("A304");
         proDataUpDescr.setState("Isere");
-        proDataUpDescr.setWebsite("http://www.bonitasoft.com");
+        proDataUpDescr.setWebsite("http://www.ofelia.com");
         proDataUpDescr.setZipCode("38000");
         return proDataUpDescr;
     }
@@ -468,7 +468,7 @@ public class UserIT extends TestWithTechnicalUser {
         assertEquals("04-76-111111", proData.getPhoneNumber());
         assertEquals("A304", proData.getRoom());
         assertEquals("Isere", proData.getState());
-        assertEquals("http://www.bonitasoft.com", proData.getWebsite());
+        assertEquals("http://www.ofelia.com", proData.getWebsite());
         assertEquals("38000", proData.getZipCode());
     }
 

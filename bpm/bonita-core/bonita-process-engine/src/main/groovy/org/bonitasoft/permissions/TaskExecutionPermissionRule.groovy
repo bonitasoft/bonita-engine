@@ -151,41 +151,25 @@ class TaskExecutionPermissionRule implements PermissionRule {
     private boolean isTaskAccessible(ProcessAPI processAPI, long flowNodeId, long currentUserId, String username, User assignedUser, Logger logger) throws NotFoundException {
         def instance = processAPI.getFlowNodeInstance(flowNodeId)
         if (FlowNodeType.MANUAL_TASK.equals(instance.getType()) || FlowNodeType.USER_TASK.equals(instance.getType())) {
-            if (instance.assigneeId > 0) {
-                if (instance.assigneeId == currentUserId) {
+            try {
+                // Single involvement check: assignee match, pending-actor mapping, OR active delegate
+                if (processAPI.isInvolvedInHumanTaskInstance(currentUserId, flowNodeId)) {
                     return true
                 }
-            } else {
-                final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1)
-                builder.filter(UserSearchDescriptor.USER_NAME, username)
-                def searchResult = processAPI.searchUsersWhoCanExecutePendingHumanTask(flowNodeId, builder.done())
-                if (searchResult.getCount() == 1l) {
-                    logger.debug("The task is pending for user")
-                    return true
-                }
-            }
-            //we can access the task if we can access the parent of the subtask
-            if (FlowNodeType.MANUAL_TASK.equals(instance.getType())) {
-                try {
-
+                // Manual-task escalation: caller may access this subtask if they can access its parent task.
+                // The parent call also covers assignee / pending-actor / delegate via the same engine method.
+                if (FlowNodeType.MANUAL_TASK.equals(instance.getType())) {
                     def parentTask = processAPI.getHumanTaskInstance(instance.getParentContainerId())
-                    if (parentTask.assigneeId > 0) {
-                        if (parentTask.assigneeId == currentUserId) {
-                            return true
-                        }
-                    } else {
-                        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1)
-                        builder.filter(UserSearchDescriptor.USER_NAME, username)
-                        def searchResult = processAPI.searchUsersWhoCanExecutePendingHumanTask(parentTask.id, builder.done())
-                        if (searchResult.getCount() == 1l) {
-                            logger.debug("The parent task is pending for user")
-                            return true
-                        }
+                    if (processAPI.isInvolvedInHumanTaskInstance(currentUserId, parentTask.id)) {
+                        return true
                     }
-                } catch (NotFoundException e) {
-                    //return false because it means the parent is not found, not the element itself
-                    return false
                 }
+            } catch (NotFoundException e) {
+                // Intentional deny: if the task (or its manual-task parent) vanished between
+                // getFlowNodeInstance above and the involvement call, treat it as no access rather than
+                // falling through to the supervisor branch. isInvolvedInHumanTaskInstance can raise
+                // ActivityInstanceNotFoundException on that race, where the old inline pending-search could not.
+                return false
             }
         }
         def processDefinitionId = instance.getProcessDefinitionId()

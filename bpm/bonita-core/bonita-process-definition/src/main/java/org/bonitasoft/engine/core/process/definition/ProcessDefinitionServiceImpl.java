@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.definition;
 import static org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.ClassReflector;
+import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -43,6 +45,9 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionE
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeploymentInfoUpdateException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDisablementException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessEnablementException;
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameGroupQuery;
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameKey;
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameVersion;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -90,6 +95,16 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
  * @author Arthur Freycon
  */
 public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
+
+    /** Maximum size of an IN (:names) clause, to stay within database IN-list limits (e.g. Oracle's 1000). */
+    static final int IN_REQUEST_SIZE = 100;
+
+    /**
+     * Separator used to concatenate (name, displayName) when counting distinct process-name groups. A control
+     * character (ASCII Unit Separator) that cannot appear in a process name or display name, so the concatenation is
+     * unambiguous. Not NUL, which PostgreSQL rejects in text values.
+     */
+    static final String GROUP_KEY_SEPARATOR = "\u001F";
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
@@ -622,6 +637,75 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public long getNumberOfProcessDeploymentInfos(final QueryOptions countOptions) throws SBonitaReadException {
         return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, countOptions, null);
+    }
+
+    @Override
+    public long getNumberOfProcessNameGroups(final String activationState, final String searchTerm)
+            throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("term", searchTerm);
+        parameters.put("sep", GROUP_KEY_SEPARATOR);
+        final String queryName;
+        if (filtersOnActivationState(activationState)) {
+            parameters.put("activationState", activationState);
+            queryName = "getNumberOfProcessNameGroupsWithActivationState";
+        } else {
+            queryName = "getNumberOfProcessNameGroups";
+        }
+        return persistenceService.selectOne(new SelectOneDescriptor<>(queryName, parameters,
+                SProcessDefinitionDeployInfo.class, Long.class));
+    }
+
+    @Override
+    public List<ProcessNameKey> searchProcessNameGroups(final ProcessNameGroupQuery query)
+            throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("term", query.searchTerm());
+        parameters.put("sortByName", query.sortByName());
+        parameters.put("ascending", query.ascending());
+        final String queryName;
+        if (filtersOnActivationState(query.activationState())) {
+            parameters.put("activationState", query.activationState());
+            queryName = "searchProcessNameGroupsWithActivationState";
+        } else {
+            queryName = "searchProcessNameGroups";
+        }
+        final SelectListDescriptor<ProcessNameKey> descriptor = new SelectListDescriptor<>(
+                queryName, parameters,
+                SProcessDefinitionDeployInfo.class, ProcessNameKey.class,
+                new QueryOptions(query.startIndex(), query.maxResults()));
+        return persistenceService.selectList(descriptor);
+    }
+
+    @Override
+    public List<ProcessNameVersion> getVersionsForProcessNames(final List<String> names, final String activationState)
+            throws SBonitaReadException {
+        if (names == null || names.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final boolean filtered = filtersOnActivationState(activationState);
+        final String queryName = filtered ? "getProcessVersionsByNamesWithActivationState"
+                : "getProcessVersionsByNames";
+        // Chunk the IN (:names) clause so an arbitrarily large page still stays within database IN-list limits.
+        final List<ProcessNameVersion> versions = new ArrayList<>();
+        for (final List<String> batch : CollectionUtil.split(names, IN_REQUEST_SIZE)) {
+            final Map<String, Object> parameters = new HashMap<>();
+            parameters.put("names", batch);
+            if (filtered) {
+                parameters.put("activationState", activationState);
+            }
+            final SelectListDescriptor<ProcessNameVersion> descriptor = new SelectListDescriptor<>(
+                    queryName, parameters, SProcessDefinitionDeployInfo.class,
+                    ProcessNameVersion.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+            versions.addAll(persistenceService.selectList(descriptor));
+        }
+        return versions;
+    }
+
+    // Optional activationState filter (cf. the *SupervisedBy named-query convention): a null/blank state selects the
+    // base query, a real state selects the *WithActivationState variant and binds the :activationState parameter.
+    private static boolean filtersOnActivationState(final String activationState) {
+        return activationState != null && !activationState.isBlank();
     }
 
     @Override

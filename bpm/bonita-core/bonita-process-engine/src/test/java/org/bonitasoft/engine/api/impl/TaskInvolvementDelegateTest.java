@@ -17,10 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.core.delegation.api.DelegationRuleService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
@@ -61,6 +64,9 @@ public class TaskInvolvementDelegateTest {
     @Mock
     private SUserTaskInstance humanTaskInstance;
 
+    @Mock
+    private DelegationRuleService delegationRuleService;
+
     private SUserTaskInstance assignedHumanTaskInstance;
 
     @InjectMocks
@@ -71,6 +77,8 @@ public class TaskInvolvementDelegateTest {
     public void before() throws SBonitaException {
         doReturn(serviceAccessor).when(taskInvolvementDelegate).getServiceAccessor();
         doReturn(activityInstanceService).when(serviceAccessor).getActivityInstanceService();
+        // Default: caller is not a delegate. Tests that exercise the delegate fall-through override this.
+        doReturn(delegationRuleService).when(serviceAccessor).getDelegationRuleService();
 
         humanTaskInstance = new SUserTaskInstance();
         humanTaskInstance.setId(EXISTING_TASK);
@@ -175,5 +183,58 @@ public class TaskInvolvementDelegateTest {
         // When
         taskInvolvementDelegate.hasUserPendingOrAssignedTasks(ASSIGNED_USER, 45621L);
 
+    }
+
+    @Test
+    public final void should_isInvolvedInHumanTaskInstance_return_true_when_user_is_active_delegate_for_task()
+            throws Exception {
+        //given — task is assigned to ASSIGNED_USER (not USER_PENDING), so the assignee check
+        //fails; USER_PENDING is not in the actor mapping for ASSIGNED_TASK; the delegation
+        //fall-through grants access because USER_PENDING is the active delegate of ASSIGNED_USER.
+        doReturn(true).when(delegationRuleService).isActiveDelegate(USER_PENDING, ASSIGNED_TASK);
+
+        //when
+        boolean involvedInHumanTaskInstance = taskInvolvementDelegate.isInvolvedInHumanTaskInstance(USER_PENDING,
+                ASSIGNED_TASK);
+
+        //then
+        assertThat(involvedInHumanTaskInstance).as("Is involved in human task via delegation").isTrue();
+    }
+
+    @Test
+    public final void should_isInvolvedInHumanTaskInstance_not_consult_delegation_when_user_is_assignee()
+            throws Exception {
+        //given — assignee check should short-circuit before the delegation fall-through runs
+
+        //when
+        taskInvolvementDelegate.isInvolvedInHumanTaskInstance(ASSIGNED_USER, ASSIGNED_TASK);
+
+        //then
+        verify(delegationRuleService, never()).isActiveDelegate(anyLong(), anyLong());
+    }
+
+    @Test
+    public final void should_isInvolvedInHumanTaskInstance_not_consult_delegation_when_user_is_pending_actor()
+            throws Exception {
+        //given — pending-actor check should short-circuit before the delegation fall-through runs
+
+        //when
+        taskInvolvementDelegate.isInvolvedInHumanTaskInstance(USER_PENDING, EXISTING_TASK);
+
+        //then
+        verify(delegationRuleService, never()).isActiveDelegate(anyLong(), anyLong());
+    }
+
+    @Test
+    public final void should_isInvolvedInHumanTaskInstance_return_false_when_no_assignee_no_pending_and_not_delegate()
+            throws Exception {
+        //given — default stub: delegationRuleService.isActiveDelegate(...) returns false
+
+        //when
+        boolean involvedInHumanTaskInstance = taskInvolvementDelegate.isInvolvedInHumanTaskInstance(USER_PENDING,
+                ASSIGNED_TASK);
+
+        //then
+        assertThat(involvedInHumanTaskInstance).as("Is involved in human task").isFalse();
     }
 }

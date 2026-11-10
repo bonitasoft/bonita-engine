@@ -733,10 +733,12 @@
         <url-pattern>/API/bpm/archivedCaseVariable/*</url-pattern>
         <url-pattern>/API/bpm/message</url-pattern>
         <url-pattern>/API/bpm/processInfo/*</url-pattern>
+        <url-pattern>/API/bpm/processName</url-pattern>
         <url-pattern>/API/bpm/signal</url-pattern>
         <url-pattern>/API/bpm/timerEventTrigger/*</url-pattern>
         <url-pattern>/API/extension/*</url-pattern>
         <url-pattern>/API/form/mapping</url-pattern>
+        <url-pattern>/API/identity/userSummary</url-pattern>
         <url-pattern>/API/system/i18ntranslation</url-pattern>
         <url-pattern>/API/system/information</url-pattern>
         <url-pattern>/API/system/maintenance</url-pattern>

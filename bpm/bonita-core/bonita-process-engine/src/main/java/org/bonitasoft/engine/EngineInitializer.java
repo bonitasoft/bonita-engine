@@ -141,7 +141,7 @@ public class EngineInitializer {
         LOGGER.info("benefit all users.");
         LOGGER.info("");
         LOGGER.info("For more information on what data we collect and how to opt-out, please visit our");
-        LOGGER.info("Product Documentation (https://documentation.bonitasoft.com/bonita/latest).");
+        LOGGER.info("Product Documentation (https://documentation.ofelia.com/bonita/latest).");
         LOGGER.info("");
         LOGGER.info("Thank you for supporting the ongoing improvement of our product!");
         LOGGER.info("-----------------------------------------------------------------------------------------");

@@ -183,6 +183,25 @@ public class CacheConfigurationBeans {
                 timeToLiveSeconds, offHeapSizeMB);
     }
 
+    /**
+     * Cache for the per-delegate active delegation-rule set, read on the permission hot path.
+     * The region name must match
+     * {@code DelegationRuleServiceImpl.ACTIVE_DELEGATION_RULES_CACHE} ("active_delegation_rules").
+     * In cluster mode it is kept node-local (see {@code EngineClusterConfiguration}) so reads stay
+     * in-JVM; cross-node invalidation is therefore bounded by {@code timeToLiveSeconds}.
+     */
+    @Bean
+    public org.bonitasoft.engine.cache.CacheConfiguration delegationRulesCacheConfig(
+            @Value("${bonita.tenant.cache.delegation.maxElementsInMemory:10000}") final int maxElementsInMemory,
+            @Value("${bonita.tenant.cache.delegation.eternal:false}") final boolean eternal,
+            @Value("${bonita.tenant.cache.delegation.evictionPolicy:LRU}") final String evictionPolicy,
+            @Value("${bonita.tenant.cache.delegation.readIntensive:true}") final boolean readIntensive,
+            @Value("${bonita.tenant.cache.delegation.timeToLiveSeconds:300}") final int timeToLiveSeconds,
+            @Value("${bonita.tenant.cache.delegation.offHeapSizeMB:0}") final int offHeapSizeMB) {
+        return createCacheConfiguration("active_delegation_rules", maxElementsInMemory, eternal, evictionPolicy,
+                readIntensive, timeToLiveSeconds, offHeapSizeMB);
+    }
+
     private org.bonitasoft.engine.cache.CacheConfiguration createCacheConfiguration(String name,
             int maxElementsInMemory, boolean eternal, String evictionPolicy, boolean readIntensive,
             int timeToLiveSeconds, int offHeapSizeMB) {

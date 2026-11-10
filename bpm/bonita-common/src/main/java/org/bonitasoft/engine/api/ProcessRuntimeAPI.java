@@ -2122,6 +2122,9 @@ public interface ProcessRuntimeAPI {
      * <li>a task in the process instance is assigned to user A</li>
      * <li>a task in the process instance is pending for user A</li>
      * <li>a task in the process instance has been performed by user A</li>
+     * <li>user A is an active delegate of the assignee of a live task whose root process instance is the
+     * given one, and the delegation rule's process whitelist includes that root process (the delegate
+     * check resolves against the root process instance, so a sub-process instance id does not match)</li>
      * </ul>
      * This method also applies to completed instances of process.
      *
@@ -2148,6 +2151,8 @@ public interface ProcessRuntimeAPI {
      * <ul>
      * <li>the human task instance is assigned to user A</li>
      * <li>the human task instance is pending for user A</li>
+     * <li>user A is an active delegate of the task's assignee, and the delegation rule's process whitelist
+     * includes the task's root process</li>
      * </ul>
      *
      * @param userId

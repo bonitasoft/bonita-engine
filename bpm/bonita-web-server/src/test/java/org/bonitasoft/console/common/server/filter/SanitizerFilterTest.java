@@ -214,7 +214,7 @@ class SanitizerFilterTest {
         when(httpRequest.getContentType()).thenReturn("application/json");
         when(sanitizerFilter.isSanitizerEnabled()).thenReturn(true);
         when(sanitizerFilter.getAttributesExcluded()).thenReturn(Collections.emptyList());
-        final String body = "{\"key\":\"<p><a href=\\\"https://documentation.bonitasoft.com/bonita/latest/\\\">link text</a></p>\"}";
+        final String body = "{\"key\":\"<p><a href=\\\"https://documentation.ofelia.com/bonita/latest/\\\">link text</a></p>\"}";
         var is = new ByteArrayInputStream(body.getBytes());
 
         when(httpRequest.getInputStream()).thenReturn(getServletInputStream(is));
@@ -231,7 +231,7 @@ class SanitizerFilterTest {
         // Check structure and all required rel values are present
         assertThat(updatedBody)
                 .startsWith(
-                        "{\"key\":\"<p><a href=\\\"https://documentation.bonitasoft.com/bonita/latest/\\\" rel=\\\"")
+                        "{\"key\":\"<p><a href=\\\"https://documentation.ofelia.com/bonita/latest/\\\" rel=\\\"")
                 .endsWith("\\\">link text</a></p>\"}")
                 .contains("noreferrer")
                 .contains("noopener")

@@ -35,7 +35,7 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * <li>Using Java System Properties</li>
  * <li>Programmatically</li>
  * <li>DEPRECATED: using a file inside bonita-home. See <a
- * href="https://documentation.bonitasoft.com/bonita/latest/configure-client-of-bonita-bpm-engine#_configure_client_using_bonita_home_client">online
+ * href="https://documentation.ofelia.com/bonita/latest/configure-client-of-bonita-bpm-engine#_configure_client_using_bonita_home_client">online
  * documentation</a>.</li>
  * </ul>
  * <h1>Using Java System Properties</h1>
@@ -86,7 +86,7 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @see <a
- *      href="https://documentation.bonitasoft.com/bonita/latest/configure-client-of-bonita-bpm-engine#client_config">Online
+ *      href="https://documentation.ofelia.com/bonita/latest/configure-client-of-bonita-bpm-engine#client_config">Online
  *      documentation on Client configuration</a>
  */
 public class APITypeManager {

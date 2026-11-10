@@ -16,5 +16,8 @@ ALTER TABLE business_app DROP CONSTRAINT fk_business_app_profileid;
 ALTER TABLE business_app DROP CONSTRAINT fk_business_app_layoutid;
 ALTER TABLE business_app DROP CONSTRAINT fk_business_app_themeid;
 
+-- delegation
+ALTER TABLE delegation_rule_process DROP CONSTRAINT fk_delegation_rule_process_delegation_rule_id;
+
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_documentid;

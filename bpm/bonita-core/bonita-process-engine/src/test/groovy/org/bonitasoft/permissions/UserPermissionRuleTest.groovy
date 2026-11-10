@@ -89,4 +89,44 @@ public class UserPermissionRuleTest {
 
         assertThat(isAuthorized).isFalse()
     }
+
+    @Test
+    public void isAllowed_should_allow_listing_userSummary_when_filtering_enabled_users() throws Exception {
+        doReturn("userSummary").when(apiCallContext).getResourceName()
+        doReturn(["enabled": "true"]).when(apiCallContext).getFilters()
+
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+
+        assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void isAllowed_should_deny_listing_userSummary_when_filtering_disabled_users() throws Exception {
+        doReturn("userSummary").when(apiCallContext).getResourceName()
+        doReturn(["enabled": "false"]).when(apiCallContext).getFilters()
+
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+
+        assertThat(isAuthorized).isFalse()
+    }
+
+    @Test
+    public void isAllowed_should_deny_listing_userSummary_without_enabled_filter() throws Exception {
+        doReturn("userSummary").when(apiCallContext).getResourceName()
+        doReturn([:]).when(apiCallContext).getFilters()
+
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+
+        assertThat(isAuthorized).isFalse()
+    }
+
+    @Test
+    public void isAllowed_should_not_extend_the_enabled_exception_to_the_user_resource() throws Exception {
+        doReturn("user").when(apiCallContext).getResourceName()
+        doReturn(["enabled": "true"]).when(apiCallContext).getFilters()
+
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+
+        assertThat(isAuthorized).isFalse()
+    }
 }

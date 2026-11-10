@@ -128,8 +128,8 @@ To report an issue use the official [bugtracker][bugtracker].
 
 
 
-[downloads]: https://www.bonitasoft.com/downloads
-[standalone]: https://documentation.bonitasoft.com/bonita/latest/runtime/embed-engine
+[downloads]: https://www.ofelia.com/downloads
+[standalone]: https://documentation.ofelia.com/bonita/latest/runtime/embed-engine
 [guide]: https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD
 [wrapper]: https://docs.gradle.org/current/userguide/gradle_wrapper.html
 [bugtracker]: https://bonita.atlassian.net/projects/BBPMC/issues

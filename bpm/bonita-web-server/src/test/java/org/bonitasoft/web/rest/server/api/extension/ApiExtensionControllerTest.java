@@ -122,7 +122,7 @@ class ApiExtensionControllerTest extends AbstractControllerTest<ApiExtensionCont
     @Test
     void should_pass_through_location_header() throws Exception {
         var restApiResponse = new RestApiResponseBuilder()
-                .withAdditionalHeader("Location", "https://documentation.bonitasoft.com/bonita/7.7/")
+                .withAdditionalHeader("Location", "https://documentation.ofelia.com/bonita/7.7/")
                 .withResponse("")
                 .build();
         when(restApiRenderer.handleRestApiCall(any(), any())).thenReturn(restApiResponse);
@@ -131,7 +131,7 @@ class ApiExtensionControllerTest extends AbstractControllerTest<ApiExtensionCont
                 .sessionAttrs(sessionAttributes)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Location", "https://documentation.bonitasoft.com/bonita/7.7/"));
+                .andExpect(header().string("Location", "https://documentation.ofelia.com/bonita/7.7/"));
     }
 
     @Test

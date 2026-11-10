@@ -90,11 +90,18 @@ public class TaskInvolvementDelegate {
             assigneeId = humanTaskInstance.getAssigneeId();
             if (assigneeId > 0) {
                 //check if the user is the assigned user
-                return userId == assigneeId;
-            } else {
+                if (userId == assigneeId) {
+                    return true;
+                }
+            } else if (activityInstanceService.isTaskPendingForUser(humanTaskInstanceId, userId)) {
                 //if the task is not assigned check if the user is mapped to the actor of the task
-                return activityInstanceService.isTaskPendingForUser(humanTaskInstanceId, userId);
+                return true;
             }
+            // IS_ACTIVE_DELEGATE rule — fall-through extension for delegation.
+            // Strict per-task check: the requesting user is the delegate, the task's assignee is the
+            // delegator, and the task's root process is in the rule's whitelist. The DelegationRuleService
+            // check fast-exits cheaply for non-delegate callers.
+            return getServiceAccessor().getDelegationRuleService().isActiveDelegate(userId, humanTaskInstanceId);
         } catch (SActivityInstanceNotFoundException e) {
             throw new ActivityInstanceNotFoundException(humanTaskInstanceId);
         } catch (SBonitaReadException | SActivityReadException e) {
