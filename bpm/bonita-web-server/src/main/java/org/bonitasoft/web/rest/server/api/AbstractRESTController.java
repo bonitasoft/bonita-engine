@@ -15,9 +15,10 @@ package org.bonitasoft.web.rest.server.api;
 
 import javax.servlet.http.HttpSession;
 
-import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -30,8 +31,9 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Parent class providing common methods for Bonita REST Controllers
  */
-@Slf4j
 public abstract class AbstractRESTController {
+
+    public static final String API_SPRING_INTERNAL = "APISpringInternal";
 
     public APISession getApiSession(HttpSession session) {
         APISession apiSession = (APISession) session.getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
@@ -52,9 +54,31 @@ public abstract class AbstractRESTController {
         return getCommandAPI(getApiSession(session));
     }
 
+    // VisibleForTesting
+    public ProcessAPI getProcessAPI(APISession apiSession)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getProcessAPI(apiSession);
+    }
+
+    protected ProcessAPI getProcessAPI(HttpSession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getProcessAPI(getApiSession(session));
+    }
+
     public TenantAdministrationAPI getTenantAdministrationAPI(HttpSession session)
             throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantAPIAccessor.getTenantAdministrationAPI(getApiSession(session));
+    }
+
+    // VisibleForTesting
+    public BusinessDataAPI getBusinessDataAPI(APISession apiSession)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getBusinessDataAPI(apiSession);
+    }
+
+    protected BusinessDataAPI getBusinessDataAPI(HttpSession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getBusinessDataAPI(getApiSession(session));
     }
 
 }

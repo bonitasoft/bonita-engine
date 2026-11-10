@@ -19,3 +19,7 @@ ALTER TABLE business_app DROP CONSTRAINT fk_business_app_themeid;
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_documentid;
+
+--  ------------------------ Temporary_content Trigger ------------------
+DROP TRIGGER IF EXISTS trg_temporary_content_lo_cleanup ON temporary_content;
+DROP FUNCTION IF EXISTS temporary_content_lo_cleanup();

@@ -14,7 +14,7 @@ class TestsPlugin implements Plugin<Project> {
 
         TaskProvider<Test> integrationTest = project.tasks.register("integrationTest", Test) {
             group = "Verification"
-            description = "Runs all integration tests (except tests from slow suite) on H2 database."
+            description = "Runs all integration tests on H2 database."
         }
 
         project.afterEvaluate {

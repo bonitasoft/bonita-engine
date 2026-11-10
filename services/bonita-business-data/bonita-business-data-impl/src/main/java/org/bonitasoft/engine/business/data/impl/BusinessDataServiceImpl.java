@@ -60,6 +60,29 @@ import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Service;
 
+/**
+ * Orchestrates Business Data Model (BDM) operations and JSON serialization for REST APIs.
+ * <p>
+ * This service acts as the main facade for business data operations, coordinating between:
+ * <ul>
+ * <li>{@link BusinessDataRepository} for entity persistence and query execution</li>
+ * <li>{@link JsonBusinessDataSerializer} for JSON serialization with standard/legacy shape support</li>
+ * <li>{@link BusinessDataModelRepository} for BDM metadata and query definitions</li>
+ * </ul>
+ * <p>
+ * Key responsibilities:
+ * <ul>
+ * <li>Execute named queries and serialize results to JSON (via {@link #getJsonQueryEntities})</li>
+ * <li>Retrieve entities by ID and serialize them (via {@link #getJsonEntity}, {@link #getJsonEntities})</li>
+ * <li>Handle Java operations on entities (setters/getters) with aggregation/composition relationship management</li>
+ * <li>Validate query parameters against BDM query definitions</li>
+ * <li>Provide count metadata for paginated query results</li>
+ * <li>Determine which JSON serialization shape to use (standard vs legacy) based on configuration</li>
+ * </ul>
+ *
+ * @see BusinessDataService
+ * @see JsonBusinessDataSerializerImpl for JSON serialization details
+ */
 @Service
 @ConditionalOnSingleCandidate(BusinessDataService.class)
 public class BusinessDataServiceImpl implements BusinessDataService {
@@ -346,11 +369,16 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             }
         }
         Serializable jsonResults;
-        if (queryDefinition.isCountQuery()) {
-            jsonResults = jsonBusinessDataSerializer.serializeCountResult((List<Long>) list, entityClassName);
-        } else {
-            jsonResults = jsonBusinessDataSerializer.serializeEntities((List<Entity>) list, businessDataURIPattern);
+
+        boolean useStandardShape = jsonBusinessDataSerializer.isStandardShapeEnabled();
+        if (isScalarQuery(queryDefinition)) { // SCALAR QUERY (Double, Float, Integer, Long)
+            jsonResults = jsonBusinessDataSerializer.serializeScalarResult(list, entityClassName, useStandardShape);
+
+        } else { // ENTITY QUERY (List or single entity)
+            jsonResults = jsonBusinessDataSerializer.serializeEntityQueryResult((List<Entity>) list,
+                    businessDataURIPattern, useStandardShape, queryDefinition.hasMultipleResults());
         }
+
         return new BusinessDataQueryResultImpl(jsonResults, businessDataQueryMetadata);
     }
 
@@ -361,6 +389,17 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return countQueryDefinition;
         }
         return null;
+    }
+
+    private boolean isScalarQuery(Query queryDefinition) {
+        String type = queryDefinition.getReturnType();
+        if (type == null) {
+            return false;
+        }
+        return type.equals("java.lang.Double")
+                || type.equals("java.lang.Integer")
+                || type.equals("java.lang.Float")
+                || type.equals("java.lang.Long"); // Includes COUNT queries and other Long scalar queries
     }
 
     private boolean ensureQueryIsDefinedInEntity(Class<? extends Entity> businessDataClass,

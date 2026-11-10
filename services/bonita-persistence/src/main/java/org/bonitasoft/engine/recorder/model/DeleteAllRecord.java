@@ -13,8 +13,10 @@
  **/
 package org.bonitasoft.engine.recorder.model;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Objects.requireNonNullElseGet;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -23,26 +25,11 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 /**
  * @author Celine Souchet
  */
-public class DeleteAllRecord {
+public record DeleteAllRecord(Class<? extends PersistentObject> entityClass, List<FilterOption> filters) {
 
-    private final Class<? extends PersistentObject> entityClass;
-
-    private final List<FilterOption> filters;
-
-    public DeleteAllRecord(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) {
-        this.entityClass = entityClass;
-        this.filters = filters;
-    }
-
-    public Class<? extends PersistentObject> getEntityClass() {
-        return entityClass;
-    }
-
-    public List<FilterOption> getFilters() {
-        if (filters == null) {
-            return Collections.unmodifiableList(new ArrayList<FilterOption>());
-        }
-        return Collections.unmodifiableList(filters);
+    @Override
+    public List<FilterOption> filters() {
+        return unmodifiableList(requireNonNullElseGet(filters, ArrayList::new));
     }
 
 }

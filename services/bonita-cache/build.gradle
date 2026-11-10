@@ -11,4 +11,6 @@ dependencies {
 
     testImplementation libs.mockitoCore
     testImplementation libs.logback
+    testImplementation libs.systemLambda
+    testImplementation libs.assertj
 }

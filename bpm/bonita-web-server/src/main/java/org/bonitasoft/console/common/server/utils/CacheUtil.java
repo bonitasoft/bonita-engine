@@ -13,101 +13,99 @@
  **/
 package org.bonitasoft.console.common.server.utils;
 
-import java.io.File;
+import static org.ehcache.config.builders.CacheConfigurationBuilder.newCacheConfigurationBuilder;
+import static org.ehcache.config.builders.CacheManagerBuilder.newCacheManagerBuilder;
+import static org.ehcache.config.builders.ResourcePoolsBuilder.newResourcePoolsBuilder;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.Configuration;
-import net.sf.ehcache.config.ConfigurationFactory;
-import net.sf.ehcache.config.DiskStoreConfiguration;
-import org.bonitasoft.console.common.server.preferences.properties.ConfigurationFilesManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.units.EntryUnit;
 
+@Slf4j
 public class CacheUtil {
 
-    /**
-     * Logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(CacheUtil.class.getName());
+    private static final int DEFAULT_ON_HEAP_MAX_ENTRIES = 10_000;
 
     protected static CacheManager CACHE_MANAGER = null;
 
-    protected static synchronized CacheManager getCacheManager(final String diskStorePath) {
+    protected static synchronized CacheManager getCacheManager() {
         if (CACHE_MANAGER == null) {
-            File cacheConfigFile = ConfigurationFilesManager.getInstance()
-                    .getPlatformConfigurationFile("cache-config.xml");
-            if (cacheConfigFile != null && cacheConfigFile.exists()) {
-                final Configuration configuration = ConfigurationFactory.parseConfiguration(cacheConfigFile);
-                final DiskStoreConfiguration diskStoreConfiguration = new DiskStoreConfiguration();
-                diskStoreConfiguration.setPath(diskStorePath);
-                configuration.addDiskStore(diskStoreConfiguration);
-                CACHE_MANAGER = CacheManager.create(configuration);
-            } else {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn(
-                            "Unable to retrieve the cache configuration file. Creating a cache manager with the default configuration");
-                }
-                CACHE_MANAGER = CacheManager.create();
+            if (log.isInfoEnabled()) {
+                log.info(
+                        "Initializing Ehcache 3 CacheManager with programmatic configuration (heap-only, LRU eviction)");
             }
+            // Create CacheManager with programmatic configuration (no XML needed)
+            // Default cache template: heap-only with 10,000 entry capacity and LRU eviction
+            // Note: Ehcache 3 uses LRU (Least Recently Used) eviction by default when heap capacity is exceeded
+            CACHE_MANAGER = newCacheManagerBuilder()
+                    .withCache("default", newCacheConfigurationBuilder(Object.class, Object.class,
+                            newResourcePoolsBuilder().heap(DEFAULT_ON_HEAP_MAX_ENTRIES, EntryUnit.ENTRIES).build())
+                            .build())
+                    .build(true);
         }
         return CACHE_MANAGER;
     }
 
-    protected static synchronized Cache createCache(final CacheManager cacheManager, final String cacheName) {
+    protected static synchronized Cache<Object, Object> createCache(final CacheManager cacheManager,
+            final String cacheName) {
         // Double-check
-        Cache cache = cacheManager.getCache(cacheName);
+        Cache<Object, Object> cache = cacheManager.getCache(cacheName, Object.class, Object.class);
         if (cache == null) {
-            cacheManager.addCache(cacheName);
-            cache = cacheManager.getCache(cacheName);
+            // In Ehcache 3, we need to provide a configuration when creating a cache
+            // Using a simple heap-based cache with default settings (10,000 entries)
+            // Eviction policy: LRU (Least Recently Used) when heap capacity is exceeded
+            cache = cacheManager.createCache(cacheName,
+                    newCacheConfigurationBuilder(Object.class, Object.class,
+                            newResourcePoolsBuilder().heap(DEFAULT_ON_HEAP_MAX_ENTRIES, EntryUnit.ENTRIES).build())
+                            .build());
         }
         return cache;
     }
 
-    public static void store(final String diskStorePath, final String cacheName, final Object key, final Object value) {
-        final CacheManager cacheManager = getCacheManager(diskStorePath);
-        Cache cache = cacheManager.getCache(cacheName);
+    public static void store(final String cacheName, final Object key, final Object value) {
+        final CacheManager cacheManager = getCacheManager();
+        Cache<Object, Object> cache = cacheManager.getCache(cacheName, Object.class, Object.class);
         if (cache == null) {
             cache = createCache(cacheManager, cacheName);
         }
-        final Element element = new Element(key, value);
-        cache.put(element);
+        // In Ehcache 3, we directly put key-value without Element wrapper
+        cache.put(key, value);
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("####Element " + key + " created in cache with name " + cacheName);
+        if (log.isTraceEnabled()) {
+            log.trace("####Element {} created in cache with name {}", key, cacheName);
         }
     }
 
-    public static Object get(final String diskStorePath, final String cacheName, final Object key) {
+    public static Object get(final String cacheName, final Object key) {
         Object value = null;
-        final CacheManager cacheManager = getCacheManager(diskStorePath);
-        final Cache cache = cacheManager.getCache(cacheName);
+        final CacheManager cacheManager = getCacheManager();
+        final Cache<Object, Object> cache = cacheManager.getCache(cacheName, Object.class, Object.class);
         if (cache != null) {
-            final Element element = cache.get(key);
-            if (element != null) {
-                value = element.getValue();
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("####Element " + key + " found in cache with name " + cacheName);
+            // In Ehcache 3, get() returns the value directly (no Element wrapper)
+            value = cache.get(key);
+            if (value != null) {
+                if (log.isTraceEnabled()) {
+                    log.trace("####Element {} found in cache with name {}", key, cacheName);
                 }
             } else {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("####Element " + key + " not found in cache with name " + cacheName);
+                if (log.isTraceEnabled()) {
+                    log.trace("####Element {} not found in cache with name {}", key, cacheName);
                 }
             }
         } else {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("####Cache with name " + cacheName + " doesn't exists or wasn't created yet.");
+            if (log.isTraceEnabled()) {
+                log.trace("####Cache with name {} doesn't exists or wasn't created yet.", cacheName);
             }
         }
         return value;
     }
 
-    public static void clear(final String diskStorePath, final String cacheName) {
-        final CacheManager cacheManager = getCacheManager(diskStorePath);
-        final Cache cache = cacheManager.getCache(cacheName);
+    public static void clear(final String cacheName) {
+        final Cache<Object, Object> cache = getCacheManager().getCache(cacheName, Object.class, Object.class);
         if (cache != null) {
-            cache.removeAll();
+            // In Ehcache 3, clear() is used instead of removeAll()
+            cache.clear();
         }
     }
 }

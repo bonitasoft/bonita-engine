@@ -1,5 +1,5 @@
 plugins {
-    id "me.champeau.gradle.jmh" version "0.5.0"
+    id("me.champeau.jmh") version "0.7.3"
 }
 
 dependencies {
@@ -11,7 +11,7 @@ dependencies {
 }
 
 jmh {
-    duplicateClassesStrategy = 'warn'
+    duplicateClassesStrategy = DuplicatesStrategy.WARN
     iterations = 2
     threads = 1
     fork = 1

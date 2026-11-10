@@ -18,7 +18,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.bonitasoft.engine.tenant.TenantElementsRestartSupervisor;
+import org.bonitasoft.engine.tenant.SingleNodeTaskCoordinator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class RecoverySchedulerTest {
 
     @Mock
-    TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
+    SingleNodeTaskCoordinator singleNodeTaskCoordinator;
     @Mock
     RecoveryService recoveryService;
     @InjectMocks
@@ -37,7 +37,7 @@ class RecoverySchedulerTest {
 
     @Test
     void should_recover_elements_when_node_is_responsible_for_recovery() {
-        when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(true);
+        when(singleNodeTaskCoordinator.isResponsibleForTask(SingleNodeTaskCoordinator.TASK_RECOVERY)).thenReturn(true);
 
         recoveryScheduler.triggerRecoveryOfAllElements();
 
@@ -46,7 +46,7 @@ class RecoverySchedulerTest {
 
     @Test
     void should_not_recover_elements_when_node_is_not_responsible_for_recovery() {
-        when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(false);
+        when(singleNodeTaskCoordinator.isResponsibleForTask(SingleNodeTaskCoordinator.TASK_RECOVERY)).thenReturn(false);
 
         recoveryScheduler.triggerRecoveryOfAllElements();
 
@@ -55,7 +55,8 @@ class RecoverySchedulerTest {
 
     @Test
     void should_catch_exception_on_error_during_call_of_isResponsibleForRecovery() {
-        when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenThrow(new IllegalStateException("BAD"));
+        when(singleNodeTaskCoordinator.isResponsibleForTask(SingleNodeTaskCoordinator.TASK_RECOVERY))
+                .thenThrow(new IllegalStateException("BAD"));
 
         recoveryScheduler.triggerRecoveryOfAllElements();
 
@@ -64,7 +65,7 @@ class RecoverySchedulerTest {
 
     @Test
     void should_catch_exception_on_error_during_calls_of_triggerRecoveryAllElements() {
-        when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(true);
+        when(singleNodeTaskCoordinator.isResponsibleForTask(SingleNodeTaskCoordinator.TASK_RECOVERY)).thenReturn(true);
         doThrow(new IllegalStateException("BAD")).when(recoveryService).recoverAllElements();
 
         recoveryScheduler.triggerRecoveryOfAllElements();

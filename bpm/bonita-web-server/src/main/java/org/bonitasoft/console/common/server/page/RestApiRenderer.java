@@ -18,18 +18,19 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 
 import groovy.lang.GroovyClassLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.page.extension.PageResourceProviderImpl;
 import org.bonitasoft.console.common.server.page.extension.RestAPIContextImpl;
 import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.extension.rest.RestApiController;
 import org.bonitasoft.web.extension.rest.RestApiResponse;
+import org.bonitasoft.web.extension.rest.RestApiResponseBuilder;
 import org.bonitasoft.web.rest.server.api.extension.ControllerClassName;
 import org.bonitasoft.web.rest.server.api.extension.ResourceExtensionResolver;
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class used by servlets to display a custom rest api
@@ -37,13 +38,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author Laurent Leseigneur
  */
+@Slf4j
 public class RestApiRenderer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestApiRenderer.class.getName());
 
     private final CustomPageService customPageService = new CustomPageService();
 
-    public org.bonitasoft.web.extension.rest.RestApiResponse handleRestApiCall(final HttpServletRequest request,
+    public RestApiResponse handleRestApiCall(final HttpServletRequest request,
             ResourceExtensionResolver resourceExtensionResolver)
             throws CompilationFailedException, InstantiationException, IllegalAccessException, IOException,
             BonitaException {
@@ -58,10 +58,9 @@ public class RestApiRenderer {
         final String mappingKey = resourceExtensionResolver.generateMappingKey();
         return renderResponse(request, apiSession, pageContextHelper, pageResourceProvider, restApiControllerClassName,
                 mappingKey);
-
     }
 
-    private org.bonitasoft.web.extension.rest.RestApiResponse renderResponse(final HttpServletRequest request,
+    private RestApiResponse renderResponse(final HttpServletRequest request,
             final APISession apiSession,
             final PageContextHelper pageContextHelper,
             final PageResourceProviderImpl pageResourceProvider, ControllerClassName restApiControllerClassName,
@@ -79,7 +78,7 @@ public class RestApiRenderer {
             try {
                 return doHandle(request, apiSession, pageContextHelper, pageResourceProvider, restApiControllerClass);
             } catch (final Throwable e) {
-                LOGGER.error("Error when executing rest api extension call to " + mappingKey, e);
+                log.error("Error when executing rest api extension call to {}", mappingKey, e);
                 throw e;
             }
         } finally {
@@ -91,16 +90,18 @@ public class RestApiRenderer {
             final APISession apiSession,
             final PageContextHelper pageContextHelper,
             final PageResourceProviderImpl pageResourceProvider,
-            final Class<?> restApiControllerClass) throws InstantiationException, IllegalAccessException {
-        final org.bonitasoft.web.extension.rest.RestApiController restApiController = instantiate(
-                restApiControllerClass);
+            final Class<?> restApiControllerClass)
+            throws InstantiationException, IllegalAccessException {
+        final RestApiController restApiController = instantiate(restApiControllerClass);
         return restApiController.doHandle(request,
-                new org.bonitasoft.web.extension.rest.RestApiResponseBuilder(),
-                new RestAPIContextImpl(apiSession, new APIClient(apiSession), pageContextHelper.getCurrentLocale(),
+                new RestApiResponseBuilder(),
+                new RestAPIContextImpl(apiSession,
+                        new APIClient(apiSession),
+                        pageContextHelper.getCurrentLocale(),
                         pageResourceProvider));
     }
 
-    protected <T extends Object> T instantiate(Class<?> baseClass)
+    protected <T> T instantiate(Class<?> baseClass)
             throws InstantiationException, IllegalAccessException {
         return (T) baseClass.newInstance();
     }

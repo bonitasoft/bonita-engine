@@ -26,7 +26,8 @@ import org.bonitasoft.console.common.server.i18n.I18n;
 import org.bonitasoft.web.rest.server.framework.exception.APIMissingIdException;
 import org.bonitasoft.web.rest.server.framework.json.JSonSimpleDeserializer;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
-import org.bonitasoft.web.rest.server.framework.utils.RestRequestParser;
+import org.bonitasoft.web.rest.server.framework.utils.ParsedRestRequestURI;
+import org.bonitasoft.web.rest.server.framework.utils.RestRequestURIParser;
 import org.bonitasoft.web.toolkit.client.common.AbstractTreeNode;
 import org.bonitasoft.web.toolkit.client.common.Tree;
 import org.bonitasoft.web.toolkit.client.common.TreeLeaf;
@@ -39,6 +40,7 @@ import org.bonitasoft.web.toolkit.client.data.item.IItem;
 import org.bonitasoft.web.toolkit.client.data.item.Item;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.ValidatorEngine;
 import org.bonitasoft.web.toolkit.server.ServletCall;
+import org.springframework.http.HttpHeaders;
 
 /**
  * @author Séverin Moussel
@@ -137,16 +139,16 @@ public class APIServletCall extends ServletCall {
     }
 
     void parsePath(final HttpServletRequest request) {
-        final RestRequestParser restRequestParser = new RestRequestParser(request).invoke();
-        APIID resourceQualifiers = restRequestParser.getResourceQualifiers();
+        final ParsedRestRequestURI parsedURI = new RestRequestURIParser(request).parse();
+        APIID resourceQualifiers = parsedURI.getResourceQualifiers();
         if (resourceQualifiers != null && resourceQualifiers.getIds().size() > 0
                 && isAnyNumberIdNegativeOrZero(resourceQualifiers.getIds())) {
-            throw new APIIncorrectIdException("Id must be non-zero positive for " + restRequestParser.getApiName()
-                    + " on resource " + restRequestParser.getResourceName());
+            throw new APIIncorrectIdException("Id must be non-zero positive for " + parsedURI.getApiName()
+                    + " on resource " + parsedURI.getResourceName());
         }
         id = resourceQualifiers;
-        apiName = restRequestParser.getApiName();
-        resourceName = restRequestParser.getResourceName();
+        apiName = parsedURI.getApiName();
+        resourceName = parsedURI.getResourceName();
     }
 
     private boolean isAnyNumberIdNegativeOrZero(List<String> ids) {
@@ -184,7 +186,7 @@ public class APIServletCall extends ServletCall {
                         Integer.parseInt(getParameter(PARAMETER_LIMIT, "10")), getParameter(PARAMETER_SEARCH),
                         getParameter(PARAMETER_ORDER), parseFilters(getParameterAsList(PARAMETER_FILTER)),
                         getParameterAsList(PARAMETER_DEPLOY), getParameterAsList(PARAMETER_COUNTER));
-                head("Content-Range", result.getPage() + "-" + result.getLength() + "/" + result.getTotal());
+                head(HttpHeaders.CONTENT_RANGE, result.getPage() + "-" + result.getLength() + "/" + result.getTotal());
 
                 output(result.getResults());
             }

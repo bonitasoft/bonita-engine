@@ -1,34 +1,36 @@
-
-
 dependencies {
     api project(':services:bonita-cache')
     api project(':services:bonita-builder')
     api project(':services:bonita-persistence')
     api project(':services:bonita-commons')
     testImplementation project(':services:bonita-events')
-    testImplementation libs.mockitoCore
-    testImplementation libs.assertj
-    testImplementation libs.logback
+    testImplementation(libs.mockitoCore)
+    testImplementation(libs.assertj)
+    testImplementation(libs.logback)
 
-    annotationProcessor libs.lombok
-    compileOnly libs.lombok
+    annotationProcessor(libs.lombok)
+    compileOnly(libs.lombok)
 }
 
 group = 'org.bonitasoft.engine.platform'
-def generatePlatformProperties = task("generatePlatformProperties") {
+
+def generatePlatformProperties = tasks.register("generatePlatformProperties") {
+    def outputDir = layout.buildDirectory.dir("generated/main/resources/org/bonitasoft/engine/platform/model/impl")
+    def outputFile = layout.buildDirectory.file("generated/main/resources/org/bonitasoft/engine/platform/model/impl/platform.properties")
+    def projectVersion = project.version
+
     doFirst{
-        project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl").mkdirs()
-        project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl/platform.properties").text =
-                "version $project.version"
+        outputDir.get().asFile.mkdirs()
+        outputFile.get().asFile.text = "version $projectVersion"
     }
-    inputs.property "version", project.version
-    outputs.file project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl/platform.properties")
+    inputs.property "version", projectVersion
+    outputs.file outputFile
 }
 tasks.processResources.dependsOn generatePlatformProperties
 sourceSets {
     main {
         resources {
-            srcDir project.file("build/generated/main/resources")
+            srcDir(layout.buildDirectory.dir("generated/main/resources"))
         }
     }
 }

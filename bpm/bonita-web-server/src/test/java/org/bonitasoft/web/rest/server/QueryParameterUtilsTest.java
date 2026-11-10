@@ -14,71 +14,304 @@
 package org.bonitasoft.web.rest.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.web.rest.server.QueryParameterUtils.parseFilters;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.bonitasoft.web.rest.server.QueryParameterUtils.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class QueryParameterUtilsTest {
+class QueryParameterUtilsTest {
 
-    @Test
-    void parseFilterShouldBuildExpectedMap() {
-        // given:
-        final List<String> filters = Arrays.asList("toto=17", "titi='EN_ECHEC'", "task=task=with=equal=in=name",
-                "list=value1,value2,value3", "anotherlist='value-1','value-2','value-3'");
+    @Nested
+    class ParseFilters {
 
-        // when:
-        final Map<String, String> parseFilters = parseFilters(filters);
+        @Test
+        void should_build_map_from_key_value_pairs() {
+            var filters = List.of("id=17", "name='John'",
+                    "filter_key_1=value=with=equal=in=value",
+                    "filter_key_2=value1,value2,value3",
+                    "filter_key_3='value-1','value-2','value-3'");
 
-        // then:
-        assertThat(parseFilters).hasSize(5);
-        assertThat(parseFilters.get("toto")).isEqualTo("17");
-        assertThat(parseFilters.get("titi")).isEqualTo("'EN_ECHEC'");
-        assertThat(parseFilters.get("task")).isEqualTo("task=with=equal=in=name");
-        assertThat(parseFilters.get("list")).isEqualTo("value1,value2,value3");
-        assertThat(parseFilters.get("anotherlist")).isEqualTo("'value-1','value-2','value-3'");
+            assertThat(parseFilters(filters))
+                    .hasSize(5)
+                    .containsEntry("id", "17")
+                    .containsEntry("name", "'John'")
+                    .containsEntry("filter_key_1", "value=with=equal=in=value")
+                    .containsEntry("filter_key_2", "value1,value2,value3")
+                    .containsEntry("filter_key_3", "'value-1','value-2','value-3'");
+        }
+
+        @Test
+        void should_handle_special_characters_in_values() {
+            var filters = List.of("path=/d/d,e");
+
+            assertThat(parseFilters(filters))
+                    .hasSize(1)
+                    .containsEntry("path", "/d/d,e");
+        }
+
+        @Test
+        void should_put_null_value_when_filter_has_no_value() {
+            var filters = List.of("id=");
+
+            assertThat(parseFilters(filters))
+                    .hasSize(1)
+                    .containsEntry("id", null);
+        }
+
+        @Test
+        void should_ignore_filter_with_no_name() {
+            assertThat(parseFilters(List.of("="))).isEmpty();
+        }
+
+        @Test
+        void should_return_null_when_input_is_null() {
+            assertThat(parseFilters(null)).isNull();
+        }
+
+        @Test
+        void should_return_empty_map_for_empty_list() {
+            assertThat(parseFilters(List.of())).isEmpty();
+        }
+
+        @Test
+        void should_put_null_value_when_filter_has_no_equals_sign() {
+            var filters = List.of("id");
+
+            assertThat(parseFilters(filters))
+                    .hasSize(1)
+                    .containsEntry("id", null);
+        }
+
     }
 
-    @Test
-    void parseFilterWithSpecialCharactersShouldBuildExpectedMap() {
-        // given:
-        final List<String> filters = Arrays.asList("a=b", "c=/d/d,e");
+    @Nested
+    class ExtractStringFilter {
 
-        // when:
-        final Map<String, String> parseFilters = parseFilters(filters);
+        @Test
+        void should_return_value_when_filter_is_present() {
+            var filters = List.of("name=John", "age=30");
 
-        // then:
-        assertThat(parseFilters).hasSize(2);
-        assertThat(parseFilters.get("a")).isEqualTo("b");
-        assertThat(parseFilters.get("c")).isEqualTo("/d/d,e");
+            assertThat(extractStringFilter(filters, "name")).isEqualTo("John");
+        }
+
+        @Test
+        void should_return_null_when_filter_is_not_present() {
+            var filters = List.of("other=John");
+
+            assertThat(extractStringFilter(filters, "name")).isNull();
+        }
+
+        @Test
+        void should_return_null_when_filters_is_null() {
+            assertThat(extractStringFilter(null, "name")).isNull();
+        }
+
+        @Test
+        void should_return_null_when_value_is_empty() {
+            var filters = List.of("name=");
+
+            assertThat(extractStringFilter(filters, "name")).isNull();
+        }
+
+        @Test
+        void should_return_value_containing_equals_sign() {
+            var filters = List.of("name=a=b=c");
+
+            assertThat(extractStringFilter(filters, "name")).isEqualTo("a=b=c");
+        }
+
+        @Test
+        void should_return_first_matching_filter() {
+            var filters = List.of("name=first", "name=second");
+
+            assertThat(extractStringFilter(filters, "name")).isEqualTo("first");
+        }
+
+        @Test
+        void should_return_null_when_filter_has_no_equals_sign() {
+            var filters = List.of("name");
+
+            assertThat(extractStringFilter(filters, "name")).isNull();
+        }
+
+        @Test
+        void should_return_comma_separated_value_as_is() {
+            var filters = List.of("name=John,Jane,Bob");
+
+            assertThat(extractStringFilter(filters, "name")).isEqualTo("John,Jane,Bob");
+        }
     }
 
-    @Test
-    void parseFilterShouldBuildMapEvenIfNoValueForParam() {
-        // given:
-        final List<String> filters = new ArrayList<>(2);
-        filters.add("nomatchingvalue=");
+    @Nested
+    class ExtractMandatoryStringFilter {
 
-        // when:
-        final Map<String, String> parseFilters = parseFilters(filters);
+        @Test
+        void should_return_value_when_filter_is_present() {
+            var filters = List.of("name=John");
 
-        // then:
-        assertThat(parseFilters).hasSize(1);
-        assertThat(parseFilters.get("nomatchingvalue")).isNull();
+            assertThat(extractMandatoryStringFilter(filters, "name")).isEqualTo("John");
+        }
+
+        @Test
+        void should_throw_when_filter_is_missing() {
+            var filters = List.of("other=John");
+
+            assertThatThrownBy(() -> extractMandatoryStringFilter(filters, "name"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter name is mandatory");
+        }
+
+        @Test
+        void should_throw_when_value_is_empty() {
+            var filters = List.of("name=");
+
+            assertThatThrownBy(() -> extractMandatoryStringFilter(filters, "name"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter name is mandatory");
+        }
+
+        @Test
+        void should_throw_when_filter_has_no_equals_sign() {
+            var filters = List.of("name");
+
+            assertThatThrownBy(() -> extractMandatoryStringFilter(filters, "name"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter name is mandatory");
+        }
+
+        @Test
+        void should_return_comma_separated_value_as_is() {
+            var filters = List.of("name=John,Jane,Bob");
+
+            assertThat(extractMandatoryStringFilter(filters, "name")).isEqualTo("John,Jane,Bob");
+        }
+
+        @Test
+        void should_throw_when_filters_is_null() {
+            assertThatThrownBy(() -> extractMandatoryStringFilter(null, "name"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter name is mandatory");
+        }
     }
 
-    @Test
-    public void parseFilterShouldNotFailIfParameterHasNoName() {
-        assertThat(parseFilters(List.of("="))).isEmpty();
+    @Nested
+    class ExtractLongFilter {
+
+        @Test
+        void should_return_value_when_filter_is_a_valid_number() {
+            var filters = List.of("id=42");
+
+            assertThat(extractLongFilter(filters, "id")).isEqualTo(42L);
+        }
+
+        @Test
+        void should_return_null_when_filter_is_not_present() {
+            var filters = List.of("other=42");
+
+            assertThat(extractLongFilter(filters, "id")).isNull();
+        }
+
+        @Test
+        void should_return_null_when_filters_is_null() {
+            assertThat(extractLongFilter(null, "id")).isNull();
+        }
+
+        @Test
+        void should_throw_when_value_is_not_a_number() {
+            var filters = List.of("id=abc");
+
+            assertThatThrownBy(() -> extractLongFilter(filters, "id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter id must be a number");
+        }
+
+        @Test
+        void should_parse_negative_number() {
+            var filters = List.of("id=-5");
+
+            assertThat(extractLongFilter(filters, "id")).isEqualTo(-5L);
+        }
+
+        @Test
+        void should_return_null_when_filter_has_no_equals_sign() {
+            var filters = List.of("id");
+
+            assertThat(extractLongFilter(filters, "id")).isNull();
+        }
+
+        @Test
+        void should_throw_when_value_contains_commas() {
+            var filters = List.of("id=1,2,3");
+
+            assertThatThrownBy(() -> extractLongFilter(filters, "id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter id must be a number");
+        }
     }
 
-    @Test
-    public void parseFilterShouldReturnNullIfListIsNull() {
-        assertThat(parseFilters(null)).isNull();
-    }
+    @Nested
+    class ExtractMandatoryLongFilter {
 
+        @Test
+        void should_return_value_when_filter_is_a_valid_number() {
+            var filters = List.of("id=99");
+
+            assertThat(extractMandatoryLongFilter(filters, "id")).isEqualTo(99L);
+        }
+
+        @Test
+        void should_throw_when_filter_is_missing() {
+            var filters = List.of("other=42");
+
+            assertThatThrownBy(() -> extractMandatoryLongFilter(filters, "id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter id is mandatory");
+        }
+
+        @Test
+        void should_throw_when_value_is_not_a_number() {
+            var filters = List.of("id=abc");
+
+            assertThatThrownBy(() -> extractMandatoryLongFilter(filters, "id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter id must be a number");
+        }
+
+        @Test
+        void should_throw_when_value_is_empty() {
+            var filters = List.of("id=");
+
+            assertThatThrownBy(() -> extractMandatoryLongFilter(filters, "id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter id is mandatory");
+        }
+
+        @Test
+        void should_throw_when_filter_has_no_equals_sign() {
+            var filters = List.of("id");
+
+            assertThatThrownBy(() -> extractMandatoryLongFilter(filters, "id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter id is mandatory");
+        }
+
+        @Test
+        void should_throw_when_value_contains_commas() {
+            var filters = List.of("id=1,2,3");
+
+            assertThatThrownBy(() -> extractMandatoryLongFilter(filters, "id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter id must be a number");
+        }
+
+        @Test
+        void should_throw_when_filters_is_null() {
+            assertThatThrownBy(() -> extractMandatoryLongFilter(null, "id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("filter id is mandatory");
+        }
+    }
 }

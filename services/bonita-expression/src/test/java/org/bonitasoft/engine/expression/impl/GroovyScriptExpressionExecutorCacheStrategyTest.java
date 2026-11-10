@@ -22,8 +22,6 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +37,6 @@ import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -47,10 +44,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.impl.SExpressionBuilderFactoryImpl;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,27 +60,25 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Mock
     private ClassLoaderService classLoaderService;
 
-    @Mock
-    private ReadSessionAccessor sessionAccessor;
-
-    @Mock
-    private CacheConfiguration defaultCacheConfiguration;
-
     private EhCacheCacheService cacheService;
 
     private GroovyScriptExpressionExecutorCacheStrategy groovyScriptExpressionExecutorCacheStrategy;
 
-    private final static String diskStorePath = IOUtil.TMP_DIRECTORY + File.separator
-            + GroovyScriptExpressionExecutorCacheStrategyTest.class.getSimpleName();
     private Class script2;
     private Map<String, Object> context;
 
     @Before
     public void setup() throws Exception {
+        // Create valid cache configurations for Ehcache 3 (heap-only)
         final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName("GROOVY_SCRIPT_CACHE_NAME");
+        cacheConfiguration.setMaxElementsInMemory(1000);
+
+        final CacheConfiguration defaultCacheConfiguration = new CacheConfiguration();
+        defaultCacheConfiguration.setMaxElementsInMemory(1000);
+
         final List<CacheConfiguration> cacheConfigurations = Collections.singletonList(cacheConfiguration);
-        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, diskStorePath);
+        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration);
         cacheService.start();
         groovyScriptExpressionExecutorCacheStrategy = new GroovyScriptExpressionExecutorCacheStrategy(cacheService,
                 classLoaderService);
@@ -98,11 +91,6 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @After
     public void teardown() {
         cacheService.stop();
-    }
-
-    @AfterClass
-    public static void cleanupClass() throws IOException {
-        IOUtil.deleteDir(new File(diskStorePath));
     }
 
     @Test
@@ -124,9 +112,9 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         // given
 
         // when
-        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12L);
         groovyScriptExpressionExecutorCacheStrategy.onUpdate(null);
-        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(12L);
 
         // then
         assertThat(shell1).isNotNull();
@@ -139,9 +127,9 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         // given
 
         // when
-        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12L);
         groovyScriptExpressionExecutorCacheStrategy.onDestroy(null);
-        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(12L);
 
         // then
         assertThat(shell1).isNotNull();

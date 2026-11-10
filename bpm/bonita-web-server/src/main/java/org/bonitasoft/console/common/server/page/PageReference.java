@@ -13,51 +13,22 @@
  **/
 package org.bonitasoft.console.common.server.page;
 
+import java.io.Serial;
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PageReference implements Serializable {
 
-    /**
-     * UID
-     */
+    @Serial
     private static final long serialVersionUID = -1692145871057019847L;
 
     private Long pageId;
-
     private String url;
-
-    private Long processId;
-
-    public PageReference() {
-    }
-
-    public PageReference(final Long pageId, final String url) {
-        this.pageId = pageId;
-        this.url = url;
-    }
-
-    public Long getPageId() {
-        return pageId;
-    }
-
-    public void setPageId(final Long pageId) {
-        this.pageId = pageId;
-    }
-
-    public String getURL() {
-        return url;
-    }
-
-    public void setURL(final String url) {
-        this.url = url;
-    }
-
-    public Long getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(final Long processId) {
-        this.processId = processId;
-    }
 
 }

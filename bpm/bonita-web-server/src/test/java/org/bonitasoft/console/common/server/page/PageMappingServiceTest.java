@@ -71,7 +71,7 @@ public class PageMappingServiceTest {
         final PageURL pageURL = mock(PageURL.class);
         when(pageURL.getUrl()).thenReturn("/externalURL");
         when(pageURL.getPageId()).thenReturn(null);
-        ArgumentCaptor<Map> contextCaptor = ArgumentCaptor.forClass(Map.class);
+        ArgumentCaptor<Map<String, Serializable>> contextCaptor = ArgumentCaptor.forClass(Map.class);
         when(pageAPI.resolvePageOrURL(eq("process/processName/processVersion"), anyMap(), eq(true)))
                 .thenReturn(pageURL);
 
@@ -87,7 +87,7 @@ public class PageMappingServiceTest {
                 ((Map<String, String[]>) capturedContext.get(URLAdapterConstants.QUERY_PARAMETERS)).get("key")[0]);
         assertNotNull(returnedPageReference);
         assertNull(returnedPageReference.getPageId());
-        assertEquals("/externalURL", returnedPageReference.getURL());
+        assertEquals("/externalURL", returnedPageReference.getUrl());
     }
 
 }

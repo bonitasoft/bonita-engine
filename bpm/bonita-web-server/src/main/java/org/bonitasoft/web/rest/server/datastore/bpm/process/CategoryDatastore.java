@@ -150,8 +150,6 @@ public class CategoryDatastore extends CommonDatastore<CategoryItem, Category> i
             return convertEngineToConsoleItem(result);
         } catch (CategoryNotFoundException e) {
             throw new APIItemNotFoundException(CategoryDefinition.TOKEN, id);
-        } catch (final BonitaException e) {
-            throw new APIException(e);
         }
     }
 

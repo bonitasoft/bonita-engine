@@ -13,175 +13,76 @@
  **/
 package org.bonitasoft.engine.cache;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Emmanuel Duchastenier
  */
+@Setter
+@Getter
 public class CacheConfiguration {
-
-    private String evictionPolicy = "LRU";
-
-    private long timeToLiveSeconds = 60 * 60;
-
-    private int maxElementsInMemory = 10000;
-
-    private int maxElementsOnDisk = 20000;
-
-    private boolean inMemoryOnly = false;
-
-    private boolean eternal = false;
-
-    private boolean readIntensive = false;
-
-    private boolean copyOnRead = false;
-
-    private boolean copyOnWrite = false;
-
-    private String name;
-
-    /**
-     * @return the evictionPolicy
-     */
-    public String getEvictionPolicy() {
-        return evictionPolicy;
-    }
 
     /**
      * most implementation support LRU and LFU
      * some implementation (ehcache) support FIFO also
      * by default set to LRU
-     *
-     * @param evictionPolicy
-     *        the evictionPolicy to set
      */
-    public void setEvictionPolicy(final String evictionPolicy) {
-        this.evictionPolicy = evictionPolicy;
-    }
-
-    /**
-     * true if the elements are never evicted automatically
-     *
-     * @return the eternal
-     */
-    public boolean isEternal() {
-        return eternal;
-    }
-
-    /**
-     * @param eternal
-     *        the eternal to set
-     */
-    public void setEternal(final boolean eternal) {
-        this.eternal = eternal;
-    }
+    private String evictionPolicy = "LRU";
 
     /**
      * The time to live is the time elements from this cache will be kept.
      * After this time the element can be evicted
-     *
-     * @return the timeToLiveSeconds
      */
-    public long getTimeToLiveSeconds() {
-        return timeToLiveSeconds;
-    }
+    private long timeToLiveSeconds = 60 * 60;
 
     /**
      * the maximum number of elements the cache will keep in memory
-     *
-     * @return the maxElementsInMemory
      */
-    public int getMaxElementsInMemory() {
-        return maxElementsInMemory;
-    }
-
-    /**
-     * the maximum number of element the cache will keep on disk after the limit of elements in memory is reached
-     *
-     * @return the maxElementsOnDisk
-     */
-    public int getMaxElementsOnDisk() {
-        return maxElementsOnDisk;
-    }
-
-    /**
-     * if true nothing is stored on disk
-     *
-     * @return the inMemoryOnly
-     */
-    public boolean isInMemoryOnly() {
-        return inMemoryOnly;
-    }
-
-    /**
-     * @param timeToLiveSeconds
-     *        the timeToLiveSeconds to set
-     */
-    public void setTimeToLiveSeconds(final long timeToLiveSeconds) {
-        this.timeToLiveSeconds = timeToLiveSeconds;
-    }
+    private int maxElementsInMemory = 10000;
 
     /**
      * @param maxElementsInMemory
-     *        the maxElementsInMemory to set
+     *        the maxElementsInMemory to set. Zero is an invalid value (infinite).
+     *        If value is set to 0 or less, the value will be reset to 1.
      */
     public void setMaxElementsInMemory(final int maxElementsInMemory) {
         this.maxElementsInMemory = maxElementsInMemory;
+        if (this.maxElementsInMemory <= 0) {
+            this.maxElementsInMemory = 1;
+        }
     }
 
     /**
-     * @param maxElementsOnDisk
-     *        the maxElementsOnDisk to set
+     * true if the elements are never evicted automatically
      */
-    public void setMaxElementsOnDisk(final int maxElementsOnDisk) {
-        this.maxElementsOnDisk = maxElementsOnDisk;
-    }
-
-    /**
-     * @param inMemoryOnly
-     *        the inMemoryOnly to set
-     */
-    public void setInMemoryOnly(final boolean inMemoryOnly) {
-        this.inMemoryOnly = inMemoryOnly;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    private boolean eternal = false;
 
     /**
      * Are the elements stored in the cache read more often than written ?
-     *
-     * @return readIntensive
      */
-    public boolean isReadIntensive() {
-        return readIntensive;
-    }
+    private boolean readIntensive = false;
 
     /**
-     * @param readIntensive
-     *        the readIntensive to set
+     * Off-heap memory size in megabytes.
+     * Zero means no off-heap storage (heap-only).
+     * <p>
+     * Off-heap storage provides overflow capacity for the heap tier without requiring disk I/O.
+     * It uses native memory (outside JVM heap) which doesn't participate in garbage collection,
+     * reducing GC pressure while maintaining good performance.
+     * </p>
+     * <p>
+     * Example: 512 = 512MB of off-heap memory
+     * </p>
+     * <p>
+     * Note: Off-heap storage requires that cached objects are serializable.
+     * </p>
      */
-    public void setReadIntensive(final boolean readIntensive) {
-        this.readIntensive = readIntensive;
-    }
+    private int offHeapSizeMB = 0; // Default: no off-heap (heap-only)
 
-    public boolean isCopyOnRead() {
-        return copyOnRead;
-    }
-
-    public void setCopyOnRead(final boolean copyOnRead) {
-        this.copyOnRead = copyOnRead;
-    }
-
-    public boolean isCopyOnWrite() {
-        return copyOnWrite;
-    }
-
-    public void setCopyOnWrite(final boolean copyOnWrite) {
-        this.copyOnWrite = copyOnWrite;
-    }
+    /**
+     * Name of this cache configuration
+     */
+    private String name;
 
 }

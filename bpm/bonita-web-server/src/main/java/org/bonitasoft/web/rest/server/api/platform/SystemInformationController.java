@@ -27,7 +27,6 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/API/system/information")
 public class SystemInformationController extends AbstractRESTController {
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public Map<String, String> getPlatformInfo(HttpSession session) {
         try {
             return getPlatformInformationAPI(getApiSession(session)).getPlatformInformation();

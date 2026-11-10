@@ -15,8 +15,6 @@ package org.bonitasoft.web.rest.server.api.resource;
 
 import static org.bonitasoft.web.toolkit.client.common.json.JSonUtil.escape;
 
-import org.restlet.ext.jackson.JacksonRepresentation;
-
 /**
  * Representation for error entity
  *
@@ -56,7 +54,4 @@ public class ErrorMessage {
         this.message = escape(message);
     }
 
-    public JacksonRepresentation<ErrorMessage> toEntity() {
-        return new JacksonRepresentation<>(this);
-    }
 }

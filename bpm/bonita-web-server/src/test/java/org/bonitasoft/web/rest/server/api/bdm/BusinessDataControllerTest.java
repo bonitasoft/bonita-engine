@@ -14,9 +14,7 @@
 package org.bonitasoft.web.rest.server.api.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.web.rest.server.api.RestControllerUtils.initMockMvcWithSessionAttributes;
 import static org.mockito.Mockito.*;
-import static org.mockito.quality.Strictness.LENIENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -34,105 +32,141 @@ import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.session.APISession;
-import org.junit.jupiter.api.BeforeEach;
+import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.stubbing.Answer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@MockitoSettings(strictness = LENIENT)
-class BusinessDataControllerTest {
+class BusinessDataControllerTest extends AbstractControllerTest<BusinessDataController> {
 
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
-    private MockMvc mockMvc;
-
-    @Mock
-    private APISession apiSession;
+    private static final String FAKE_CLASS_NAME = "org.bonitasoft.pojo.Employee";
+    private static final long FAKE_ID = 1983L;
+    private static final String FAKE_EXCEPTION_MESSAGE = "fake exception message";
 
     @Mock
-    CommandAPI commandAPI;
+    protected CommandAPI commandAPI;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        commandAPI = mock(CommandAPI.class);
-        BusinessDataController businessDataController = spy(new BusinessDataController());
-        mockMvc = initMockMvcWithSessionAttributes(businessDataController, sessionAttributes, apiSession);
-        doReturn(commandAPI).when(businessDataController).getCommandAPI(apiSession);
+    @Override
+    protected BusinessDataController createController() {
+        return spy(new BusinessDataController());
+    }
+
+    @Override
+    protected void configureMocks(BusinessDataController controller) throws Exception {
+        doReturn(commandAPI).when(controller).getCommandAPI(apiSession);
     }
 
     @Test
     void should_return_the_business_data_based_on_its_id() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<>();
-        parameters.put("entityClassName", "org.bonitasoft.pojo.Employee");
-        parameters.put("businessDataId", 1983L);
+        parameters.put("entityClassName", FAKE_CLASS_NAME);
+        parameters.put("businessDataId", FAKE_ID);
         parameters.put("businessDataURIPattern", "/API/bdm/businessData/{className}/{id}/{field}");
-        when(commandAPI.execute("getBusinessDataById", parameters)).thenReturn("{\"name\":\"Matti\"}");
+        when(commandAPI.execute("getBusinessDataById", parameters)).thenReturn("{\"name\":\"たこ焼き\"}");
 
-        mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983").sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        //when
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/{id}", FAKE_CLASS_NAME, FAKE_ID)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+
+                //then
                 .andExpect(status().isOk())
-
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("{\"name\":\"Matti\"}"));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        {"name":"たこ焼き"}
+                        """, true));
     }
 
     @Test
     void should_get_return_a_not_found_error_status_when_command_is_not_found() throws Exception {
         doThrow(new CommandNotFoundException(null)).when(commandAPI).execute(anyString(), anyMap());
 
-        mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983").sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        //when
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/{id}", FAKE_CLASS_NAME, FAKE_ID)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+
+                //then
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(CommandNotFoundException.class.toString()));
     }
 
     @Test
     void should_get_return_an_error_when_id_is_not_a_integer() throws Exception {
+        var id = "not_a_number";
+        //when
         mockMvc.perform(
-                get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/not_a_number").sessionAttrs(sessionAttributes)
+                get("/API/bdm/businessData/{className}/{id}", FAKE_CLASS_NAME, id)
+                        .sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
+
+                //then
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class java.lang.IllegalArgumentException","message":"[ not_a_number ] must be a number"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("[ %s ] must be a number".formatted(id)));
     }
 
     @Test
     void should_get_return_an_internal_server_error_status_when_command_is_not_well_parameterized()
             throws Exception {
-        doThrow(new CommandParameterizationException("id is missing")).when(commandAPI).execute(anyString(), anyMap());
+        doThrow(new CommandParameterizationException(FAKE_EXCEPTION_MESSAGE))
+                .when(commandAPI).execute(anyString(), anyMap());
 
-        mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983").sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
+        //when
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/{id}", FAKE_CLASS_NAME, FAKE_ID)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+
+                //then
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(CommandParameterizationException.class.toString()))
+                .andExpect(jsonPath("$.message").value(FAKE_EXCEPTION_MESSAGE));
     }
 
     @Test
     void should_get_return_a_not_found_status_when_command_fails_business_data_not_found() throws Exception {
-        doThrow(newCommandExecutionException(new BusinessDataNotFoundException(new RuntimeException("not found"))))
-                .when(commandAPI).execute(anyString(),
-                        anyMap());
+        doThrow(newCommandExecutionException(
+                new BusinessDataNotFoundException(new RuntimeException(FAKE_EXCEPTION_MESSAGE))))
+                .when(commandAPI).execute(anyString(), anyMap());
 
-        mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983").sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        //when
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/{id}", FAKE_CLASS_NAME, FAKE_ID)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+
+                //then
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(BusinessDataNotFoundException.class.toString()))
+                .andExpect(jsonPath("$.message").value(FAKE_EXCEPTION_MESSAGE));
     }
 
     @Test
     void should_get_return_an_internal_server_error_status_when_command_fails_during_execution() throws Exception {
-        doThrow(newCommandExecutionException(new BusinessDataRepositoryException("repository error"))).when(commandAPI)
-                .execute(anyString(), anyMap());
+        var exception = new BusinessDataRepositoryException(FAKE_EXCEPTION_MESSAGE);
+        doThrow(newCommandExecutionException(exception))
+                .when(commandAPI).execute(anyString(), anyMap());
 
-        mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983").sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        //when
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/{id}", FAKE_CLASS_NAME, FAKE_ID)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+
+                //then
                 .andExpect(status().isInternalServerError())
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"org.bonitasoft.engine.business.data.BusinessDataRepositoryException: repository error"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(CommandExecutionException.class.toString()))
+                .andExpect(jsonPath("$.message").value(exception.toString()));
     }
 
     // =================================================================================================================
@@ -141,33 +175,42 @@ class BusinessDataControllerTest {
 
     @Test
     void should_fetch_business_data_child_if_it_is_specified() throws Exception {
+        var fieldName = "child";
         final Map<String, Serializable> parameters = new HashMap<>();
-        parameters.put("entityClassName", "org.bonitasoft.pojo.Employee");
-        parameters.put("businessDataId", 1983L);
-        parameters.put("businessDataChildName", "child");
+        parameters.put("entityClassName", FAKE_CLASS_NAME);
+        parameters.put("businessDataId", FAKE_ID);
+        parameters.put("businessDataChildName", fieldName);
         parameters.put("businessDataURIPattern", "/API/bdm/businessData/{className}/{id}/{field}");
         when(commandAPI.execute("getBusinessDataById", parameters)).thenReturn("{\"child\":\"Leo\"}");
 
+        //when
         mockMvc.perform(
-                get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/1983/child").sessionAttrs(sessionAttributes)
+                get("/API/bdm/businessData/{className}/{id}/{fieldName}", FAKE_CLASS_NAME, FAKE_ID, fieldName)
+                        .sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
+
+                //then
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"child":"Leo"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        {"child":"Leo"}
+                        """, true));
     }
 
     @Test
     void should_fetch_business_data_child_return_an_error_when_id_is_not_a_integer() throws Exception {
+        var id = "wrong_id";
+        //when
         mockMvc.perform(
-                get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/wrong_id/child").sessionAttrs(sessionAttributes)
+                get("/API/bdm/businessData/{className}/{id}/{fieldName}", FAKE_CLASS_NAME, id, "child")
+                        .sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
+
+                //then
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class java.lang.IllegalArgumentException","message":"[ wrong_id ] must be a number"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("[ %s ] must be a number".formatted(id)));
     }
 
     // =================================================================================================================
@@ -177,7 +220,7 @@ class BusinessDataControllerTest {
     @Test
     void should_return_the_list_of_business_objects() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<>();
-        parameters.put("entityClassName", "org.bonitasoft.pojo.Employee");
+        parameters.put("entityClassName", FAKE_CLASS_NAME);
         parameters.put("businessDataIds", (Serializable) List.of(1983L, 547862L));
         parameters.put("businessDataURIPattern", BusinessDataFieldValue.URI_PATTERN);
 
@@ -189,66 +232,69 @@ class BusinessDataControllerTest {
                 """;
         when(commandAPI.execute("getBusinessDataByIds", parameters)).thenReturn(jsonResponse);
 
-        mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/findByIds?ids=1983,547862")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON))
+        //when
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/findByIds", FAKE_CLASS_NAME)
+                        .param("ids", "1983,547862")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
 
+                //then
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(jsonResponse));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(jsonResponse, true));
     }
 
     @Test
     public void should_return_the_list_throw_an_error_when_no_ids_are_passed() throws Exception {
         // when
-        final var perform = mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/findByIds")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON));
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/findByIds", FAKE_CLASS_NAME)
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
+                // then
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class java.lang.IllegalArgumentException","message":"query parameter ids is mandatory"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("query parameter ids is mandatory"));
     }
 
     @Test
     public void should_return_the_list_throw_an_error_when_ids_not_integer_are_passed() throws Exception {
+        var ids = "1983,abc";
         // when
-        final var perform = mockMvc
-                .perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/findByIds?ids=1983,abc")
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/findByIds", FAKE_CLASS_NAME)
+                        .param("ids", ids)
                         .sessionAttrs(sessionAttributes)
-                        .accept(MediaType.APPLICATION_JSON));
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
+                // then
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class java.lang.IllegalArgumentException","message":"Bad parameter ids=1983,abc"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("Bad parameter ids=" + ids));
     }
 
     @Test
     public void should_return_the_list_throw_not_found_when_CommandNotFoundException() throws Exception {
         // given
-        when(commandAPI.execute(anyString(), anyMap())).thenThrow(new CommandNotFoundException(new RuntimeException("not found")));
+        when(commandAPI.execute(anyString(), anyMap()))
+                .thenThrow(new CommandNotFoundException(new RuntimeException(FAKE_EXCEPTION_MESSAGE)));
 
         // when
-        final var  perform = mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee/findByIds?ids=1983,1984")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON));
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}/findByIds", FAKE_CLASS_NAME)
+                        .param("ids", "1983,1984")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
+                // then
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("""
-                                {"exception":"class org.bonitasoft.engine.command.CommandNotFoundException","message":"not found"}""")
-                );
-
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(CommandNotFoundException.class.toString()))
+                .andExpect(jsonPath("$.message").value(FAKE_EXCEPTION_MESSAGE));
     }
 
     // =================================================================================================================
@@ -256,6 +302,7 @@ class BusinessDataControllerTest {
     // =================================================================================================================
 
     @Test
+    @SuppressWarnings("unchecked")
     void should_call_custom_query() throws Exception {
         String jsonResponse = """
                     [
@@ -275,7 +322,7 @@ class BusinessDataControllerTest {
             assertThat(parameters).containsEntry("maxResults", 5);
             assertThat(parameters).containsEntry("queryName", "findByName");
             assertThat(parameters).containsEntry("businessDataURIPattern", BusinessDataFieldValue.URI_PATTERN);
-            assertThat(parameters).containsEntry("entityClassName", "org.bonitasoft.pojo.Employee");
+            assertThat(parameters).containsEntry("entityClassName", FAKE_CLASS_NAME);
             assertThat(parameters).containsKey("queryParameters");
 
             final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters
@@ -288,19 +335,26 @@ class BusinessDataControllerTest {
         };
         when(commandAPI.execute(anyString(), anyMap())).then(answer);
 
-        //then
+        //when
         mockMvc.perform(
-                get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByName&c=5&p=3&f=name=John&f=country=US")
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByName")
+                        .param("c", "5")
+                        .param("p", "3")
+                        .param("f", "name=John")
+                        .param("f", "country=US")
                         .sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
 
+                //then
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(jsonResponse))
-                .andExpect(header().string("Content-Range", "3-5/4"));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(jsonResponse, true))
+                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "3-5/4"));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void should_call_custom_query_single_multivalued_query_parameter() throws Exception {
         String jsonResponse = """
                     [
@@ -323,7 +377,7 @@ class BusinessDataControllerTest {
             assertThat(parameters).containsEntry("maxResults", 6);
             assertThat(parameters).containsEntry("queryName", "findByNames");
             assertThat(parameters).containsEntry("businessDataURIPattern", BusinessDataFieldValue.URI_PATTERN);
-            assertThat(parameters).containsEntry("entityClassName", "org.bonitasoft.pojo.Employee");
+            assertThat(parameters).containsEntry("entityClassName", FAKE_CLASS_NAME);
             assertThat(parameters).containsKey("queryParameters");
 
             final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters
@@ -335,19 +389,25 @@ class BusinessDataControllerTest {
         };
         when(commandAPI.execute(anyString(), anyMap())).then(answer);
 
-        //then
+        //when
         mockMvc.perform(
-                get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByNames&c=6&p=2&f=names=Harry,Anna")
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByNames")
+                        .param("c", "6")
+                        .param("p", "2")
+                        .param("f", "names=Harry,Anna")
                         .sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
 
+                //then
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(jsonResponse))
-                .andExpect(header().string("Content-Range", "2-6/26"));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(jsonResponse, true))
+                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "2-6/26"));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void should_call_custom_query_multiple_multivalued_query_parameters() throws Exception {
         String jsonResponse = """
                     [
@@ -368,7 +428,7 @@ class BusinessDataControllerTest {
             assertThat(parameters).containsEntry("maxResults", 8);
             assertThat(parameters).containsEntry("queryName", "findByNamesAndCountries");
             assertThat(parameters).containsEntry("businessDataURIPattern", BusinessDataFieldValue.URI_PATTERN);
-            assertThat(parameters).containsEntry("entityClassName", "org.bonitasoft.pojo.Employee");
+            assertThat(parameters).containsEntry("entityClassName", FAKE_CLASS_NAME);
             assertThat(parameters).containsKey("queryParameters");
 
             final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters
@@ -381,118 +441,137 @@ class BusinessDataControllerTest {
         };
         when(commandAPI.execute(anyString(), anyMap())).then(answer);
 
-        //then
+        //when
         mockMvc.perform(
-                get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByNamesAndCountries&c=8&p=4&f=names=Harry,Anna&f=countries=Catalunya,Corsica,Scotland,Quebec")
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByNamesAndCountries")
+                        .param("c", "8")
+                        .param("p", "4")
+                        .param("f", "names=Harry,Anna", "countries=Catalunya,Corsica,Scotland,Quebec")
                         .sessionAttrs(sessionAttributes)
                         .accept(MediaType.APPLICATION_JSON))
 
+                //then
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(jsonResponse))
-                .andExpect(header().string("Content-Range", "4-8/36"));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(jsonResponse, true))
+                .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "4-8/36"));
     }
 
     @Test
     void should_call_custom_query_throw_exception_when_missing_count() throws Exception {
         // when
-        final var perform = mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByName&p=0")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON));
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByName")
+                        .param("p", "0")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
+                // then
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class java.lang.IllegalArgumentException","message":"query parameter c (count) is mandatory"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("query parameter c (count) is mandatory"));
     }
 
     @Test
     void should_call_custom_query_throw_exception_when_count_conversion_fails() throws Exception {
         // when
-        final var perform = mockMvc
-                .perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByName&p=0&c=abc")
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByName")
+                        .param("p", "0")
+                        .param("c", "abc")
                         .sessionAttrs(sessionAttributes)
-                        .accept(MediaType.APPLICATION_JSON));
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
-                .andExpect(status().isBadRequest()) // Status.CLIENT_ERROR_NOT_FOUND
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class java.lang.IllegalArgumentException","message":"query parameter c (count) should be a number"}"""));
+                // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("query parameter c (count) should be a number"));
     }
 
     @Test
     public void should_call_custom_query_throw_exception_when_missing_page() throws Exception {
         // when
-        final var perform = mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByName&c=0")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON));
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByName")
+                        .param("c", "0")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
+                // then
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class java.lang.IllegalArgumentException","message":"query parameter p (page) is mandatory"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("query parameter p (page) is mandatory"));
     }
 
     @Test
     public void should_call_custom_query_throw_exception_when_page_conversion_fails() throws Exception {
         // when
-        final var perform = mockMvc
-                .perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByName&c=0&p=abc")
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByName")
+                        .param("c", "0")
+                        .param("p", "abc")
                         .sessionAttrs(sessionAttributes)
-                        .accept(MediaType.APPLICATION_JSON));
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
+                // then
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json("""
-                                {"exception":"class java.lang.IllegalArgumentException","message":"query parameter p (page) should be a number"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(IllegalArgumentException.class.toString()))
+                .andExpect(jsonPath("$.message").value("query parameter p (page) should be a number"));
     }
 
     @Test
     void should_call_custom_query_throw_not_found_when_CommandNotFoundException() throws Exception {
         // given
-        when(commandAPI.execute(anyString(), anyMap())).thenThrow(new CommandNotFoundException(new RuntimeException("Unable to read configuration file")));
+        when(commandAPI.execute(anyString(), anyMap()))
+                .thenThrow(new CommandNotFoundException(new RuntimeException(FAKE_EXCEPTION_MESSAGE)));
 
         // when
-        final var perform = mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByName&c=5&p=3")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON));
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByName")
+                        .param("c", "5")
+                        .param("p", "3")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
+                // then
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("""
-                            {"exception":"class org.bonitasoft.engine.command.CommandNotFoundException","message":"Unable to read configuration file"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(CommandNotFoundException.class.toString()))
+                .andExpect(jsonPath("$.message").value(FAKE_EXCEPTION_MESSAGE));
     }
 
     @Test
-    public void should_call_custom_query_return_an_internal_server_error_status_when_command_fails_during_execution() throws Exception {
+    public void should_call_custom_query_return_an_internal_server_error_status_when_command_fails_during_execution()
+            throws Exception {
         // given
-        when(commandAPI.execute(anyString(), anyMap())).thenThrow(newCommandExecutionException(new BusinessDataRepositoryException("repository error")));
+        var exception = new BusinessDataRepositoryException(FAKE_EXCEPTION_MESSAGE);
+        when(commandAPI.execute(anyString(), anyMap()))
+                .thenThrow(newCommandExecutionException(exception));
 
         // when
-        final var perform = mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=findByName&c=5&p=3")
-                .sessionAttrs(sessionAttributes)
-                .accept(MediaType.APPLICATION_JSON));
+        mockMvc.perform(
+                get("/API/bdm/businessData/{className}", FAKE_CLASS_NAME)
+                        .param("q", "findByName")
+                        .param("c", "5")
+                        .param("p", "3")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
 
-        // then
-        perform
+                // then
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("""
-                            {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"org.bonitasoft.engine.business.data.BusinessDataRepositoryException: repository error"}"""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.exception").value(CommandExecutionException.class.toString()))
+                .andExpect(jsonPath("$.message").value(exception.toString()));
     }
 
     // wrap the root cause in the same way the command api does

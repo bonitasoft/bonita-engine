@@ -13,8 +13,10 @@
  **/
 package org.bonitasoft.engine.tenant.restart;
 
+import static org.bonitasoft.engine.tenant.SingleNodeTaskCoordinator.TASK_RECOVERY;
+
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.tenant.TenantElementsRestartSupervisor;
+import org.bonitasoft.engine.tenant.SingleNodeTaskCoordinator;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -26,19 +28,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class RecoveryScheduler {
 
-    private final TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
+    private final SingleNodeTaskCoordinator singleNodeTaskCoordinator;
     private final RecoveryService recoveryService;
 
-    RecoveryScheduler(TenantElementsRestartSupervisor tenantElementsRestartSupervisor,
+    RecoveryScheduler(SingleNodeTaskCoordinator singleNodeTaskCoordinator,
             RecoveryService recoveryService) {
-        this.tenantElementsRestartSupervisor = tenantElementsRestartSupervisor;
+        this.singleNodeTaskCoordinator = singleNodeTaskCoordinator;
         this.recoveryService = recoveryService;
     }
 
     @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT2H}", initialDelayString = "${bonita.tenant.recover.delay_between_recovery:PT2H}")
     public void triggerRecoveryOfAllElements() {
         try {
-            if (tenantElementsRestartSupervisor.isResponsibleForRecovery()) {
+            if (singleNodeTaskCoordinator.isResponsibleForTask(TASK_RECOVERY)) {
                 log.debug("Starting periodic recovery of elements...");
                 recoveryService.recoverAllElements();
                 log.debug("Completed periodic recovery of elements.");

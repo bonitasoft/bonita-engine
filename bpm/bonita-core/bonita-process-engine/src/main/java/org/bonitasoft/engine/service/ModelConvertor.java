@@ -394,7 +394,7 @@ public class ModelConvertor {
             final FlowNodeStateManager flowNodeStateManager) {
         return switch (sFlowNode.getType()) {
             case START_EVENT, INTERMEDIATE_CATCH_EVENT, BOUNDARY_EVENT, INTERMEDIATE_THROW_EVENT, END_EVENT ->
-                    toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
+                toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
             case GATEWAY -> toGatewayInstance((SGatewayInstance) sFlowNode, flowNodeStateManager);
             default -> {
                 if (sFlowNode instanceof SActivityInstance) {

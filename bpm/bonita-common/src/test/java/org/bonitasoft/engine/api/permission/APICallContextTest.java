@@ -34,6 +34,26 @@ public class APICallContextTest {
     }
 
     @Test
+    public void getFilters_with_multi_value() {
+        final APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setQueryString("p=0&c=10&f=state%3dready,completed&f=user_id%3d104");
+
+        final Map<String, String> filters = apiCallContext.getFilters();
+
+        assertThat(filters).containsOnly(entry("user_id", "104"), entry("state", "ready,completed"));
+    }
+
+    @Test
+    public void getFilters_with_uncoded_equals() {
+        final APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setQueryString("p=0&c=10&f=state=ready,completed&f=user_id=104");
+
+        final Map<String, String> filters = apiCallContext.getFilters();
+
+        assertThat(filters).containsOnly(entry("user_id", "104"), entry("state", "ready,completed"));
+    }
+
+    @Test
     public void getFilters_with_UpperCase_in_separator() {
         final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3D104&d=processId");

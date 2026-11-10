@@ -25,14 +25,34 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * Base filter that supports URL exclude patterns and ensures each filter instance
+ * executes at most once per request (similar to Spring's {@code OncePerRequestFilter}).
+ * <p>
+ * The once-per-request guard uses a request attribute named {@code "<filter-name>.FILTERED"}
+ * (where {@code <filter-name>} is the {@code <filter-name>} declared in {@code web.xml}).
+ * This allows filter-mappings to include both REQUEST and FORWARD dispatchers for
+ * defense-in-depth, without the filter logic running twice when a URL-rewritten request
+ * is forwarded internally (e.g. {@code /APIToolkit/*} forwarded to {@code /API/*}).
+ * <p>
+ * Because the attribute key is derived from the filter name (not the class name),
+ * two distinct {@code <filter>} declarations of the same class (e.g. {@code CacheFilter}
+ * and {@code CustomPageCacheFilter}) are tracked independently.
+ *
  * @author Anthony Birembaut
  */
 public abstract class ExcludingPatternFilter implements Filter {
 
     protected URLExcludePattern urlExcludePattern;
 
+    /**
+     * Request attribute name used to mark that this filter instance has already
+     * been applied to the current request. Derived from the filter-name in web.xml.
+     */
+    private String alreadyFilteredAttrName;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        alreadyFilteredAttrName = filterConfig.getFilterName() + ".FILTERED";
         urlExcludePattern = new URLExcludePattern(filterConfig, getDefaultExcludedPages());
     }
 
@@ -41,8 +61,16 @@ public abstract class ExcludingPatternFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    public final void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        // Skip if this filter instance already executed for this request (e.g. on FORWARD
+        // after the initial REQUEST dispatch). This prevents double-filtering while still
+        // allowing the filter-mapping to cover both REQUEST and FORWARD dispatchers.
+        if (request.getAttribute(alreadyFilteredAttrName) != null) {
+            chain.doFilter(request, response);
+            return;
+        }
+        request.setAttribute(alreadyFilteredAttrName, Boolean.TRUE);
         final String url = ((HttpServletRequest) request).getRequestURL().toString();
         if (matchExcludePatterns(url)) {
             excludePatternFiltering(request, response, chain);

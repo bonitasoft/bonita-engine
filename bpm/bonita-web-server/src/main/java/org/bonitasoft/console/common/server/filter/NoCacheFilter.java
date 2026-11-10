@@ -15,38 +15,30 @@ package org.bonitasoft.console.common.server.filter;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * This Filter adds headers to the response to prevent caching of the page/resource.
+ * It extends ExcludingPatternFilter, so that it benefits from its once-per-request behavior.
+ *
  * @author Paul AMAR
  */
-public class NoCacheFilter implements Filter {
+public class NoCacheFilter extends ExcludingPatternFilter {
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
-
-    @Override
-    public void destroy() {
-    }
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        // casting to HTTPServlet(Request/Response)
-        final HttpServletRequest req = (HttpServletRequest) request;
+    public void proceedWithFiltering(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
         final HttpServletResponse res = (HttpServletResponse) response;
-
         res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+        chain.doFilter(request, res);
+    }
 
-        chain.doFilter(req, res);
-
+    @Override
+    public String getDefaultExcludedPages() {
+        return "";
     }
 }

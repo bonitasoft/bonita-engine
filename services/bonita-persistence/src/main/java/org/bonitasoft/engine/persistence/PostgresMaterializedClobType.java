@@ -15,16 +15,21 @@ package org.bonitasoft.engine.persistence;
 
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
 import org.hibernate.type.descriptor.java.StringTypeDescriptor;
-import org.hibernate.type.descriptor.sql.VarcharTypeDescriptor;
+import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
 
 /**
+ * Custom Hibernate type for PostgreSQL TEXT fields.
+ * In Hibernate 5.6+, PostgreSQL CLOB mapping changed from TEXT to OID type,
+ * which causes issues with large text storage. This type forces TEXT columns
+ * by using LongVarcharTypeDescriptor which maps to TEXT in PostgreSQL.
+ *
  * @author Guillaume Rosinosky
  */
 public class PostgresMaterializedClobType extends AbstractSingleColumnStandardBasicType<String> {
 
     public PostgresMaterializedClobType() {
-        // forcing VARCHAR to String as there is no real CLOB in PSQL
-        super(VarcharTypeDescriptor.INSTANCE, StringTypeDescriptor.INSTANCE);
+        // Use LongVarcharTypeDescriptor which maps to TEXT type in PostgreSQL (not OID)
+        super(LongVarcharTypeDescriptor.INSTANCE, StringTypeDescriptor.INSTANCE);
     }
 
     @Override
