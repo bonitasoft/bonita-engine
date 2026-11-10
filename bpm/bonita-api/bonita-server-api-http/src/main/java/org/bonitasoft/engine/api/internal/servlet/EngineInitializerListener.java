@@ -27,6 +27,38 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
+/**
+ * Servlet container entry point that orchestrates the complete Bonita Engine initialization sequence.
+ * <p>
+ * This listener is triggered by the servlet container (Tomcat) during application startup
+ * and shutdown. It coordinates the following initialization phases:
+ * <ol>
+ * <li><b>Platform Setup Phase</b>: Initializes the database schema and configuration via {@link PlatformSetup}</li>
+ * <li><b>Engine Initialization Phase</b>: Starts the engine and loads all services via {@link EngineInitializer}</li>
+ * <li><b>Web Context Phase</b>: Creates the web application context with the engine context as parent</li>
+ * </ol>
+ * <p>
+ * <b>Responsibilities:</b>
+ * <ul>
+ * <li>Invokes {@link PlatformSetup#init()} to create/update database tables and configuration</li>
+ * <li>Calls {@link EngineInitializer#initializeEngine()} to start the platform node</li>
+ * <li>Creates an {@link AnnotationConfigWebApplicationContext} with the engine Spring context as parent</li>
+ * <li>Registers the web context in servlet context for access by REST controllers and filters</li>
+ * <li>Handles graceful shutdown via {@link EngineInitializer#unloadEngine()}</li>
+ * <li>Supports update-only mode via {@code bonita.runtime.startup.update-only} property</li>
+ * </ul>
+ * <p>
+ * The resulting Spring context hierarchy is:
+ *
+ * <pre>
+ * Engine Context (parent) → contains all engine services (100+ beans)
+ *     └── Web Context (child) → contains REST API controllers, filters, web config
+ * </pre>
+ *
+ * @see EngineInitializer
+ * @see PlatformSetup
+ * @see ServiceAccessorFactory
+ */
 public class EngineInitializerListener implements ServletContextListener {
 
     static final String UPDATE_ONLY_STARTUP_PROPERTY = "bonita.runtime.startup.update-only";

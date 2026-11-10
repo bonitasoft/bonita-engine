@@ -21,6 +21,7 @@ import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionException;
@@ -33,13 +34,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Initialize the engine and create/start or not the platform based on bonita-platform.xml
- * properties used are:
- * platform.create -- create the platform on startup
- * node.start -- start the platform (node) on startup
- * node.stop -- stop the platform (node) on shutdown
+ * Orchestrates the Bonita Engine initialization and manages the platform node lifecycle.
+ * <p>
+ * This class is responsible for starting and stopping the Bonita Platform node (the current JVM instance).
+ * It creates a temporary platform session, verifies the platform exists in the database, starts all
+ * platform services, and publishes the platform started event.
+ * <p>
+ * <b>Initialization Flow:</b>
+ * <ol>
+ * <li>Obtains platform services via {@link ServiceAccessorFactory}</li>
+ * <li>Creates a temporary "SYSTEM" platform session for initialization</li>
+ * <li>Instantiates {@link PlatformAPI} for platform operations</li>
+ * <li>Verifies the platform is created in the database via {@link PlatformAPI#isPlatformCreated()}</li>
+ * <li>Starts the node via {@link PlatformAPI#startNode()}, which triggers {@link PlatformManager#start()}</li>
+ * <li>Publishes {@link PlatformStartedEvent} to notify subscribers</li>
+ * <li>Deletes the temporary platform session</li>
+ * </ol>
+ * <p>
+ * <b>Responsibilities:</b>
+ * <ul>
+ * <li>Creates and manages temporary platform sessions for initialization/shutdown operations</li>
+ * <li>Coordinates with {@link PlatformAPI} to start/stop the platform node</li>
+ * <li>Publishes platform lifecycle events via {@link org.bonitasoft.engine.service.ServiceAccessor}</li>
+ * <li>Handles graceful shutdown of the engine via {@link #unloadEngine()}</li>
+ * <li>Logs engine edition and data collection information messages</li>
+ * </ul>
+ * <p>
+ * <b>Note:</b> This class does NOT create the platform or database tables. Platform creation is handled
+ * by {@link org.bonitasoft.platform.setup.PlatformSetup} before this initializer runs.
+ * <p>
+ * <b>Usage:</b> This class is typically invoked by
+ * {@link org.bonitasoft.engine.api.internal.servlet.EngineInitializerListener}
+ * during servlet container startup.
  *
  * @author Baptiste Mesta
+ * @see PlatformAPI
+ * @see PlatformManager
+ * @see ServiceAccessorFactory
+ * @see org.bonitasoft.platform.setup.PlatformSetup
  */
 public class EngineInitializer {
 

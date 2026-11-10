@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 11:55+0000\n"
+"POT-Creation-Date: 2026-03-19 17:10+0000\n"
 "PO-Revision-Date: 2024-01-01 00:00\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
@@ -263,6 +263,9 @@ msgstr "Esta função já foi designada como ator"
 msgid "This user has already been mapped to actor"
 msgstr "Este usuário já foi designado como ator"
 
+msgid "Too many failed login attempts. Please try again later."
+msgstr "Muitas tentativas de login falharam. Por favor, tente novamente mais tarde."
+
 msgid "Unable to deploy business archive"
 msgstr "Não foi possível instalar o arquivo"
 
@@ -286,9 +289,6 @@ msgstr "Impossível obter definições de dados do processo, processo %processId
 
 msgid "Unable to log in. Please check your username and password."
 msgstr "Não foi possível logar. Por favor, verifique seu nome de usuário e senha."
-
-msgid "Too many failed login attempts. Please try again later."
-msgstr "Muitas tentativas de login falharam. Por favor, tente novamente mais tarde."
 
 msgid "User"
 msgstr "Usuário"

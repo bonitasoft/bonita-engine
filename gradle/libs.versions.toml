@@ -6,7 +6,7 @@ springSessionVersion = "2.7.4"
 springBootVersion = "2.7.18"
 commonsLangVersion = "3.20.0"
 bonitaArtifactsModelVersion = "1.2.3"
-bonitaSecurityVersion = "1.27.2"
+bonitaSecurityVersion = "1.28.2"
 commonsIOVersion = "2.20.0"
 commonsFileUploadVersion = "1.6.0"
 commonsBeanutilsVersion = "1.11.0"
@@ -31,10 +31,10 @@ javaxServletVersion = "4.0.1"
 httpComponentsVersion = "4.5.14"
 xstreamVersion = "1.4.21"
 ehCacheVersion = "2.10.10.24.8"
-eclipseCompilerVersion = "3.42.0"
+eclipseCompilerVersion = "3.43.0"
 jakartaActivationVersion = "1.2.2"
 quartzVersion = "2.3.2"
-micrometerVersion = "1.15.3"
+micrometerVersion = "1.15.5"
 # DB drivers:
 mysqlVersion = "8.4.0"
 msSqlServerVersion = "12.6.5.jre11"
@@ -75,12 +75,12 @@ owaspHtmlSanitizerVersion = "20261031.1"
 
 # Test dependency versions
 junit4Version = "4.13.2"
-junit5Version = "5.13.4"
+junit5Version = "6.0.0"
 awaitilityVersion = "4.3.0"
-assertjVersion = "3.27.4"
+assertjVersion = "3.27.6"
 xmlunitVersion = "1.6"
-mockitoVersion = "5.19.0"
-jsonUnitVersion = "4.1.1"
+mockitoVersion = "5.20.0"
+jsonUnitVersion = "5.0.0"
 systemRulesVersion = "1.19.0"
 systemLambdaVersion = "1.2.1"
 concurrentUnitVersion = "0.4.6"
@@ -199,7 +199,7 @@ msSqlServer = { group = "com.microsoft.sqlserver", name = "mssql-jdbc", version.
 oracle = { group = "com.oracle.database.jdbc", name = "ojdbc11", version.ref = "oracleVersion" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresqlVersion" }
 
-lombok = "org.projectlombok:lombok:1.18.38"
+lombok = "org.projectlombok:lombok:1.18.42"
 
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 
@@ -265,6 +265,6 @@ groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx",
 
 [plugins]
 bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "0.1.64" }
-dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.52.0" } # used by "List out-of-date dependencies" script
+dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.53.0" } # used by "List out-of-date dependencies" script
 taskInfo = { id = "org.barfuin.gradle.taskinfo", version = "2.2.0" } # Adds a 'tiTree' task to display Gradle task-graph
 testRetry = { id = "org.gradle.test-retry", version = "1.6.4" } # used to retry flaky tests automatically

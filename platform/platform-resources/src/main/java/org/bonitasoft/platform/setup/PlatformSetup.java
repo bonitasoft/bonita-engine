@@ -53,11 +53,55 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 /**
- * Class that setup an environment for the engine to start on.
- * <p/>
- * It creates tables and insert the default configuration
+ * Manages database schema creation, initialization, and configuration for the Bonita Platform.
+ * <p>
+ * This component is responsible for preparing the database environment required by the Bonita Engine.
+ * It handles both initial setup (first run) and updates (subsequent runs), ensuring the database schema
+ * and configuration are consistent with the platform binaries version.
+ * <p>
+ * <b>Main Responsibilities:</b>
+ * <ul>
+ * <li><b>Database Schema Management</b>: Creates all required tables on first run via {@link ScriptExecutor}
+ * (platform, configuration, sequence, and 50+ BPM tables)</li>
+ * <li><b>Configuration Management</b>: Stores and retrieves configuration files in the database via
+ * {@link ConfigurationService}</li>
+ * <li><b>Version Compatibility</b>: Validates platform binaries version matches database schema version
+ * via {@link VersionService}</li>
+ * <li><b>Configuration Push/Pull</b>: Synchronizes configuration files between filesystem and database</li>
+ * <li><b>License Management</b>: Handles license file storage (subscription edition)</li>
+ * </ul>
+ * <p>
+ * <b>Key Methods:</b>
+ * <ul>
+ * <li>{@link #init()}: Main entry point - creates tables on first run or updates configuration on subsequent runs</li>
+ * <li>{@link #push()}: Pushes configuration from {@code platform_conf/current/} to database</li>
+ * <li>{@link #pull()}: Pulls configuration from database to {@code platform_conf/current/}</li>
+ * <li>{@link #destroy()}: Drops all database tables</li>
+ * </ul>
+ * <p>
+ * <b>Configuration Types Managed:</b>
+ * <ul>
+ * <li>PLATFORM_ENGINE: Platform-level engine configuration</li>
+ * <li>PLATFORM_PORTAL: Platform-level portal configuration</li>
+ * <li>TENANT_ENGINE: Tenant-level engine configuration</li>
+ * <li>TENANT_PORTAL: Tenant-level portal configuration (permissions, security)</li>
+ * <li>TENANT_SECURITY_SCRIPTS: Authorization and security scripts</li>
+ * </ul>
+ * <p>
+ * The class uses the following folder structure:
+ *
+ * <pre>
+ * platform_conf/
+ *   ├── initial/          - Initial configuration (used on first setup)
+ *   ├── current/          - Current configuration (for push/pull operations)
+ *   ├── licenses/         - License files (subscription only)
+ *   └── backup-[timestamp]/ - Backup before push operations
+ * </pre>
  *
  * @author Baptiste Mesta
+ * @see ScriptExecutor
+ * @see ConfigurationService
+ * @see VersionService
  */
 @Component
 @ConditionalOnSingleCandidate(PlatformSetup.class)

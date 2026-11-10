@@ -23,9 +23,48 @@ import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * Main entry point to access services and api implementation of the engine
- * {@link ServiceAccessors} and {@link APIAccessResolver} classes can be overridden in the configuration
- * under the name `serviceAccessors` and `apiAccessResolver`
+ * Singleton factory that creates and manages the main {@link ServiceAccessor} instance for the Bonita Engine.
+ * <p>
+ * This factory is the main entry point to access all engine services and API implementations. It manages
+ * the lifecycle of the Spring application context that contains all engine services (100+ beans) and
+ * provides access to core infrastructure components.
+ * <p>
+ * <b>Key Responsibilities:</b>
+ * <ul>
+ * <li><b>Service Accessor Creation</b>: Creates and caches the main {@link ServiceAccessor} instance,
+ * which wraps the engine's Spring application context</li>
+ * <li><b>Session Accessor Creation</b>: Provides {@link SessionAccessor} for thread-local session management</li>
+ * <li><b>API Access Resolver</b>: Creates {@link APIAccessResolver} for API implementation resolution</li>
+ * <li><b>Lifecycle Management</b>: Handles cleanup via {@link #destroyAccessors()} during engine shutdown</li>
+ * <li><b>Configuration Loading</b>: Loads class names from bonita-platform-private-community.properties</li>
+ * </ul>
+ * <p>
+ * <b>Configuration Properties:</b>
+ * The factory reads the following properties from {@code bonita-platform-private-community.properties}:
+ * <ul>
+ * <li>{@code serviceAccessors}: Class name of {@link ServiceAccessors} implementation (default:
+ * ServiceAccessorsImpl)</li>
+ * <li>{@code apiAccessResolver}: Class name of {@link APIAccessResolver} implementation</li>
+ * </ul>
+ * <p>
+ * <b>Usage Pattern:</b>
+ *
+ * <pre>
+ *
+ * ServiceAccessor accessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
+ * PlatformService platformService = accessor.getPlatformService();
+ * </pre>
+ *
+ * <p>
+ * <b>Spring Context Hierarchy:</b>
+ * The {@link ServiceAccessor} created by this factory contains the root Spring context for the engine,
+ * which serves as the parent context for the web application context.
+ * <p>
+ * <b>Thread Safety:</b> All factory methods are synchronized to ensure thread-safe singleton creation.
+ *
+ * @see ServiceAccessor
+ * @see SessionAccessor
+ * @see APIAccessResolver
  */
 public class ServiceAccessorFactory {
 
