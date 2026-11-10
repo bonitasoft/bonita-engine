@@ -61,6 +61,9 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
     @Override
     public SProcessDefinition deploy(BusinessArchive businessArchive)
             throws SObjectCreationException, SAlreadyExistsException {
+        if (BusinessArchiveResourcePaths.hasResourceOutsideOfArchive(businessArchive)) {
+            throw new SObjectCreationException(BusinessArchiveResourcePaths.RESOURCE_OUTSIDE_OF_ARCHIVE_MESSAGE);
+        }
 
         final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
         SProcessDefinition sProcessDefinition;
