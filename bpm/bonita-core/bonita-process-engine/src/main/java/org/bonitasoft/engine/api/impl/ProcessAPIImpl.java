@@ -69,6 +69,7 @@ import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.*;
 import org.bonitasoft.engine.api.impl.transaction.task.*;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bar.BusinessArchiveResourcePaths;
 import org.bonitasoft.engine.bpm.actor.*;
 import org.bonitasoft.engine.bpm.actor.ActorUpdater.ActorField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -425,6 +426,11 @@ public class ProcessAPIImpl implements ProcessAPI {
             barExport = File.createTempFile("barExport", ".bar");
             barExport.delete();
             final BusinessArchive export = getServiceAccessor().getBusinessArchiveService().export(processDefinitionId);
+            // resource paths become file paths when the archive is written: also checked here for the processes
+            // deployed before the check was added on deploy
+            if (BusinessArchiveResourcePaths.hasResourceOutsideOfArchive(export)) {
+                throw new ProcessExportException(BusinessArchiveResourcePaths.RESOURCE_OUTSIDE_OF_ARCHIVE_MESSAGE);
+            }
             BusinessArchiveFactory.writeBusinessArchiveToFile(export, barExport);
             return FileUtils.readFileToByteArray(barExport);
         } catch (IOException | InvalidBusinessArchiveFormatException | SBonitaException e) {
