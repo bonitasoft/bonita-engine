@@ -25,6 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryMetadataImpl;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
@@ -40,8 +44,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.stubbing.Answer;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 @MockitoSettings(strictness = LENIENT)
 class BusinessDataControllerTest {
@@ -493,6 +499,64 @@ class BusinessDataControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                             {"exception":"class org.bonitasoft.engine.command.CommandExecutionException","message":"org.bonitasoft.engine.business.data.BusinessDataRepositoryException: repository error"}"""));
+    }
+
+    @Test
+    void getBusinessDataByQuery_should_succeed_without_filter_when_debug_logging_is_enabled() throws Exception {
+        // given a parameterless query called with no "f" filter while the controller logs at DEBUG,
+        // as when support asks a customer to enable DEBUG on org.bonitasoft (BPA-687)
+        String jsonResponse = """
+                    [
+                        {"id": 123, "name": "Harry"}
+                    ]
+                """;
+        doReturn(new BusinessDataQueryResultImpl(jsonResponse, new BusinessDataQueryMetadataImpl(0, 10, 1L)))
+                .when(commandAPI).execute(eq("getBusinessDataByQueryCommand"), anyMap());
+        final ListAppender<ILoggingEvent> logAppender = startCapturingControllerDebugLogs();
+
+        // when
+        final ResultActions perform;
+        try {
+            perform = mockMvc.perform(get("/API/bdm/businessData/org.bonitasoft.pojo.Employee?q=find&c=10&p=0")
+                    .sessionAttrs(sessionAttributes)
+                    .accept(MediaType.APPLICATION_JSON));
+        } finally {
+            stopCapturingControllerDebugLogs(logAppender);
+        }
+
+        // then the request succeeds: no exception reached the REST error handler ...
+        assertThat(perform.andReturn().getResolvedException())
+                .as("exception resolved by the REST error handler").isNull();
+        perform
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonResponse));
+        // ... the command still receives no query parameters, as when DEBUG is off ...
+        verify(commandAPI).execute(eq("getBusinessDataByQueryCommand"),
+                argThat(parameters -> parameters.containsKey("queryParameters")
+                        && parameters.get("queryParameters") == null));
+        // ... and the DEBUG log still reports the (absent) query parameters
+        assertThat(logAppender.list).anySatisfy(event -> {
+            assertThat(event.getLevel()).isEqualTo(Level.DEBUG);
+            assertThat(event.getFormattedMessage()).isEqualTo("queryParameters: null");
+        });
+    }
+
+    private static ListAppender<ILoggingEvent> startCapturingControllerDebugLogs() {
+        final Logger controllerLogger = (Logger) LoggerFactory.getLogger(BusinessDataController.class);
+        // The query details are logged at DEBUG and guarded by isDebugEnabled(); pin the level so they are
+        // emitted (and captured) regardless of the ambient test configuration.
+        controllerLogger.setLevel(Level.DEBUG);
+        final ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        controllerLogger.addAppender(appender);
+        return appender;
+    }
+
+    private static void stopCapturingControllerDebugLogs(final ListAppender<ILoggingEvent> appender) {
+        final Logger controllerLogger = (Logger) LoggerFactory.getLogger(BusinessDataController.class);
+        controllerLogger.detachAppender(appender);
+        // Restore inheritance from the root logger so the raised level does not leak to other tests.
+        controllerLogger.setLevel(null);
     }
 
     // wrap the root cause in the same way the command api does
