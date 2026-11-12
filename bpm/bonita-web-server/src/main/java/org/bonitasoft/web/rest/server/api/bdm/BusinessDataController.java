@@ -119,7 +119,7 @@ public class BusinessDataController extends AbstractRESTController {
         if (log.isDebugEnabled()) {
             log.debug("Executing business Data Query: {}", parameters.get("queryName"));
             log.debug("entityClassName: {}", parameters.get("entityClassName"));
-            log.debug("queryParameters: {}", parameters.get("queryParameters").toString());
+            log.debug("queryParameters: {}", parameters.get("queryParameters"));
             log.debug("startIndex: {}", parameters.get("startIndex"));
             log.debug("maxResults: {}", parameters.get("maxResults"));
         }
