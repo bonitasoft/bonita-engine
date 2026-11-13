@@ -40,8 +40,8 @@ import org.bonitasoft.web.rest.server.api.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
-import org.springframework.http.HttpHeaders;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
