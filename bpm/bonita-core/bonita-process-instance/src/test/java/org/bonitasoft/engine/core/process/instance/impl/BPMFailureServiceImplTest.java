@@ -54,6 +54,10 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class BPMFailureServiceImplTest {
 
+    // BPA-867: errorMessage and context are VARCHAR(1024) (characters) in bpm_failure / arch_bpm_failure on every
+    // supported database. Longer values make the failure insert fail, so the element cannot be marked as failed.
+    private static final int FAILURE_COLUMN_MAX_LENGTH = 1024;
+
     @Mock
     private PersistenceService persistenceService;
     @Mock
@@ -102,6 +106,80 @@ class BPMFailureServiceImplTest {
         assertThat(bpmFailure.getErrorMessage()).isEqualTo("Throwable: error message");
         assertThat(bpmFailure.getStackTrace()).isEqualTo(ExceptionUtils.getStackTrace(failure.throwable()));
         assertThat(Instant.ofEpochMilli(bpmFailure.getFailureDate())).isCloseTo(now, within(1000, ChronoUnit.MILLIS));
+    }
+
+    @Test
+    void createFlowNodeFailure_should_truncate_error_message_longer_than_column_size() throws Exception {
+        var flowNodeInstance = createFlowNodeInstance();
+        var throwable = new RuntimeException("x".repeat(5000));
+        var failure = new BPMFailureService.Failure("scope", throwable);
+        var fullErrorMessage = ExceptionUtils.getRootCauseMessage(throwable);
+
+        var bpmFailure = service.createFlowNodeFailure(flowNodeInstance, failure);
+
+        assertThat(bpmFailure.getErrorMessage())
+                .hasSize(FAILURE_COLUMN_MAX_LENGTH)
+                .isEqualTo(fullErrorMessage.substring(0, FAILURE_COLUMN_MAX_LENGTH));
+        // the complete message is still available in the (unbounded) stack trace
+        assertThat(bpmFailure.getStackTrace()).isEqualTo(ExceptionUtils.getStackTrace(throwable));
+    }
+
+    @Test
+    void createProcessInstanceFailure_should_truncate_error_message_longer_than_column_size() throws Exception {
+        var processInstance = createProcessInstance();
+        var throwable = new RuntimeException("x".repeat(5000));
+        var failure = new BPMFailureService.Failure("scope", throwable);
+        var fullErrorMessage = ExceptionUtils.getRootCauseMessage(throwable);
+
+        var bpmFailure = service.createProcessInstanceFailure(processInstance, failure);
+
+        assertThat(bpmFailure.getErrorMessage())
+                .hasSize(FAILURE_COLUMN_MAX_LENGTH)
+                .isEqualTo(fullErrorMessage.substring(0, FAILURE_COLUMN_MAX_LENGTH));
+        assertThat(bpmFailure.getStackTrace()).isEqualTo(ExceptionUtils.getStackTrace(throwable));
+    }
+
+    @Test
+    void createFlowNodeFailure_should_keep_error_message_of_exactly_column_size() throws Exception {
+        var flowNodeInstance = createFlowNodeInstance();
+        // "Throwable: " prefix added by getRootCauseMessage is 11 characters long
+        var throwable = new Throwable("x".repeat(FAILURE_COLUMN_MAX_LENGTH - "Throwable: ".length()));
+        var failure = new BPMFailureService.Failure("scope", throwable);
+
+        var bpmFailure = service.createFlowNodeFailure(flowNodeInstance, failure);
+
+        assertThat(bpmFailure.getErrorMessage())
+                .hasSize(FAILURE_COLUMN_MAX_LENGTH)
+                .isEqualTo(ExceptionUtils.getRootCauseMessage(throwable));
+    }
+
+    @Test
+    void createFlowNodeFailure_should_not_split_surrogate_pair_when_truncating_error_message() throws Exception {
+        var flowNodeInstance = createFlowNodeInstance();
+        // place the high surrogate of the first emoji at index 1023 (the last kept character)
+        var prefix = "x".repeat(FAILURE_COLUMN_MAX_LENGTH - 1 - "Throwable: ".length());
+        var throwable = new Throwable(prefix + "😀".repeat(10));
+        var failure = new BPMFailureService.Failure("scope", throwable);
+
+        var bpmFailure = service.createFlowNodeFailure(flowNodeInstance, failure);
+
+        assertThat(bpmFailure.getErrorMessage())
+                .hasSize(FAILURE_COLUMN_MAX_LENGTH - 1)
+                .isEqualTo("Throwable: " + prefix);
+    }
+
+    @Test
+    void createFlowNodeFailure_should_truncate_context_longer_than_column_size() throws Exception {
+        var flowNodeInstance = createFlowNodeInstance();
+        var longExpressionName = "e".repeat(2000);
+        var failure = new BPMFailureService.Failure("scope",
+                new SExpressionEvaluationException(new RuntimeException("error in expression"), longExpressionName));
+
+        var bpmFailure = service.createFlowNodeFailure(flowNodeInstance, failure);
+
+        assertThat(bpmFailure.getContext())
+                .hasSize(FAILURE_COLUMN_MAX_LENGTH)
+                .isEqualTo(("expression::" + longExpressionName).substring(0, FAILURE_COLUMN_MAX_LENGTH));
     }
 
     private static SFlowNodeInstance createFlowNodeInstance() {
