@@ -92,4 +92,47 @@ public class FlowNodeFailureIT extends TestWithUser {
                 .isEqualTo(failures.get(0));
     }
 
+    /**
+     * BPA-867: an exception whose message is longer than the bpm_failure.errorMessage column (VARCHAR(1024)) made the
+     * failure insert fail ("value too large for column"), so the flow node could not be marked as failed and an
+     * incident was reported instead.
+     */
+    @Test
+    public void createFlowNodeFailure_should_mark_flownode_failed_when_exception_message_exceeds_column_size()
+            throws Exception {
+        // Given a process whose operation throws an exception with a 5000-character message
+        DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("My_Process_with_large_exception_message", PROCESS_VERSION)
+                .addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createDataLeftOperand("myData"),
+                        OperatorType.ASSIGNMENT,
+                        "",
+                        new ExpressionBuilder()
+                                .createGroovyScriptExpression("my-failing-script-with-large-message",
+                                        "throw new RuntimeException('x' * 5000)", String.class.getName()))
+                .getProcess();
+        ProcessDefinition largeMessageProcess = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        try {
+            // When the flow node is executed
+            ProcessInstance processInstance = getProcessAPI().startProcess(largeMessageProcess.getId());
+
+            // Then the flow node reaches the failed state
+            FlowNodeInstance failedFlowNodeInstance = waitForFlowNodeInFailedState(processInstance);
+
+            // And the failure is recorded with an error message truncated to the column size
+            var failureService = serviceAccessor.getBpmFailureService();
+            var failures = serviceAccessor.getTransactionService()
+                    .executeInTransaction(
+                            () -> failureService.getFlowNodeFailures(failedFlowNodeInstance.getId(), 5));
+            assertThat(failures).hasSize(1);
+            assertThat(failures.get(0).getErrorMessage())
+                    .hasSize(1024)
+                    .startsWith("RuntimeException: xxxx");
+        } finally {
+            disableAndDeleteProcess(largeMessageProcess);
+        }
+    }
+
 }
