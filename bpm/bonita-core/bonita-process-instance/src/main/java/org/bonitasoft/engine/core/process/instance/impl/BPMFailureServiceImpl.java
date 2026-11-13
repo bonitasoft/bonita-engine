@@ -46,6 +46,11 @@ public class BPMFailureServiceImpl implements BPMFailureService {
 
     private static final String TYPE_SEPARATOR = "::";
     private static final String CONTEXT_PATH_SEPARATOR = "//";
+    /**
+     * Size (in characters) of the errorMessage and context columns of bpm_failure / arch_bpm_failure on every
+     * supported database. A longer value makes the failure insert fail, so the element cannot be marked as failed.
+     */
+    private static final int MAX_COLUMN_LENGTH = 1024;
 
     private final PersistenceService persistenceService;
     private final ArchiveService archiveService;
@@ -65,8 +70,8 @@ public class BPMFailureServiceImpl implements BPMFailureService {
                 .rootProcessInstanceId(flowNodeInstance.getRootProcessInstanceId())
                 .processDefinitionId(flowNodeInstance.getProcessDefinitionId())
                 .scope(failure.scope())
-                .context(buildContext(failure.throwable()))
-                .errorMessage(ExceptionUtils.getRootCauseMessage(failure.throwable()))
+                .context(truncate(buildContext(failure.throwable())))
+                .errorMessage(truncate(ExceptionUtils.getRootCauseMessage(failure.throwable())))
                 .stackTrace(ExceptionUtils.getStackTrace(failure.throwable()))
                 .build();
         return persistenceService.insert(bpmFailure);
@@ -127,8 +132,8 @@ public class BPMFailureServiceImpl implements BPMFailureService {
                 .processDefinitionId(processInstance.getProcessDefinitionId())
                 .rootProcessInstanceId(processInstance.getRootProcessInstanceId())
                 .scope(failure.scope())
-                .context(buildContext(failure.throwable()))
-                .errorMessage(ExceptionUtils.getRootCauseMessage(failure.throwable()))
+                .context(truncate(buildContext(failure.throwable())))
+                .errorMessage(truncate(ExceptionUtils.getRootCauseMessage(failure.throwable())))
                 .stackTrace(ExceptionUtils.getStackTrace(failure.throwable()))
                 .build();
         return persistenceService.insert(bpmFailure);
@@ -199,6 +204,22 @@ public class BPMFailureServiceImpl implements BPMFailureService {
         return persistenceService
                 .selectList(new SelectListDescriptor<>("getArchivedChildProcessInstancesFailures", parameters,
                         SABPMFailure.class, queryOptions));
+    }
+
+    /**
+     * Truncates the value to {@link #MAX_COLUMN_LENGTH} characters so that it fits its database column, without
+     * splitting a surrogate pair. For the error message, the complete text remains available in the failure stack
+     * trace.
+     */
+    private static String truncate(String value) {
+        if (value == null || value.length() <= MAX_COLUMN_LENGTH) {
+            return value;
+        }
+        int end = MAX_COLUMN_LENGTH;
+        if (Character.isHighSurrogate(value.charAt(end - 1))) {
+            end--;
+        }
+        return value.substring(0, end);
     }
 
     private static String buildContext(Throwable e) {
