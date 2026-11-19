@@ -138,7 +138,7 @@ class DockerDatabaseContainerTasksCreator {
 
             TaskProvider databaseTestTask = project.tasks.register("${vendor.name}DatabaseTest", Test) {
                 group = "Verification"
-                description = "Runs slow integration test suite on $vendor.name database."
+                description = "Runs integration test suite on $vendor.name database."
                 systemProperty "bonita.version", project.version
                 jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.lang=ALL-UNNAMED', '-Dfile.encoding=UTF-8']
                 if (extension."${vendor.name}"?.includeTestProject) {

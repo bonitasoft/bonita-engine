@@ -40,7 +40,7 @@ import org.bonitasoft.engine.business.application.model.builder.impl.SApplicatio
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageLogBuilderImpl;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
-import org.bonitasoft.engine.cache.configuration.CacheConfiguration;
+import org.bonitasoft.engine.cache.configuration.CacheConfigurationBeans;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -168,14 +168,15 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public SApplication getApplicationByToken(final String token) throws SBonitaReadException {
         try {
-            SApplication application = (SApplication) cacheService.get(CacheConfiguration.APPLICATION_TOKEN_CACHE_NAME,
+            SApplication application = (SApplication) cacheService.get(
+                    CacheConfigurationBeans.APPLICATION_TOKEN_CACHE_NAME,
                     token);
             if (application == null) {
                 application = persistenceService
                         .selectOne(new SelectOneDescriptor<>("getApplicationByToken", Collections
                                 .singletonMap("token", token), SApplication.class));
                 if (application != null) {
-                    cacheService.store(CacheConfiguration.APPLICATION_TOKEN_CACHE_NAME, token, application);
+                    cacheService.store(CacheConfigurationBeans.APPLICATION_TOKEN_CACHE_NAME, token, application);
                 }
             }
             return application;
@@ -270,7 +271,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private void deleteApplication(SApplication application) throws SBonitaException {
         if (application.getToken() != null) {
-            cacheService.remove(CacheConfiguration.APPLICATION_TOKEN_CACHE_NAME, application.getToken());
+            cacheService.remove(CacheConfigurationBeans.APPLICATION_TOKEN_CACHE_NAME, application.getToken());
         }
         applicationDestructor.onDeleteApplication(application);
         recorder.recordDelete(new DeleteRecord(application), APPLICATION);
@@ -329,7 +330,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         try {
             validateUpdatedFields(updateDescriptor, application);
             if (application.getToken() != null) {
-                cacheService.remove(CacheConfiguration.APPLICATION_TOKEN_CACHE_NAME, application.getToken());
+                cacheService.remove(CacheConfigurationBeans.APPLICATION_TOKEN_CACHE_NAME, application.getToken());
             }
             updateDescriptor.addField(AbstractSApplication.LAST_UPDATE_DATE, now);
 

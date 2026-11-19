@@ -14,12 +14,10 @@
 package org.bonitasoft.web.rest.server.api.extension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,21 +31,17 @@ import org.bonitasoft.console.common.server.page.PageReference;
 import org.bonitasoft.console.common.server.page.extension.PageResourceProviderImpl;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.session.APISession;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.restlet.Request;
-import org.restlet.data.Method;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-/**
- * @author Laurent Leseigneur
- */
-@RunWith(MockitoJUnitRunner.class)
-public class ResourceExtensionResolverTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class ResourceExtensionResolverTest {
 
     public static final String API_EXTENSION_POST_MAPPING_KEY = "apiExtension|POST|myPostResource";
     public static final String API_EXTENSION_GET_MAPPING_KEY = "apiExtension|GET|helloWorld";
@@ -56,10 +50,6 @@ public class ResourceExtensionResolverTest {
 
     @Mock
     private PageResourceProviderImpl pageResourceProvider;
-
-    File file;
-
-    FileInputStream fileInputStream;
 
     @Mock
     private APISession apiSession;
@@ -73,25 +63,17 @@ public class ResourceExtensionResolverTest {
     @Mock
     private PageReference pageReference;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
-    public void before() throws Exception {
+    @BeforeEach
+    void before() throws Exception {
         final URL resource = ResourceExtensionResolverTest.class.getResource("page.properties");
-        file = new File(resource.toURI());
-        fileInputStream = new FileInputStream(file);
-
-        doReturn(fileInputStream).when(pageResourceProvider).getResourceAsStream("page.properties");
-
+        doReturn(new FileInputStream(new File(resource.toURI()))).when(pageResourceProvider)
+                .getResourceAsStream("page.properties");
     }
 
     @Test
-    public void should_post_resolve_class_file_name() throws Exception {
+    void should_post_resolve_class_file_name() throws Exception {
         //given
-        final Request request = new Request(Method.POST, "/bonita/API/extension/myPostResource");
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/myPostResource");
+        var resourceExtensionResolver = createResolver("POST", "/bonita/API/extension/myPostResource");
 
         //when
         final ControllerClassName controllerClassName = resourceExtensionResolver
@@ -103,11 +85,9 @@ public class ResourceExtensionResolverTest {
     }
 
     @Test
-    public void should_get_resolve_class_file_name() throws Exception {
+    void should_get_resolve_class_file_name() throws Exception {
         //given
-        final Request request = new Request(Method.GET, "/bonita/API/extension/helloWorld");
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/helloWorld");
+        var resourceExtensionResolver = createResolver("GET", "/bonita/API/extension/helloWorld");
 
         //when
         final ControllerClassName restApiControllerClassName = resourceExtensionResolver
@@ -119,11 +99,9 @@ public class ResourceExtensionResolverTest {
     }
 
     @Test
-    public void should_get_resolve_class_name() throws Exception {
+    void should_get_resolve_class_name() throws Exception {
         //given
-        final Request request = new Request(Method.GET, "/bonita/API/extension/myCompiledRestApi");
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/myCompiledRestApi");
+        var resourceExtensionResolver = createResolver("GET", "/bonita/API/extension/myCompiledRestApi");
 
         //when
         final ControllerClassName restApiControllerClassName = resourceExtensionResolver
@@ -135,11 +113,10 @@ public class ResourceExtensionResolverTest {
     }
 
     @Test
-    public void should_get_resolve_class_name_over_class_file_name_when_both_are_present() throws Exception {
+    void should_get_resolve_class_name_over_class_file_name_when_both_are_present() throws Exception {
         //given
-        final Request request = new Request(Method.GET, "/bonita/API/extension/myCompiledRestApi2");
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/myCompiledRestApi2");
+        var resourceExtensionResolver = createResolver("GET", "/bonita/API/extension/myCompiledRestApi2");
+
         //when
         final ControllerClassName restApiControllerClassName = resourceExtensionResolver
                 .resolveRestApiControllerClassName(pageResourceProvider);
@@ -150,12 +127,10 @@ public class ResourceExtensionResolverTest {
     }
 
     @Test
-    public void should_resolve_class_file_name_when_name_begins_the_same_than_another() throws Exception {
+    void should_resolve_class_file_name_when_name_begins_the_same_than_another() throws Exception {
         // two api extensions with names that begins the same are installed (myPostResource and myPostResourceB)
         // see https://bonitasoft.atlassian.net/browse/BS-16791
-        final Request request = new Request(Method.POST, "/bonita/API/extension/myPostResourceB");
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/myPostResourceB");
+        var resourceExtensionResolver = createResolver("POST", "/bonita/API/extension/myPostResourceB");
 
         final ControllerClassName controllerClassName = resourceExtensionResolver
                 .resolveRestApiControllerClassName(pageResourceProvider);
@@ -165,26 +140,20 @@ public class ResourceExtensionResolverTest {
     }
 
     @Test
-    public void should_not_resolve_class_file_name() throws Exception {
-        expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage("error while getting resource:apiExtension|POST|notResource");
-
+    void should_not_resolve_class_file_name() {
         //given
-        final Request request = new Request(Method.POST, "/bonita/API/extension/notResource");
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/notResource");
+        var resourceExtensionResolver = createResolver("POST", "/bonita/API/extension/notResource");
 
         //when then exception
-        resourceExtensionResolver.resolveRestApiControllerClassName(pageResourceProvider);
-
+        assertThatThrownBy(() -> resourceExtensionResolver.resolveRestApiControllerClassName(pageResourceProvider))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("error while getting resource:apiExtension|POST|notResource");
     }
 
     @Test
-    public void should_generate_mapping_key() throws Exception {
+    void should_generate_mapping_key() {
         //given
-        final Request request = new Request(Method.POST, "/bonita/API/extension/myPostResource");
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/myPostResource");
+        var resourceExtensionResolver = createResolver("POST", "/bonita/API/extension/myPostResource");
 
         //when
         final String mappingKey = resourceExtensionResolver.generateMappingKey();
@@ -194,15 +163,13 @@ public class ResourceExtensionResolverTest {
     }
 
     @Test
-    public void should_resolve_pageId() throws Exception {
+    void should_resolve_pageId() throws Exception {
         //given
-        final Request request = new Request(Method.POST, "/bonita/API/extension/myPostResource");
         doReturn(pageReference).when(pageMappingService).getPage(httpServletRequest, apiSession,
                 API_EXTENSION_POST_MAPPING_KEY, Locale.FRENCH, false);
         doReturn(PAGE_ID).when(pageReference).getPageId();
 
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/myPostResource");
+        var resourceExtensionResolver = createResolver("POST", "/bonita/API/extension/myPostResource");
 
         //when
         final Long pageId = resourceExtensionResolver.resolvePageId(apiSession);
@@ -215,15 +182,13 @@ public class ResourceExtensionResolverTest {
     }
 
     @Test
-    public void should_resolve_pageId_with_parameters() throws Exception {
+    void should_resolve_pageId_with_parameters() throws Exception {
         //given
-        final Request request = new Request(Method.GET, "/bonita/API/extension/helloWorld?param1=a&param2=b");
         doReturn(pageReference).when(pageMappingService).getPage(httpServletRequest, apiSession,
                 API_EXTENSION_GET_MAPPING_KEY, Locale.FRENCH, false);
         doReturn(PAGE_ID).when(pageReference).getPageId();
 
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/helloWorld");
+        var resourceExtensionResolver = createResolver("GET", "/bonita/API/extension/helloWorld");
 
         //when
         final Long pageId = resourceExtensionResolver.resolvePageId(apiSession);
@@ -236,11 +201,9 @@ public class ResourceExtensionResolverTest {
     }
 
     @Test
-    public void should_mapping_key_exclude_parameters() throws Exception {
+    void should_mapping_key_exclude_parameters() {
         //given
-        final Request request = new Request(Method.GET, "/bonita/API/extension/helloWorld?param1=a&param2=b");
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/helloWorld");
+        var resourceExtensionResolver = createResolver("GET", "/bonita/API/extension/helloWorld");
 
         //when
         final String mappingKey = resourceExtensionResolver.generateMappingKey();
@@ -249,30 +212,25 @@ public class ResourceExtensionResolverTest {
         assertThat(mappingKey).isEqualTo(API_EXTENSION_GET_MAPPING_KEY);
     }
 
-    @Test(expected = NotFoundException.class)
-    public void should_unresolved_pageId_throw_exception() throws Exception {
+    @Test
+    void should_unresolved_pageId_throw_exception() throws Exception {
         //given
-        final Request request = new Request(Method.POST, "/bonita/API/extension/myPostResource");
         final NotFoundException notFoundException = new NotFoundException("page not found");
         doThrow(notFoundException).when(pageMappingService).getPage(httpServletRequest, apiSession,
                 API_EXTENSION_POST_MAPPING_KEY, Locale.FRENCH, false);
 
-        final ResourceExtensionResolver resourceExtensionResolver = createSpy(request,
-                "/bonita/API/extension/myPostResource");
+        var resourceExtensionResolver = createResolver("POST", "/bonita/API/extension/myPostResource");
 
-        //when
-        resourceExtensionResolver.resolvePageId(apiSession);
-
+        //when then exception
+        assertThatThrownBy(() -> resourceExtensionResolver.resolvePageId(apiSession))
+                .isInstanceOf(NotFoundException.class);
     }
 
-    private ResourceExtensionResolver createSpy(Request request, String uri) {
-        ResourceExtensionResolver resourceExtensionResolver;
-        resourceExtensionResolver = spy(new ResourceExtensionResolver(request, pageMappingService));
-        doReturn(httpServletRequest).when(resourceExtensionResolver).getHttpServletRequest();
+    private ResourceExtensionResolver createResolver(String httpMethod, String uri) {
         doReturn(uri).when(httpServletRequest).getRequestURI();
         doReturn(Locale.FRENCH).when(httpServletRequest).getLocale();
 
-        return resourceExtensionResolver;
+        return new ResourceExtensionResolver(httpServletRequest, httpMethod, pageMappingService);
     }
 
 }

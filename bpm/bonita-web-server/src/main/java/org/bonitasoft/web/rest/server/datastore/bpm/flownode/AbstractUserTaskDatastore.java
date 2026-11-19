@@ -19,12 +19,10 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.web.rest.model.bpm.flownode.UserTaskItem;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemNotFoundException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
@@ -56,8 +54,6 @@ public class AbstractUserTaskDatastore<CONSOLE_ITEM extends UserTaskItem, ENGINE
             return convertEngineToConsoleItem((ENGINE_ITEM) humanTaskInstance);
         } catch (final ActivityInstanceNotFoundException e) {
             throw new APIItemNotFoundException(UserTaskDefinition.TOKEN, id);
-        } catch (final BonitaException e) {
-            throw new APIException(e);
         }
     }
 

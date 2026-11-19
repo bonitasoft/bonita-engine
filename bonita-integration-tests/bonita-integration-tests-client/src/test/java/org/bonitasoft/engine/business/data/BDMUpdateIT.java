@@ -25,7 +25,6 @@ import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.tenant.TenantResource;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,11 +49,7 @@ public class BDMUpdateIT extends CommonAPIIT {
         tenantAdministrationAPI = getTenantAdministrationAPI();
     }
 
-    @After
-    public void cleanup() throws Exception {
-        cleanAndUninstallBusinessDataModel();
-        logout();
-    }
+    // No @After needed: CommonAPIIT.clean() handles BDM and logout
 
     @Test
     public void should_change_single_aggregation_relation() throws Exception {
@@ -81,8 +76,7 @@ public class BDMUpdateIT extends CommonAPIIT {
         final BusinessObject businessObject = getBusinessObject(PARENT_BO);
         businessObject.addField(getSingleRelationField(getBusinessObject(CHILD_BO), relationType));
         final String version = installBusinessDataModel(getBusinessObjectModel(businessObject));
-        assertThat(version).as("should have deployed BDM").isNotNull();
-        ensureBDMIsInstalled();
+        ensureBDMIsInstalled(version);
 
         // when
         uninstallBusinessDataModel();
@@ -102,8 +96,7 @@ public class BDMUpdateIT extends CommonAPIIT {
         final BusinessObject businessObject = getBusinessObject(PARENT_BO);
         businessObject.addField(getMultipleRelationField(getBusinessObject(CHILD_BO), relationType));
         final String version = installBusinessDataModel(getBusinessObjectModel(businessObject));
-        assertThat(version).as("should have deployed BDM").isNotNull();
-        ensureBDMIsInstalled();
+        ensureBDMIsInstalled(version);
 
         // when
         uninstallBusinessDataModel();
@@ -165,7 +158,8 @@ public class BDMUpdateIT extends CommonAPIIT {
         return simpleField;
     }
 
-    private void ensureBDMIsInstalled() {
+    private void ensureBDMIsInstalled(String bdmVersion) {
+        assertThat(bdmVersion).as("should have deployed BDM").isNotNull();
         TenantResource tenantResource = tenantAdministrationAPI.getBusinessDataModelResource();
         assertThat(tenantResource.getLastUpdateDate()).isAfter(OffsetDateTime.now().minusMinutes(1));
     }

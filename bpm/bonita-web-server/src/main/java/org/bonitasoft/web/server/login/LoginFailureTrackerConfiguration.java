@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.web.server.login;
 
+import static org.bonitasoft.engine.Profiles.NOT_IN_CLUSTER;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("!cluster")
+@Profile(NOT_IN_CLUSTER)
 public class LoginFailureTrackerConfiguration {
 
     // Inline @Value defaults mirror bonita-platform-community.properties — keep them in sync.

@@ -131,8 +131,7 @@ public class StringIndexIT extends CommonAPIIT {
         loginWithTechnicalUser();
         final String qualifiedName = "com.company.test.Bo";
         final BusinessObjectModel bom = buildSimpleBom(qualifiedName);
-        var businessDataModelVersion = installBusinessDataModel(bom);
-        assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
+        assertThat(installBusinessDataModel(bom)).as("should have deployed BDM").isNotNull();
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("test", "1.2-alpha");

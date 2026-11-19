@@ -121,6 +121,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
@@ -129,6 +130,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
+import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivityInstances;
 import org.bonitasoft.engine.test.check.CheckNbOfOpenActivities;
@@ -1465,6 +1467,21 @@ public class APITestUtil extends PlatformTestUtil {
         if (searchCommands.getCount() > 0) {
             for (final CommandDescriptor command : commands) {
                 getCommandAPI().unregister(command.getName());
+            }
+        }
+    }
+
+    protected void cleanBdm() throws BonitaException {
+        TenantAdministrationAPI tenantAdministrationAPI = getTenantAdministrationAPI();
+        MaintenanceAPI maintenanceAPI = getMaintenanceAPI();
+        if (tenantAdministrationAPI.getBusinessDataModelResource() != TenantResource.NONE) {
+            if (maintenanceAPI.getMaintenanceDetails().getMaintenanceState() == MaintenanceDetails.State.DISABLED) {
+                maintenanceAPI.enableMaintenanceMode();
+            }
+            try {
+                tenantAdministrationAPI.cleanAndUninstallBusinessDataModel();
+            } finally {
+                maintenanceAPI.disableMaintenanceMode();
             }
         }
     }

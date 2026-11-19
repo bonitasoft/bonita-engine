@@ -35,6 +35,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpHeaders;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APIServletCallTest {
@@ -113,7 +114,7 @@ public class APIServletCallTest {
         verify(api, times(1)).runSearch(Integer.parseInt(parameterPageValue), Integer.parseInt(parameterLimitValue),
                 parameterSearchValue, parameterOrderValue, new HashMap<>(), parameterDeployValue,
                 parameterCounterValue);
-        verify(apiServletCall).head("Content-Range", 4 + "-" + 8 + "/" + 789L);
+        verify(apiServletCall).head(HttpHeaders.CONTENT_RANGE, 4 + "-" + 8 + "/" + 789L);
     }
 
 }

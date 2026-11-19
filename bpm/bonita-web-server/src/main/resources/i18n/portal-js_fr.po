@@ -599,6 +599,9 @@ msgstr "Adhésions associées à {}"
 msgid "Mobile"
 msgstr "Portable"
 
+msgid "Modifying or redeploying the Business Data Model may impact existing data retention rules. After redeployment, review your configuration in the Data Retention (GDPR) section."
+msgstr "La modification ou le redéploiement du Modèle de Données Métier peuvent avoir une incidence sur les règles de rétention des données existantes. Après le redéploiement, vérifiez votre configuration dans la section Rétention des Données (RGPD)."
+
 msgid "Monitoring status"
 msgstr "Monitoring"
 

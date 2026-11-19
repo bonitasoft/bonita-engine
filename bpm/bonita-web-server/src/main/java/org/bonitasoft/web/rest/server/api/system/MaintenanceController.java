@@ -27,7 +27,6 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.system.MaintenanceDetailsClient;
 import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -36,7 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/API/system/maintenance")
 public class MaintenanceController extends AbstractRESTController {
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public MaintenanceDetails getMaintenanceDetails(HttpSession session) {
         APISession apiSession = getApiSession(session);
         try {
@@ -49,7 +48,7 @@ public class MaintenanceController extends AbstractRESTController {
         }
     }
 
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping
     public MaintenanceDetails changeMaintenanceState(@RequestBody MaintenanceDetailsClient maintenanceInfo,
             HttpSession session) {
         APISession apiSession = getApiSession(session);

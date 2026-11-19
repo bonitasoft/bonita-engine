@@ -199,8 +199,6 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
             return convertEngineToConsoleItem(pageItem);
         } catch (PageNotFoundException e) {
             throw new APIItemNotFoundException(PageDefinition.TOKEN, id);
-        } catch (final BonitaException e) {
-            throw new APIException(e);
         }
     }
 

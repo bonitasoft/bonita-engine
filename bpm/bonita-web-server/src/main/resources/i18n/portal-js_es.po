@@ -598,6 +598,9 @@ msgstr "Membresias asignadas a {}"
 msgid "Mobile"
 msgstr "Móvil"
 
+msgid "Modifying or redeploying the Business Data Model may impact existing data retention rules. After redeployment, review your configuration in the Data Retention (GDPR) section."
+msgstr ""
+
 msgid "Monitoring status"
 msgstr "Monitorización"
 

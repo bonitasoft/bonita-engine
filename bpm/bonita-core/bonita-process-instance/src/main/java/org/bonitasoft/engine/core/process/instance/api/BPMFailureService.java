@@ -58,5 +58,5 @@ public interface BPMFailureService {
     List<SABPMFailure> getArchivedChildProcessInstancesFailures(long rootProcessInstanceId, int maxResults)
             throws SBonitaReadException;
 
-    record Failure(String scope, Throwable throwable){}
+    record Failure(String scope, Throwable throwable) {}
 }

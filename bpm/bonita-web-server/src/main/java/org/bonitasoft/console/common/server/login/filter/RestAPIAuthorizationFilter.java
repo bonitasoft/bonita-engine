@@ -38,8 +38,10 @@ import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.web.rest.server.framework.utils.RestRequestParser;
+import org.bonitasoft.web.rest.server.framework.utils.ParsedRestRequestURI;
+import org.bonitasoft.web.rest.server.framework.utils.RestRequestURIParser;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIMalformedUrlException;
 import org.bonitasoft.web.toolkit.client.common.i18n.model.I18nLocaleDefinition;
 import org.bonitasoft.web.toolkit.client.common.session.SessionDefinition;
 import org.bonitasoft.web.toolkit.client.data.APIID;
@@ -124,6 +126,11 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
             } else {
                 return true;
             }
+        } catch (APIMalformedUrlException e) {
+            LOGGER.info("Malformed API URL: {}", e.getMessage());
+            httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            httpResponse.flushBuffer();
+            return false;
         } catch (InvalidSessionException e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Invalid Bonita engine session.", e);
@@ -147,9 +154,9 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
     }
 
     protected boolean checkPermissions(final HttpServletRequest request) throws ServletException {
-        final RestRequestParser restRequestParser = new RestRequestParser(request).invoke();
-        return checkPermissions(request, restRequestParser.getApiName(), restRequestParser.getResourceName(),
-                restRequestParser.getResourceQualifiers());
+        final ParsedRestRequestURI parsedURI = new RestRequestURIParser(request).parse();
+        return checkPermissions(request, parsedURI.getApiName(), parsedURI.getResourceName(),
+                parsedURI.getResourceQualifiers());
     }
 
     protected boolean checkPermissions(final HttpServletRequest request, final String apiName,

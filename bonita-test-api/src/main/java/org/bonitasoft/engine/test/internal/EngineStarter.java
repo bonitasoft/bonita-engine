@@ -196,14 +196,14 @@ public class EngineStarter {
     }
 
     private boolean isCacheManager(Thread thread) {
-        return thread.getName().startsWith("net.sf.ehcache.CacheManager");
+        return thread.getName().contains("ehcache") || thread.getName().contains("Ehcache");
     }
 
     private void printThread(final Thread thread) {
         LOGGER.info("\n");
         LOGGER.info("Thread is still alive:" + thread.getName());
         for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
-            LOGGER.info("        at " + stackTraceElement.toString());
+            LOGGER.info("        at " + stackTraceElement);
         }
     }
 

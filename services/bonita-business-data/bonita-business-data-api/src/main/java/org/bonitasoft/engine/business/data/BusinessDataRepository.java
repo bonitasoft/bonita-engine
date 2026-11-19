@@ -89,6 +89,9 @@ public interface BusinessDataRepository extends TenantLifecycleService {
 
     /**
      * Saves or updates an entity in the Business Data Repository.
+     * <p>
+     * This operation also inserts or updates a data retention tracking record in the Bonita DB
+     * via {@code DataRetentionBdmTrackingRepository} when a BDM entity is created or updated.
      *
      * @param entity the entity to save / update.
      */
@@ -96,13 +99,33 @@ public interface BusinessDataRepository extends TenantLifecycleService {
 
     /**
      * Removes an entity from the Business Data Repository.
+     * <p>
+     * This operation also deletes the associated data retention tracking record in the Bonita DB
+     * via {@code DataRetentionBdmTrackingService} when a BDM entity is removed.
      *
      * @param entity the entity to remove.
      */
     void remove(Entity entity);
 
     /**
-     * Reconnect the given entity with the persistence unit
+     * Removes the entity with the given persistence ID. Also deletes the associated data
+     * retention tracking record in the Bonita DB.
+     * <p>
+     * Fires a {@code BUSINESS_DATA_DELETED} AOP event on the removed entity, like
+     * {@link #remove(Entity)}.
+     *
+     * @param entityClass the class of the entity to remove
+     * @param persistenceId the persistence ID of the entity to remove
+     * @return the removed entity
+     * @throws SBusinessDataNotFoundException if no entity exists with the given ID
+     */
+    Entity removeById(Class<? extends Entity> entityClass, long persistenceId) throws SBusinessDataNotFoundException;
+
+    /**
+     * Reconnect the given entity with the persistence unit.
+     * <p>
+     * This operation also inserts or updates a data retention tracking record in the Bonita DB
+     * via {@code DataRetentionBdmTrackingRepository} when a BDM entity is created or updated.
      *
      * @param entity the entity to reconnect.
      * @return the connected entity.

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.business.data.BusinessDataReference;
+import org.bonitasoft.engine.business.data.DataRetentionSettings;
 import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
 import org.bonitasoft.engine.business.data.SimpleBusinessDataReference;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -53,7 +55,7 @@ public class BusinessDataAPIImplTest {
     @Before
     public void setUp() {
         doReturn(serviceAccessor).when(businessDataAPI).getServiceAccessor();
-        when(serviceAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
+        lenient().when(serviceAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
     }
 
     private SProcessSimpleRefBusinessDataInstance buildSimpleRefBusinessData(final String name,
@@ -160,6 +162,42 @@ public class BusinessDataAPIImplTest {
                 .thenThrow(new SBonitaReadException("exception"));
 
         businessDataAPI.getProcessBusinessDataReferences(487654L, 0, 10);
+    }
+
+    @Test
+    public void isDataRetentionEnabled_should_return_true_when_enabled_in_engine_settings() {
+        //given
+        when(serviceAccessor.getDataRetentionSettings()).thenReturn(new DataRetentionSettings(true));
+
+        //when
+        boolean enabled = businessDataAPI.isDataRetentionEnabled();
+
+        //then
+        assertThat(enabled).isTrue();
+    }
+
+    @Test
+    public void isDataRetentionEnabled_should_return_false_when_disabled_in_engine_settings() {
+        //given
+        when(serviceAccessor.getDataRetentionSettings()).thenReturn(new DataRetentionSettings(false));
+
+        //when
+        boolean enabled = businessDataAPI.isDataRetentionEnabled();
+
+        //then
+        assertThat(enabled).isFalse();
+    }
+
+    @Test
+    public void isDataRetentionEnabled_should_be_available_in_maintenance_mode() throws Exception {
+        //given
+        var method = BusinessDataAPIImpl.class.getMethod("isDataRetentionEnabled");
+
+        //when
+        boolean annotated = method.isAnnotationPresent(AvailableInMaintenanceMode.class);
+
+        //then
+        assertThat(annotated).isTrue();
     }
 
 }

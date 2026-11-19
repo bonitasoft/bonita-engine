@@ -45,7 +45,7 @@ public class QueriableLoggerImpl implements QueriableLoggerService {
 
     private final PersistenceService persistenceService;
     private final QueriableLoggerStrategy loggerStrategy;
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
     private final QueriableLogUpdater logUpdater;
     private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<>();
@@ -72,7 +72,7 @@ public class QueriableLoggerImpl implements QueriableLoggerService {
     public List<SQueriableLog> getLogs(final int startIndex, final int maxResults, final String field,
             final OrderByType order) throws SBonitaReadException {
         return persistenceService.selectList(
-                new SelectListDescriptor<SQueriableLog>("getLogs", null, SQueriableLog.class,
+                new SelectListDescriptor<>("getLogs", null, SQueriableLog.class,
                         new QueryOptions(startIndex, maxResults, SQueriableLog.class, field, order)));
     }
 

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api;
 
+import static org.bonitasoft.engine.commons.ExceptionUtils.printLightWeightStacktrace;
 import static org.bonitasoft.web.rest.server.api.SpringResponseEntityUtils.generateErrorResponse;
 
 import java.lang.reflect.UndeclaredThrowableException;
@@ -23,9 +24,11 @@ import javax.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.business.data.BusinessDataCrudOperationException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.exception.UnavailableLockException;
@@ -33,6 +36,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -62,7 +67,8 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<Object> defaultToInternalServerError(Exception exception) {
         // If no specific exception handler is found, log the error and return an internal server error:
-        log.error("Generic server-side error", exception);
+        log.error("Generic server-side error:\n{}", printLightWeightStacktrace(exception));
+        log.debug(exception.getMessage(), exception);
         return bonitaHandleException(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -81,7 +87,6 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     @ExceptionHandler(value = { MethodArgumentTypeMismatchException.class })
     public ResponseEntity<Object> handleInvalidParameters(HttpServletRequest req,
             MethodArgumentTypeMismatchException ex) {
-        // replicate the error message produced by former API written with Restlet (see CommonResource)
         String parameterName = ex.getName();
         if (log.isDebugEnabled()) {
             log.debug("Invalid parameter [{}] {}: {}", req.getPathInfo(), parameterName, ex.getMessage());
@@ -97,7 +102,9 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
 
         Object value = ex.getValue();
         Class<?> requiredType = ex.getRequiredType();
-        boolean isNumber = Integer.class.equals(requiredType) || Long.class.equals(requiredType);
+        // Check if the required type is a number (handle primitive types and primitive objects, e.g. int and Integer)
+        boolean isNumber = requiredType != null
+                && Number.class.isAssignableFrom(ClassUtils.resolvePrimitiveIfNecessary(requiredType));
         if (isNumber) {
             return bonitaHandleException(new IllegalArgumentException("[ " + value + " ] must be a number"),
                     HttpStatus.BAD_REQUEST);
@@ -107,9 +114,20 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
                 HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = { ActivityInstanceNotFoundException.class })
+    public ResponseEntity<Object> handleActivityInstanceNotFound(ActivityInstanceNotFoundException exception) {
+        // The message contains the ID:
+        return generateErrorResponse(exception.getClass().getName(), HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
     @ExceptionHandler(value = { NotFoundException.class })
     public ResponseEntity<Object> handleNotFound(NotFoundException exception) {
         return bonitaHandleException(exception, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = { AlreadyExistsException.class })
+    public ResponseEntity<Object> handleAlreadyExists(AlreadyExistsException exception) {
+        return bonitaHandleException(exception, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = { CommandExecutionException.class })
@@ -172,10 +190,16 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException exception,
+            HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return generateErrorResponse(exception.getClass().getName(), HttpStatus.BAD_REQUEST,
+                "Unable to parse the JSON body");
+    }
+
+    @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException exception, HttpHeaders headers, HttpStatus status,
             WebRequest request) {
-        // replicate the error message produced by former API written with Restlet (see CommonResource)
         String parameterName = exception.getParameterName();
 
         String mapping = parameterErrorNames.get(parameterName);
@@ -190,7 +214,6 @@ public class SpringRestResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     private static ResponseEntity<Object> bonitaHandleException(Throwable exception, HttpStatus status) {
-        // replicate the behaviour of former API written with Restlet (see CommonResource)
         final Throwable cause = exception.getCause() != null ? exception.getCause() : exception;
         return generateErrorResponse(exception.getClass().getName(), status, cause.getMessage());
     }

@@ -350,6 +350,21 @@ public class RestAPIAuthorizationFilterTest {
         });
     }
 
+    @Test
+    public void should_return_bad_request_when_api_url_is_malformed() throws Exception {
+        doReturn(new StringBuffer("http://host/bonita/API")).when(request).getRequestURL();
+        doReturn("/API").when(request).getServletPath();
+        doReturn(null).when(request).getPathInfo();
+
+        //when
+        restAPIAuthorizationFilter.proceedWithFiltering(request, response, chain);
+
+        //then
+        verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        verify(response).flushBuffer();
+        verify(chain, never()).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+    }
+
     private void matchExcludePattern(final String urlToMatch, final Boolean mustMatch) {
         if (restAPIAuthorizationFilter.matchExcludePatterns(urlToMatch) != mustMatch) {
             Assertions.fail("Matching excludePattern and the Url " + urlToMatch + " must return " + mustMatch);

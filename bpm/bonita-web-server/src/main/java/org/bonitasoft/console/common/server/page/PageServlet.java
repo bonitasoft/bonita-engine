@@ -232,8 +232,8 @@ public class PageServlet extends HttpServlet {
             final PageReference pageReference = pageMappingService.getPage(request, apiSession, mappingKey,
                     currentLocale,
                     isNotResourcePath);
-            if (pageReference.getURL() != null) {
-                displayExternalPage(response, pageReference.getURL());
+            if (pageReference.getUrl() != null) {
+                displayExternalPage(response, pageReference.getUrl());
             } else if (pageReference.getPageId() != null) {
                 displayPageOrResource(request, response, apiSession, pageReference.getPageId(), resourcePath,
                         currentLocale);

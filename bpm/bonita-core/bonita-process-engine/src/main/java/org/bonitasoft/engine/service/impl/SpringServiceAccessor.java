@@ -26,6 +26,7 @@ import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
+import org.bonitasoft.engine.business.data.DataRetentionSettings;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -491,6 +492,11 @@ public class SpringServiceAccessor implements ServiceAccessor {
     @Override
     public BusinessDataService getBusinessDataService() {
         return beanAccessor.getService(BusinessDataService.class);
+    }
+
+    @Override
+    public DataRetentionSettings getDataRetentionSettings() {
+        return beanAccessor.getService(DataRetentionSettings.class);
     }
 
     @Override

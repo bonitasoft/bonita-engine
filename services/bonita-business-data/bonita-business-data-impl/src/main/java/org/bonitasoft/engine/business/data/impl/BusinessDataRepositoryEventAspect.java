@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.bonitasoft.engine.bdm.Entity;
@@ -64,8 +64,17 @@ public class BusinessDataRepositoryEventAspect {
         return null;
     }
 
-    @After("execution(* org.bonitasoft.engine.business.data.BusinessDataRepository.remove(..)) && args(entity)")
+    @AfterReturning("execution(* org.bonitasoft.engine.business.data.BusinessDataRepository.remove(..)) && args(entity)")
     public void afterRemove(Entity entity) throws SFireEventException {
+        fireDeleteEvent(entity);
+    }
+
+    @AfterReturning(pointcut = "execution(* org.bonitasoft.engine.business.data.BusinessDataRepository.removeById(..))", returning = "entity")
+    public void afterRemoveById(Entity entity) throws SFireEventException {
+        fireDeleteEvent(entity);
+    }
+
+    private void fireDeleteEvent(Entity entity) throws SFireEventException {
         var event = new SDeleteEvent(getEventType(SEvent.DELETED));
         event.setObject(entity);
         eventService.fireEvent(event);

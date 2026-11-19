@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bdm.validator.assertion;
 
+import static org.bonitasoft.engine.api.result.Status.Level.ERROR;
+
 import java.util.Objects;
 
 import org.assertj.core.api.AbstractAssert;
@@ -52,9 +54,16 @@ public class ValidationStatusAssert extends AbstractAssert<ValidationStatusAsser
 
     public ValidationStatusAssert hasError(String errorMessage) {
         Assertions.assertThat(
-                actual.getStatuses().stream().filter(status -> Objects.equals(Status.Level.ERROR, status.getLevel()))
+                actual.getStatuses().stream().filter(status -> Objects.equals(ERROR, status.getLevel()))
                         .map(Status::getMessage).toList())
                 .contains(errorMessage);
+        return this;
+    }
+
+    public ValidationStatusAssert hasErrorSize(int size) {
+        Assertions.assertThat(actual.getStatuses().stream()
+                .filter(status -> Objects.equals(ERROR, status.getLevel()))
+                .count()).isEqualTo(size);
         return this;
     }
 }

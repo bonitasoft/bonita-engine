@@ -93,15 +93,6 @@ dependencyManagement {
         dependency(libs.jakartaJstlApi.get() as String)
         dependency(libs.jgettext.get() as String)
         dependency(libs.urlrewritefilter.get() as String)
-        dependency(libs.restlet.get() as String)
-        dependency(libs.restletServlet.get() as String) {
-            exclude "org.restlet.jee:org.restlet"
-        }
-        dependency(libs.restletJackson.get() as String) {
-            exclude "org.codehaus.woodstox:woodstox-core-asl"
-            exclude "org.codehaus.woodstox:stax2-api"
-        }
-        // Specify woodstox version to override the version pulled by jackson-dataformat-xml (transitive dep of restlet)
         dependency(libs.woodstoxCore.get() as String)
         dependency(libs.jsonSimple.get() as String)
         dependency(libs.keycloakSamlAdapterApiPublic.get() as String)

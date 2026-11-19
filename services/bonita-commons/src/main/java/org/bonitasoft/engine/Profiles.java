@@ -16,5 +16,6 @@ package org.bonitasoft.engine;
 public class Profiles {
 
     public static final String CLUSTER = "cluster";
+    public static final String NOT_IN_CLUSTER = "!cluster";
 
 }

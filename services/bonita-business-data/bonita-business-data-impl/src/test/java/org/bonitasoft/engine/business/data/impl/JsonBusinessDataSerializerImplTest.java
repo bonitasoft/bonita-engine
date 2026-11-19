@@ -108,6 +108,131 @@ public class JsonBusinessDataSerializerImplTest {
                 .isEqualTo(getJsonContent("EntitySerializerPojo.json"));
     }
 
+    @Test
+    public void scalar_result_should_be_serialized_in_legacy_format() throws Exception {
+        // when - Long
+        String longJson = jsonBusinessDataSerializer.serializeScalarResult(Collections.singletonList(59L),
+                Person.class.getName(), false);
+        // then
+        assertThatJson(longJson).isEqualTo("[59]");
+
+        // when - Double
+        String doubleJson = jsonBusinessDataSerializer.serializeScalarResult(Collections.singletonList(42.5),
+                Person.class.getName(), false);
+        // then
+        assertThatJson(doubleJson).isEqualTo("[42.5]");
+
+        // when - Integer
+        String intJson = jsonBusinessDataSerializer.serializeScalarResult(Collections.singletonList(100),
+                Person.class.getName(), false);
+        // then
+        assertThatJson(intJson).isEqualTo("[100]");
+    }
+
+    @Test
+    public void scalar_result_should_be_serialized_in_standard_format() throws Exception {
+        // when - Long
+        String longJson = jsonBusinessDataSerializer.serializeScalarResult(Collections.singletonList(59L),
+                Person.class.getName(), true);
+        // then
+        assertThatJson(longJson).isEqualTo("{ \"value\": 59 }");
+
+        // when - Double
+        String doubleJson = jsonBusinessDataSerializer.serializeScalarResult(Collections.singletonList(42.5),
+                Person.class.getName(), true);
+        // then
+        assertThatJson(doubleJson).isEqualTo("{ \"value\": 42.5 }");
+
+        // when - null
+        String nullJson = jsonBusinessDataSerializer.serializeScalarResult(Collections.singletonList(null),
+                Person.class.getName(), true);
+        // then
+        assertThatJson(nullJson).isEqualTo("{ \"value\": null }");
+    }
+
+    @Test
+    public void entity_query_result_should_be_serialized_as_array_in_legacy_mode() throws Exception {
+        // given - single entity
+        Entity person = initPerson(1L);
+
+        // when - legacy mode always returns array regardless of queryReturnsMultipleResults
+        final String jsonSingle = jsonBusinessDataSerializer.serializeEntityQueryResult(
+                Collections.singletonList(person), PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, false, false);
+
+        // then - returns array even for single entity
+        assertThatJson(jsonSingle).isArray();
+        assertThatJson(jsonSingle).node("[0]").isObject();
+    }
+
+    @Test
+    public void entity_query_result_should_be_serialized_as_object_in_standard_mode_for_single_entity_query()
+            throws Exception {
+        // given - single entity from a query designed to return single entity
+        Entity person = initPerson(1L);
+
+        // when - standard mode with query returning single entity (queryReturnsMultipleResults = false)
+        final String jsonSingle = jsonBusinessDataSerializer.serializeEntityQueryResult(
+                Collections.singletonList(person), PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, true, false);
+
+        // then - returns object (not array) for single entity query
+        assertThatJson(jsonSingle).isObject();
+        assertThatJson(jsonSingle).node("persistenceId").isEqualTo(1);
+    }
+
+    @Test
+    public void entity_query_result_should_be_serialized_as_array_in_standard_mode_for_list_query_with_single_result()
+            throws Exception {
+        // given - single entity from a query designed to return List
+        Entity person = initPerson(1L);
+
+        // when - standard mode with query returning List (queryReturnsMultipleResults = true)
+        final String jsonSingle = jsonBusinessDataSerializer.serializeEntityQueryResult(
+                Collections.singletonList(person), PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, true, true);
+
+        // then - returns array even for single result because query is designed to return List
+        assertThatJson(jsonSingle).isArray();
+        assertThatJson(jsonSingle).node("[0]").isObject();
+        assertThatJson(jsonSingle).node("[0].persistenceId").isEqualTo(1);
+    }
+
+    @Test
+    public void entity_query_result_should_be_serialized_as_array_in_standard_mode_for_multiple_entities()
+            throws Exception {
+        // given - multiple entities
+        List<Entity> persons = IntStream.range(1, 3).mapToObj(i -> initPerson(i)).collect(Collectors.toList());
+
+        // when - standard mode with query returning List (queryReturnsMultipleResults = true)
+        final String jsonMultiple = jsonBusinessDataSerializer.serializeEntityQueryResult(persons,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, true, true);
+
+        // then - returns array for multiple entities
+        assertThatJson(jsonMultiple).isArray();
+        assertThatJson(jsonMultiple).node("[0].persistenceId").isEqualTo(1);
+        assertThatJson(jsonMultiple).node("[1].persistenceId").isEqualTo(2);
+    }
+
+    @Test
+    public void entity_query_result_should_return_empty_object_for_no_results_in_standard_mode_single_entity_query()
+            throws Exception {
+        // when - standard mode with query returning single entity (queryReturnsMultipleResults = false)
+        final String jsonEmpty = jsonBusinessDataSerializer.serializeEntityQueryResult(Collections.emptyList(),
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, true, false);
+
+        // then - returns empty object for single entity query
+        assertThatJson(jsonEmpty).isEqualTo("{}");
+    }
+
+    @Test
+    public void entity_query_result_should_return_empty_array_for_no_results_in_standard_mode_list_query()
+            throws Exception {
+        // when - standard mode with query returning List (queryReturnsMultipleResults = true)
+        final String jsonEmpty = jsonBusinessDataSerializer.serializeEntityQueryResult(Collections.emptyList(),
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE, true, true);
+
+        // then - returns empty array for list query
+        assertThatJson(jsonEmpty).isEqualTo("[]");
+    }
+
     // =================================================================================================================
     // UTILS
     // =================================================================================================================

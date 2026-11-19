@@ -15,6 +15,7 @@ package org.bonitasoft.web.extension.rest;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -38,10 +39,11 @@ public class RestApiResponse {
      */
     public static final int DEFAULT_STATUS = 200;
 
+    public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     /**
      * default character set
      */
-    public static final String DEFAULT_CHARACTER_SET = Charset.forName("UTF-8").name();
+    public static final String DEFAULT_CHARACTER_SET = DEFAULT_CHARSET.name();
 
     /**
      * default media type

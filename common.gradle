@@ -46,11 +46,6 @@ subprojects {
             }
         }
 
-        // related to ehcache-core 2.x - must be challenged when upgrading to ehcache 3.x
-        // needed to get org.terracotta.internal:statistics:1.0.5 (required by ehcache-core jar)
-        maven {
-            url='https://repo.terracotta.org/maven2/'
-        }
         maven {
             url="https://central.sonatype.com/repository/maven-snapshots/"
             mavenContent {
@@ -88,8 +83,8 @@ subprojects {
         options.encoding = 'UTF-8'
     }
     tasks.withType(DependencyReportTask).configureEach {
-        group "Documentation"
-        description "List runtime dependencies for a specified configuration"
+        group = "Documentation"
+        description = "List runtime dependencies for a specified configuration"
         configurations = [project.configurations.runtimeClasspath]
     }
 

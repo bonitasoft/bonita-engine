@@ -24,7 +24,7 @@ public class ApplicationSearchDescriptorConverterTest {
     private final ApplicationSearchDescriptorConverter converter = new ApplicationSearchDescriptorConverter();
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_id_on_convert_attribute_id() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_id_on_convert_attribute_id() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_ID);
 
@@ -33,7 +33,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_name_on_convert_attribute_name() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_name_on_convert_attribute_name() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_TOKEN);
 
@@ -42,7 +42,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_name_on_convert_attribute_displayName() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_name_on_convert_attribute_displayName() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_DISPLAY_NAME);
 
@@ -51,7 +51,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_version_on_convert_attribute_version() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_version_on_convert_attribute_version() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_VERSION);
 
@@ -60,8 +60,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_creationDate_on_convert_attribute_creationDate()
-            throws Exception {
+    public void should_return_ApplicationSearchDescriptor_creationDate_on_convert_attribute_creationDate() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_CREATION_DATE);
 
@@ -70,7 +69,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_createdBy_on_convert_attribute_createdBy() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_createdBy_on_convert_attribute_createdBy() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_CREATED_BY);
 
@@ -79,8 +78,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_lastUpdateDate_on_convert_attribute_lastUpdateDate()
-            throws Exception {
+    public void should_return_ApplicationSearchDescriptor_lastUpdateDate_on_convert_attribute_lastUpdateDate() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_LAST_UPDATE_DATE);
 
@@ -89,7 +87,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_updatedBy_on_convert_attribute_updatedBy() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_updatedBy_on_convert_attribute_updatedBy() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_UPDATED_BY);
 
@@ -98,7 +96,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_state_on_convert_attribute_state() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_state_on_convert_attribute_state() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_STATE);
 
@@ -107,7 +105,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_layoutid_on_convert_attribute_layoutid() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_layoutid_on_convert_attribute_layoutid() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_LAYOUT_ID);
 
@@ -116,7 +114,7 @@ public class ApplicationSearchDescriptorConverterTest {
     }
 
     @Test
-    public void should_return_ApplicationSearchDescriptor_themeid_on_convert_attribute_themeid() throws Exception {
+    public void should_return_ApplicationSearchDescriptor_themeid_on_convert_attribute_themeid() {
         //when
         final String value = converter.convert(ApplicationItem.ATTRIBUTE_THEME_ID);
 
