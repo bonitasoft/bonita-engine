@@ -101,7 +101,7 @@ public interface TenantAdministrationAPI {
      * byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
      * clientBDMZip will typically contain : "README.md", "example-pom.xml", "bdm-dao.jar", "bdm-model.jar", "bom.zip".
      * See online <a
-     * href="https://documentation.bonitasoft.com/bonita/latest/how-a-bdm-is-deployed#_bdm_classes_generation">a Java
+     * href="https://documentation.ofelia.com/bonita/latest/how-a-bdm-is-deployed#_bdm_classes_generation">a Java
      * code example</a>
      * on how to extract those artefacts from the Zip file.
      *

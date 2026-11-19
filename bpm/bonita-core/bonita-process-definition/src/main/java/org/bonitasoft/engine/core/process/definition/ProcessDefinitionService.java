@@ -27,6 +27,9 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionE
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeploymentInfoUpdateException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDisablementException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessEnablementException;
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameGroupQuery;
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameKey;
+import org.bonitasoft.engine.core.process.definition.model.ProcessNameVersion;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -395,6 +398,44 @@ public interface ProcessDefinitionService {
      * @throws SBonitaReadException
      */
     long getNumberOfProcessDeploymentInfos(QueryOptions countOptions) throws SBonitaReadException;
+
+    /**
+     * Get the total number of distinct (name, displayName) groups matching the optional activationState filter and
+     * search term.
+     *
+     * @param activationState
+     *        the activation state to filter on, or {@code null} for no activation-state filter
+     * @param searchTerm
+     *        the SQL LIKE pattern to match against name and displayName ({@code "%"} to match all)
+     * @return the number of distinct (name, displayName) groups
+     * @throws SBonitaReadException
+     */
+    long getNumberOfProcessNameGroups(String activationState, String searchTerm) throws SBonitaReadException;
+
+    /**
+     * Search a page of process deployment infos grouped by (name, displayName). Returns one {@link ProcessNameKey}
+     * per distinct (name, displayName) combination, ordered and paginated at the database level.
+     *
+     * @param query
+     *        the page criteria (filter, search term, ordering and pagination)
+     * @return the requested page of distinct (name, displayName) groups
+     * @throws SBonitaReadException
+     */
+    List<ProcessNameKey> searchProcessNameGroups(ProcessNameGroupQuery query) throws SBonitaReadException;
+
+    /**
+     * Get the versions of the given process names, optionally restricted to an activation state so that only matching
+     * versions are returned. Results are not paginated; callers group them by (name, displayName).
+     *
+     * @param names
+     *        the process names of the groups to retrieve versions for
+     * @param activationState
+     *        the activation state to filter on, or {@code null} for no activation-state filter
+     * @return the matching (name, displayName, version) projections
+     * @throws SBonitaReadException
+     */
+    List<ProcessNameVersion> getVersionsForProcessNames(List<String> names, String activationState)
+            throws SBonitaReadException;
 
     /**
      * Get total number of uncategorized process definitions by given query criteria

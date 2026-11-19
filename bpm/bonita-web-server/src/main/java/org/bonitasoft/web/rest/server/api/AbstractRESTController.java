@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
@@ -63,6 +64,17 @@ public abstract class AbstractRESTController {
     protected ProcessAPI getProcessAPI(HttpSession session)
             throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getProcessAPI(getApiSession(session));
+    }
+
+    // VisibleForTesting
+    public IdentityAPI getIdentityAPI(APISession apiSession)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getIdentityAPI(apiSession);
+    }
+
+    protected IdentityAPI getIdentityAPI(HttpSession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getIdentityAPI(getApiSession(session));
     }
 
     public TenantAdministrationAPI getTenantAdministrationAPI(HttpSession session)

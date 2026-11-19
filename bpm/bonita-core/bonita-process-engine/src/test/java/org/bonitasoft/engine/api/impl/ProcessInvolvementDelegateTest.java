@@ -14,18 +14,23 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 
+import org.bonitasoft.engine.core.delegation.api.DelegationRuleService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -136,6 +141,55 @@ public class ProcessInvolvementDelegateTest {
 
         //then
         assertThat(involvedInProcessInstance).as("should be involved in archived case").isFalse();
+    }
+
+    @Test
+    public final void should_isInvolvedInProcessInstance_return_true_when_user_is_active_delegate() throws Exception {
+        //given — not initiator, not archived-task executor, no pending/assigned task; only the
+        //        delegate fall-through can grant. The TaskInvolvementDelegate seam lets us drive
+        //        the upstream checks to false without the static ServiceAccessorSingleton.
+        doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
+        doReturn(PROCESS_INITIATOR_USER_ID).when(sProcessInstance).getStartedBy();
+        TaskInvolvementDelegate taskInvolvementDelegate = mock(TaskInvolvementDelegate.class);
+        doReturn(taskInvolvementDelegate).when(processInvolvementDelegate).getTaskInvolvementDelegate();
+        doReturn(false).when(taskInvolvementDelegate).isExecutorOfArchivedTaskOfProcess(WRONG_USER_ID,
+                PROCESS_INSTANCE_ID);
+        doReturn(false).when(taskInvolvementDelegate).hasUserPendingOrAssignedTasks(WRONG_USER_ID, PROCESS_INSTANCE_ID);
+        DelegationRuleService delegationRuleService = mock(DelegationRuleService.class);
+        doReturn(delegationRuleService).when(serviceAccessor).getDelegationRuleService();
+        doReturn(true).when(delegationRuleService).isActiveDelegateForProcessInstance(WRONG_USER_ID,
+                PROCESS_INSTANCE_ID);
+
+        //when
+        boolean involvedInProcessInstance = processInvolvementDelegate.isInvolvedInProcessInstance(WRONG_USER_ID,
+                PROCESS_INSTANCE_ID);
+
+        //then
+        assertThat(involvedInProcessInstance).as("active delegate should be involved in the process instance")
+                .isTrue();
+    }
+
+    @Test
+    public final void should_isInvolvedInProcessInstance_wrap_read_exception_from_delegate_check_in_RetrieveException()
+            throws Exception {
+        //given — every prior check is false and the delegate query fails with a read exception
+        doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
+        doReturn(PROCESS_INITIATOR_USER_ID).when(sProcessInstance).getStartedBy();
+        TaskInvolvementDelegate taskInvolvementDelegate = mock(TaskInvolvementDelegate.class);
+        doReturn(taskInvolvementDelegate).when(processInvolvementDelegate).getTaskInvolvementDelegate();
+        doReturn(false).when(taskInvolvementDelegate).isExecutorOfArchivedTaskOfProcess(WRONG_USER_ID,
+                PROCESS_INSTANCE_ID);
+        doReturn(false).when(taskInvolvementDelegate).hasUserPendingOrAssignedTasks(WRONG_USER_ID, PROCESS_INSTANCE_ID);
+        DelegationRuleService delegationRuleService = mock(DelegationRuleService.class);
+        doReturn(delegationRuleService).when(serviceAccessor).getDelegationRuleService();
+        doThrow(new SBonitaReadException("boom")).when(delegationRuleService)
+                .isActiveDelegateForProcessInstance(WRONG_USER_ID, PROCESS_INSTANCE_ID);
+
+        //expect
+        assertThatThrownBy(
+                () -> processInvolvementDelegate.isInvolvedInProcessInstance(WRONG_USER_ID, PROCESS_INSTANCE_ID))
+                .isInstanceOf(RetrieveException.class)
+                .hasCauseInstanceOf(SBonitaReadException.class);
     }
 
 }

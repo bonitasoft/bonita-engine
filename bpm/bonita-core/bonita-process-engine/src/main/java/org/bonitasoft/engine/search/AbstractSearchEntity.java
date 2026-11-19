@@ -123,11 +123,11 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
             if (count != doubleCheck) {
                 log.error("Double checking the same query within the same transaction did NOT bring the same"
                         + " result. You DO have a database transaction isolation problem. Please fix it ASAP. See" +
-                        " https://documentation.bonitasoft.com/bonita/latest/runtime/database-configuration#customize-rdbms"
+                        " https://documentation.ofelia.com/bonita/latest/runtime/database-configuration#customize-rdbms"
                         + " for details.");
             } else {
                 log.warn("Within the same transaction, the Search count & page results are not consistent." +
-                        " Please see https://documentation.bonitasoft.com/bonita/latest/runtime/performance-troubleshooting#monitor-transaction-isolation");
+                        " Please see https://documentation.ofelia.com/bonita/latest/runtime/performance-troubleshooting#monitor-transaction-isolation");
             }
         }
     }

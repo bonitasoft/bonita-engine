@@ -58,6 +58,10 @@ public class ProcessInvolvementDelegate {
         return ServiceAccessorSingleton.getInstance();
     }
 
+    protected TaskInvolvementDelegate getTaskInvolvementDelegate() {
+        return new TaskInvolvementDelegate();
+    }
+
     private static QueryOptions buildArchivedTasksQueryOptions(final long processInstanceId) {
         final SAUserTaskInstanceBuilderFactory archUserTaskKeyFactory = BuilderFactory
                 .get(SAUserTaskInstanceBuilderFactory.class);
@@ -73,7 +77,7 @@ public class ProcessInvolvementDelegate {
 
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId)
             throws ProcessInstanceNotFoundException {
-        final TaskInvolvementDelegate taskInvolvementDelegate = new TaskInvolvementDelegate();
+        final TaskInvolvementDelegate taskInvolvementDelegate = getTaskInvolvementDelegate();
         // IS_PROCESS_INITIATOR rule
         if (isProcessOrArchivedProcessInitiator(userId, processInstanceId)) {
             return true;
@@ -96,8 +100,16 @@ public class ProcessInvolvementDelegate {
             throw new RetrieveException(e);
         }
 
-        return false;
-
+        // IS_ACTIVE_DELEGATE rule — fall-through extension for delegation.
+        // Case-scoped involvement: a delegate of a user who is assignee of any live task in this
+        // process instance — and whose delegation whitelist names the root process — is considered
+        // involved. The DelegationRuleService check fast-exits cheaply for non-delegate callers.
+        try {
+            return getServiceAccessor().getDelegationRuleService()
+                    .isActiveDelegateForProcessInstance(userId, processInstanceId);
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
     }
 
     public boolean isProcessOrArchivedProcessInitiator(long userId, long processInstanceId)

@@ -29,8 +29,6 @@ import org.bonitasoft.engine.bpm.flownode.*
 import org.bonitasoft.engine.bpm.process.ProcessInstance
 import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.identity.User
-import org.bonitasoft.engine.search.SearchOptions
-import org.bonitasoft.engine.search.impl.SearchResultImpl
 import org.bonitasoft.engine.session.APISession
 import org.junit.Before
 import org.junit.Test
@@ -162,12 +160,13 @@ public class TaskPermissionRuleTest {
 
 
     @Test
-    public void should_get_on_a_assigned_human_task_is_ok() {
-        //given
+    public void should_get_on_a_human_task_the_user_is_involved_in_is_ok() {
+        //given — involvement (assignee / pending-actor / active delegate) is resolved engine-side
+        //        by isInvolvedInHumanTaskInstance; the rule only consults that single result.
         havingResource("humanTask")
         def instance = mock(UserTaskInstance.class)
-        doReturn(currentUserId).when(instance).getAssigneeId()
         doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doReturn(true).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 458l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -175,12 +174,66 @@ public class TaskPermissionRuleTest {
     }
 
     @Test
-    public void should_get_on_a_assigned_human_task_is_not_ok() {
-        //given
+    public void should_get_on_a_human_task_the_user_is_not_involved_in_is_not_ok() {
+        //given — not involved and not supervisor
         havingResource("humanTask")
         def instance = mock(UserTaskInstance.class)
-        doReturn(59l).when(instance).getAssigneeId()
+        doReturn(10l).when(instance).getProcessDefinitionId()
         doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doReturn(false).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 458l)
+        doReturn(false).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isFalse()
+    }
+
+    @Test
+    public void should_allow_on_a_manual_task_when_user_is_involved_in_the_parent_task() {
+        //given — caller is not involved in the manual subtask itself, but is involved in its parent task.
+        havingResource("humanTask")
+        def instance = mock(ManualTaskInstance.class)
+        doReturn(999l).when(instance).getParentContainerId()
+        doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doReturn(false).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 458l)
+        def parentTask = mock(HumanTaskInstance.class)
+        doReturn(777l).when(parentTask).getId()
+        doReturn(parentTask).when(processAPI).getHumanTaskInstance(999l)
+        doReturn(true).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 777l)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void should_deny_on_a_manual_task_when_parent_task_is_not_found() {
+        //given — manual subtask not granted and its parent task cannot be loaded
+        havingResource("humanTask")
+        def instance = mock(ManualTaskInstance.class)
+        doReturn(999l).when(instance).getParentContainerId()
+        doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doReturn(false).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 458l)
+        doThrow(new ActivityInstanceNotFoundException(999l)).when(processAPI).getHumanTaskInstance(999l)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isFalse()
+    }
+
+    @Test
+    public void should_deny_on_a_manual_task_when_parent_involvement_check_throws_NotFoundException() {
+        //given — parent task loads, but its involvement check loses the race (task vanished); deny.
+        havingResource("humanTask")
+        def instance = mock(ManualTaskInstance.class)
+        doReturn(999l).when(instance).getParentContainerId()
+        doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doReturn(false).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 458l)
+        def parentTask = mock(HumanTaskInstance.class)
+        doReturn(777l).when(parentTask).getId()
+        doReturn(parentTask).when(processAPI).getHumanTaskInstance(999l)
+        doThrow(new ActivityInstanceNotFoundException(777l)).when(processAPI)
+                .isInvolvedInHumanTaskInstance(currentUserId, 777l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -200,42 +253,14 @@ public class TaskPermissionRuleTest {
 
 
     @Test
-    public void should_get_on_a_pending_task_is_ok() {
-        //given
-        havingResource("humanTask")
-        def instance = mock(UserTaskInstance.class)
-        doReturn(-1l).when(instance).getAssigneeId()
-        doReturn(instance).when(processAPI).getFlowNodeInstance(458)
-        doReturn(new SearchResultImpl(1, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
-        //when
-        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
-        //then
-        assertThat(isAuthorized).isTrue()
-    }
-
-    @Test
-    public void should_get_on_a_pending_task_is_not_ok() {
-        //given
-        havingResource("humanTask")
-        def instance = mock(UserTaskInstance.class)
-        doReturn(-1l).when(instance).getAssigneeId()
-        doReturn(instance).when(processAPI).getFlowNodeInstance(458)
-        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
-        //when
-        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
-        //then
-        assertThat(isAuthorized).isFalse()
-    }
-
-    @Test
-    public void should_PUT_on_assigned_human_task_is_ok() {
+    public void should_PUT_on_a_human_task_the_user_is_involved_in_is_ok() {
         //given
         doReturn(true).when(apiCallContext).isPUT()
         doReturn("458").when(apiCallContext).getResourceId()
         doReturn("humanTask").when(apiCallContext).getResourceName()
         def instance = mock(UserTaskInstance.class)
-        doReturn(currentUserId).when(instance).getAssigneeId()
         doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doReturn(true).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 458l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -291,22 +316,22 @@ public class TaskPermissionRuleTest {
     }
 
     @Test
-    public void should_PUT_on_a_human_task_if_supervisor() {
-        //given
+    public void should_PUT_on_a_human_task_if_supervisor_and_assigned_user_is_involved() {
+        //given — caller is supervisor; the assigned user (4) is involved, so the
+        //        supervisor-with-assignedUser recursion grants access.
         doReturn(true).when(apiCallContext).isPUT()
         doReturn("458").when(apiCallContext).getResourceId()
         doReturn("humanTask").when(apiCallContext).getResourceName()
         def instance = mock(UserTaskInstance.class)
         doReturn(instance).when(processAPI).getFlowNodeInstance(458)
         doReturn(10l).when(instance).getProcessDefinitionId()
+        doReturn(false).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 458l)
         doReturn(true).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
         doReturn('''{"assigned_id":"4"}''').when(apiCallContext).getBody()
         def assigneUser = mock(User.class)
         doReturn(assigneUser).when(identityAPI).getUser(4l)
         doReturn(4l).when(assigneUser).getId()
-        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
-        doReturn(4l).when(instance).getAssigneeId()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(10l, 4l)
+        doReturn(true).when(processAPI).isInvolvedInHumanTaskInstance(4l, 458l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -314,21 +339,21 @@ public class TaskPermissionRuleTest {
     }
 
     @Test
-    public void should_not_PUT_on_a_human_task_if_supervisor_but_assigned_id_no_actor() {
-        //given
+    public void should_not_PUT_on_a_human_task_if_supervisor_but_assigned_user_not_involved() {
+        //given — caller is supervisor but the assigned user (4) is neither involved nor supervisor
         doReturn(true).when(apiCallContext).isPUT()
         doReturn("458").when(apiCallContext).getResourceId()
         doReturn("humanTask").when(apiCallContext).getResourceName()
         def instance = mock(UserTaskInstance.class)
         doReturn(instance).when(processAPI).getFlowNodeInstance(458)
         doReturn(10l).when(instance).getProcessDefinitionId()
+        doReturn(false).when(processAPI).isInvolvedInHumanTaskInstance(currentUserId, 458l)
         doReturn(true).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
         doReturn('''{"assigned_id":"4"}''').when(apiCallContext).getBody()
         def assigneUser = mock(User.class)
         doReturn(assigneUser).when(identityAPI).getUser(4l)
         doReturn(4l).when(assigneUser).getId()
-        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
-        doReturn(99l).when(instance).getAssigneeId()
+        doReturn(false).when(processAPI).isInvolvedInHumanTaskInstance(4l, 458l)
         doReturn(false).when(processAPI).isUserProcessSupervisor(10l, 4l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
@@ -357,5 +382,22 @@ public class TaskPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn("458").when(apiCallContext).getResourceId()
         doReturn(resourceName).when(apiCallContext).getResourceName()
+    }
+
+    @Test
+    public void should_return_false_when_isInvolvedInHumanTaskInstance_throws_NotFoundException() {
+        //given — defensive: if the involvement check throws NotFoundException (task vanished mid-check),
+        //        treat as deny rather than letting it surface as a 404-granting path.
+        havingResource("humanTask")
+        def instance = mock(UserTaskInstance.class)
+        doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doThrow(new ActivityInstanceNotFoundException(458l)).when(processAPI)
+                .isInvolvedInHumanTaskInstance(currentUserId, 458l)
+
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+
+        //then
+        assertThat(isAuthorized).isFalse()
     }
 }

@@ -39,19 +39,19 @@ public class UrlBuilderTest {
     @Test
     public void appendParameter_should_add_service_param_to_URL() {
         urlBuilder = new UrlBuilder("http://www.cas-service.com/login");
-        urlBuilder.appendParameter("service", "http://www.bonitasoft.com/bonita");
+        urlBuilder.appendParameter("service", "http://www.ofelia.com/bonita");
 
         assertThat(urlBuilder.build())
-                .isEqualTo("http://www.cas-service.com/login?service=http%3A%2F%2Fwww.bonitasoft.com%2Fbonita");
+                .isEqualTo("http://www.cas-service.com/login?service=http%3A%2F%2Fwww.ofelia.com%2Fbonita");
     }
 
     @Test
     public void appendParameter_should_add_service_param_to_URL_with_hash() {
         urlBuilder = new UrlBuilder("http://www.cas-service.com/login#_pf=2");
-        urlBuilder.appendParameter("service", "http://www.bonitasoft.com/bonita");
+        urlBuilder.appendParameter("service", "http://www.ofelia.com/bonita");
 
         assertThat(urlBuilder.build())
-                .isEqualTo("http://www.cas-service.com/login?service=http%3A%2F%2Fwww.bonitasoft.com%2Fbonita#_pf=2");
+                .isEqualTo("http://www.cas-service.com/login?service=http%3A%2F%2Fwww.ofelia.com%2Fbonita#_pf=2");
     }
 
     @Test
@@ -65,23 +65,23 @@ public class UrlBuilderTest {
     @Test
     public void appendParameter_should_add_params_to_URL() {
         Map<String, String[]> params = new HashMap<>();
-        params.put("service", new String[] { "http://www.bonitasoft.com/bonita" });
+        params.put("service", new String[] { "http://www.ofelia.com/bonita" });
         params.put("ids", new String[] { "4", "5", "6" });
         urlBuilder = new UrlBuilder("http://www.cas-service.com/login?redirect=false");
         urlBuilder.appendParameters(params);
 
         assertThat(urlBuilder.build())
                 .isEqualTo(
-                        "http://www.cas-service.com/login?redirect=false&service=http%3A%2F%2Fwww.bonitasoft.com%2Fbonita&ids=4%2C5%2C6");
+                        "http://www.cas-service.com/login?redirect=false&service=http%3A%2F%2Fwww.ofelia.com%2Fbonita&ids=4%2C5%2C6");
     }
 
     @Test
     public void appendParameter_should_not_add_params_already_defined_to_URL() {
-        urlBuilder = new UrlBuilder("http://www.cas-service.com/login?service=http://www.bonitasoft.com");
-        urlBuilder.appendParameter("service", "http://www.bonitasoft.com/bonita");
+        urlBuilder = new UrlBuilder("http://www.cas-service.com/login?service=http://www.ofelia.com");
+        urlBuilder.appendParameter("service", "http://www.ofelia.com/bonita");
 
         assertThat(urlBuilder.build())
-                .isEqualTo("http://www.cas-service.com/login?service=http%3A%2F%2Fwww.bonitasoft.com");
+                .isEqualTo("http://www.cas-service.com/login?service=http%3A%2F%2Fwww.ofelia.com");
     }
 
     @Test

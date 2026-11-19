@@ -50,10 +50,10 @@ class UrlRewriteConfigurationTest {
 
         // Then - Should have rule for process design endpoint
         boolean hasProcessDesignRule = rules.stream()
-                .anyMatch(rule -> rule.from.contains("/API/bpm/process/")
-                        && rule.from.contains("/design")
-                        && rule.to.contains("/APISpringInternal/bpm/process/")
-                        && rule.to.contains("/design"));
+                .anyMatch(rule -> rule.from().contains("/API/bpm/process/")
+                        && rule.from().contains("/design")
+                        && rule.to().contains("/APISpringInternal/bpm/process/")
+                        && rule.to().contains("/design"));
 
         assertThat(hasProcessDesignRule)
                 .withFailMessage(
@@ -67,7 +67,7 @@ class UrlRewriteConfigurationTest {
                                 This rule is required because Tomcat servlet mappings don't support
                                 wildcards in the middle of paths (/API/bpm/process/*/design).
 
-                                See: doc/RESTLET_TO_SPRING_MVC_CONVERSION_GUIDE.md - Pattern 5: URL Rewriting""")
+                                See: doc/LEGACY_API_TO_SPRING_MVC_GUIDE.md - "Wildcard in the MIDDLE" box in Step 5""")
                 .isTrue();
     }
 

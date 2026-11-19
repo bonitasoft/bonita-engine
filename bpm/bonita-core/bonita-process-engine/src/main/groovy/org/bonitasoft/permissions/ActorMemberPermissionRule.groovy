@@ -39,6 +39,8 @@ import org.bonitasoft.engine.session.APISession
  */
 class ActorMemberPermissionRule implements PermissionRule {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+
     public static final String ACTOR_ID = "actor_id"
 
     @Override
@@ -58,8 +60,7 @@ class ActorMemberPermissionRule implements PermissionRule {
 
     private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
 
-        ObjectMapper mapper = new ObjectMapper()
-        def list = mapper.readValue(apiCallContext.getBody(), List.class)
+        def list = MAPPER.readValue(apiCallContext.getBody(), List.class)
 
         for (int i = 0; i < list.size(); i++) {
             def object = list.get(i)

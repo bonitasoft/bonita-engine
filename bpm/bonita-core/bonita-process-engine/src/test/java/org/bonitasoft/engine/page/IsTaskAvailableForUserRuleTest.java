@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.core.delegation.api.DelegationRuleService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -48,6 +49,9 @@ public class IsTaskAvailableForUserRuleTest {
     ActivityInstanceService activityInstanceService;
 
     @Mock
+    DelegationRuleService delegationRuleService;
+
+    @Mock
     SHumanTaskInstance humanTaskInstance;
 
     @Mock
@@ -59,7 +63,7 @@ public class IsTaskAvailableForUserRuleTest {
 
     @InjectMocks
     IsTaskAvailableForUserRule isTaskAvailableForUserRule = new IsTaskAvailableForUserRule(activityInstanceService,
-            sessionService, sessionAccessor);
+            sessionService, sessionAccessor, delegationRuleService);
 
     @Before
     public void initMocks() throws Exception {
@@ -161,6 +165,124 @@ public class IsTaskAvailableForUserRuleTest {
                 .thenReturn(null);
 
         isTaskAvailableForUserRule.isAllowed("key", context);
+    }
+
+    @Test
+    public void isAllowed_should_return_true_when_isActiveDelegate_returns_true_for_assigned_task()
+            throws Exception {
+        //given
+        Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
+        queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
+        context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
+        when(humanTaskInstance.getAssigneeId()).thenReturn(5L);
+        when(activityInstanceService.getHumanTaskInstance(taskInstanceId)).thenReturn(humanTaskInstance);
+        when(delegationRuleService.isActiveDelegate(userId, taskInstanceId)).thenReturn(true);
+
+        //when
+        boolean allowed = isTaskAvailableForUserRule.isAllowed("key", context);
+
+        //then
+        assertThat(allowed).isTrue();
+        verify(delegationRuleService).isActiveDelegate(userId, taskInstanceId);
+    }
+
+    @Test
+    public void isAllowed_should_return_false_when_not_assignee_and_not_active_delegate() throws Exception {
+        //given
+        Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
+        queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
+        context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
+        when(humanTaskInstance.getAssigneeId()).thenReturn(5L);
+        when(activityInstanceService.getHumanTaskInstance(taskInstanceId)).thenReturn(humanTaskInstance);
+        when(delegationRuleService.isActiveDelegate(userId, taskInstanceId)).thenReturn(false);
+
+        //when
+        boolean allowed = isTaskAvailableForUserRule.isAllowed("key", context);
+
+        //then
+        assertThat(allowed).isFalse();
+        verify(delegationRuleService).isActiveDelegate(userId, taskInstanceId);
+    }
+
+    @Test
+    public void isAllowed_should_return_true_when_isActiveDelegate_returns_true_for_unassigned_task()
+            throws Exception {
+        //given
+        Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
+        queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
+        context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
+        when(humanTaskInstance.getAssigneeId()).thenReturn(0L);
+        when(activityInstanceService.getHumanTaskInstance(taskInstanceId)).thenReturn(humanTaskInstance);
+        when(activityInstanceService.isTaskPendingForUser(taskInstanceId, userId)).thenReturn(false);
+        when(delegationRuleService.isActiveDelegate(userId, taskInstanceId)).thenReturn(true);
+
+        //when
+        boolean allowed = isTaskAvailableForUserRule.isAllowed("key", context);
+
+        //then
+        assertThat(allowed).isTrue();
+        verify(delegationRuleService).isActiveDelegate(userId, taskInstanceId);
+    }
+
+    @Test
+    public void isAllowed_should_not_consult_delegation_when_user_is_pending_actor() throws Exception {
+        //given
+        Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
+        queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
+        context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
+        when(humanTaskInstance.getAssigneeId()).thenReturn(0L);
+        when(activityInstanceService.getHumanTaskInstance(taskInstanceId)).thenReturn(humanTaskInstance);
+        when(activityInstanceService.isTaskPendingForUser(taskInstanceId, userId)).thenReturn(true);
+
+        //when
+        boolean allowed = isTaskAvailableForUserRule.isAllowed("key", context);
+
+        //then
+        assertThat(allowed).isTrue();
+        verify(delegationRuleService, never()).isActiveDelegate(anyLong(), anyLong());
+    }
+
+    @Test
+    public void isAllowed_should_not_consult_delegation_when_user_is_assignee() throws Exception {
+        //given
+        Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
+        queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
+        context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
+        when(humanTaskInstance.getAssigneeId()).thenReturn(userId);
+        when(activityInstanceService.getHumanTaskInstance(taskInstanceId)).thenReturn(humanTaskInstance);
+
+        //when
+        boolean allowed = isTaskAvailableForUserRule.isAllowed("key", context);
+
+        //then
+        assertThat(allowed).isTrue();
+        verify(delegationRuleService, never()).isActiveDelegate(anyLong(), anyLong());
+    }
+
+    @Test
+    public void isAllowed_should_not_consult_delegation_for_archived_task() throws Exception {
+        //given
+        Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
+        queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
+        context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
+        doThrow(SActivityInstanceNotFoundException.class).when(activityInstanceService)
+                .getHumanTaskInstance(taskInstanceId);
+        when(archivedHumanTaskInstance.getExecutedBy()).thenReturn(userId);
+        when(activityInstanceService.getLastArchivedFlowNodeInstance(SAHumanTaskInstance.class, taskInstanceId))
+                .thenReturn(archivedHumanTaskInstance);
+
+        //when
+        boolean allowed = isTaskAvailableForUserRule.isAllowed("key", context);
+
+        //then
+        assertThat(allowed).isTrue();
+        verify(delegationRuleService, never()).isActiveDelegate(anyLong(), anyLong());
     }
 
     @Test

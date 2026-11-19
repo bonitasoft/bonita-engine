@@ -51,6 +51,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessExportException;
+import org.bonitasoft.engine.bpm.process.ProcessNameInfo;
 import org.bonitasoft.engine.bpm.process.ProcessResourceNotFoundException;
 import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
@@ -1118,6 +1119,33 @@ public interface ProcessManagementAPI {
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(SearchOptions searchOptions)
             throws SearchException;
+
+    /**
+     * Searches for process deployment infos grouped by (name, displayName).
+     * <p>
+     * The results are grouped so that no two items share the same (name, displayName) combination; each
+     * {@link ProcessNameInfo} item carries the list of matching versions. Filters (for example
+     * {@link ProcessDeploymentInfoSearchDescriptor#ACTIVATION_STATE}) and ordering behave as in
+     * {@link #searchProcessDeploymentInfos(SearchOptions)}, but are applied before grouping. The search term matches
+     * against name and displayName only (not version), so a group is selected when its name or displayName matches; the
+     * returned version list then contains every version of that group passing the activationState filter. The
+     * {@link SearchResult#getCount()} is the total number of distinct (name, displayName) groups, and pagination
+     * applies to the groups.
+     * <p>
+     * This resource is intentionally narrow: the only supported filter is
+     * {@link ProcessDeploymentInfoSearchDescriptor#ACTIVATION_STATE} (any other filter is ignored), and ordering is
+     * restricted to {@link ProcessDeploymentInfoSearchDescriptor#DISPLAY_NAME} and
+     * {@link ProcessDeploymentInfoSearchDescriptor#NAME} (only the first such sort is applied).
+     *
+     * @param searchOptions
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
+     * @return the matching distinct (name, displayName) groups with their versions.
+     * @throws SearchException
+     *         If an exception occurs when getting the processes.
+     * @since 11.1.0
+     */
+    SearchResult<ProcessNameInfo> searchProcessNames(SearchOptions searchOptions) throws SearchException;
 
     /**
      * Associates the categories to the process definition.

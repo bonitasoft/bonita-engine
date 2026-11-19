@@ -43,6 +43,7 @@ import org.bonitasoft.engine.session.APISession
  */
 class CommentPermissionRule implements PermissionRule {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper()
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
@@ -57,8 +58,7 @@ class CommentPermissionRule implements PermissionRule {
 
     private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
 
-        ObjectMapper mapper = new ObjectMapper()
-        def map = mapper.readValue(apiCallContext.getBody(), Map.class)
+        def map = MAPPER.readValue(apiCallContext.getBody(), Map.class)
 
         def string = map.get("processInstanceId")
         if (string == null || string.toString().isEmpty()) {
