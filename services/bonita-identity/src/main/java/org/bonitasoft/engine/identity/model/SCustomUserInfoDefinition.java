@@ -16,7 +16,6 @@ package org.bonitasoft.engine.identity.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -24,7 +23,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Anthony Birembaut
@@ -36,7 +34,6 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "custom_usr_inf_def")
-@IdClass(PersistentObjectId.class)
 public class SCustomUserInfoDefinition implements PersistentObject {
 
     public static final String ID = "id";
@@ -45,8 +42,6 @@ public class SCustomUserInfoDefinition implements PersistentObject {
     public static final String DISPLAY_NAME = "displayName";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private String name;
     @Column

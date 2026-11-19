@@ -24,10 +24,21 @@ import static org.bonitasoft.engine.bpm.process.ActivationState.DISABLED;
 import static org.bonitasoft.engine.bpm.process.ConfigurationState.RESOLVED;
 import static org.bonitasoft.engine.business.application.ApplicationImportPolicy.FAIL_ON_DUPLICATES;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -51,15 +62,31 @@ import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDeployException;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.application.xml.AbstractApplicationNode;
-import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.ApplicationInstallationException;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.ImportException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.io.FileOperations;
@@ -69,7 +96,6 @@ import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.impl.SPlatformUpdateBuilderImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -85,7 +111,6 @@ import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -115,19 +140,17 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     private final SessionService sessionService;
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     private final ApplicationImporter applicationImporter;
-    private final Long tenantId;
     private final ApplicationNodeContainerConverter appXmlConverter = new ApplicationNodeContainerConverter();
 
     public ApplicationInstallerImpl(InstallationService installationService,
             @Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
-            UserTransactionService transactionService, @Value("${tenantId}") Long tenantId,
-            SessionAccessor sessionAccessor, SessionService sessionService, TenantStateManager tenantStateManager,
+            UserTransactionService transactionService, SessionAccessor sessionAccessor, SessionService sessionService,
+            TenantStateManager tenantStateManager,
             @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager,
             ApplicationImporter applicationImporter) {
         this.installationService = installationService;
         this.bdmRepository = bdmRepository;
         this.transactionService = transactionService;
-        this.tenantId = tenantId;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.tenantStateManager = tenantStateManager;
@@ -218,7 +241,7 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     public void resumeTenantInSession() throws Exception {
         inSession(() -> {
             try {
-                if (Objects.equals(STenant.PAUSED, tenantStateManager.getStatus())) {
+                if (tenantStateManager.isPaused()) {
                     tenantStateManager.resume();
                     transactionService.executeInTransaction(() -> {
                         businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getServiceAccessor());
@@ -236,12 +259,8 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     public void pauseTenantInSession() throws Exception {
         inSession(() -> {
             try {
-                String status = tenantStateManager.getStatus();
-                if (STenant.ACTIVATED.equals(status)) {
+                if (!tenantStateManager.isPaused()) {
                     tenantStateManager.pause();
-                } else if (!STenant.PAUSED.equals(status)) {
-                    throw new UpdateException(
-                            "The default tenant is in state " + status + " and cannot be paused. Aborting.");
                 }
             } catch (Exception e) {
                 throw new UpdateException(e);
@@ -474,8 +493,8 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
     protected void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         log.info("Uninstalling the currently deployed BDM");
         try {
-            tenantStateManager.executeTenantManagementOperation("BDM Uninstallation", () -> {
-                bdmRepository.uninstall(tenantId);
+            tenantStateManager.executeManagementOperation("BDM Uninstallation", () -> {
+                bdmRepository.uninstall();
                 return null;
             });
             log.info("BDM successfully uninstalled");
@@ -490,7 +509,7 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         log.info("Starting the installation of the BDM.");
         try {
-            String bdmVersion = tenantStateManager.executeTenantManagementOperation("BDM Installation",
+            String bdmVersion = tenantStateManager.executeManagementOperation("BDM Installation",
                     () -> bdmRepository.install(zip, SessionService.SYSTEM_ID));
             log.info("Installation of the BDM completed.");
             return bdmVersion;
@@ -824,15 +843,14 @@ public class ApplicationInstallerImpl implements ApplicationInstaller {
 
     @VisibleForTesting
     public <T> T inSession(Callable<T> callable) throws Exception {
-        final SSession session = sessionService.createSession(tenantId, SessionService.SYSTEM);
+        final SSession session = sessionService.createSession(SessionService.SYSTEM);
         final long sessionId = session.getId();
         log.trace("New session created with id {}", sessionId);
         try {
-            sessionAccessor.setSessionInfo(sessionId, tenantId);
+            sessionAccessor.setSessionId(sessionId);
             return callable.call();
         } finally {
             sessionAccessor.deleteSessionId();
-            sessionAccessor.deleteTenantId();
         }
     }
 

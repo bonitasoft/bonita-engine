@@ -57,9 +57,8 @@ public class AutoUpdateConfigurationVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
         if (isAutoUpdateConfigurationFile(path)) {
-            final String configurationType = getFolderName(path.getParent());
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(buildMessage(path, configurationType));
+                LOGGER.debug(buildMessage(path, getFolderName(path.getParent())));
             }
             bonitaConfigurations.add(new BonitaConfiguration(path.getFileName().toString(), Files.readAllBytes(path)));
         }

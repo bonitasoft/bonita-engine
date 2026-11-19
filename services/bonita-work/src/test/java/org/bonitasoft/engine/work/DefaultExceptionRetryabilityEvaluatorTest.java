@@ -138,7 +138,7 @@ public class DefaultExceptionRetryabilityEvaluatorTest {
 
         assertThat(defaultExceptionRetryabilityEvaluator
                 .evaluateRetryability(new IllegalStateException(new SQLException("connection issue"))))
-                        .isEqualTo(RETRYABLE);
+                .isEqualTo(RETRYABLE);
         assertThat(defaultExceptionRetryabilityEvaluator
                 .evaluateRetryability(new CannotGetJdbcConnectionException("I/O error"))).isEqualTo(RETRYABLE);
     }
@@ -149,7 +149,7 @@ public class DefaultExceptionRetryabilityEvaluatorTest {
 
         assertThat(defaultExceptionRetryabilityEvaluator
                 .evaluateRetryability(new STransactionCommitException(new SQLException("connection issue"))))
-                        .isEqualTo(UNCERTAIN_COMPLETION_OF_COMMIT);
+                .isEqualTo(UNCERTAIN_COMPLETION_OF_COMMIT);
     }
 
     @Test
@@ -158,7 +158,7 @@ public class DefaultExceptionRetryabilityEvaluatorTest {
 
         assertThat(defaultExceptionRetryabilityEvaluator.evaluateRetryability(
                 new STransactionCommitException(new SRetryableException(new IOException("some file issue")))))
-                        .isEqualTo(RETRYABLE);
+                .isEqualTo(RETRYABLE);
     }
 
     @Test
@@ -167,7 +167,7 @@ public class DefaultExceptionRetryabilityEvaluatorTest {
 
         assertThat(
                 defaultExceptionRetryabilityEvaluator.evaluateRetryability(new XAException(XAException.XA_RBTIMEOUT)))
-                        .isEqualTo(RETRYABLE);
+                .isEqualTo(RETRYABLE);
     }
 
     @Test

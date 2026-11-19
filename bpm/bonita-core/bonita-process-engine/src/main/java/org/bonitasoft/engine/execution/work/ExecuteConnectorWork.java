@@ -61,14 +61,14 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     private final SExpressionContext inputParametersContext;
     private final long processInstanceId;
 
-    public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId,
+    protected ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId,
             final String connectorDefinitionName, final SExpressionContext inputParametersContext,
             long processInstanceId) {
         this(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParametersContext, null,
                 processInstanceId);
     }
 
-    public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId,
+    protected ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId,
             final String connectorDefinitionName,
             final SExpressionContext inputParametersContext, final Map<String, Object> inputs, long processInstanceId) {
         super();
@@ -90,7 +90,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     protected abstract SConnectorDefinition getSConnectorDefinition(
             final ProcessDefinitionService processDefinitionService) throws SBonitaException;
 
-    protected abstract void setContainerInFail(Map<String, Object> context) throws SBonitaException;
+    protected abstract void setContainerInFail(Map<String, Object> context, Throwable t) throws SBonitaException;
 
     protected abstract void continueFlow(Map<String, Object> context) throws SBonitaException;
 
@@ -106,7 +106,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     protected void setConnectorAndContainerToFailed(final Map<String, Object> context, final Throwable t)
             throws SBonitaException {
         setConnectorOnlyToFailed(context, t);
-        setContainerInFail(context);
+        setContainerInFail(context, t);
     }
 
     protected void setConnectorOnlyToFailed(final Map<String, Object> context, final Throwable t)
@@ -156,7 +156,8 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                     .getConnectorImplementationDescriptor();
             return connectorService.executeConnector(processDefinitionId, connectorInstance,
                     connectorImplementationDescriptor, processClassloader,
-                    callable.getInputParameters()).thenAccept(r -> {
+                    callable.getInputParameters())
+                    .thenAccept(r -> {
                         try {
                             executeOutputOperationsAndContinue(context, serviceAccessor, userTransactionService,
                                     sConnectorDefinition, r);
@@ -173,7 +174,6 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                                             e));
                         }
                     });
-
         } finally {
             if (timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK)) {
                 final long endTime = System.currentTimeMillis();
@@ -197,7 +197,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             throws Exception {
         // evaluate output and trigger the execution of the flow node
         BonitaLock lock = serviceAccessor.getLockService().lock(processInstanceId,
-                SFlowElementsContainerType.PROCESS.name(), getTenantId());
+                SFlowElementsContainerType.PROCESS.name());
         try {
             userTransactionService.executeInTransaction(() -> {
                 evaluateOutput(context, r, sConnectorDefinition);
@@ -205,7 +205,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                 return null;
             });
         } finally {
-            serviceAccessor.getLockService().unlock(lock, getTenantId());
+            serviceAccessor.getLockService().unlock(lock);
         }
     }
 

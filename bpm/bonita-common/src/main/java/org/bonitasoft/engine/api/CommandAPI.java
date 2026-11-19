@@ -41,12 +41,9 @@ import org.bonitasoft.engine.search.SearchResult;
  * </p>
  * <p>
  * A command is composed of a jar containing at least one class that implements
- * <code>org.bonitasoft.engine.command.TenantCommand</code>.
- * <code>org.bonitasoft.engine.command.system.CommandWithParameters</code> can be used to handle parameter more easily.
- * The behavior of the command must be
- * defined in the
- * execute method of this class.<br>
- * TenantCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a
+ * <code>org.bonitasoft.engine.command.RuntimeCommand</code>.
+ * The behavior of the command must be defined in the execute method of this class.<br>
+ * RuntimeCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a
  * dependency on that jar.
  * <p>
  * The jar containing the command class must be added to the engine using the {@link CommandAPI#addDependency} method
@@ -66,7 +63,7 @@ import org.bonitasoft.engine.search.SearchResult;
  * <pre>
  * Code example:<br>
  *
- * In this example we deploy a command named "myCommandName". The class that implements <code>TenantCommand</code> is <code>org.bonitasoft.engine.command.IntegerCommand</code> and
+ * In this example we deploy a command named "myCommandName". The class that implements <code>RuntimeCommand</code> is <code>org.bonitasoft.engine.command.IntegerCommand</code> and
  * is contained in the jar we deploy using CommandAPI.addDependency.
  * <br>
  * <br>

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import static java.util.Collections.singleton;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -29,9 +28,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,50 +53,26 @@ public class ClassLoaderUpdaterTest {
     @Captor
     private ArgumentCaptor<Callable<?>> callableGivenToTheTransactionService;
     @Mock
-    private SessionAccessor sessionAccessor;
-    @Mock
     private ClassLoaderServiceImpl classLoaderService;
     @InjectMocks
     private ClassLoaderUpdater classLoaderUpdater;
 
     @Test
-    public void should_refresh_classloaders_in_session_and_in_transaction() throws Exception {
+    public void should_refresh_classloaders_in_transaction() throws Exception {
         doReturn(completedFuture(null)).when(bonitaTaskExecutor).execute(callableGivenToTheTaskExecutor.capture());
         doReturn(null).when(userTransactionService)
                 .executeInTransaction(callableGivenToTheTransactionService.capture());
 
         HashSet<ClassLoaderIdentifier> ids = new HashSet<>();
-        ids.add(identifier(ScopeType.TENANT, 4L));
+        ids.add(ClassLoaderIdentifier.TENANT);
         ids.add(identifier(PROCESS, 45L));
-        classLoaderUpdater.refreshClassloaders(classLoaderService, 12L, ids);
+        classLoaderUpdater.refreshClassloaders(classLoaderService, ids);
 
         callableGivenToTheTaskExecutor.getValue().call();
         callableGivenToTheTransactionService.getValue().call();
 
-        verify(classLoaderService).refreshClassLoaderImmediately(identifier(ScopeType.TENANT, 4L));
+        verify(classLoaderService).refreshClassLoaderImmediately(ClassLoaderIdentifier.TENANT);
         verify(classLoaderService).refreshClassLoaderImmediately(identifier(PROCESS, 45L));
-    }
-
-    @Test
-    public void should_not_create_a_session_when_there_is_no_tenant_id() throws Exception {
-        doReturn(completedFuture(null)).when(bonitaTaskExecutor).execute(callableGivenToTheTaskExecutor.capture());
-
-        classLoaderUpdater.refreshClassloaders(classLoaderService, null, singleton(identifier(PROCESS, 4L)));
-
-        callableGivenToTheTaskExecutor.getValue().call();
-
-        verifyNoInteractions(sessionAccessor);
-    }
-
-    @Test
-    public void should_create_a_session_when_there_is_a_tenant_id() throws Exception {
-        doReturn(completedFuture(null)).when(bonitaTaskExecutor).execute(callableGivenToTheTaskExecutor.capture());
-
-        classLoaderUpdater.refreshClassloaders(classLoaderService, 54L, singleton(identifier(PROCESS, 4L)));
-
-        callableGivenToTheTaskExecutor.getValue().call();
-
-        verify(sessionAccessor).setTenantId(54L);
     }
 
     @Test

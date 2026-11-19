@@ -47,7 +47,6 @@ public class ScriptExecutorTest {
         verify(spy, times(0)).createTables();
         verify(spy, times(0)).initializePlatformStructure();
         verify(spy, times(0)).insertPlatform();
-        verify(spy, times(0)).insertTenant();
     }
 
     @Test
@@ -63,7 +62,6 @@ public class ScriptExecutorTest {
         verify(spy).createTables();
         verify(spy).initializePlatformStructure();
         verify(spy).insertPlatform();
-        verify(spy).insertTenant();
 
         //cleanup
         scriptExecutor.deleteTables();

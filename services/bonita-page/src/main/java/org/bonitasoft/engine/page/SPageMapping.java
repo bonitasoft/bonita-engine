@@ -20,7 +20,6 @@ import java.util.StringTokenizer;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -30,7 +29,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Baptiste Mesta
@@ -42,13 +40,10 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = "authorizationRules")
 @Table(name = "page_mapping")
-@IdClass(PersistentObjectId.class)
 public class SPageMapping implements PersistentObject {
 
     public static final String COMMA_DELIMITER = ",";
 
-    @Id
-    private long tenantId;
     @Id
     private long id;
 
@@ -68,6 +63,7 @@ public class SPageMapping implements PersistentObject {
     private String pageAuthorizRules;
 
     @Transient
+    @Builder.Default
     private List<String> authorizationRules = new ArrayList<>();
 
     private void parseRules() {

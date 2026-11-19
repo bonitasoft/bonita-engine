@@ -136,8 +136,8 @@ public class UserFilterServiceImplTest {
                 "</connectorImplementation>\n").getBytes();
         doReturn(Collections.singletonList(new SBARResource("my-user-filter.impl", BARResourceType.USER_FILTER,
                 PROCESS_DEFINITION_ID, userFilterImplContent)))
-                        .when(resourceService)
-                        .get(eq(PROCESS_DEFINITION_ID), eq(BARResourceType.USER_FILTER), anyInt(), anyInt());
+                .when(resourceService)
+                .get(eq(PROCESS_DEFINITION_ID), eq(BARResourceType.USER_FILTER), anyInt(), anyInt());
         //when
         userFilterService.loadUserFilters(PROCESS_DEFINITION_ID);
 

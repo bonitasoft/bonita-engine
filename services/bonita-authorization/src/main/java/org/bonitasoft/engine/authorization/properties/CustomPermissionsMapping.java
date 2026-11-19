@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.authorization.properties;
 
 import org.bonitasoft.engine.cache.CacheService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -35,9 +34,8 @@ public class CustomPermissionsMapping extends ConfigurationFile {
         return PROPERTIES_FILENAME;
     }
 
-    public CustomPermissionsMapping(@Value("${tenantId}") long tenantId, CacheService cacheService,
-            ConfigurationFilesManager configurationFilesManager) {
-        super(tenantId, cacheService, configurationFilesManager);
+    public CustomPermissionsMapping(CacheService cacheService, ConfigurationFilesManager configurationFilesManager) {
+        super(cacheService, configurationFilesManager);
     }
 
     @Override

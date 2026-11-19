@@ -44,12 +44,9 @@ public class LockProcessInstanceWorkTest {
 
     private LockService lockService;
 
-    private static final long TENANT_ID = 1;
-
     @Before
     public void before() {
         lockProcessInstanceWork = new LockProcessInstanceWork(wrappedWork, processInstanceId);
-        when(wrappedWork.getTenantId()).thenReturn(TENANT_ID);
         serviceAccessor = mock(ServiceAccessor.class);
         lockService = mock(LockService.class);
         WorkExecutorService workService = mock(WorkExecutorService.class);
@@ -60,14 +57,13 @@ public class LockProcessInstanceWorkTest {
     @Test
     public void testWork() throws Exception {
         BonitaLock bonitaLock = new BonitaLock(PROCESS, processInstanceId);
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID)))
+        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS)))
                 .thenReturn(
                         bonitaLock);
         Map<String, Object> singletonMap = Collections.singletonMap("serviceAccessor", serviceAccessor);
         lockProcessInstanceWork.work(singletonMap);
-        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS),
-                eq(TENANT_ID));
-        verify(lockService, times(1)).unlock(bonitaLock, TENANT_ID);
+        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS));
+        verify(lockService, times(1)).unlock(bonitaLock);
         verify(wrappedWork, times(1)).work(singletonMap);
     }
 
@@ -92,18 +88,6 @@ public class LockProcessInstanceWorkTest {
     }
 
     @Test
-    public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12L);
-        assertEquals(12, lockProcessInstanceWork.getTenantId());
-    }
-
-    @Test
-    public void setTenantId() {
-        lockProcessInstanceWork.setTenantId(12L);
-        verify(wrappedWork).setTenantId(12L);
-    }
-
-    @Test
     public void getWrappedWork() {
         assertEquals(wrappedWork, lockProcessInstanceWork.getWrappedWork());
     }
@@ -118,7 +102,7 @@ public class LockProcessInstanceWorkTest {
     public void should_throw_exception_when_unable_to_lock() throws Exception {
         // On first try to lock : exception to reschedule the work
         // On the second try : return a correct lock
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID)))
+        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS)))
                 .thenReturn(null);
 
         lockProcessInstanceWork.work(Collections.singletonMap("serviceAccessor", serviceAccessor));

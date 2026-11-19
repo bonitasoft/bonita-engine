@@ -26,9 +26,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.bonitasoft.console.common.server.auth.AuthenticationFailedException;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
+import org.bonitasoft.console.common.server.auth.AuthenticationManagerFactory;
 import org.bonitasoft.console.common.server.auth.AuthenticationManagerNotFoundException;
 import org.bonitasoft.console.common.server.filter.PathSanitizer;
 import org.bonitasoft.console.common.server.login.AccountLockedException;
+import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.LoginFailedException;
 import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.login.utils.RedirectUrlBuilder;
@@ -37,7 +39,6 @@ import org.bonitasoft.console.common.server.utils.LocaleUtils;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.console.common.server.utils.TenantsManagementUtils;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
@@ -74,11 +75,6 @@ public class LoginServlet extends HttpServlet {
      * account locked message — must match the string literal in login.jsp (line 58)
      */
     protected static final String ACCOUNT_LOCKED_MESSAGE = "accountLockedMessage";
-
-    /**
-     * the URL param for the login page
-     */
-    protected static final String LOGIN_URL_PARAM_NAME = "loginUrl";
 
     /*
      * System property to allow login with GET from the development suite
@@ -145,14 +141,25 @@ public class LoginServlet extends HttpServlet {
             doLogin(request, response);
             final APISession apiSession = (APISession) request.getSession()
                     .getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
-            // if there a redirect=true or a redirectURL parameter in the request do nothing (API login), otherwise, redirect (Portal login)
+            // if there is no redirect=true or redirectURL parameter in the request do nothing (API login), otherwise, redirect (Portal login)
             if (redirectAfterLogin) {
                 if (apiSession.isTechnicalUser() || hasProfile(apiSession)) {
                     response.sendRedirect(createRedirectUrl(redirectURL, locale));
                 } else {
-                    request.setAttribute(LOGIN_FAIL_MESSAGE, "noProfileForUser");
-                    getServletContext().getRequestDispatcher(AuthenticationManager.LOGIN_PAGE).forward(request,
-                            response);
+                    String loginURL = getAuthenticationManager()
+                            .getLoginPageURL(new HttpServletRequestAccessor(request), redirectURL);
+                    if (loginURL.startsWith(request.getContextPath() + AuthenticationManager.LOGIN_PAGE)) {
+                        request.setAttribute(LOGIN_FAIL_MESSAGE, "noProfileForUser");
+                        getServletContext().getRequestDispatcher(AuthenticationManager.LOGIN_PAGE).forward(request,
+                                response);
+                    } else {
+                        // if the login page is not the default jsp but an external URL the forward cannot work.
+                        // just respond with a 401
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("No profiles for user");
+                        }
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED, "noProfileForUser");
+                    }
                 }
             } else {
                 LocaleUtils.addOrReplaceLocaleCookieResponse(response, locale);
@@ -178,24 +185,22 @@ public class LoginServlet extends HttpServlet {
     }
 
     protected boolean hasProfile(final APISession apiSession)
-            throws NotFoundException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantsManagementUtils.hasProfileForUser(apiSession);
     }
 
     private void handleException(final HttpServletRequest request, final HttpServletResponse response,
-            final boolean redirectAfterLogin,
-            final Exception e, final String locale) throws ServletException {
+            final boolean redirectAfterLogin, final Exception exception, final String locale) throws ServletException {
         if (redirectAfterLogin) {
             try {
-                if (e instanceof AccountLockedException) {
+                if (exception instanceof AccountLockedException) {
                     request.setAttribute(LOGIN_FAIL_MESSAGE, ACCOUNT_LOCKED_MESSAGE);
                 } else {
                     request.setAttribute(LOGIN_FAIL_MESSAGE, LOGIN_FAIL_MESSAGE);
                 }
-                String loginURL = request.getParameter(LOGIN_URL_PARAM_NAME);
+                String loginURL = request.getParameter(AuthenticationManager.LOGIN_URL_PARAM_NAME);
                 if (loginURL == null) {
-                    loginURL = AuthenticationManager.LOGIN_PAGE;
-                    getServletContext().getRequestDispatcher(loginURL).forward(request, response);
+                    loginURL = createDefaultRedirectUrl(request, redirectAfterLogin);
                 } else {
                     // Defense-in-depth: sanitize user-supplied loginURL before passing
                     // to getRequestDispatcher(). Strip path parameters (semicolons) to
@@ -206,26 +211,33 @@ public class LoginServlet extends HttpServlet {
                         String normalizedPath = new URI(sanitizedLoginURL).normalize().getPath();
                         sanitizedLoginURL = normalizedPath != null ? normalizedPath
                                 : AuthenticationManager.LOGIN_PAGE;
+                        loginURL = createRedirectUrl(sanitizedLoginURL, locale);
                     } catch (URISyntaxException uriEx) {
                         LOGGER.warn("Invalid loginURL [{}], falling back to default login page: {}",
                                 loginURL, uriEx.getMessage());
-                        sanitizedLoginURL = AuthenticationManager.LOGIN_PAGE;
+                        loginURL = createDefaultRedirectUrl(request, redirectAfterLogin);
                     }
-                    getServletContext()
-                            .getRequestDispatcher(createRedirectUrl(sanitizedLoginURL, locale))
-                            .forward(request, response);
                 }
-            } catch (final Exception e1) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error(e1.getMessage());
+                if (loginURL.startsWith(request.getContextPath() + AuthenticationManager.LOGIN_PAGE)) {
+                    getServletContext().getRequestDispatcher(AuthenticationManager.LOGIN_PAGE).forward(request,
+                            response);
+                } else {
+                    // if the login page is not the default jsp but an external URL the forward cannot work.
+                    // just respond with a 401
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(exception.getMessage());
+                    }
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED, LOGIN_FAIL_MESSAGE);
                 }
-                throw new ServletException(e1);
+            } catch (final Exception e) {
+                LOGGER.error(e.getMessage());
+                throw new ServletException(e);
             }
         } else {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(e.getMessage());
+                LOGGER.debug(exception.getMessage());
             }
-            if (e instanceof AccountLockedException) {
+            if (exception instanceof AccountLockedException) {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
                 if (loginFailureTracker != null) {
                     response.setHeader(HttpHeaders.RETRY_AFTER,
@@ -258,11 +270,22 @@ public class LoginServlet extends HttpServlet {
         return redirectUrlBuilder.build().getUrl();
     }
 
+    private String createDefaultRedirectUrl(HttpServletRequest request, boolean redirectAfterLogin)
+            throws ServletException, AuthenticationManagerNotFoundException {
+        final String redirectURL = getRedirectUrl(request, redirectAfterLogin);
+        return getAuthenticationManager()
+                .getLoginPageURL(new HttpServletRequestAccessor(request), redirectURL);
+    }
+
     protected void doLogin(final HttpServletRequest request, final HttpServletResponse response)
             throws AuthenticationManagerNotFoundException, LoginFailedException, ServletException,
             AuthenticationFailedException {
         final LoginManager loginManager = getLoginManager();
         loginManager.login(request, response);
+    }
+
+    protected AuthenticationManager getAuthenticationManager() throws AuthenticationManagerNotFoundException {
+        return AuthenticationManagerFactory.getAuthenticationManager();
     }
 
     protected LoginManager getLoginManager() {

@@ -13,14 +13,16 @@
  **/
 package org.bonitasoft.engine.profile.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +30,6 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "profile")
-@IdClass(PersistentObjectId.class)
 public class SProfile implements PersistentObject {
 
     public static final String PROFILE_IDS = "profileIds";
@@ -43,8 +44,6 @@ public class SProfile implements PersistentObject {
     public static final String LAST_UPDATED_BY = "lastUpdatedBy";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private boolean isDefault;
     @Column
@@ -62,7 +61,6 @@ public class SProfile implements PersistentObject {
 
     public SProfile(final SProfile profile) {
         super();
-        tenantId = profile.getTenantId();
         id = profile.getId();
         isDefault = profile.isDefault();
         name = profile.getName();

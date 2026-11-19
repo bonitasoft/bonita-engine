@@ -57,7 +57,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         try {
             log.debug("{} trying to get lock for instance {}: {}", Thread.currentThread().getName(),
                     processInstanceId, getDescription());
-            lock = lockService.tryLock(processInstanceId, objectType, TIMEOUT, timeUnit, getTenantId());
+            lock = lockService.tryLock(processInstanceId, objectType, TIMEOUT, timeUnit);
             if (lock == null) {
                 throw new LockTimeoutException(
                         "Unable to lock process instance " + processInstanceId + ": " + getDescription());
@@ -70,7 +70,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
                     + processInstanceId + ": " + getDescription(), e);
         } finally {
             if (lock != null) {
-                lockService.unlock(lock, getTenantId());
+                lockService.unlock(lock);
                 log.debug("{} has unlocked lock for instance {}: {}", Thread.currentThread().getName(),
                         processInstanceId, getDescription());
             }

@@ -16,7 +16,6 @@ dependencies {
     api libs.slf4jApi
     testImplementation libs.assertj
     testImplementation libs.mockitoCore
-    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.systemRules
     testImplementation libs.systemLambda
     testImplementation libs.logback

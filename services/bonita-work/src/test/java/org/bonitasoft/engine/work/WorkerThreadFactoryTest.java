@@ -22,16 +22,16 @@ public class WorkerThreadFactoryTest {
 
     @Test
     public void newThreadStartsWithName() {
-        WorkerThreadFactory threadFactory = new WorkerThreadFactory("foo", 11, 1);
+        WorkerThreadFactory threadFactory = new WorkerThreadFactory("foo", 1);
         Thread newThread = threadFactory.newThread(buildRunnable());
-        assertEquals("foo-11-1", newThread.getName());
+        assertEquals("foo-1", newThread.getName());
     }
 
     @Test
     public void newThreadNameNumberIsPadded() {
-        WorkerThreadFactory threadFactory = new WorkerThreadFactory("foo", 22, 100);
+        WorkerThreadFactory threadFactory = new WorkerThreadFactory("foo", 100);
         Thread newThread = threadFactory.newThread(buildRunnable());
-        assertEquals("foo-22-001", newThread.getName());
+        assertEquals("foo-001", newThread.getName());
     }
 
     @Test

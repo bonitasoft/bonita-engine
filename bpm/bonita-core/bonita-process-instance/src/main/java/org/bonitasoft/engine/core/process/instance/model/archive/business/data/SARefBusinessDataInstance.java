@@ -17,7 +17,6 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -25,7 +24,6 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Emmanuel Duchastenier
@@ -34,14 +32,11 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @NoArgsConstructor
 @Entity
 @Table(name = "arch_ref_biz_data_inst")
-@IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")
 public abstract class SARefBusinessDataInstance implements ArchivedPersistentObject {
 
     @Id
     protected long id;
-    @Id
-    protected long tenantId;
     private String name;
     @Column(name = "data_classname")
     private String dataClassName;

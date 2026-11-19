@@ -92,7 +92,7 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
             ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } catch (final TenantStatusException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Platform is probably under Maintenance : " + e.getMessage());
+                LOGGER.info("Platform is probably under Maintenance : {}", e.getMessage());
             }
             ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         } catch (final Exception e) {

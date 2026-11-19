@@ -240,8 +240,7 @@ public class ConsoleIdentityLoginModule implements LoginModule {
 
         if (!loggingsArgs.containsKey(JAVAX_SECURITY_AUTH_LOGIN_PASSWORD)) {
             // update password
-            if (callbacks.get(PASSWORD_PROMPT) instanceof PasswordCallback) {
-                PasswordCallback pwdCallback = ((PasswordCallback) callbacks.get(PASSWORD_PROMPT));
+            if (callbacks.get(PASSWORD_PROMPT) instanceof PasswordCallback pwdCallback) {
                 loggingsArgs.put(JAVAX_SECURITY_AUTH_LOGIN_PASSWORD, String.valueOf(pwdCallback.getPassword()));
                 pwdCallback.clearPassword();
             }

@@ -161,7 +161,7 @@ public class ProcessInstantiationResourceTest extends RestletTest {
             throws Exception {
         doThrow(new ContractViolationException("aMessage", "aMessage",
                 asList("first explanation", "second explanation"), null))
-                        .when(processAPI).startProcessWithInputs(anyLong(), anyMap());
+                .when(processAPI).startProcessWithInputs(anyLong(), anyMap());
         when(processAPI.getProcessContract(PROCESS_DEFINITION_ID)).thenReturn(contractDefinition);
 
         final Response response = request(URL_API_PROCESS_INSTANTIATION_TEST).post(VALID_POST_BODY);

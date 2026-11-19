@@ -133,7 +133,7 @@ public class ClassLoaderIT extends TestWithUser {
 
     @Test
     public void should_refresh_classloader_only_once_on_deploy_bdm() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildCustomBOM());
         getTenantAdministrationAPI().pause();
@@ -143,7 +143,7 @@ public class ClassLoaderIT extends TestWithUser {
         String deployBDMLog = systemOutRule.getLog();
         getTenantAdministrationAPI().resume();
 
-        assertThat(deployBDMLog).containsOnlyOnce("Refreshing classloader TENANT:");
+        assertThat(deployBDMLog).containsOnlyOnce("Refreshing classloader TENANT");
     }
 
     @Test
@@ -171,7 +171,7 @@ public class ClassLoaderIT extends TestWithUser {
                 "}",
                 "}"));
         logoutOnPlatform(session);
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
                 "processWithDisplayName",
@@ -195,7 +195,7 @@ public class ClassLoaderIT extends TestWithUser {
                 "}",
                 "}"));
         logoutOnPlatform(session);
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
 

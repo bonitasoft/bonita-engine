@@ -34,4 +34,8 @@ public class SBusinessDataRepositoryException extends SBonitaException {
         super(message, cause);
     }
 
+    public BusinessDataRepositoryException convertToClientException() {
+        return new BusinessDataRepositoryException(getMessage(), getCause());
+    }
+
 }

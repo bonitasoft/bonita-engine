@@ -19,7 +19,7 @@ import org.bonitasoft.engine.maintenance.MaintenanceDetailsNotFoundException;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 
 /**
- * This API gives access to maintenance administration tasks such as enabling maintenance mode and also enable/disable
+ * This API gives access to maintenance administration tasks such as enabling maintenance mode and enabling/disabling
  * maintenance message.
  */
 public interface MaintenanceAPI {

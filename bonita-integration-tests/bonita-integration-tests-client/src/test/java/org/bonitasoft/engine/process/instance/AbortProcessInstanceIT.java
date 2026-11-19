@@ -440,7 +440,7 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
     private void shouldNotHaveFailedTasks() throws SearchException {
         assertThat(getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 1000).done()).getResult()
                 .stream().map(ArchivedFlowNodeInstance::getState))
-                        .doesNotContain("failed");
+                .doesNotContain("failed");
     }
 
     private List<ArchivedFlowNodeInstance> getAllCompletedArchivedFlowNodeInstances() throws SearchException {

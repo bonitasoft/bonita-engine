@@ -33,7 +33,6 @@ dependencies {
     api project(':services:bonita-data-instance')
     api project(':services:bonita-events')
     api project(':services:bonita-expression')
-    api project(':services:bonita-external-identity-mapping')
     api project(':services:bonita-identity')
     api project(':services:bonita-incident')
     api project(':services:bonita-lock')
@@ -76,7 +75,6 @@ dependencies {
     testAnnotationProcessor libs.lombok
 
     testImplementation libs.assertj
-    testImplementation libs.mockitoJunitJupiter
     testImplementation libs.systemRules      // works with Junit4
     testImplementation libs.systemLambda    // works with Junit5
     testImplementation libs.springTest

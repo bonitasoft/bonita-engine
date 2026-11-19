@@ -66,12 +66,11 @@ public class PlatformManagementUtilsTest {
         //when
         doReturn(new PlatformSessionImpl(1231, new Date(), 54325423, "testUser", 75463)).when(platformManagementUtils)
                 .platformLogin();
-        doReturn(1L).when(platformManagementUtils).getDefaultTenantId();
         platformManagementUtils.updateConfigurationFile("myFile", "theNewContent".getBytes());
         //then
         InOrder inOrder = inOrder(platformManagementUtils, platformAPI);
         inOrder.verify(platformManagementUtils).platformLogin();
-        inOrder.verify(platformAPI).updateClientTenantConfigurationFile(1L, "myFile", "theNewContent".getBytes());
+        inOrder.verify(platformAPI).updateClientTenantConfigurationFile("myFile", "theNewContent".getBytes());
         inOrder.verify(platformManagementUtils).platformLogout(any(PlatformSession.class));
     }
 

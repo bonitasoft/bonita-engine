@@ -13,12 +13,19 @@
  **/
 package org.bonitasoft.engine.bdm;
 
+import java.io.Serial;
+
+import org.bonitasoft.engine.api.result.Status;
+import org.bonitasoft.engine.api.result.Status.Level;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
  */
 public class BusinessObjectModelValidationException extends Exception {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private final ValidationStatus validationStatus;
 
@@ -29,13 +36,9 @@ public class BusinessObjectModelValidationException extends Exception {
     @Override
     public String getMessage() {
         final StringBuilder sb = new StringBuilder();
-        for (final String errorMessage : validationStatus.getErrors()) {
-            sb.append("\n- ");
-            sb.append(errorMessage);
-        }
+        validationStatus.getStatuses().stream().filter(status -> Level.ERROR.equals(status.getLevel()))
+                .map(Status::getMessage).forEach(s -> sb.append("\n- ").append(s));
         return sb.toString();
     }
-
-    private static final long serialVersionUID = 1L;
 
 }

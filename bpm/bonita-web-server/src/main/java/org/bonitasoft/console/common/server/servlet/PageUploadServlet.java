@@ -94,8 +94,8 @@ public class PageUploadServlet extends TenantFileUploadServlet {
 
     @Override
     protected void fillJsonResponseMap(final HttpServletRequest request, final Map<String, Serializable> responseMap,
-            final String fileName, final String contentType, final String uploadedFileKey) {
-        super.fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFileKey);
+            final String fileName, final String contentType, final String uploadedFileKey, final boolean isJarlessBar) {
+        super.fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFileKey, isJarlessBar);
         // also add the permissions to the map
         try {
             final String[] permissions = getPermissions(request);

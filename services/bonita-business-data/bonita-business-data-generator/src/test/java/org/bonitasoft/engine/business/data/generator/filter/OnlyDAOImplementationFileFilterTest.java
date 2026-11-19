@@ -72,7 +72,7 @@ public class OnlyDAOImplementationFileFilterTest {
         doReturn("Employee." + extension).when(file).getName();
         doReturn(domain + File.separatorChar + subDomain + File.separatorChar + "model" + File.separatorChar
                 + "Employee." + extension).when(file)
-                        .getAbsolutePath();
+                .getAbsolutePath();
 
         // when then
         assertThat(fileFilter.accept(file))

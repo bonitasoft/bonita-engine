@@ -33,8 +33,6 @@ public abstract class ConfigurationFile {
 
     protected static final String CONFIGURATION_FILES_CACHE = "CONFIGURATION_FILES_CACHE";
 
-    protected final long tenantId;
-
     private final String propertiesFilename;
 
     protected final String cacheKey;
@@ -45,14 +43,12 @@ public abstract class ConfigurationFile {
 
     ConfigurationFilesManager configurationFilesManager;
 
-    public ConfigurationFile(long tenantId, CacheService cacheService,
-            ConfigurationFilesManager configurationFilesManager) {
-        this(tenantId, cacheService, configurationFilesManager, false);
+    public ConfigurationFile(CacheService cacheService, ConfigurationFilesManager configurationFilesManager) {
+        this(cacheService, configurationFilesManager, false);
     }
 
-    public ConfigurationFile(long tenantId, CacheService cacheService,
+    public ConfigurationFile(CacheService cacheService,
             ConfigurationFilesManager configurationFilesManager, boolean setKeysToLowerCase) {
-        this.tenantId = tenantId;
         this.propertiesFilename = getPropertiesFileName();
         this.cacheKey = propertiesFilename;
         this.cacheService = cacheService;
@@ -65,10 +61,10 @@ public abstract class ConfigurationFile {
     }
 
     protected Properties readPropertiesFromDatabaseAndStoreThemInCache() {
-        Properties tenantProperties = configurationFilesManager.getTenantProperties(propertiesFilename, tenantId,
+        Properties properties = configurationFilesManager.getTenantProperties(propertiesFilename,
                 setKeysToLowerCase);
-        storePropertiesInCache(tenantProperties);
-        return tenantProperties;
+        storePropertiesInCache(properties);
+        return properties;
     }
 
     protected Properties readPropertiesFromClasspathAndStoreThemInCache() {
@@ -89,14 +85,13 @@ public abstract class ConfigurationFile {
 
     abstract protected boolean hasInternalVersion();
 
-    void storePropertiesInCache(Properties tenantProperties) {
+    void storePropertiesInCache(Properties properties) {
         try {
-            cacheService.store(CONFIGURATION_FILES_CACHE, cacheKey, tenantProperties);
-            log.debug(format("Successfully stored configuration file %s (tenant %s) in dedicated cache",
-                    propertiesFilename, tenantId));
+            cacheService.store(CONFIGURATION_FILES_CACHE, cacheKey, properties);
+            log.debug("Successfully stored configuration file {} in dedicated cache", propertiesFilename);
         } catch (SCacheException e) {
-            log.warn(format("Problem storing configuration file %s (tenant %s) in dedicated cache (%s)",
-                    propertiesFilename, tenantId, e.getMessage()));
+            log.warn("Problem storing configuration file {} in dedicated cache ({})", propertiesFilename,
+                    e.getMessage());
         }
     }
 
@@ -105,8 +100,7 @@ public abstract class ConfigurationFile {
         try {
             properties = (Properties) cacheService.get(CONFIGURATION_FILES_CACHE, cacheKey);
         } catch (SCacheException e) {
-            log.warn(format("Problem retrieving configuration file %s (tenant %s) from dedicated cache",
-                    propertiesFilename, tenantId));
+            log.warn("Problem retrieving configuration file {} from dedicated cache", propertiesFilename);
             return new Properties(); // Should we return null?
         }
         if (properties == null) {
@@ -130,10 +124,10 @@ public abstract class ConfigurationFile {
                 throw new IllegalArgumentException(
                         format("File %s cannot be modified directly, as a writable version exists", propertyName));
             }
-            final Properties tenantProperties = getProperties();
-            if (tenantProperties.remove(propertyName) != null) { // if the property was present
-                storePropertiesInCache(tenantProperties);
-                configurationFilesManager.removeProperty(propertiesFilename, tenantId, propertyName);
+            final Properties properties = getProperties();
+            if (properties.remove(propertyName) != null) { // if the property was present
+                storePropertiesInCache(properties);
+                configurationFilesManager.removeProperty(propertiesFilename, propertyName);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -145,12 +139,12 @@ public abstract class ConfigurationFile {
             if (!hasCustomVersion()) {
                 throw new IllegalArgumentException(format("File %s does not have a -custom version", propertyName));
             }
-            final Properties tenantProperties = getProperties();
+            final Properties properties = getProperties();
             // FIXME: is there a risk to remove a property that is not custom, here?
-            if (tenantProperties.remove(propertyName) != null) { // if the property was present
-                storePropertiesInCache(tenantProperties);
+            if (properties.remove(propertyName) != null) { // if the property was present
+                storePropertiesInCache(properties);
                 configurationFilesManager.removeProperty(getCustomPropertiesFilename(propertiesFilename),
-                        tenantId, propertyName);
+                        propertyName);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -162,12 +156,12 @@ public abstract class ConfigurationFile {
             if (!hasInternalVersion()) {
                 throw new IllegalArgumentException(format("File %s does not have a -internal version", propertyName));
             }
-            final Properties tenantProperties = getProperties();
+            final Properties properties = getProperties();
             // FIXME: is there a risk to remove a property that is not internal, here?
-            if (tenantProperties.remove(propertyName) != null) { // if the property was present
-                storePropertiesInCache(tenantProperties);
+            if (properties.remove(propertyName) != null) { // if the property was present
+                storePropertiesInCache(properties);
                 configurationFilesManager.removeProperty(getInternalPropertiesFilename(propertiesFilename),
-                        tenantId, propertyName);
+                        propertyName);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -180,10 +174,10 @@ public abstract class ConfigurationFile {
                 throw new IllegalArgumentException(
                         format("File %s cannot be modified directly, as a writable version exists", propertyName));
             }
-            final Properties tenantProperties = getProperties();
-            tenantProperties.setProperty(propertyName, propertyValue);
-            storePropertiesInCache(tenantProperties);
-            configurationFilesManager.setProperty(propertiesFilename, tenantId, propertyName,
+            final Properties properties = getProperties();
+            properties.setProperty(propertyName, propertyValue);
+            storePropertiesInCache(properties);
+            configurationFilesManager.setProperty(propertiesFilename, propertyName,
                     propertyValue);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -195,11 +189,11 @@ public abstract class ConfigurationFile {
             if (!hasCustomVersion()) {
                 throw new IllegalArgumentException(format("File %s does not have a -custom version", propertyName));
             }
-            final Properties tenantProperties = getProperties();
-            tenantProperties.setProperty(propertyName, propertyValue);
-            storePropertiesInCache(tenantProperties);
+            final Properties properties = getProperties();
+            properties.setProperty(propertyName, propertyValue);
+            storePropertiesInCache(properties);
             configurationFilesManager.setProperty(getCustomPropertiesFilename(propertiesFilename),
-                    tenantId, propertyName, propertyValue);
+                    propertyName, propertyValue);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -210,11 +204,11 @@ public abstract class ConfigurationFile {
             if (!hasInternalVersion()) {
                 throw new IllegalArgumentException(format("File %s does not have a -internal version", propertyName));
             }
-            final Properties tenantProperties = getProperties();
-            tenantProperties.setProperty(propertyName, propertyValue);
-            storePropertiesInCache(tenantProperties);
+            final Properties properties = getProperties();
+            properties.setProperty(propertyName, propertyValue);
+            storePropertiesInCache(properties);
             configurationFilesManager.setProperty(getInternalPropertiesFilename(propertiesFilename),
-                    tenantId, propertyName, propertyValue);
+                    propertyName, propertyValue);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

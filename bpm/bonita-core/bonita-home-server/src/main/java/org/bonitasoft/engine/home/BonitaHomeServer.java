@@ -19,7 +19,6 @@ import static org.bonitasoft.engine.home.FolderMgr.getFolder;
 import static org.bonitasoft.engine.home.FolderMgr.getPlatformTempFolder;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -46,17 +45,15 @@ public class BonitaHomeServer {
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
 
-    private long DEFAULT_TENANT_ID = -1;
-
     /**
      * property name of the server api implementation class name
      */
     private static final String SERVER_API_IMPLEMENTATION = "serverApi";
-    private final TenantStorage tenantStorage;
+    private final ProfileStorage profileStorage;
     private ConfigurationService configurationService;
 
     private BonitaHomeServer() {
-        tenantStorage = new TenantStorage();
+        profileStorage = new ProfileStorage();
     }
 
     public static BonitaHomeServer getInstance() {
@@ -72,13 +69,6 @@ public class BonitaHomeServer {
             }
         }
         return configurationService;
-    }
-
-    public long getDefaultTenantId() {
-        if (DEFAULT_TENANT_ID == -1) {
-            DEFAULT_TENANT_ID = getConfigurationService().getDefaultTenantId();
-        }
-        return DEFAULT_TENANT_ID;
     }
 
     /**
@@ -103,15 +93,13 @@ public class BonitaHomeServer {
      * <li>platform properties in database overrides platform properties in classpath</li>
      * </ol>
      */
-    public Properties getTenantProperties(long tenantId) throws IOException {
+    public Properties getTenantProperties() throws IOException {
         Properties allProperties = getPlatformProperties();
         Properties tenantProperties = mergeProperties(getPropertiesFromClassPath(
                 "bonita-tenant-community.properties",
                 "bonita-tenant-sp.properties",
-                "bonita-tenant-sp-cluster.properties"), getConfigurationService().getTenantEngineConf(tenantId));
+                "bonita-tenant-sp-cluster.properties"), getConfigurationService().getTenantEngineConf());
         allProperties.putAll(tenantProperties);
-
-        allProperties.setProperty("tenantId", String.valueOf(tenantId));
         return allProperties;
     }
 
@@ -135,8 +123,8 @@ public class BonitaHomeServer {
         return getAllXmlConfiguration(getConfigurationService().getPlatformEngineConf());
     }
 
-    public List<BonitaConfiguration> getTenantConfiguration(long tenantId) {
-        return getAllXmlConfiguration(getConfigurationService().getTenantEngineConf(tenantId));
+    public List<BonitaConfiguration> getTenantConfiguration() {
+        return getAllXmlConfiguration(getConfigurationService().getTenantEngineConf());
     }
 
     private Properties mergeProperties(Properties mergeInto, List<BonitaConfiguration> configurationFiles)
@@ -167,8 +155,8 @@ public class BonitaHomeServer {
      * =================================================
      */
 
-    public TenantStorage getTenantStorage() {
-        return tenantStorage;
+    public ProfileStorage getProfileStorage() {
+        return profileStorage;
     }
 
     /**
@@ -201,45 +189,18 @@ public class BonitaHomeServer {
         return file;
     }
 
-    public File getLicensesFolder() throws IOException {
-        return FolderMgr.getLicensesFolder().getFile();
+    public URI getLocalTemporaryFolder(final String artifactType) throws IOException {
+        return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType).toURI();
     }
 
     public URI getLocalTemporaryFolder(final String artifactType, final long artifactId) throws IOException {
         return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType, artifactId).toURI();
     }
 
-    public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        getConfigurationService().deleteTenantConfiguration(tenantId);
-        //allow re-import of profiles, need to be deleted when we remove the ability to delete tenant
-        getTenantStorage().getProfileMD5(tenantId).delete();
-    }
-
-    public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException {
-        List<BonitaConfiguration> tenantEngineConf = getConfigurationService().getTenantEngineConf(tenantId);
-        for (BonitaConfiguration bonitaConfiguration : tenantEngineConf) {
-            if (bonitaConfiguration.getResourceName().equals("bonita-tenant-community-custom.properties")) {
-                Properties properties = new Properties();
-                properties.load(new ByteArrayInputStream(bonitaConfiguration.getResourceContent()));
-                if (userName != null) {
-                    properties.setProperty("bonita.runtime.admin.username", userName);
-                }
-                if (password != null) {
-                    properties.setProperty("bonita.runtime.admin.password", password);
-                }
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                properties.store(out, "");
-                bonitaConfiguration.setResourceContent(out.toByteArray());
-                break;
-            }
-        }
-        getConfigurationService().storeTenantEngineConf(tenantEngineConf, tenantId);
-    }
-
-    public File getSecurityScriptsFolder(long tenantId) throws BonitaHomeNotSetException, IOException {
-        final Folder localFolder = getFolder(getPlatformTempFolder(), "security-scripts").createIfNotExists();
-        final Folder tenantSecurityScriptsFolder = getFolder(localFolder, String.valueOf(tenantId)).createIfNotExists();
-        List<BonitaConfiguration> tenantSecurityScripts = getConfigurationService().getTenantSecurityScripts(tenantId);
+    public File getSecurityScriptsFolder() throws BonitaHomeNotSetException, IOException {
+        final Folder tenantSecurityScriptsFolder = getFolder(getPlatformTempFolder(), "security-scripts")
+                .createIfNotExists();
+        List<BonitaConfiguration> tenantSecurityScripts = getConfigurationService().getTenantSecurityScripts();
         writeBonitaConfiguration(tenantSecurityScriptsFolder.getFile(), tenantSecurityScripts);
         return tenantSecurityScriptsFolder.getFile();
     }
@@ -262,20 +223,20 @@ public class BonitaHomeServer {
                 .collect(toMap(BonitaConfiguration::getResourceName, BonitaConfiguration::getResourceContent));
     }
 
-    public Map<String, byte[]> getTenantPortalConfigurations(long tenantId) {
-        return getConfigurationService().getTenantPortalConf(tenantId).stream()
+    public Map<String, byte[]> getTenantPortalConfigurations() {
+        return getConfigurationService().getTenantPortalConf().stream()
                 .collect(toMap(BonitaConfiguration::getResourceName, BonitaConfiguration::getResourceContent));
     }
 
-    public byte[] getTenantPortalConfiguration(long tenantId, String file) {
-        return getConfigurationService().getTenantPortalConfiguration(tenantId, file).getResourceContent();
+    public byte[] getTenantPortalConfiguration(String file) {
+        return getConfigurationService().getTenantPortalConfiguration(file).getResourceContent();
     }
 
-    public void updateTenantPortalConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
-        BonitaConfiguration configuration = getConfigurationService().getTenantPortalConfiguration(tenantId, file);
+    public void updateTenantPortalConfigurationFile(String file, byte[] content) throws UpdateException {
+        BonitaConfiguration configuration = getConfigurationService().getTenantPortalConfiguration(file);
         if (configuration != null) {
             configuration.setResourceContent(content);
-            getConfigurationService().storeTenantPortalConf(singletonList(configuration), tenantId);
+            getConfigurationService().storeTenantPortalConf(singletonList(configuration));
         } else {
             throw new UpdateException("Cannot update non-existing configuration file " + file);
         }

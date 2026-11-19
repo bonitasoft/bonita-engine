@@ -50,7 +50,6 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
@@ -215,9 +214,8 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         return new APIAccessorImpl();
     }
 
-    protected APIAccessor getConnectorApiAccessor() throws STenantIdNotSetException {
-        final long tenantId = sessionAccessor.getTenantId();
-        return new ConnectorAPIAccessorImpl(tenantId);
+    protected APIAccessor getConnectorApiAccessor() {
+        return new ConnectorAPIAccessorImpl();
     }
 
     long getLoggedUserFromSession(Map<String, Object> context, ContainerState containerState) {

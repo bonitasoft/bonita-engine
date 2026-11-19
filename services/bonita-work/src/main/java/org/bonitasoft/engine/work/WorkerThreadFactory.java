@@ -28,16 +28,13 @@ public class WorkerThreadFactory implements ThreadFactory {
 
     private final int padding;
 
-    private final long tenantId;
-
-    public WorkerThreadFactory(final String name, final long tenantId, final int maximumPoolSize) {
+    public WorkerThreadFactory(final String name, final int maximumPoolSize) {
         this.name = name;
-        this.tenantId = tenantId;
         this.padding = guessPadding(maximumPoolSize);
     }
 
-    public WorkerThreadFactory(final String name, final long tenantId) {
-        this(name, tenantId, 1);
+    public WorkerThreadFactory(final String name) {
+        this(name, 1);
     }
 
     /**
@@ -57,8 +54,6 @@ public class WorkerThreadFactory implements ThreadFactory {
     public Thread newThread(final Runnable runnable) {
         final StringBuilder builder = new StringBuilder();
         builder.append(name);
-        builder.append("-");
-        builder.append(tenantId);
         builder.append("-");
         builder.append("%0");
         builder.append(padding);

@@ -24,12 +24,6 @@ import org.bonitasoft.web.toolkit.client.data.item.template.ItemHasUniqueId;
  */
 public class ApplicationItem extends AbstractApplicationItem implements ItemHasUniqueId, ItemHasIcon {
 
-    /**
-     * @deprecated since 7.13.0, see {@link #getIconPath()} & {@link #setIconPath(String)}
-     */
-    @Deprecated(since = "7.13.0")
-    public static final String ATTRIBUTE_ICON_PATH = "iconPath";
-
     public static final String ATTRIBUTE_HOME_PAGE_ID = "homePageId";
 
     public static final String ATTRIBUTE_LAYOUT_ID = "layoutId";
@@ -47,22 +41,6 @@ public class ApplicationItem extends AbstractApplicationItem implements ItemHasU
     @Override
     public boolean isLink() {
         return false;
-    }
-
-    /**
-     * @deprecated since 7.13, use {@link #getIcon()} instead
-     */
-    @Deprecated(since = "7.13.0")
-    public String getIconPath() {
-        return getAttributeValue(ATTRIBUTE_ICON_PATH);
-    }
-
-    /**
-     * @deprecated since 7.13, use {@link #setIcon(String)} instead
-     */
-    @Deprecated(since = "7.13.0")
-    public void setIconPath(final String iconPath) {
-        setAttribute(ATTRIBUTE_ICON_PATH, iconPath);
     }
 
     public APIID getHomePageId() {

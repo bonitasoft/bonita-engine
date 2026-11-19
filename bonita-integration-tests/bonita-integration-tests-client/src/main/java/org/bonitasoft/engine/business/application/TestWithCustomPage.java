@@ -34,11 +34,11 @@ public class TestWithCustomPage extends TestWithLivingApplication {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         if (page != null) {
             getPageAPI().deletePage(page.getId());
         }
-        logoutOnTenant();
+        logout();
     }
 
     public Page getPage() {

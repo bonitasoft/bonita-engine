@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.command;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.operation.pojo.Travel;
@@ -34,12 +36,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class GetBusinessDataByIdsCommandTest {
 
-    private static final List<Long> identifers;
+    private static final List<Long> identifiers;
 
     static {
-        identifers = new ArrayList<>();
-        identifers.add(1983L);
-        identifers.add(1990L);
+        identifiers = new ArrayList<>();
+        identifiers.add(1983L);
+        identifiers.add(1990L);
     }
 
     private static final String PARAMETER_CLASS_NAME = Travel.class.getName();
@@ -60,7 +62,7 @@ public class GetBusinessDataByIdsCommandTest {
     public void setUp() throws Exception {
         command = new GetBusinessDataByIdsCommand();
         parameters = new HashMap<>();
-        parameters.put(GetBusinessDataByIdsCommand.BUSINESS_DATA_IDS, (Serializable) identifers);
+        parameters.put(GetBusinessDataByIdsCommand.BUSINESS_DATA_IDS, (Serializable) identifiers);
         parameters.put(GetBusinessDataByIdsCommand.ENTITY_CLASS_NAME, PARAMETER_CLASS_NAME);
         parameters.put(BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         when(serviceAccessor.getBusinessDataService()).thenReturn(businessDataService);
@@ -72,19 +74,23 @@ public class GetBusinessDataByIdsCommandTest {
         command.execute(parameters, serviceAccessor);
 
         //then
-        verify(businessDataService).getJsonEntities(PARAMETER_CLASS_NAME, identifers,
+        verify(businessDataService).getJsonEntities(PARAMETER_CLASS_NAME, identifiers,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
-    @Test(expected = SCommandExecutionException.class)
-    public void executeCommandWithEntitiesShloudThrowException() throws Exception {
+    @Test
+    public void executeCommandWithEntitiesShouldThrowException() throws Exception {
         //given
-        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonEntities(PARAMETER_CLASS_NAME,
-                identifers,
+        doThrow(new SBusinessDataRepositoryException("Constraint violation")).when(businessDataService).getJsonEntities(
+                PARAMETER_CLASS_NAME,
+                identifiers,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
-        command.execute(parameters, serviceAccessor);
+        assertThatThrownBy(() -> command.execute(parameters, serviceAccessor))
+                .isInstanceOf(SCommandExecutionException.class)
+                .hasRootCauseInstanceOf(BusinessDataRepositoryException.class)
+                .hasRootCauseMessage("Constraint violation");
     }
 
 }

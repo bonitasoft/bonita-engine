@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,10 @@ import org.bonitasoft.engine.CallableWithException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -106,7 +110,7 @@ public class ProcessInstanceServiceIT extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getNumberOfProcessInstances()
+    public void testGetNumberOfProcessInstances()
             throws STransactionCreationException, STransactionCommitException, SProcessInstanceCreationException,
             STransactionRollbackException, SBonitaReadException {
         transactionService.begin();
@@ -184,30 +188,6 @@ public class ProcessInstanceServiceIT extends CommonBPMServicesTest {
     @Test
     public void testSetState() {
         // TODO: not yet implemented
-    }
-
-    @Test
-    public void testDeleteProcessInstance() throws SBonitaException {
-        // Creation of a process instance:
-        transactionService.begin();
-        final long processDefinitionId = 123L;
-        final SProcessInstance sProcessInstance = SProcessInstance.builder()
-                .name("an instance name")
-                .processDefinitionId(processDefinitionId).build();
-        processInstanceService.createProcessInstance(sProcessInstance);
-        transactionService.complete();
-
-        // clean up:
-        cleanUpAllProcessInstances();
-
-        // retrieve the number of process instances:
-        transactionService.begin();
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
-        final long processInstanceNumber = processInstanceService.getNumberOfProcessInstances(queryOptions);
-        transactionService.complete();
-
-        // Check that this number is 0:
-        assertEquals(0, processInstanceNumber);
     }
 
     @Test
@@ -339,7 +319,19 @@ public class ProcessInstanceServiceIT extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testDeletProcessInstanceAlsoDeleteDataInstances() throws Exception {
+    public void testDeleteProcessInstance() throws Exception {
+        //given
+        createProcessInstanceInTransaction(123L, "an instance name");
+
+        //when
+        cleanUpAllProcessInstances();
+
+        //then
+        assertEquals(0, getNumberOfProcessInstances());
+    }
+
+    @Test
+    public void testDeleteProcessInstanceAlsoDeleteDataInstances() throws Exception {
         final long processDefinitionId = 123123123L;
         final String processName = "myProcInst";
 
@@ -362,28 +354,53 @@ public class ProcessInstanceServiceIT extends CommonBPMServicesTest {
         deleteSProcessInstance(processInstance);
 
         // check that no more data is available for the deleted process instance and flow node instance
+        assertEquals(0, getNumberOfProcessInstances());
         checkDataDoesNotExist(globalDataInstance);
         checkDataDoesNotExist(localDataInstance);
         checkFlowNodeDoesNotExist(taskInstance);
 
     }
 
-    private void checkDataDoesNotExist(final SDataInstance dataInstance) throws SBonitaException {
-        try {
-            getDataInstanceInTransaction(dataInstance.getId());
-            fail("the data instance was not deleted");
-        } catch (final SDataInstanceNotFoundException e) {
-            // ok
-        }
+    @Test
+    public void testDeleteProcessInstanceAlsoDeleteDocumentMappings() throws Exception {
+        //given
+        final long processDefinitionId = 123123123L;
+        final String processName = "myProcInst";
+
+        // create a process instance
+        final SProcessInstance processInstance = createProcessInstanceInTransaction(processDefinitionId, processName);
+
+        // attached a document to the process instance
+        SDocument document = new SDocumentBuilderFactory()
+                .createNewProcessDocument("myDocument", "mimeType", 1234L, "content".getBytes()).done();
+        transactionService.begin();
+        SMappedDocument mappedDocument = getServiceAccessor().getDocumentService()
+                .attachDocumentToProcessInstance(document, processInstance.getId(), document.getFileName(),
+                        "a description");
+        transactionService.complete();
+
+        //when
+        deleteSProcessInstance(processInstance);
+
+        //then
+        assertEquals(0, getNumberOfProcessInstances());
+        transactionService.begin();
+        // assert document mapping does not exist
+        assertThatExceptionOfType(SObjectNotFoundException.class)
+                .isThrownBy(() -> getServiceAccessor().getDocumentService().getMappedDocument(mappedDocument.getId()));
+        transactionService.complete();
     }
 
-    private void checkFlowNodeDoesNotExist(final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
-        try {
-            getFlowNodeInstance(flowNodeInstance.getId());
-            fail("the flowNode instance was not deleted");
-        } catch (final SFlowNodeNotFoundException e) {
-            // ok
-        }
+    private void checkDataDoesNotExist(final SDataInstance dataInstance) {
+        assertThatExceptionOfType(SDataInstanceNotFoundException.class)
+                .as("the data instance was not deleted")
+                .isThrownBy(() -> getDataInstanceInTransaction(dataInstance.getId()));
+    }
+
+    private void checkFlowNodeDoesNotExist(final SFlowNodeInstance flowNodeInstance) {
+        assertThatExceptionOfType(SFlowNodeNotFoundException.class)
+                .as("the flowNode instance was not deleted")
+                .isThrownBy(() -> getFlowNodeInstance(flowNodeInstance.getId()));
     }
 
     private SProcessInstance createProcessInstanceInTransaction(final long process_definition_id,
@@ -426,6 +443,14 @@ public class ProcessInstanceServiceIT extends CommonBPMServicesTest {
             getTransactionService().complete();
         }
         return dataInstance;
+    }
+
+    private long getNumberOfProcessInstances() throws SBonitaException {
+        transactionService.begin();
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
+        final long processInstanceNumber = processInstanceService.getNumberOfProcessInstances(queryOptions);
+        transactionService.complete();
+        return processInstanceNumber;
     }
 
 }

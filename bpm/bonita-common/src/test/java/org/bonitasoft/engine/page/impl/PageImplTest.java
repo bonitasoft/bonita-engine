@@ -98,8 +98,8 @@ public class PageImplTest {
                         date.getTime(), USER_ID,
                         modificationDate.getTime(), USER_ID,
                         "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID).toString())
-                                .contains(String.valueOf(PROCESS_DEFINITION_ID)).contains(
-                                        ContentType.FORM);
+                .contains(String.valueOf(PROCESS_DEFINITION_ID)).contains(
+                        ContentType.FORM);
 
     }
 }

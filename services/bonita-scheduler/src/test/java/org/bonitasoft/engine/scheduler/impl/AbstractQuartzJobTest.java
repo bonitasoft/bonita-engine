@@ -41,12 +41,12 @@ public class AbstractQuartzJobTest {
     @Mock
     private SchedulerServiceImpl schedulerService;
 
-    private ConcurrentQuartzJob abstractQuartzJob = new ConcurrentQuartzJob();
+    private final ConcurrentQuartzJob abstractQuartzJob = new ConcurrentQuartzJob();
 
     @Before
     public void before() {
         abstractQuartzJob.setSchedulerService(schedulerService);
-        abstractQuartzJob.setJobDetails(createJobDetails(1, 2));
+        abstractQuartzJob.setJobDetails(createJobDetails(2));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class AbstractQuartzJobTest {
     public void should_retry_job_that_failed_with_SRetryable() throws Exception {
         doReturn(jobThatThrowASRetryableException()).when(schedulerService).getPersistedJob(any());
         abstractQuartzJob.setSchedulerService(schedulerService);
-        abstractQuartzJob.setJobDetails(createJobDetails(1, 2));
+        abstractQuartzJob.setJobDetails(createJobDetails(2));
 
         abstractQuartzJob.execute(null);
 

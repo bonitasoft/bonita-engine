@@ -34,21 +34,9 @@ public interface Platform extends Serializable {
      * Retrieves the <code>platform</code> version
      *
      * @return a String representing the <code>platform</code> version
-     * @see #getPreviousVersion()
      * @see #getInitialVersion()
      */
     String getVersion();
-
-    /**
-     * This method is deprecated. It used to return the previous version of bonita if the platform was migrated.
-     * However this previous version was always exactly the n-1 version compared to the current one.
-     *
-     * @return an empty string (deprecated)
-     * @deprecated since 7.11.0. There is no replacement for this method because previous version is always
-     *             deterministic
-     */
-    @Deprecated
-    String getPreviousVersion();
 
     /**
      * Retrieves the <code>platform</code> initial version. That is, the Bonita version in which you have initially
@@ -57,12 +45,10 @@ public interface Platform extends Serializable {
      * <p>
      * For instance, if you have created your platform in the version 6.1.0 and have migrated to the version 6.3.4 using
      * the <code>Bonita Migration
-     * Tool</code>, {@code getInitialVersion} will return 6.1.0, {@link #getPreviousVersion()} will return 6.3.3 and
-     * {@link #getVersion()} will return 6.3.4.
+     * Tool</code>, {@code getInitialVersion} will return 6.1.0 and {@link #getVersion()} will return 6.3.4.
      *
      * @return a String representing the <code>platform</code> initial version
      * @see #getVersion()
-     * @see #getPreviousVersion()
      */
     String getInitialVersion();
 
@@ -79,5 +65,12 @@ public interface Platform extends Serializable {
      * @return a String representing the name of the platform technical user that created the platform
      */
     String getCreatedBy();
+
+    /**
+     * Return whether this platform is in maintenance or not.
+     * When the platform is in maintenance, the services are paused, and most features are disabled.
+     * Only the Technical Admin can log in during the maintenance time.
+     */
+    boolean isMaintenanceEnabled();
 
 }

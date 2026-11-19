@@ -191,7 +191,7 @@ public class CustomOrDefaultApplicationInstaller {
     void installDefaultProvidedApplications() throws ApplicationInstallationException {
         try {
             // default app importer requires a tenant session and to be executed inside a transaction
-            tenantServicesManager.inTenantSessionTransaction(() -> {
+            tenantServicesManager.inSessionTransaction(() -> {
                 defaultLivingApplicationImporter.execute();
                 return null;
             });

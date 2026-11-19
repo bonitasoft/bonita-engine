@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.exception;
 
+import java.io.Serial;
+
 /**
  * Thrown when we try to access on a paused tenant an API method that cannot be called on a paused tenant, or when we
  * try to access on a running tenant an API
@@ -22,6 +24,7 @@ package org.bonitasoft.engine.exception;
  */
 public class TenantStatusException extends BonitaRuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

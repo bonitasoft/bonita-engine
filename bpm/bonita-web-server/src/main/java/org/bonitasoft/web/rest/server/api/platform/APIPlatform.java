@@ -69,7 +69,7 @@ public class APIPlatform extends org.bonitasoft.web.rest.server.api.PlatformAPI<
 
     @Override
     public PlatformItem get(final APIID id) {
-        PlatformItem clientItem = null;
+        PlatformItem platformItem;
         try {
             final PlatformAPI platformAPI = getPlatformAPI();
             final Platform platform = platformAPI.getPlatform();
@@ -79,15 +79,12 @@ public class APIPlatform extends org.bonitasoft.web.rest.server.api.PlatformAPI<
             if (platformState != null) {
                 platformStateStr = platformState.toString();
             }
-            clientItem = new PlatformItem(platform.getVersion(), platform.getPreviousVersion(),
-                    platform.getInitialVersion(), createdDate,
+            platformItem = new PlatformItem(platform.getVersion(), platform.getInitialVersion(), createdDate,
                     platform.getCreatedBy(), platformStateStr);
-            return clientItem;
+            return platformItem;
         } catch (final PlatformNotFoundException ex) {
-            clientItem = new PlatformItem();
-            return clientItem;
-        } catch (final BonitaException e) {
-            throw new APIException(e);
+            platformItem = new PlatformItem();
+            return platformItem;
         }
     }
 

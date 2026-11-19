@@ -1362,7 +1362,7 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         FlowNodeInstance joinGateway = waitForFlowNodeInExecutingState(processInstance, "join", false);
 
-        logoutOnTenant();
+        logout();
         final PlatformSession loginPlatform = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         platformAPI.stopNode();

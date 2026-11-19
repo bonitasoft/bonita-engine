@@ -13,15 +13,14 @@
  **/
 package org.bonitasoft.engine.command;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.business.data.BusinessDataService;
-import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.*;
 import org.bonitasoft.engine.operation.pojo.Travel;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
@@ -71,28 +70,36 @@ public class GetBusinessDataByIdCommandTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
-    @Test(expected = SCommandExecutionException.class)
-    public void executeCommandWithEntityShloudThrowException() throws Exception {
+    @Test
+    public void executeCommandWithEntityShouldThrowException() throws Exception {
         //given
-        doThrow(SBusinessDataNotFoundException.class).when(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME,
+        doThrow(new SBusinessDataNotFoundException("BO not found")).when(businessDataService).getJsonEntity(
+                PARAMETER_CLASS_NAME,
                 PARAMETER_IDENTIFIER,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
-        command.execute(parameters, serviceAccessor);
+        assertThatThrownBy(() -> command.execute(parameters, serviceAccessor))
+                .isInstanceOf(SCommandExecutionException.class)
+                .hasRootCauseInstanceOf(BusinessDataNotFoundException.class)
+                .hasRootCauseMessage("BO not found");
     }
 
-    @Test(expected = SCommandExecutionException.class)
+    @Test
     public void executeCommandWithChildEntityShouldThrowException() throws Exception {
         //given
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, PARAMETER_CHILDNAME);
-        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonChildEntity(
-                PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
-                PARAMETER_CHILDNAME,
-                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        doThrow(new SBusinessDataRepositoryException("Constraint violation")).when(businessDataService)
+                .getJsonChildEntity(
+                        PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
+                        PARAMETER_CHILDNAME,
+                        PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
-        command.execute(parameters, serviceAccessor);
+        assertThatThrownBy(() -> command.execute(parameters, serviceAccessor))
+                .isInstanceOf(SCommandExecutionException.class)
+                .hasRootCauseInstanceOf(BusinessDataRepositoryException.class)
+                .hasRootCauseMessage("Constraint violation");
     }
 
     @Test

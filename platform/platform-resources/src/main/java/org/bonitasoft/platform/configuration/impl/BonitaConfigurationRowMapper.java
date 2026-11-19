@@ -27,8 +27,8 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class BonitaConfigurationRowMapper implements RowMapper<BonitaConfiguration> {
 
-    public static final String SELECT_CONFIGURATION_FOR_TYPE = "SELECT tenant_id, content_type, resource_name, resource_content FROM configuration WHERE tenant_id = ? AND content_type = ? ORDER BY resource_name";
-    public static final String SELECT_CONFIGURATION = "SELECT tenant_id, content_type, resource_name, resource_content FROM configuration WHERE tenant_id = ? AND content_type = ? AND resource_name = ?";
+    public static final String SELECT_CONFIGURATION_FOR_TYPE = "SELECT content_type, resource_name, resource_content FROM configuration WHERE content_type = ? ORDER BY resource_name";
+    public static final String SELECT_CONFIGURATION = "SELECT content_type, resource_name, resource_content FROM configuration WHERE content_type = ? AND resource_name = ?";
 
     @Override
     public BonitaConfiguration mapRow(ResultSet rs, int rowNum) throws SQLException {

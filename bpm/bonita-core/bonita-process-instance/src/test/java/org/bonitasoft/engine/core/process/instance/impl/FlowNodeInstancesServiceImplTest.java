@@ -134,7 +134,6 @@ public class FlowNodeInstancesServiceImplTest {
     @Test
     public void should_setTaskPriority_update_lastUpdateDate() throws Exception {
         // Given
-        when(flowNodeInstance.getTenantId()).thenReturn(101L);
         when(recorder.recordUpdateWithQuery(any(UpdateRecord.class),
                 eq(FlowNodeInstanceService.ACTIVITYINSTANCE_STATE),
                 eq("updateHumanTaskPriority"))).thenReturn(1);
@@ -146,18 +145,11 @@ public class FlowNodeInstancesServiceImplTest {
         verify(recorder).recordUpdateWithQuery(updateRecordCaptor.capture(),
                 eq(FlowNodeInstanceService.ACTIVITYINSTANCE_STATE),
                 eq("updateHumanTaskPriority"));
-        // The update must stay minimal: the composite identifier (id + tenantId, the WHERE clause of the
-        // atomic query) plus only the columns actually written. A whole-row recordUpdate would carry ~30
-        // fields and fail here -- that is the lost update of BPA-167. Dropping tenantId would also fail
-        // here, and would leave MySQL scanning and locking the whole table.
+        // The update must stay minimal: the id (the WHERE clause of the atomic query) plus only the columns
+        // actually written. A whole-row recordUpdate would carry ~30 fields and fail here -- that is the lost
+        // update of BPA-167.
         assertThat(updateRecordCaptor.getValue().getFields().keySet())
-                .containsExactlyInAnyOrder("id", "tenantId", "priority", "lastUpdateDate");
-        // A migrated customer's tenant id is NOT 1: installations that ran multi-tenant before 8.0.0 kept
-        // their original id when their databases were split (e.g. 101). Binding a literal here would break
-        // exactly those customers, so the value is asserted, not just the key.
-        assertThat(updateRecordCaptor.getValue().getFields())
-                .as("tenantId must be the value read from the flow node, never a literal")
-                .containsEntry("tenantId", 101L);
+                .containsExactlyInAnyOrder("id", "priority", "lastUpdateDate");
         // Writer 2 deliberately does NOT refresh: its only caller (SetTaskPriority) neither re-reads nor
         // mutates the entity afterwards, and a gratuitous refresh would discard un-flushed mutations on it.
         // Pinned here so the asymmetry with setExpectedEndDate stays a decision rather than an oversight.
@@ -200,7 +192,6 @@ public class FlowNodeInstancesServiceImplTest {
     @Test
     public void should_setExpectedEndDate_update_lastUpdateDate() throws Exception {
         // Given
-        when(flowNodeInstance.getTenantId()).thenReturn(101L);
         when(recorder.recordUpdateWithQuery(any(UpdateRecord.class),
                 eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED),
                 eq("updateHumanTaskExpectedEndDate"))).thenReturn(1);
@@ -212,12 +203,9 @@ public class FlowNodeInstancesServiceImplTest {
         verify(recorder).recordUpdateWithQuery(updateRecordCaptor.capture(),
                 eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED),
                 eq("updateHumanTaskExpectedEndDate"));
-        // Minimality, as above: id + tenantId + the written columns only.
+        // Minimality, as above: id + the written columns only.
         assertThat(updateRecordCaptor.getValue().getFields().keySet())
-                .containsExactlyInAnyOrder("id", "tenantId", "expectedEndDate", "lastUpdateDate");
-        assertThat(updateRecordCaptor.getValue().getFields())
-                .as("tenantId must be the value read from the flow node, never a literal")
-                .containsEntry("tenantId", 101L);
+                .containsExactlyInAnyOrder("id", "expectedEndDate", "lastUpdateDate");
         // The bulk HQL update bypasses the managed entity, so the in-memory copy is stale. It must be
         // refreshed before the state machine re-reads it or re-dirties it in the same transaction --
         // otherwise the commit flush writes the stale snapshot back (BPA-167).

@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -303,7 +301,7 @@ public class SearchCommentIT extends TestWithUser {
         waitForUserTaskAndAssignIt(instance1, "userTask1", jack);
         waitForUserTaskAndAssignIt(instance1, "userTask2", jack);
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(jackUserName, PASSWORD);
 
         final String commentContent1 = "jack's comment Content1";
@@ -313,7 +311,7 @@ public class SearchCommentIT extends TestWithUser {
         getProcessAPI().addProcessComment(instance1.getId(), commentContent2);
         getProcessAPI().addProcessComment(instance1.getId(), commentContent3);
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(johnUserName, PASSWORD);
         final String commentContent4 = "john's comment Content3";
         getProcessAPI().addProcessComment(instance2.getId(), commentContent4);
@@ -349,7 +347,7 @@ public class SearchCommentIT extends TestWithUser {
         final User john = createUser(johnUserName, PASSWORD, steven.getId());
         final User jim = createUser("jim", PASSWORD, steven.getId());
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(johnUserName, PASSWORD);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME,
@@ -369,14 +367,14 @@ public class SearchCommentIT extends TestWithUser {
         getProcessAPI().addProcessComment(pi1.getId(), "John's comment Content2");
         getProcessAPI().addProcessComment(pi1.getId(), "John's comment Content3");
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(jackUserName, PASSWORD);
 
         final ProcessInstance pi2 = getProcessAPI().startProcess(jim.getId(), processDefinition.getId());
         final String commentContent4 = "Jack's comment Content4";
         getProcessAPI().addProcessComment(pi2.getId(), commentContent4);
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(stevenUserName, PASSWORD);
 
         final ProcessInstance pi3 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
@@ -388,8 +386,8 @@ public class SearchCommentIT extends TestWithUser {
         final String commentContent6 = "Steven's comment Content6";
         getProcessAPI().addProcessComment(pi4.getId(), commentContent6);
 
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
 
         final SearchOptionsBuilder builder3 = new SearchOptionsBuilder(0, 10);
         final SearchResult<Comment> searchResult3 = getProcessAPI().searchCommentsManagedBy(jack.getId(),

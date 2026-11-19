@@ -50,17 +50,17 @@ public class IncidentServiceImplTest {
     @Test
     public void reportCallAllHandlers() {
         final Incident incident = new Incident("test", "recovery", null, null);
-        incidentService.report(1, incident);
-        verify(handler1, times(1)).handle(1, incident);
-        verify(handler2, times(1)).handle(1, incident);
+        incidentService.report(incident);
+        verify(handler1, times(1)).handle(incident);
+        verify(handler2, times(1)).handle(incident);
     }
 
     @Test
     public void reportCallAllHandlersEvenIfFirstThrowException() {
-        doThrow(new RuntimeException()).when(handler1).handle(anyLong(), nullable(Incident.class));
+        doThrow(new RuntimeException()).when(handler1).handle(nullable(Incident.class));
         final Incident incident = new Incident("test", "recovery", null, null);
-        incidentService.report(1, incident);
-        verify(handler2, times(1)).handle(1, incident);
+        incidentService.report(incident);
+        verify(handler2, times(1)).handle(incident);
     }
 
 }

@@ -13,10 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.GLOBAL;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.GLOBAL_ID;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.GLOBAL_TYPE;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -91,8 +88,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
 
         try {
             dependencyService.deleteDependency(name);
-            classLoaderService.refreshClassLoaderAfterUpdate(
-                    identifier(GLOBAL_TYPE, GLOBAL_ID));
+            classLoaderService.refreshClassLoaderAfterUpdate(GLOBAL);
         } catch (final SDependencyNotFoundException e) {
             throw new DependencyNotFoundException(e);
         } catch (final SBonitaException e) {

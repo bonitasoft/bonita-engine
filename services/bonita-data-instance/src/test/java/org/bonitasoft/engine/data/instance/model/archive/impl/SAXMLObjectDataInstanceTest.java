@@ -38,7 +38,6 @@ public class SAXMLObjectDataInstanceTest {
         sDataInstance.setDescription("description");
         sDataInstance.setId(3);
         sDataInstance.setName("name");
-        sDataInstance.setTenantId(4);
         sDataInstance.setTransientData(false);
         sDataInstance.setValue("value");
     }
@@ -79,13 +78,6 @@ public class SAXMLObjectDataInstanceTest {
     public final void getValueShouldBeNull() {
         final SAXMLObjectDataInstance saxmlObjectDataInstance = new SAXMLObjectDataInstance();
         assertEquals(null, saxmlObjectDataInstance.getValue());
-    }
-
-    @Test
-    public final void getSetTenantId() {
-        final SAXMLObjectDataInstance saxmlObjectDataInstance = new SAXMLObjectDataInstance();
-        saxmlObjectDataInstance.setTenantId(69);
-        assertEquals(69, saxmlObjectDataInstance.getTenantId());
     }
 
     @Test
