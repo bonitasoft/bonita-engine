@@ -2,6 +2,7 @@ import org.bonitasoft.engine.gradle.PomUtils
 
 plugins {
     id "java-library"
+    id "bonita-docker-database"
 }
 
 dependencies {
@@ -29,6 +30,14 @@ dependencies {
     testImplementation(libs.mysql)
     testImplementation(libs.h2)
 
+}
+
+// BonitaDataSourceInitializerIT runs on H2 with the unit tests, and on each vendor with the <vendor>DatabaseTest tasks
+databaseIntegrationTest {
+    include '**/*IT.class'
+    mysql { enabled = true }
+    oracle { enabled = true }
+    sqlserver { enabled = true }
 }
 
 tasks.register("sourcesJar", Jar) {
