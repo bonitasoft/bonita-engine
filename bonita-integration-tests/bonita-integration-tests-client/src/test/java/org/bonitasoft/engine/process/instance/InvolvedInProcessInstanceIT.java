@@ -314,7 +314,7 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
                 .isTrue();
 
         //clean up
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         disableAndDeleteProcess(rootProcessDefinition, subProcessDefinition);
         deleteUsers(callActivityAssignee);
 
@@ -361,7 +361,7 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
                         + rootProcessInstanceId)
                 .isTrue();
         //clean up
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         disableAndDeleteProcess(rootProcessDefinition, subProcessDefinition);
         deleteUsers(callActivityAssignee, callActivityExecutor);
 

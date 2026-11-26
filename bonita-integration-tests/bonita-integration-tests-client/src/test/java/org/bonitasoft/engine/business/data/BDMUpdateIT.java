@@ -46,14 +46,14 @@ public class BDMUpdateIT extends CommonAPIIT {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         tenantAdministrationAPI = getTenantAdministrationAPI();
     }
 
     @After
     public void cleanup() throws Exception {
         cleanAndUninstallBusinessDataModel();
-        logoutOnTenant();
+        logout();
     }
 
     @Test

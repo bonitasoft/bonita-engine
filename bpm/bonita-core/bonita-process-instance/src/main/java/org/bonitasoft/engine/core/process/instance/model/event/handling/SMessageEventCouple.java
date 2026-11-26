@@ -44,10 +44,4 @@ public class SMessageEventCouple implements PersistentObject {
     public void setId(final long id) {
         throw new IllegalArgumentException();
     }
-
-    @Override
-    public void setTenantId(final long id) {
-        throw new IllegalArgumentException();
-    }
-
 }

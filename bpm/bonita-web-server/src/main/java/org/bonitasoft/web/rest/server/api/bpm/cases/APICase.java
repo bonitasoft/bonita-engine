@@ -26,10 +26,7 @@ import org.bonitasoft.web.rest.server.datastore.bpm.cases.CaseDatastore;
 import org.bonitasoft.web.rest.server.datastore.bpm.flownode.FlowNodeDatastore;
 import org.bonitasoft.web.rest.server.datastore.bpm.process.ProcessDatastore;
 import org.bonitasoft.web.rest.server.datastore.organization.UserDatastore;
-import org.bonitasoft.web.rest.server.framework.api.APIHasAdd;
-import org.bonitasoft.web.rest.server.framework.api.APIHasDelete;
-import org.bonitasoft.web.rest.server.framework.api.APIHasGet;
-import org.bonitasoft.web.rest.server.framework.api.APIHasSearch;
+import org.bonitasoft.web.rest.server.framework.api.*;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
@@ -41,7 +38,8 @@ import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
  * @author Celine Souchet
  */
 public class APICase extends ConsoleAPI<CaseItem>
-        implements APIHasGet<CaseItem>, APIHasAdd<CaseItem>, APIHasSearch<CaseItem>, APIHasDelete {
+        implements APIHasUpdate<CaseItem>, APIHasGet<CaseItem>, APIHasAdd<CaseItem>, APIHasSearch<CaseItem>,
+        APIHasDelete {
 
     @Override
     protected ItemDefinition defineItemDefinition() {
@@ -106,22 +104,48 @@ public class APICase extends ConsoleAPI<CaseItem>
         }
     }
 
-    private void fillNumberOfFailedFlowNodesIfFailedCounterExists(final CaseItem item, final List<String> counters) {
+    private void fillNumberOfFailedFlowNodesIfFailedCounterExists(final CaseItem item, final List<String> counters,
+            Map<String, String> filters) {
         if (counters.contains(CaseItem.COUNTER_FAILED_FLOW_NODES)) {
             final FlowNodeDatastore flowNodeDatastore = getFlowNodeDatastore();
-            final Map<String, String> filters = new HashMap<>();
-            filters.put(FlowNodeItem.ATTRIBUTE_STATE, FlowNodeItem.VALUE_STATE_FAILED);
-            filters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(item.getId().toLong()));
-            item.setAttribute(CaseItem.COUNTER_FAILED_FLOW_NODES, flowNodeDatastore.count(null, null, filters));
+            final Map<String, String> flowNodeFilters = new HashMap<>();
+            if ("any".equalsIgnoreCase(filters.get(CaseItem.FILTER_CALLER))) {
+                flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(item.getId().toLong()));
+            } else {
+                flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_ROOT_CASE_ID, String.valueOf(item.getId().toLong()));
+            }
+            flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_STATE, FlowNodeItem.VALUE_STATE_FAILED);
+            item.setAttribute(CaseItem.COUNTER_FAILED_FLOW_NODES, flowNodeDatastore.count(null, null, flowNodeFilters));
         }
     }
 
-    private void fillNumberOfPendingFlowNodesIfActiveCounterExists(final CaseItem item, final List<String> counters) {
+    private void fillNumberOfActiveFlowNodesIfActiveCounterExists(final CaseItem item, final List<String> counters,
+            Map<String, String> filters) {
         if (counters.contains(CaseItem.COUNTER_ACTIVE_FLOW_NODES)) {
             final FlowNodeDatastore flowNodeDatastore = getFlowNodeDatastore();
-            final Map<String, String> filters = new HashMap<>();
-            filters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(item.getId().toLong()));
-            item.setAttribute(CaseItem.COUNTER_ACTIVE_FLOW_NODES, flowNodeDatastore.count(null, null, filters));
+            final Map<String, String> flowNodeFilters = new HashMap<>();
+            if ("any".equalsIgnoreCase(filters.get(CaseItem.FILTER_CALLER))) {
+                flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(item.getId().toLong()));
+            } else {
+                flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_ROOT_CASE_ID, String.valueOf(item.getId().toLong()));
+            }
+            item.setAttribute(CaseItem.COUNTER_ACTIVE_FLOW_NODES, flowNodeDatastore.count(null, null, flowNodeFilters));
+        }
+    }
+
+    private void fillNumberOfPendingFlowNodesIfActiveCounterExists(final CaseItem item, final List<String> counters,
+            Map<String, String> filters) {
+        if (counters.contains(CaseItem.COUNTER_PENDING_FLOW_NODES)) {
+            final FlowNodeDatastore flowNodeDatastore = getFlowNodeDatastore();
+            final Map<String, String> flowNodeFilters = new HashMap<>();
+            if ("any".equalsIgnoreCase(filters.get(CaseItem.FILTER_CALLER))) {
+                flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_PARENT_CASE_ID, String.valueOf(item.getId().toLong()));
+            } else {
+                flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_ROOT_CASE_ID, String.valueOf(item.getId().toLong()));
+            }
+            flowNodeFilters.put(FlowNodeItem.ATTRIBUTE_STATE, FlowNodeItem.VALUE_STATE_PENDING);
+            item.setAttribute(CaseItem.COUNTER_PENDING_FLOW_NODES,
+                    flowNodeDatastore.count(null, null, flowNodeFilters));
         }
     }
 
@@ -131,9 +155,18 @@ public class APICase extends ConsoleAPI<CaseItem>
     }
 
     @Override
+    protected void fillCountersDependingOnFilters(final CaseItem item, final List<String> counters,
+            final Map<String, String> filters) {
+        fillNumberOfFailedFlowNodesIfFailedCounterExists(item, counters, filters);
+        fillNumberOfActiveFlowNodesIfActiveCounterExists(item, counters, filters);
+        fillNumberOfPendingFlowNodesIfActiveCounterExists(item, counters, filters);
+    }
+
+    @Override
     protected void fillCounters(final CaseItem item, final List<String> counters) {
-        fillNumberOfFailedFlowNodesIfFailedCounterExists(item, counters);
-        fillNumberOfPendingFlowNodesIfActiveCounterExists(item, counters);
+        fillNumberOfFailedFlowNodesIfFailedCounterExists(item, counters, Map.of(CaseItem.FILTER_CALLER, "any"));
+        fillNumberOfActiveFlowNodesIfActiveCounterExists(item, counters, Map.of(CaseItem.FILTER_CALLER, "any"));
+        fillNumberOfPendingFlowNodesIfActiveCounterExists(item, counters, Map.of(CaseItem.FILTER_CALLER, "any"));
     }
 
     UserDatastore getUserDatastore() {
@@ -152,4 +185,8 @@ public class APICase extends ConsoleAPI<CaseItem>
         return new CaseDatastore(getEngineSession());
     }
 
+    @Override
+    public CaseItem update(final APIID id, final Map<String, String> attributes) {
+        return getCaseDatastore().update(id, attributes);
+    }
 }

@@ -13,17 +13,15 @@
  **/
 package org.bonitasoft.engine.command;
 
+import static org.bonitasoft.engine.commons.io.IOUtil.generateJar;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -62,13 +60,10 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test
     public void executeCommandWithParameters() throws BonitaException, IOException {
-        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/commands-jar.bak");
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
+        final byte[] byteArray = generateJar(IntegerCommand.class);
         getCommandAPI().addDependency("commands", byteArray);
         getCommandAPI().register("intReturn", "Retrieving the integer value",
-                "org.bonitasoft.engine.command.IntergerCommand");
+                "org.bonitasoft.engine.command.IntegerCommand");
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("int", 83);
         final Integer actual = (Integer) getCommandAPI().execute("intReturn", parameters);
@@ -79,10 +74,7 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test(expected = CommandParameterizationException.class)
     public void commandThrowsCommandParameterizationException() throws BonitaException, IOException {
-        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/commands-jar.bak");
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
+        final byte[] byteArray = generateJar(ParameterizationExceptionCommand.class);
         getCommandAPI().addDependency("commands", byteArray);
         getCommandAPI().register("except", "Throws ParameterizationException",
                 "org.bonitasoft.engine.command.ParameterizationExceptionCommand");
@@ -98,10 +90,7 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test(expected = CommandExecutionException.class)
     public void commandThrowsCommandExecutionException() throws BonitaException, IOException {
-        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/commands-jar.bak");
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
+        final byte[] byteArray = generateJar(ExecutionExceptionCommand.class);
         getCommandAPI().addDependency("commands", byteArray);
         getCommandAPI().register("except", "Throws ExecutionExceptionCommand",
                 "org.bonitasoft.engine.command.ExecutionExceptionCommand");
@@ -376,13 +365,10 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test
     public void executeCommandById() throws BonitaException, IOException {
-        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/commands-jar.bak");
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
+        final byte[] byteArray = generateJar(IntegerCommand.class);
         getCommandAPI().addDependency("commands", byteArray);
         final CommandDescriptor command = getCommandAPI()
-                .register("intReturn", "Retrieving the integer value", "org.bonitasoft.engine.command.IntergerCommand");
+                .register("intReturn", "Retrieving the integer value", "org.bonitasoft.engine.command.IntegerCommand");
 
         final CommandDescriptor commandById = getCommandAPI().get(command.getId());
         assertEquals(commandById.getId(), command.getId());
@@ -398,10 +384,7 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test(expected = BonitaRuntimeException.class)
     public void executeCommandThrowsANPE() throws BonitaException, IOException {
-        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/npe-command-jar.bak");
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
+        final byte[] byteArray = generateJar(NPECommand.class);
         getCommandAPI().addDependency("commands", byteArray);
         getCommandAPI().register("NPEReturns", "Throws a NPE", "org.bonitasoft.engine.command.NPECommand");
         try {

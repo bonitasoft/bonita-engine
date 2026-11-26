@@ -109,7 +109,7 @@ public class AlreadyLoggedInRuleTest {
     @Test
     public void testIfRuleAuthorizeAlreadyLoggedUserIfPlatform() throws Exception {
         doReturn("/API").when(httpServletRequest).getServletPath();
-        doReturn("/platform/tenant/unusedId").when(httpServletRequest).getPathInfo();
+        doReturn("/platform/license").when(httpServletRequest).getPathInfo();
         doReturn(mock(PlatformSession.class)).when(httpSession)
                 .getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
 

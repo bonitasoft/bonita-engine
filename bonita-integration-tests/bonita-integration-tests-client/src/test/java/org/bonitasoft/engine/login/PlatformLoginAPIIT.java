@@ -62,7 +62,7 @@ public class PlatformLoginAPIIT extends CommonAPIIT {
         // register and execute a command to delete a session
         platformCommandAPI.register(COMMAND_NAME, "Deletes a platform session based on its sessionId",
                 "org.bonitasoft.engine.command.DeletePlatformSessionCommand");
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("sessionId", sessionId);
         platformCommandAPI.execute(COMMAND_NAME, parameters);
         platformCommandAPI.unregister(COMMAND_NAME);

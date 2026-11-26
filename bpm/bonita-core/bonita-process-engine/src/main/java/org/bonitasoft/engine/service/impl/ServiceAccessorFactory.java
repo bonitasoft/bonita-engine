@@ -15,14 +15,11 @@ package org.bonitasoft.engine.service.impl;
 
 import java.io.IOException;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.service.APIAccessResolver;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
@@ -52,16 +49,6 @@ public class ServiceAccessorFactory {
         return getServiceAccessors().getServiceAccessor();
     }
 
-    /**
-     * @deprecated since 9.0.0, use {@link #createServiceAccessor()} instead
-     */
-    @Deprecated(forRemoval = true, since = "9.0.0")
-    public synchronized PlatformServiceAccessor createPlatformServiceAccessor()
-            throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
-            ReflectiveOperationException {
-        return getServiceAccessors().getPlatformServiceAccessor();
-    }
-
     private synchronized ServiceAccessors getServiceAccessors() throws BonitaHomeConfigurationException, IOException,
             ReflectiveOperationException {
         if (serviceAccessors == null) {
@@ -69,16 +56,6 @@ public class ServiceAccessorFactory {
                     .newInstance();
         }
         return serviceAccessors;
-    }
-
-    /**
-     * @deprecated since 9.0.0, use {@link #createServiceAccessor()} instead
-     */
-    @Deprecated(forRemoval = true, since = "9.0.0")
-    public TenantServiceAccessor createTenantServiceAccessor()
-            throws SBonitaException, BonitaHomeNotSetException, IOException,
-            BonitaHomeConfigurationException, ReflectiveOperationException {
-        return getServiceAccessors().getTenantServiceAccessor();
     }
 
     public SessionAccessor createSessionAccessor()

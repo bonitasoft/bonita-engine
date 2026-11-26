@@ -179,7 +179,7 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
     @Test
     public void assignUserTaskSeveralTimesByChangingLogin() throws Exception {
         // login as jack
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(JACK, "bpm");
 
         // assign
@@ -346,7 +346,7 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
 
     @Test
     public void shouldAssignUserTaskSeveralTimesByChangingLogin() throws Exception {
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(JACK, "bpm");
 
         getProcessAPI().assignUserTaskIfNotAssigned(step2.getId(), jack.getId());

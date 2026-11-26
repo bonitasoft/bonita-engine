@@ -15,6 +15,7 @@ package org.bonitasoft.engine.work;
 
 import java.util.concurrent.*;
 
+import org.bonitasoft.engine.mdc.MDCTransmitingThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,21 +27,19 @@ import org.springframework.stereotype.Component;
 public class WorkSingleThreadPoolExecutorFactory implements BonitaWorkExecutorFactory {
 
     private final int queueCapacity;
-    private final long tenantId;
 
-    public WorkSingleThreadPoolExecutorFactory(@Value("${tenantId}") long tenantId,
+    public WorkSingleThreadPoolExecutorFactory(
             @Value("${bonita.tenant.work.queueCapacity}") int queueCapacity) {
         this.queueCapacity = queueCapacity;
-        this.tenantId = tenantId;
     }
 
     @Override
     public ThreadPoolExecutor create() {
         return new SingleThreadPoolExecutor(new ArrayBlockingQueue<>(queueCapacity),
-                new WorkerThreadFactory("Bonita-Worker", tenantId));
+                new WorkerThreadFactory("Bonita-Worker"));
     }
 
-    public static class SingleThreadPoolExecutor extends ThreadPoolExecutor {
+    public static class SingleThreadPoolExecutor extends MDCTransmitingThreadPoolExecutor {
 
         public SingleThreadPoolExecutor(final BlockingQueue<Runnable> workQueue,
                 final ThreadFactory threadFactory) {

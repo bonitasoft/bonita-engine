@@ -59,7 +59,7 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         getTenantAdministrationAPI().pause();
         try {
             assertTrue(workService.isStopped());
-            logoutOnTenant();
+            logout();
 
             // clear logs before restarting the node
             systemOutRule.clearLog();
@@ -74,7 +74,7 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
             assertTrue(workService.isStopped());
         } finally {
             // cleanup
-            loginOnDefaultTenantWithDefaultTechnicalUser();
+            loginWithTechnicalUser();
             getTenantAdministrationAPI().resume();
 
             waitForProcessToFinish(processInstance);

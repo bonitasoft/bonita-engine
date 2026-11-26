@@ -26,11 +26,11 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class FullBonitaConfigurationRowMapper implements RowMapper<FullBonitaConfiguration> {
 
-    public static final String SELECT_CONFIGURATION = "SELECT tenant_id, content_type, resource_name, resource_content FROM configuration ORDER BY tenant_id, content_type, resource_name";
+    public static final String SELECT_CONFIGURATION = "SELECT content_type, resource_name, resource_content FROM configuration ORDER BY content_type, resource_name";
 
     @Override
     public FullBonitaConfiguration mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new FullBonitaConfiguration(rs.getString(RESOURCE_NAME), rs.getBytes(RESOURCE_CONTENT),
-                rs.getString(CONTENT_TYPE), rs.getLong(TENANT_ID));
+                rs.getString(CONTENT_TYPE));
     }
 }

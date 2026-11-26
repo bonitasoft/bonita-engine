@@ -877,10 +877,10 @@ public class ProcessInstanceQueriesTest {
                 pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "myMultiProcData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
                 .queryForObject(
-                        "SELECT TENANTID, ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, PROC_INST_ID, FN_INST_ID FROM ref_biz_data_inst WHERE proc_inst_id="
+                        "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, PROC_INST_ID, FN_INST_ID FROM ref_biz_data_inst WHERE proc_inst_id="
                                 + PROCESS_INSTANCE_ID
                                 + " AND name='myMultiProcData'",
-                        new JdbcRowMapper("TENANTID", "ID", "DATA_ID", "PROC_INST_ID", "FN_INST_ID"));
+                        new JdbcRowMapper("ID", "DATA_ID", "PROC_INST_ID", "FN_INST_ID"));
         List<Map<String, Object>> dataIds = jdbcTemplate.query(
                 "SELECT ID, IDX, DATA_ID FROM multi_biz_data WHERE id=" + multiRefBusinessDataInstance.getId(),
                 new JdbcRowMapper("ID", "IDX", "DATA_ID"));
@@ -889,7 +889,6 @@ public class ProcessInstanceQueriesTest {
                 .isEqualTo(Arrays.asList(23L, 25L, 27L));
         assertThat(multiRefBusinessData).isEqualTo(multiRefBusinessDataInstance);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", multiRefBusinessDataInstance.getId()),
                 entry("KIND", "proc_multi_ref"),
                 entry("NAME", "myMultiProcData"),

@@ -93,7 +93,7 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Test
     public void createCategoryWithCreatorAsAnID() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final Category category = getProcessAPI().createCategory(name, description);

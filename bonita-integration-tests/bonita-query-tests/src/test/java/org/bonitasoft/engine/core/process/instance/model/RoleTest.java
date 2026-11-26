@@ -37,8 +37,8 @@ public class RoleTest {
 
     @Test
     public void should_get_role_by_name() {
-        repository.add(aRole().forTenant(1L).forRoleId(10L).forRoleName("MyRole10").build());
-        repository.add(aRole().forTenant(1L).forRoleId(11L).forRoleName("MyRole11").build());
+        repository.add(aRole().forRoleId(10L).forRoleName("MyRole10").build());
+        repository.add(aRole().forRoleId(11L).forRoleName("MyRole11").build());
 
         assertThat(repository.getRoleByName("MyRole10").getId()).isEqualTo(10L);
         assertThat(repository.getRoleByName("MyRole11").getId()).isEqualTo(11L);

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.execution.work;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -58,7 +58,8 @@ public class NotifyChildFinishedWorkTest {
     @Before
     public void before() throws SClassLoaderException {
         doReturn(this.getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
-        context = Collections.singletonMap(TenantAwareBonitaWork.SERVICE_ACCESSOR, serviceAccessor);
+        context = new HashMap<>();
+        context.put(TenantAwareBonitaWork.SERVICE_ACCESSOR, serviceAccessor);
 
         doReturn(classLoaderService).when(serviceAccessor).getClassLoaderService();
         doReturn(flowNodeInstanceService).when(serviceAccessor).getActivityInstanceService();

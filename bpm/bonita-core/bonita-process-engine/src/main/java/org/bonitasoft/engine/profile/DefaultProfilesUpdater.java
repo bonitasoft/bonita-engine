@@ -23,11 +23,9 @@ import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.session.SessionService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -41,12 +39,9 @@ import org.springframework.stereotype.Component;
 public class DefaultProfilesUpdater implements TenantLifecycleService {
 
     private final ProfilesImporter profilesImporter;
-    private final Long tenantId;
 
-    public DefaultProfilesUpdater(@Value("${tenantId}") Long tenantId,
-            ProfilesImporter profilesImporter) {
+    public DefaultProfilesUpdater(ProfilesImporter profilesImporter) {
         this.profilesImporter = profilesImporter;
-        this.tenantId = tenantId;
     }
 
     @Override
@@ -93,7 +88,7 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
         try {
             final List<ImportStatus> importStatuses = profilesImporter.importProfiles(defaultProfiles,
                     ImportPolicy.UPDATE_DEFAULTS, SessionService.SYSTEM_ID);
-            log.info("Updated default profiles " + importStatuses);
+            log.info("Updated default profiles {}", importStatuses);
             if (md5File != null) { // but may not exist
                 IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
             }
@@ -102,8 +97,8 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
         }
     }
 
-    File getProfilesMD5File() throws BonitaHomeNotSetException, IOException {
-        return ProfilesImporter.getFileContainingMD5(tenantId);
+    File getProfilesMD5File() throws IOException {
+        return ProfilesImporter.getFileContainingMD5();
     }
 
     /**

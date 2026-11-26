@@ -54,8 +54,8 @@ public class TemporaryContentServiceImpl implements TemporaryContentService {
     public String add(String fileName, InputStream content, String mimeType)
             throws SRecorderException, IOException, SPersistenceException {
         Blob data = BlobProxy.generateProxy(content, content.available());
-        STemporaryContent temporaryContent = new STemporaryContent(fileName, data, mimeType);
-        platformPersistenceService.insert(temporaryContent);
+        STemporaryContent temporaryContent = platformPersistenceService
+                .insert(new STemporaryContent(fileName, data, mimeType));
         return temporaryContent.getKey();
     }
 

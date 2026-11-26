@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.archive;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -23,19 +22,15 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 @Data
 @NoArgsConstructor
 @Entity
-@IdClass(PersistentObjectId.class)
 @Table(name = "arch_process_instance")
 public class SAProcessInstance implements ArchivedPersistentObject {
 
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private long archiveDate;
     private long sourceObjectId;
     private String name;

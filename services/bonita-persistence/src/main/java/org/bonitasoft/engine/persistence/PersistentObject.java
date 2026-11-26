@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,15 +16,14 @@ package org.bonitasoft.engine.persistence;
 import java.io.Serializable;
 
 /**
- * @author Charles Souillard
- * @author Matthieu Chaffotte
+ * Interface for all {@link PersistentObject}.
+ *
+ * @author Emmanuel Duchastenier
  */
 public interface PersistentObject extends Serializable {
 
     long getId();
 
     void setId(long id);
-
-    void setTenantId(long id);
 
 }

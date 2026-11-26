@@ -13,14 +13,12 @@
  **/
 package org.bonitasoft.engine.platform;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
+@Getter
 @Component
 public class PlatformStateProvider {
-
-    private static Logger logger = LoggerFactory.getLogger(PlatformStateProvider.class);
 
     private PlatformState state = PlatformState.STOPPED;
 
@@ -29,10 +27,6 @@ public class PlatformStateProvider {
 
     PlatformStateProvider(PlatformState state) {
         this.state = state;
-    }
-
-    public PlatformState getState() {
-        return state;
     }
 
     /**

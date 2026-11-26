@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.web.rest.server.api.system;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpSession;
@@ -25,17 +27,17 @@ import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.maintenance.impl.MaintenanceDetailsImpl;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.system.MaintenanceDetailsClient;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-@RunWith(MockitoJUnitRunner.class)
-public class MaintenanceControllerTest {
+@ExtendWith(MockitoExtension.class)
+class MaintenanceControllerTest {
 
     @Mock
     private HttpSession session;
@@ -186,19 +188,19 @@ public class MaintenanceControllerTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> maintenanceController.getApiSession(session));
         //then
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
+        assertThat(exception.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
         //when
         exception = assertThrows(ResponseStatusException.class,
                 () -> maintenanceController.getMaintenanceDetails(session));
         //then
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
+        assertThat(exception.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
         //when
         exception = assertThrows(ResponseStatusException.class,
                 () -> maintenanceController.changeMaintenanceState(null, session));
         //then
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
+        assertThat(exception.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test

@@ -38,10 +38,8 @@ public class SelectRange {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof SelectRange))
+        if (!(o instanceof SelectRange that))
             return false;
-
-        SelectRange that = (SelectRange) o;
 
         if (maxResults != that.maxResults)
             return false;

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.execution.work.failurewrapping;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.ExceptionContext;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -28,7 +28,9 @@ public class ConnectorDefinitionAndInstanceContextWork extends TxInHandleFailure
 
     private static final long serialVersionUID = 6958842321501639910L;
 
-    private final String connectorDefinitionName;
+    private final String connectorDefinitionId;
+
+    private final String connectorName;
 
     private final ConnectorEvent activationEvent;
 
@@ -37,37 +39,31 @@ public class ConnectorDefinitionAndInstanceContextWork extends TxInHandleFailure
     /**
      * @param wrappedWork
      *        The work to wrap
-     * @param connectorDefinitionName
+     * @param connectorDefinitionId
      *        The name of the connector definition
-     * @param connectorInstanceId
-     *        The identifier of the connector instance
-     */
-    public ConnectorDefinitionAndInstanceContextWork(final BonitaWork wrappedWork, final String connectorDefinitionName,
-            final long connectorInstanceId) {
-        this(wrappedWork, connectorDefinitionName, connectorInstanceId, null);
-    }
-
-    /**
-     * @param wrappedWork
-     *        The work to wrap
-     * @param connectorDefinitionName
-     *        The name of the connector definition
+     * @param connectorName
+     *        The name of the connector
      * @param connectorInstanceId
      *        The identifier of the connector instance
      * @param activationEvent
      *        The event to activate the connector
      */
-    public ConnectorDefinitionAndInstanceContextWork(final BonitaWork wrappedWork, final String connectorDefinitionName,
+    public ConnectorDefinitionAndInstanceContextWork(final BonitaWork wrappedWork,
+            final String connectorDefinitionId,
+            final String connectorName,
             long connectorInstanceId, final ConnectorEvent activationEvent) {
         super(wrappedWork);
-        this.connectorDefinitionName = connectorDefinitionName;
+        this.connectorDefinitionId = connectorDefinitionId;
+        this.connectorName = connectorName;
         this.activationEvent = activationEvent;
         this.connectorInstanceId = connectorInstanceId;
     }
 
     @Override
-    protected void setExceptionContext(final SBonitaException e, final Map<String, Object> context) {
-        e.setConnectorImplementationClassNameOnContext(connectorDefinitionName);
+    protected void setExceptionContext(final ExceptionContext e, final Map<String, Object> context) {
+        e.setConnectorImplementationClassNameOnContext(connectorName);
+        e.setConnectorNameOnContext(connectorName);
+        e.setConnectorDefinitionIdOnContext(connectorDefinitionId);
         e.setConnectorInstanceIdOnContext(connectorInstanceId);
         if (activationEvent != null) {
             e.setConnectorActivationEventOnContext(activationEvent.name());

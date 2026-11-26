@@ -28,7 +28,7 @@ public class ApplicationPageRelatedMenusFilterBuilderTest {
     public static final int MAX_RESULTS = 10;
 
     @Test
-    public void buildQueryOptions_should_filter_on_applicationPageId() throws Exception {
+    public void buildQueryOptions_should_filter_on_applicationPageId() {
         //given
         long applicationPageId = 2L;
         ApplicationPageRelatedMenusFilterBuilder builder = new ApplicationPageRelatedMenusFilterBuilder(

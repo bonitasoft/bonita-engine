@@ -35,7 +35,7 @@ class ChangesServicesStateCallable implements Callable<Void>, Serializable {
         ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
         TenantServicesManager tenantServicesManager = serviceAccessor.getTenantServicesManager();
         TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
-        return tenantStateManager.executeTenantManagementOperation(
+        return tenantStateManager.executeManagementOperation(
                 "Executing received " + action.name().toLowerCase() + " operation", () -> {
                     switch (action) {
                         case START:

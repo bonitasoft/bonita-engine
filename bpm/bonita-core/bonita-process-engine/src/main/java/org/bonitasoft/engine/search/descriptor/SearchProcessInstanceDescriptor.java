@@ -60,6 +60,8 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(STATE_ID, new FieldDescriptor(SProcessInstance.class, SProcessInstance.STATE_ID_KEY));
         searchEntityKeys.put(STATE_NAME, new FieldDescriptor(SProcessInstance.class, SProcessInstance.STATE_ID_KEY));
         searchEntityKeys.put(ID, new FieldDescriptor(SProcessInstance.class, SProcessInstance.ID_KEY));
+        searchEntityKeys.put(ROOT_PROCESS_INSTANCE_ID, new FieldDescriptor(SProcessInstance.class,
+                SProcessInstance.ROOT_PROCESS_INSTANCE_ID_KEY));
         searchEntityKeys.put(STARTED_BY,
                 new FieldDescriptor(SProcessInstance.class, SProcessInstance.STARTED_BY_KEY));
         searchEntityKeys.put(CALLER_ID, new FieldDescriptor(SProcessInstance.class, SProcessInstance.CALLER_ID));

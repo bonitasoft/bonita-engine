@@ -36,7 +36,11 @@ import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformState;
@@ -45,7 +49,11 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.session.*;
+import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.InvalidSessionException;
+import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.session.Session;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -69,9 +77,9 @@ public class ServerAPIImplTest {
 
     private static final long TENANT_SESSION_ID = 54335453241L;
     private static final long PLATFORM_SESSION_ID = 54335453241L;
-    private APISession tenantSession = new APISessionImpl(TENANT_SESSION_ID, new Date(), 10000, "john", 14L,
-            "theTenant", 42L);
-    private PlatformSession platformSession = new PlatformSessionImpl(PLATFORM_SESSION_ID, new Date(), 10000, "john",
+    private final APISession tenantSession = new APISessionImpl(TENANT_SESSION_ID, new Date(), 10000, "john", 14L);
+    private final PlatformSession platformSession = new PlatformSessionImpl(PLATFORM_SESSION_ID, new Date(), 10000,
+            "john",
             14L);
     @Mock
     private SessionAccessor sessionAccessor;
@@ -100,9 +108,9 @@ public class ServerAPIImplTest {
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     private ServerAPIImpl serverAPIImpl;
-    private MyApiImplementation myApi = new MyApiImplementation();
-    private MyApiWithNoSessionImpl myApiWithNoSession = new MyApiWithNoSessionImpl();
-    private ApiFullyAccessibleWhenMaintenanceModeIsEnabledImpl myApiFullyAccessibleWhenMaintenanceModeIsEnabled = new ApiFullyAccessibleWhenMaintenanceModeIsEnabledImpl();
+    private final MyApiImplementation myApi = new MyApiImplementation();
+    private final MyApiWithNoSessionImpl myApiWithNoSession = new MyApiWithNoSessionImpl();
+    private final ApiFullyAccessibleWhenMaintenanceModeIsEnabledImpl myApiFullyAccessibleWhenMaintenanceModeIsEnabled = new ApiFullyAccessibleWhenMaintenanceModeIsEnabledImpl();
     private APIAccessResolver accessResolver;
     @Mock
     private PlatformAPI platformApi;
@@ -132,7 +140,7 @@ public class ServerAPIImplTest {
         doReturn(true).when(platformLoginService).isValid(PLATFORM_SESSION_ID);
         doAnswer(invocation -> (isMaintenanceEnabled ? MaintenanceDetails.State.ENABLED
                 : MaintenanceDetails.State.DISABLED))
-                        .when(maintenanceDetails).getMaintenanceState();
+                .when(maintenanceDetails).getMaintenanceState();
         doAnswer(invocation -> maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
         accessResolver = new APIAccessResolver() {

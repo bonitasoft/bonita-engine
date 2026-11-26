@@ -22,8 +22,6 @@ public interface BonitaJobListener extends Serializable {
 
     String JOB_DESCRIPTOR_ID = "jobDescriptorId";
 
-    String TENANT_ID = "tenantId";
-
     String JOB_TYPE = "jobType";
 
     String JOB_NAME = "jobName";
@@ -44,9 +42,9 @@ public interface BonitaJobListener extends Serializable {
 
     String JOB_RESULT = "jobResult";
 
-    void jobToBeExecuted(Map<String, Serializable> context);
+    void jobToBeExecuted();
 
-    void jobExecutionVetoed(Map<String, Serializable> Context);
+    void jobExecutionVetoed();
 
     void jobWasExecuted(Map<String, Serializable> context, Exception jobException);
 

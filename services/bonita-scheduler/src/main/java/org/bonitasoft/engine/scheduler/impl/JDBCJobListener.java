@@ -41,20 +41,20 @@ public class JDBCJobListener implements BonitaJobListener {
     }
 
     @Override
-    public void jobToBeExecuted(final Map<String, Serializable> context) {
+    public void jobToBeExecuted() {
         // nothing to do
     }
 
     @Override
-    public void jobExecutionVetoed(final Map<String, Serializable> context) {
+    public void jobExecutionVetoed() {
         // nothing to do
     }
 
     @Override
     public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         if (jobException != null) {
-            if (jobException instanceof JobExecutionException
-                    && ((JobExecutionException) jobException).refireImmediately()) {
+            if (jobException instanceof JobExecutionException jobExecutionException
+                    && jobExecutionException.refireImmediately()) {
                 log.debug("An exception occurs during the job execution but it will be retried.", jobException);
             } else {
                 log.warn("An exception occurs during the job execution.", jobException);
@@ -76,8 +76,7 @@ public class JDBCJobListener implements BonitaJobListener {
     private void deleteJobDescriptor(Map<String, Serializable> context, Long jobDescriptorId) {
         try {
             //delete job only if there is no other trigger
-            boolean mayFireAgain = schedulerService.mayFireAgain(((String) context.get(JOB_GROUP)),
-                    ((String) context.get(JOB_NAME)));
+            boolean mayFireAgain = schedulerService.mayFireAgain((String) context.get(JOB_NAME));
 
             log.debug("{} job descriptor of job {} because it may {}fire again.",
                     mayFireAgain ? "Keeping" : "Deleting", context.get(JOB_NAME), mayFireAgain ? "" : "not ");

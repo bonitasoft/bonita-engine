@@ -42,12 +42,12 @@ public class DocumentQueryTest {
     public void getLightDocument_should_read_previously_saved_document() {
         // given
         repository.add(
-                SLightDocument.builder().id(99L).tenantId(3L).author(11L).hasContent(true).fileName("myFile.pdf")
+                SLightDocument.builder().id(99L).author(11L).hasContent(true).fileName("myFile.pdf")
                         .mimeType("application/pdf").author(22L)
                         .build());
 
         //when
-        final SLightDocument document = repository.getById(SLightDocument.class, 99L, 3L);
+        final SLightDocument document = repository.getById(SLightDocument.class, 99L);
 
         // //then
         assertThat(document.getFileName()).isEqualTo("myFile.pdf");
@@ -60,12 +60,12 @@ public class DocumentQueryTest {
         // given
         final byte[] binaryDocContent = "someBinaryContent".getBytes();
         repository.add(
-                SDocument.builder().id(666L).tenantId(2L).hasContent(true).fileName("myFile.pdf")
+                SDocument.builder().id(666L).hasContent(true).fileName("myFile.pdf")
                         .mimeType("application/pdf").content(binaryDocContent)
                         .build());
 
         //when
-        final SDocument document = repository.getById(SDocument.class, 666L, 2L);
+        final SDocument document = repository.getById(SDocument.class, 666L);
 
         // //then
         assertThat(document.getFileName()).isEqualTo("myFile.pdf");
@@ -76,13 +76,13 @@ public class DocumentQueryTest {
     @Test
     public void getDocumentMapping_should_retrieve_previously_saved_document_mapping() {
         // given:
-        repository.add(SDocumentMapping.builder().id(14L).tenantId(4L)
+        repository.add(SDocumentMapping.builder().id(14L)
                 .name("myDocMapping").description("doc mapping description").documentId(111L)
                 .index(9).processInstanceId(987987987987L).version("2.0")
                 .build());
 
         // when:
-        SDocumentMapping documentMapping = repository.getById(SDocumentMapping.class, 14L, 4L);
+        SDocumentMapping documentMapping = repository.getById(SDocumentMapping.class, 14L);
 
         // then:
         assertThat(documentMapping.getName()).isEqualTo("myDocMapping");
@@ -97,11 +97,11 @@ public class DocumentQueryTest {
     public void getSMappedDocumentOfProcessWithName_should_retrieve_previously_saved_mapped_document() {
         // given:
         final SLightDocument docContent = SLightDocument.builder()
-                .id(666L).tenantId(1L).hasContent(true).fileName("myFile.pdf").mimeType("application/pdf")
+                .id(666L).hasContent(true).fileName("myFile.pdf").mimeType("application/pdf")
                 .build();
 
         repository.add(docContent);
-        repository.add(SMappedDocument.builder().id(14L).tenantId(1L)
+        repository.add(SMappedDocument.builder().id(14L)
                 .name("myMappedDocument").description("doc desc")
                 .index(-1).processInstanceId(444888444488844L).version("1.7")
                 .document(docContent)
@@ -125,11 +125,11 @@ public class DocumentQueryTest {
     public void getSAMappedDocumentOfProcessWithName_should_retrieve_previously_saved_archived_mapped_document() {
         // given:
         final SLightDocument docContent = SLightDocument.builder()
-                .id(915L).tenantId(1L).hasContent(true).fileName("myFile.txt").mimeType("test/plain")
+                .id(915L).hasContent(true).fileName("myFile.txt").mimeType("test/plain")
                 .build();
 
         repository.add(docContent);
-        repository.add(SAMappedDocument.builder().id(32L).tenantId(1L)
+        repository.add(SAMappedDocument.builder().id(32L)
                 .name("archivedMappedDoc").description("doc desc")
                 .index(-1).processInstanceId(PROCESS_INSTANCE_ID).version("1.7")
                 .document(docContent)

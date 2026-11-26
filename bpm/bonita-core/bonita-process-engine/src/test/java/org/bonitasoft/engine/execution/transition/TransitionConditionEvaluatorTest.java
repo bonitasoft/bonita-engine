@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.execution.transition;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -75,7 +75,7 @@ public class TransitionConditionEvaluatorTest {
     }
 
     @Test
-    public void evaluateCondition_should_throw_SExpressionEvaluationException_when_expression_return_type_is_not_a_boolean()
+    public void evaluateCondition_should_throw_STransitionConditionEvaluationException_when_expression_return_type_is_not_a_boolean()
             throws Exception {
         //given
         SExpression condition = mock(SExpression.class);
@@ -84,19 +84,17 @@ public class TransitionConditionEvaluatorTest {
         STransitionDefinitionImpl transition = new STransitionDefinitionImpl("t1");
         transition.setCondition(condition);
 
-        try {
-            //when
+        var exception = assertThrows(STransitionConditionEvaluationException.class, () -> {
             evaluator.evaluateCondition(transition, context);
-            fail("Exception expected");
-        } catch (SExpressionEvaluationException e) {
-            //then
-            assertThat(e.getMessage())
-                    .isEqualTo("Condition expression must return a boolean, on transition: " + transition.getName());
-            assertThat(e.getExpressionName()).isEqualTo("isTrue");
+        });
 
-            verifyNoInteractions(expressionResolverService);
-        }
+        //then
+        assertThat(exception).hasMessage("TRANSITION_NAME=t1 | Condition expression must return a boolean");
+        assertThat(exception.getCause()).isInstanceOf(SExpressionEvaluationException.class);
+        var cause = (SExpressionEvaluationException) exception.getCause();
+        assertThat(cause.getExpressionName()).isEqualTo("isTrue");
 
+        verifyNoInteractions(expressionResolverService);
     }
 
     private SExpression buildBooleanExpression(boolean value) {

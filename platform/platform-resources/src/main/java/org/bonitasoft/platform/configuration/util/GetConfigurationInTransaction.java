@@ -30,31 +30,27 @@ import org.springframework.transaction.support.TransactionCallback;
 public class GetConfigurationInTransaction implements TransactionCallback<BonitaConfiguration> {
 
     private final JdbcTemplate jdbcTemplate;
-    private final long tenantId;
     private final ConfigurationType type;
     private final String resourceName;
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
-    public GetConfigurationInTransaction(JdbcTemplate jdbcTemplate, long tenantId, ConfigurationType type,
-            String resourceName) {
+    public GetConfigurationInTransaction(JdbcTemplate jdbcTemplate, ConfigurationType type, String resourceName) {
         this.jdbcTemplate = jdbcTemplate;
-        this.tenantId = tenantId;
         this.type = type;
         this.resourceName = resourceName;
     }
 
     @Override
     public BonitaConfiguration doInTransaction(TransactionStatus status) {
-        LOGGER.debug("get configurations for type:" + type.name() + " resource:" + resourceName + " and tenant id:"
-                + tenantId);
+        LOGGER.debug("get configurations for type:{} resource:{}", type.name(), resourceName);
 
         final List<BonitaConfiguration> bonitaConfigurations = jdbcTemplate.query(
                 BonitaConfigurationRowMapper.SELECT_CONFIGURATION,
-                new Object[] { tenantId, type.name(), resourceName },
+                new Object[] { type.name(), resourceName },
                 new BonitaConfigurationRowMapper());
 
-        LOGGER.debug("configurations found:" + bonitaConfigurations);
+        LOGGER.debug("configurations found:{}", bonitaConfigurations);
 
         if (bonitaConfigurations.size() == 1) {
             return bonitaConfigurations.get(0);

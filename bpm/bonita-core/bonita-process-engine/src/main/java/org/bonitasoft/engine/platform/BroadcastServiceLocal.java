@@ -40,12 +40,7 @@ public class BroadcastServiceLocal implements BroadcastService {
     }
 
     @Override
-    public <T> Future<Map<String, TaskResult<T>>> executeOnOthers(Callable<T> callable, Long tenantId) {
-        return CompletableFuture.completedFuture(Collections.emptyMap());
-    }
-
-    @Override
-    public <T> Map<String, TaskResult<T>> executeOnOthersAndWait(Callable<T> callable, Long tenantId) {
+    public <T> Map<String, TaskResult<T>> executeOnOthersAndWait(Callable<T> callable) {
         return Collections.emptyMap();
     }
 }

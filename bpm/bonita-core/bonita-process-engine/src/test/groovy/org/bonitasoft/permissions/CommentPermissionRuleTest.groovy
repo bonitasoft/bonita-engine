@@ -198,7 +198,6 @@ public class CommentPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         Assertions.assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -258,6 +257,5 @@ public class CommentPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         Assertions.assertThat(isAuthorized).isTrue()
-
     }
 }

@@ -36,7 +36,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class SessionServiceImplTest {
 
     private static final long SESSION_ID = 1258L;
-    private static final long TENANT_ID = 2L;
     private static final String USER_NAME = "john";
     private static final long USER_ID = 58L;
 
@@ -52,7 +51,7 @@ public class SessionServiceImplTest {
 
     @Before
     public void setUp() {
-        sSession = SSession.builder().id(SESSION_ID).tenantId(TENANT_ID).userName(USER_NAME).userId(USER_ID).build();
+        sSession = SSession.builder().id(SESSION_ID).userName(USER_NAME).userId(USER_ID).build();
     }
 
     /**
@@ -90,15 +89,15 @@ public class SessionServiceImplTest {
     }
 
     @Test
-    public final void deleteSessionsOfTenant() {
-        sessionServiceImpl.deleteSessionsOfTenant(12L);
-        verify(sessionProvider, times(1)).deleteSessionsOfTenant(12L, false);
+    public final void deleteAllSessions() {
+        sessionServiceImpl.deleteAllSessions();
+        verify(sessionProvider, times(1)).deleteSessions(false);
     }
 
     @Test
-    public final void deleteSessionsOfTenantExceptTechnicalUser() {
-        sessionServiceImpl.deleteSessionsOfTenantExceptTechnicalUser(12L);
-        verify(sessionProvider, times(1)).deleteSessionsOfTenant(12L, true);
+    public final void deleteSessionsExceptTechnicalUser() {
+        sessionServiceImpl.deleteSessionsExceptTechnicalUser();
+        verify(sessionProvider, times(1)).deleteSessions(true);
     }
 
     @Test

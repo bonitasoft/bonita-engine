@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
@@ -76,17 +75,16 @@ public class SecuredLoginServiceImpl implements LoginService {
     public SSession login(final Map<String, Serializable> credentials) throws SLoginException, SUserNotFoundException {
         debugLog("Logging in");
         checkNull(credentials);
-        Long tenantId = extractTenant(credentials);
         if (isTechnicalUser(credentials)) {
             debugLog("Authenticated as technical user");
-            return createSession(tenantId, extractUserName(credentials), -1L, true);
+            return createSession(extractUserName(credentials), -1L, true);
         }
         String userName = verifyCredentials(credentials);
         checkIsNotBlank(userName);
         debugLog("Authenticated as regular user");
         SUser user = getUser(userName);
         checkIsEnabled(user);
-        SSession session = createSession(tenantId, userName, user.getId(), false);
+        SSession session = createSession(userName, user.getId(), false);
         updateLastConnectionDate(user);
         return session;
     }
@@ -99,23 +97,19 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
     }
 
-    private long extractTenant(Map<String, Serializable> credentials) {
-        return NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), -1);
-    }
-
     private void checkNull(Map<String, Serializable> credentials) throws SLoginException {
         if (credentials == null) {
             throw new SLoginException("invalid credentials, map is null");
         }
     }
 
-    private SSession createSession(Long tenantId, String userName, long id, boolean isTechnicalUser)
+    private SSession createSession(String userName, long id, boolean isTechnicalUser)
             throws SLoginException {
         try {
             List<SProfile> profilesOfUser = profileService.getProfilesOfUser(id);
             List<String> profiles = profilesOfUser.stream().map(SProfile::getName).collect(Collectors.toList());
             Set<String> permissions = permissionsBuilder.getPermissions(isTechnicalUser, profiles, userName);
-            return sessionService.createSession(tenantId, id, userName, isTechnicalUser, profiles, permissions);
+            return sessionService.createSession(id, userName, isTechnicalUser, profiles, permissions);
         } catch (SSessionException | SBonitaReadException e) {
             throw new SLoginException(e);
         }

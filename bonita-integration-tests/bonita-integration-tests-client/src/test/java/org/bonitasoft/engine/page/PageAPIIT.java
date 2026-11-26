@@ -72,7 +72,7 @@ public class PageAPIIT extends CommonAPIIT {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         final SearchResult<Page> searchPages = getPageAPI()
                 .searchPages(new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         for (final Page page : searchPages.getResult()) {
@@ -84,7 +84,7 @@ public class PageAPIIT extends CommonAPIIT {
 
     @After
     public void after() throws Exception {
-        logoutOnTenant();
+        logout();
     }
 
     @Test
@@ -136,7 +136,7 @@ public class PageAPIIT extends CommonAPIIT {
         final User john = createUser("john", "bpm");
         final User jack = createUser("jack", "bpm");
 
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("john", "bpm");
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
@@ -146,7 +146,7 @@ public class PageAPIIT extends CommonAPIIT {
         Thread.sleep(10);
         assertThat(pageBeforeUpdate.getInstalledBy()).isEqualTo(john.getId());
         assertThat(pageBeforeUpdate.getLastUpdatedBy()).isEqualTo(john.getId());
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("jack", "bpm");
         // when
         final PageUpdater pageUpdater = new PageUpdater();
@@ -178,8 +178,8 @@ public class PageAPIIT extends CommonAPIIT {
         assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated")
                 .isAfter(pageBeforeUpdate.getLastModificationDate());
 
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
         deleteUser(john);
         deleteUser(jack);
 
@@ -704,7 +704,7 @@ public class PageAPIIT extends CommonAPIIT {
         final Page apiExtension = getPageAPI().createPage(apiExtensionName, apiExtensionContent1);
 
         // need to log back in to actualize permissions:
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith("jack", "bpm");
 
         // Check that we are not authorized before update of the page properties content:
@@ -737,8 +737,8 @@ public class PageAPIIT extends CommonAPIIT {
         assertThat(getPermissionAPI().isAuthorized(apiCallContext)).isFalse();
 
         //cleanup
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        logout();
+        loginWithTechnicalUser();
         deleteUser(jack);
     }
 

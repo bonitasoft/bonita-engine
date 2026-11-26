@@ -233,8 +233,8 @@ class SanitizerFilterTest {
                 .startsWith(
                         "{\"key\":\"<p><a href=\\\"https://documentation.bonitasoft.com/bonita/latest/\\\" rel=\\\"")
                 .endsWith("\\\">link text</a></p>\"}")
-                .contains("noopener")
                 .contains("noreferrer")
+                .contains("noopener")
                 .contains("nofollow");
     }
 

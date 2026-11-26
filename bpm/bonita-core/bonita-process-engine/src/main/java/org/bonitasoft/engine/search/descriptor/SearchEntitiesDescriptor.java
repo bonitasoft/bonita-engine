@@ -43,8 +43,6 @@ public class SearchEntitiesDescriptor {
 
     private final SearchDocumentDescriptor searchDocumentDescriptor;
 
-    private final SearchEntityMemberUserDescriptor searchEntityMemberUserDescriptor;
-
     private final SearchArchivedDocumentDescriptor searchArchivedDocumentDescriptor;
 
     private final SearchActivityInstanceDescriptor searchActivityInstanceDescriptor;
@@ -100,7 +98,6 @@ public class SearchEntitiesDescriptor {
         searchCommentDescriptor = new SearchCommentDescriptor();
         searchConnectorInstanceDescriptor = new SearchConnectorInstanceDescriptor();
         searchDocumentDescriptor = new SearchDocumentDescriptor();
-        searchEntityMemberUserDescriptor = new SearchEntityMemberUserDescriptor();
         searchArchivedDocumentDescriptor = new SearchArchivedDocumentDescriptor();
         searchActivityInstanceDescriptor = new SearchActivityInstanceDescriptor();
         searchArchivedActivityInstanceDescriptor = new SearchArchivedActivityInstanceDescriptor();
@@ -165,10 +162,6 @@ public class SearchEntitiesDescriptor {
 
     public SearchDocumentDescriptor getSearchDocumentDescriptor() {
         return searchDocumentDescriptor;
-    }
-
-    public SearchEntityMemberUserDescriptor getSearchEntityMemberUserDescriptor() {
-        return searchEntityMemberUserDescriptor;
     }
 
     public SearchArchivedDocumentDescriptor getSearchArchivedDocumentDescriptor() {

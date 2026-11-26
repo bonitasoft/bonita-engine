@@ -222,11 +222,10 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ArchivedFlowNodeInstanceImpl))
+        if (!(o instanceof ArchivedFlowNodeInstanceImpl that))
             return false;
         if (!super.equals(o))
             return false;
-        ArchivedFlowNodeInstanceImpl that = (ArchivedFlowNodeInstanceImpl) o;
         return Objects.equals(parentContainerId, that.parentContainerId) &&
                 Objects.equals(rootContainerId, that.rootContainerId) &&
                 Objects.equals(processDefinitionId, that.processDefinitionId) &&

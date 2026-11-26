@@ -64,7 +64,7 @@ public class IconServiceImplTest {
 
     @Test
     public void should_replace_existing_icon() throws Exception {
-        SIcon previousIcon = new SIcon(1L, 42L, "image/jpeg", new byte[] { 1, 2, 3 });
+        SIcon previousIcon = new SIcon(42L, "image/jpeg", new byte[] { 1, 2, 3 });
         doReturn(previousIcon).when(persistenceService)
                 .selectById(new SelectByIdDescriptor<>(SIcon.class, 42L));
 
@@ -91,7 +91,7 @@ public class IconServiceImplTest {
 
     @Test
     public void should_remove_existing_icon() throws Exception {
-        SIcon previousIcon = new SIcon(1L, 42L, "image/jpeg", new byte[] { 1, 2, 3 });
+        SIcon previousIcon = new SIcon(42L, "image/jpeg", new byte[] { 1, 2, 3 });
         doReturn(previousIcon).when(persistenceService)
                 .selectById(new SelectByIdDescriptor<>(SIcon.class, 42L));
 
@@ -104,7 +104,7 @@ public class IconServiceImplTest {
 
     @Test
     public void should_delete_icon_when_it_exists() throws Exception {
-        doReturn(new SIcon(1L, 42L, "image/jpeg", new byte[] { 1, 2, 3 })).when(persistenceService)
+        doReturn(new SIcon(42L, "image/jpeg", new byte[] { 1, 2, 3 })).when(persistenceService)
                 .selectById(new SelectByIdDescriptor<>(SIcon.class, 42L));
 
         iconService.deleteIcon(42L);

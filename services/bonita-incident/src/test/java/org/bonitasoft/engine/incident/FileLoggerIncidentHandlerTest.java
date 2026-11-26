@@ -66,9 +66,9 @@ public class FileLoggerIncidentHandlerTest {
         FileLoggerIncidentHandler fileLoggerIncidentHandler = new FileLoggerIncidentHandler();
 
         //When
-        fileLoggerIncidentHandler.handle(tenantId, incident);
+        fileLoggerIncidentHandler.handle(incident);
 
-        String expectedDescription = "An incident on tenant id 1 occurred: " + description;
+        String expectedDescription = "An incident occurred: " + description;
         String expectedRecoveryProcedureMessage = "Procedure to recover: " + recovery;
 
         // as defined in logback.xml all logs are logged in system out, so we check that incidents are also logged to the console.

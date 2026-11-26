@@ -35,9 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { PermissionServiceConfigurationTest.TestConfiguration.class })
-@TestPropertySource(properties = {
-        "tenantId=1",
-        "bonita.runtime.authorization.dynamic-check.enabled=false" })
+@TestPropertySource(properties = { "bonita.runtime.authorization.dynamic-check.enabled=false" })
 public class PermissionServiceConfigurationTest {
 
     @Autowired

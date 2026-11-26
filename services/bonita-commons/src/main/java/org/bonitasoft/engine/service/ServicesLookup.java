@@ -28,20 +28,6 @@ public interface ServicesLookup {
      * @return
      *         the service
      */
-    <T> T lookupOnPlatform(String serviceName);
-
-    /**
-     * lookup for a service on the tenant
-     *
-     * @param tenantId
-     *        id of the tenant on which to look
-     * @param serviceName
-     *        name of the service, it is the id of the bean in the spring context
-     * @param <T>
-     *        type of the service to return
-     * @return
-     *         the service
-     */
-    <T> T lookupOnTenant(Long tenantId, String serviceName);
+    <T> T lookupService(String serviceName);
 
 }

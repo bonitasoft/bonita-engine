@@ -194,12 +194,10 @@ class PlatformSetupConcurrencyIT {
     private void seedLicenseRow() throws Exception {
         try (Connection connection = dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
-                        "INSERT INTO configuration(tenant_id, content_type, resource_name, resource_content) "
-                                + "VALUES (?, ?, ?, ?)")) {
-            statement.setLong(1, 0L);
-            statement.setString(2, ConfigurationType.LICENSES.name());
-            statement.setString(3, "bpa291-test.lic");
-            statement.setBytes(4, "dummy-license-content".getBytes(StandardCharsets.UTF_8));
+                        "INSERT INTO configuration(content_type, resource_name, resource_content) VALUES (?, ?, ?)")) {
+            statement.setString(1, ConfigurationType.LICENSES.name());
+            statement.setString(2, "bpa291-test.lic");
+            statement.setBytes(3, "dummy-license-content".getBytes(StandardCharsets.UTF_8));
             statement.executeUpdate();
         }
     }

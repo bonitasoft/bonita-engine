@@ -62,10 +62,9 @@ class SingleThreadPoolExecutorTest {
     void setUp() {
         var threadPoolExecutor = new WorkSingleThreadPoolExecutorFactory.SingleThreadPoolExecutor(
                 new LinkedBlockingQueue<>(10),
-                new WorkerThreadFactory("test-worker", 1, 1));
+                new WorkerThreadFactory("test-worker", 1));
         bonitaExecutorService = new DefaultBonitaExecutorService(threadPoolExecutor, workFactory, engineClock,
-                workExecutionCallback, workExecutionAuditor,
-                meterRegistry, TENANT_ID);
+                workExecutionCallback, workExecutionAuditor, meterRegistry);
     }
 
     @AfterEach

@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -247,15 +247,16 @@ public class DocumentServiceIT extends CommonBPMServicesTest {
     private void delete(final List<SMappedDocument> sDocuments) throws SBonitaException {
         transactionService.begin();
         for (final SMappedDocument sDocument : sDocuments) {
-            documentService.removeDocument(sDocument);
+            documentService.deleteMappedDocument(sDocument);
+            documentService.deleteDocument(sDocument.getDocumentId());
         }
         transactionService.complete();
     }
 
     private void delete(final SMappedDocument mappedDocument) throws SBonitaException {
         transactionService.begin();
-        documentService.removeDocument(mappedDocument);
-        documentService.deleteDocument(documentService.getDocument(mappedDocument.getDocumentId()));
+        documentService.deleteMappedDocument(mappedDocument);
+        documentService.deleteDocument(mappedDocument.getDocumentId());
         transactionService.complete();
     }
 
@@ -322,23 +323,22 @@ public class DocumentServiceIT extends CommonBPMServicesTest {
     }
 
     @Test
-    public void removeDocumentsTest() throws SBonitaException {
+    public void removeDocumentsTest() throws Exception {
+        //given
         final byte[] documentContent = "this is the content of the document".getBytes();
-
         final List<SMappedDocument> list = createAndAttachDocumentToProcessInstancesWithContent(documentContent);
+
+        //when
         delete(list);
 
+        //then
         for (final SMappedDocument sProcessDocument : list) {
-            try {
-                transactionService.begin();
-                final SMappedDocument result = documentService.getMappedDocument(sProcessDocument.getId());
-
-                assertNull(result);
-            } catch (final SObjectNotFoundException e) {
-                transactionService.setRollbackOnly();
-            } finally {
-                transactionService.complete();
-            }
+            transactionService.begin();
+            assertThatExceptionOfType(SObjectNotFoundException.class)
+                    .isThrownBy(() -> documentService.getMappedDocument(sProcessDocument.getId()));
+            assertThatExceptionOfType(SObjectNotFoundException.class)
+                    .isThrownBy(() -> documentService.getDocument(sProcessDocument.getDocumentId()));
+            transactionService.complete();
         }
     }
 
