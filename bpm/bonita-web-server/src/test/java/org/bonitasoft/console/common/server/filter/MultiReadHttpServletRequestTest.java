@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.console.common.server.filter;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.BufferedReader;
@@ -80,6 +81,20 @@ public class MultiReadHttpServletRequestTest {
                 fakeInputStream.close();
             }
         }
+    }
+
+    @Test
+    public void cleanMultipartTempContent_should_close_the_input_streams_it_handed_out() throws Exception {
+        doReturn("POST").when(request).getMethod();
+        doReturn("multipart/form-data").when(request).getContentType();
+        doReturn(new FakeServletInputStream()).when(request).getInputStream();
+        final MultiReadHttpServletRequest multiReadHttpServletRequest = new MultiReadHttpServletRequest(request);
+        final InputStream inputStreamLeftOpen = multiReadHttpServletRequest.getInputStream();
+
+        multiReadHttpServletRequest.cleanMultipartTempContent();
+
+        // an open descriptor keeps the space of the deleted copy allocated (and prevents the deletion on Windows)
+        assertThatThrownBy(inputStreamLeftOpen::read).isInstanceOf(IOException.class);
     }
 
     @Test

@@ -268,7 +268,9 @@ public abstract class FileUploadServlet extends HttpServlet {
             }
             throw new ServletException(theErrorMessage, e);
         } finally {
-            //Clean multiread wrapper temp file if it exists, whether the upload succeeded or not
+            // free the space of the multiread wrapper copy as soon as the upload is parsed, whether it succeeded or
+            // not. The filter that created the wrapper (TokenValidatorFilter) deletes the copy when the request ends
+            // anyway, including when another filter wrapped the request again and this check misses it.
             if (request instanceof MultiReadHttpServletRequest) {
                 ((MultiReadHttpServletRequest) request).cleanMultipartTempContent();
             }
