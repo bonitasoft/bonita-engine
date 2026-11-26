@@ -39,7 +39,6 @@ class BonitaDataSourceInitializer {
     private static final Map<String, String> defaultDriver;
     private static final Map<String, String> defaultXADataSourceNames;
     private static final Map<String, String> defaultXADataSourceFactories;
-    private static final Map<String, String> defaultTestQueries;
 
     static {
         HashMap<String, String> drivers = new HashMap<>();
@@ -63,13 +62,6 @@ class BonitaDataSourceInitializer {
         xaDataSourceFactories.put(POSTGRES, "org.postgresql.xa.PGXADataSourceFactory");
         xaDataSourceFactories.put(SQLSERVER, "com.microsoft.sqlserver.jdbc.SQLServerDataSourceObjectFactory");
         defaultXADataSourceFactories = Collections.unmodifiableMap(xaDataSourceFactories);
-        HashMap<String, String> testQueries = new HashMap<>();
-        testQueries.put(H2, "SELECT 1");
-        testQueries.put(MYSQL, "SELECT 1");
-        testQueries.put(ORACLE, "SELECT 1 FROM DUAL");
-        testQueries.put(POSTGRES, "SELECT 1");
-        testQueries.put(SQLSERVER, "SELECT 1");
-        defaultTestQueries = Collections.unmodifiableMap(testQueries);
     }
 
     BasicManagedDataSource createManagedDataSource(BonitaDatabaseConfiguration configuration,
@@ -110,8 +102,11 @@ class BonitaDataSourceInitializer {
         bonitaDataSource.setRemoveAbandonedOnBorrow(true);
         bonitaDataSource.setRemoveAbandonedOnMaintenance(true);
         bonitaDataSource.setLogAbandoned(false);
+        // Validate connections on borrow, to replace those closed by the database or the network.
+        // No validation query: DBCP2 then validates with Connection.isValid(), which leaves no local transaction
+        // open. A query would open one (autoCommit is disabled), and the XA transaction would then start on top of it
+        // (PostgreSQL warns "there is already a transaction in progress" since pgjdbc 42.7.13).
         bonitaDataSource.setTestOnBorrow(true);
-        bonitaDataSource.setValidationQuery(defaultTestQueries.get(dbVendor));
         bonitaDataSource.setTransactionManager(transactionManager);
         bonitaDataSource.setInitialSize(1);
         bonitaDataSource.setTestWhileIdle(false);
