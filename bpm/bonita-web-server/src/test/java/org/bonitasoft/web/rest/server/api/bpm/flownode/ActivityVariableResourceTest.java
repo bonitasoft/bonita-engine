@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
-import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -134,7 +134,6 @@ public class ActivityVariableResourceTest extends RestletTest {
 
     private void fillIds(final DataInstanceImpl dataInstance) {
         dataInstance.setId(5L);
-        dataInstance.setTenantId(2L);
         dataInstance.setContainerId(7L);
     }
 
@@ -192,7 +191,7 @@ public class ActivityVariableResourceTest extends RestletTest {
                 .get();
 
         //then
-        assertJsonEquals(getJson(jsonFile), response.getEntityAsText());
+        assertThatJson(getJson(jsonFile)).isEqualTo(response.getEntityAsText());
     }
 
     // Should be in bonita-common, engine side...

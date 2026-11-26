@@ -338,7 +338,7 @@ public class IdentityServiceImplForUserMembershipTest {
                 persistenceService
                         .selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
                                 new QueryOptions(0, 10, Collections.singletonList(orderByOption)))))
-                                        .thenThrow(new SBonitaReadException(""));
+                .thenThrow(new SBonitaReadException(""));
 
         identityServiceImpl.getUserMemberships(0, 10, orderByOption);
     }
@@ -352,7 +352,7 @@ public class IdentityServiceImplForUserMembershipTest {
                         .selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(0, 10,
                                 Collections
                                         .singletonList(orderByOption)))))
-                                                .thenReturn(Collections.singletonList(userMembership));
+                .thenReturn(Collections.singletonList(userMembership));
 
         final List<SUserMembership> userMemberships = identityServiceImpl.getUserMemberships(0, 10, orderByOption);
 
@@ -368,7 +368,7 @@ public class IdentityServiceImplForUserMembershipTest {
                         .selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(0, 10,
                                 Collections
                                         .singletonList(orderByOption)))))
-                                                .thenReturn(Collections.singletonList(userMembership));
+                .thenReturn(Collections.singletonList(userMembership));
 
         final List<SUserMembership> userMemberships = identityServiceImpl.getUserMemberships(0, 10, orderByOption);
 

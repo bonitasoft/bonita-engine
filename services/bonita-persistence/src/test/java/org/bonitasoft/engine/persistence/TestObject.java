@@ -27,9 +27,4 @@ public class TestObject implements PersistentObject {
     public void setId(long id) {
 
     }
-
-    @Override
-    public void setTenantId(long id) {
-
-    }
 }

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.ScopedException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
@@ -71,7 +72,8 @@ public class CompletingCallActivityState extends CompletingActivityState {
             // archive child process instance
             bpmArchiverService.archiveAndDeleteProcessInstance(childProcInst);
         } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException(e);
+            throw new SActivityStateExecutionException("Unable to map call activity output data",
+                    ScopedException.OPERATION, e);
         }
     }
 

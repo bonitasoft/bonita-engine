@@ -431,9 +431,9 @@ public class DocumentAPIImpl implements DocumentAPI {
 
                 for (int i = index + 1; i < allDocumentOfTheList.size(); i++) {
                     documentService.updateDocumentIndex(allDocumentOfTheList.get(i), i - 1);
-
                 }
             }
+            // archive and delete mapping on the process but keep the content of the document itself
             documentService.removeCurrentVersion(document);
             return ModelConvertor.toDocument(document, documentService);
         } catch (final SObjectNotFoundException e) {

@@ -319,7 +319,8 @@ public class DocumentUtilTest {
                 new ByteArrayInputStream(bigEndianTiffBytes))).isTrue();
         assertThat(
                 DocumentUtil.isContentConsistentWithExtension("letter.odt", "application/vnd.oasis.opendocument.text",
-                        new ByteArrayInputStream(zipWithEntries("mimetype", "content.xml")))).isTrue();
+                        new ByteArrayInputStream(zipWithEntries("mimetype", "content.xml"))))
+                .isTrue();
         assertThat(DocumentUtil.isContentConsistentWithExtension("budget.ods",
                 "application/vnd.oasis.opendocument.spreadsheet",
                 new ByteArrayInputStream(zipWithEntries("mimetype", "content.xml")))).isTrue();

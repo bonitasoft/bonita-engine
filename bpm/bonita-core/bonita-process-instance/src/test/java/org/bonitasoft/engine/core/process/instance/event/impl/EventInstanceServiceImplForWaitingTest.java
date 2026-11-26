@@ -48,7 +48,7 @@ public class EventInstanceServiceImplForWaitingTest {
     @Before
     public void setUp() {
         eventInstanceServiceImpl = spy(
-                new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry, 1L));
+                new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry));
     }
 
     @Test

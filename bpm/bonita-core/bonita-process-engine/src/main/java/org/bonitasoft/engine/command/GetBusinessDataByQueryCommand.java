@@ -49,7 +49,7 @@ public class GetBusinessDataByQueryCommand extends RuntimeCommand {
                     queryParameters, startIndex, maxResults,
                     businessDataURIPattern);
         } catch (SBusinessDataRepositoryException e) {
-            throw new SCommandExecutionException(e);
+            throw new SCommandExecutionException(e.convertToClientException());
         }
     }
 }

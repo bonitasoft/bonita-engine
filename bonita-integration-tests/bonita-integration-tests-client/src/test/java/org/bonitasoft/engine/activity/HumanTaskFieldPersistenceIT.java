@@ -49,7 +49,7 @@ import org.junit.Test;
  * <h2>What each test detects</h2>
  * <ul>
  * <li><b>{@link #setExpectedEndDate_should_survive_the_state_transition_that_follows_it_in_the_same_transaction()}</b>
- * — the <i>self-revert</i>. An atomic {@code UPDATE ... WHERE id = :id AND tenantId = :tenantId} never touches
+ * — the <i>self-revert</i>. An atomic {@code UPDATE ... WHERE id = :id} never touches
  * the managed entity, so the entity still holds the pre-update {@code expectedEndDate}. When {@code setState}
  * re-dirties that entity a few frames later, the commit flush writes the whole row back from the stale snapshot
  * and the due date is silently lost. The {@code refresh} in {@code setExpectedEndDate} is what prevents this,

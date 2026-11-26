@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 @Service("workService")
 public class WorkServiceImpl implements WorkService {
 
-    private Logger log = LoggerFactory.getLogger(WorkServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(WorkServiceImpl.class);
     private final UserTransactionService transactionService;
     private final SessionAccessor sessionAccessor;
     private final WorkExecutorService workExecutorService;
@@ -66,7 +66,7 @@ public class WorkServiceImpl implements WorkService {
 
     private WorkSynchronization createAndRegisterNewSynchronization(WorkDescriptor workDescriptor)
             throws SWorkRegisterException {
-        WorkSynchronization synchro = new WorkSynchronization(transactionService, workExecutorService, sessionAccessor,
+        WorkSynchronization synchro = new WorkSynchronization(transactionService, workExecutorService,
                 workDescriptor, workDelayOnMultipleXAResource);
         try {
             transactionService.registerBonitaSynchronization(synchro);

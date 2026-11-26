@@ -195,7 +195,7 @@ public class FlowNodesRecoverTest {
 
         assertThatThrownBy(() -> flowNodesRecover.execute(recoveryMonitor,
                 flowNodeIds(automaticTaskInstance1, automaticTaskInstance2)))
-                        .isInstanceOf(SWorkRegisterException.class);
+                .isInstanceOf(SWorkRegisterException.class);
     }
 
     @Test

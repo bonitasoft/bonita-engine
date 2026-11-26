@@ -44,7 +44,7 @@ public class SProfileMemberLogBuilderImpl extends CRUDELogBuilder implements SPe
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(PROFILE_MEMBER_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Profile member id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Profile member id");
         }
     }
 

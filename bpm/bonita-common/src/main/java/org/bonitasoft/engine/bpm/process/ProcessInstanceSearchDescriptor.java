@@ -47,6 +47,11 @@ public class ProcessInstanceSearchDescriptor {
     public static final String ID = "id";
 
     /**
+     * The field corresponding to the identifier of the root process instance.
+     */
+    public static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInstanceId";
+
+    /**
      * The field corresponding to the identifier of the user assignee to a user task of the process instance.
      */
     public static final String ASSIGNEE_ID = "assigneeId";

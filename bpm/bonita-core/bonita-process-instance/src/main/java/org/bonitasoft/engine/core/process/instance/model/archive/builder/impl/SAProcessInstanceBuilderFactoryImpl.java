@@ -34,6 +34,8 @@ public class SAProcessInstanceBuilderFactoryImpl implements SAProcessInstanceBui
 
     private static final String PROCESSDEF_ID_KEY = "processDefinitionId";
 
+    private static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInstanceId";
+
     private static final String STATE_ID_KEY = "stateId";
 
     private static final String SOURCE_OBJECT_ID_KEY = "sourceObjectId";
@@ -69,6 +71,10 @@ public class SAProcessInstanceBuilderFactoryImpl implements SAProcessInstanceBui
     @Override
     public String getIdKey() {
         return ID_KEY;
+    }
+
+    public String getRootProcessInstanceIdKey() {
+        return ROOT_PROCESS_INSTANCE_ID;
     }
 
     @Override

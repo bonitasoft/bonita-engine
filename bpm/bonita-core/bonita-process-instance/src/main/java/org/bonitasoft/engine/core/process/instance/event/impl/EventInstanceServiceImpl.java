@@ -58,13 +58,13 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     public static final String BONITA_BPMENGINE_MESSAGE_SENT = "bonita.bpmengine.message.sent";
     private final Counter messageSentCounter;
 
-    private EventInstanceRepository eventInstanceRepository;
+    private final EventInstanceRepository eventInstanceRepository;
 
     public EventInstanceServiceImpl(EventInstanceRepository eventInstanceRepository,
-            DataInstanceService dataInstanceService, MeterRegistry meterRegistry, Long tenantId) {
+            DataInstanceService dataInstanceService, MeterRegistry meterRegistry) {
         this.eventInstanceRepository = eventInstanceRepository;
         this.dataInstanceService = dataInstanceService;
-        messageSentCounter = meterRegistry.counter(BONITA_BPMENGINE_MESSAGE_SENT, "tenant", tenantId.toString());
+        messageSentCounter = meterRegistry.counter(BONITA_BPMENGINE_MESSAGE_SENT);
     }
 
     @Override

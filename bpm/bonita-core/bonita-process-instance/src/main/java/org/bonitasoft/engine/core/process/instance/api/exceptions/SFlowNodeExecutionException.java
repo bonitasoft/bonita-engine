@@ -25,6 +25,14 @@ public class SFlowNodeExecutionException extends SBonitaException {
 
     private static final long serialVersionUID = 5549874111741638842L;
 
+    public SFlowNodeExecutionException(final String message, final String scope, final Throwable cause) {
+        super(message, scope, cause);
+    }
+
+    public SFlowNodeExecutionException(final String message, final String scope) {
+        super(message, scope);
+    }
+
     public SFlowNodeExecutionException(final String message, final Throwable cause) {
         super(message, cause);
     }

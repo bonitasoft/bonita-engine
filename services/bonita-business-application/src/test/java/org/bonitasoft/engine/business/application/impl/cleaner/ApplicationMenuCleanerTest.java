@@ -47,7 +47,7 @@ public class ApplicationMenuCleanerTest {
     private ApplicationMenuCleaner cleaner;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         given(options.getNumberOfResults()).willReturn(MAX_RESULTS);
     }
 

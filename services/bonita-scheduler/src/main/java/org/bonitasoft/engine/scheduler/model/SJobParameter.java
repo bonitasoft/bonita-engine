@@ -19,7 +19,6 @@ import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +26,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Type;
 
 @Data
@@ -35,7 +33,6 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 @Builder
 @Entity
-@IdClass(PersistentObjectId.class)
 @Table(name = "job_param")
 @Cacheable(false)
 public class SJobParameter implements PersistentObject {
@@ -45,8 +42,6 @@ public class SJobParameter implements PersistentObject {
     public static final String VALUE = "value";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private long jobDescriptorId;
     @Column(name = "key_")
     private String key;

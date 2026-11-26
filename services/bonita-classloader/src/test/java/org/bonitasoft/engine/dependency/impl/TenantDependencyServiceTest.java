@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.dependency.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,7 +26,6 @@ import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -54,10 +54,8 @@ public class TenantDependencyServiceTest {
     @Mock
     private Recorder recorder;
     @Mock
-    private EventService eventService;
-
-    @Mock
     private QueriableLoggerService queriableLoggerService;
+
     @InjectMocks
     private TenantDependencyService tenantDependencyService;
 
@@ -94,7 +92,7 @@ public class TenantDependencyServiceTest {
      */
     @Test
     public final void getDependenciesByIds() throws SBonitaReadException, SDependencyException {
-        final List<SDependency> sDependencies = new ArrayList<SDependency>();
+        final List<SDependency> sDependencies = new ArrayList<>();
         when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SDependency>> any()))
                 .thenReturn(sDependencies);
 
@@ -114,7 +112,7 @@ public class TenantDependencyServiceTest {
      */
     @Test
     public final void getDependenciesWithOptions() throws SBonitaReadException, SDependencyException {
-        final List<SDependency> sDependencies = new ArrayList<SDependency>();
+        final List<SDependency> sDependencies = new ArrayList<>();
         when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SDependency>> any()))
                 .thenReturn(sDependencies);
 
@@ -133,11 +131,11 @@ public class TenantDependencyServiceTest {
 
     @Test
     public final void getDependencyIds() throws SBonitaReadException, SDependencyException {
-        final List<SDependency> sDependencies = new ArrayList<SDependency>();
+        final List<SDependency> sDependencies = new ArrayList<>();
         when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SDependency>> any()))
                 .thenReturn(sDependencies);
 
-        Assert.assertEquals(sDependencies, tenantDependencyService.getDependencyIds(54156L, PROCESS, 1, 100));
+        assertThat(tenantDependencyService.getDependencyIds(54156L, PROCESS, 1, 100)).isEqualTo(sDependencies);
     }
 
     @Test(expected = SDependencyException.class)
@@ -155,7 +153,7 @@ public class TenantDependencyServiceTest {
     @Test
     public final void getDependencyMappingsWithDependencyIdAndQueryOptions()
             throws SBonitaReadException, SDependencyException {
-        final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
+        final List<SDependencyMapping> sDependencyMappings = new ArrayList<>();
         when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SDependencyMapping>> any()))
                 .thenReturn(sDependencyMappings);
 
@@ -180,7 +178,7 @@ public class TenantDependencyServiceTest {
      */
     @Test
     public final void getDependencyMappingsWithOptions() throws SBonitaReadException, SDependencyException {
-        final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
+        final List<SDependencyMapping> sDependencyMappings = new ArrayList<>();
         when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SDependencyMapping>> any()))
                 .thenReturn(sDependencyMappings);
 

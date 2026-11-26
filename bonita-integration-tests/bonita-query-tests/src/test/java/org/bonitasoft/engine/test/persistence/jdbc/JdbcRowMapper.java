@@ -53,7 +53,7 @@ public class JdbcRowMapper implements RowMapper<Map<String, Object>> {
             "oracle", new OracleValueConverter());
 
     public JdbcRowMapper() {
-        log.info("Detected DB vendor: {}", dbVendor);
+        log.debug("Detected DB vendor: {}", dbVendor);
     }
 
     /**

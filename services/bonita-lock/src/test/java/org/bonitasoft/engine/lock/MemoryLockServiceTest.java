@@ -30,7 +30,6 @@ import org.junit.Test;
  */
 public class MemoryLockServiceTest {
 
-    private final Long tenantId = 1L;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private final class LockThread extends Thread {
@@ -49,7 +48,7 @@ public class MemoryLockServiceTest {
         @Override
         public void run() {
             try {
-                lock = memoryLockService.lock(id, type, tenantId);
+                lock = memoryLockService.lock(id, type);
             } catch (final SLockException | SLockTimeoutException e) {
                 // NOTHING
             }
@@ -70,10 +69,7 @@ public class MemoryLockServiceTest {
 
         private final Semaphore semaphore;
 
-        private final String name2;
-
-        public TryLockThread(final String name, final int id, final String type, final Semaphore semaphore) {
-            name2 = name;
+        public TryLockThread(final int id, final String type, final Semaphore semaphore) {
             this.id = id;
             this.type = type;
             this.semaphore = semaphore;
@@ -83,9 +79,9 @@ public class MemoryLockServiceTest {
         public void run() {
             try {
                 semaphore.acquire();
-                lock = memoryLockService.tryLock(id, type, 20, TimeUnit.SECONDS, tenantId);
+                lock = memoryLockService.tryLock(id, type, 20, TimeUnit.SECONDS);
                 semaphore.acquire();
-                memoryLockService.unlock(lock, tenantId);
+                memoryLockService.unlock(lock);
                 lock = null;
             } catch (final InterruptedException e) {
                 e.printStackTrace();
@@ -116,42 +112,42 @@ public class MemoryLockServiceTest {
     @Test
     public void testUnlock() throws Exception {
 
-        final BonitaLock lock = memoryLockService.lock(5, "a", tenantId);
+        final BonitaLock lock = memoryLockService.lock(5, "a");
         final LockThread lockThread = new LockThread(5, "a");
         lockThread.start();
         Thread.sleep(100);
-        memoryLockService.unlock(lock, tenantId);
+        memoryLockService.unlock(lock);
         lockThread.join(1200);
         assertTrue("should not be able to lock", lockThread.isLockObtained());
     }
 
     @Test
     public void should_lock_multiple_times_on_the_same_thread() throws Exception {
-        BonitaLock bonitaLock = memoryLockService.lock(123, "abc", tenantId);
-        memoryLockService.lock(123, "abc", tenantId);
+        BonitaLock bonitaLock = memoryLockService.lock(123, "abc");
+        memoryLockService.lock(123, "abc");
 
         //Unable to lock in an other thread
-        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNull();
+        assertThat(tryLockInAnOtherThread(123, "abc")).isNull();
 
         //Unable to lock in an other thread: the lock is still hold once by the current thread
-        memoryLockService.unlock(bonitaLock, tenantId);
-        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNull();
+        memoryLockService.unlock(bonitaLock);
+        assertThat(tryLockInAnOtherThread(123, "abc")).isNull();
 
         //Able to unlock the thread release all holds
-        memoryLockService.unlock(bonitaLock, tenantId);
-        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNotNull();
+        memoryLockService.unlock(bonitaLock);
+        assertThat(tryLockInAnOtherThread(123, "abc")).isNotNull();
     }
 
-    private BonitaLock tryLockInAnOtherThread(int objectToLockId, String abc, Long tenantId)
+    private BonitaLock tryLockInAnOtherThread(int objectToLockId, String abc)
             throws InterruptedException, java.util.concurrent.ExecutionException {
         return executorService
-                .submit(() -> memoryLockService.tryLock(objectToLockId, abc, 10, TimeUnit.MILLISECONDS, tenantId))
+                .submit(() -> memoryLockService.tryLock(objectToLockId, abc, 10, TimeUnit.MILLISECONDS))
                 .get();
     }
 
     @Test
     public void testLock() throws Exception {
-        memoryLockService.lock(3, "a", tenantId);
+        memoryLockService.lock(3, "a");
         final LockThread lockThread = new LockThread(4, "a");
         lockThread.start();
         lockThread.join(100);
@@ -160,7 +156,7 @@ public class MemoryLockServiceTest {
 
     @Test
     public void testLockTimeout() throws Exception {
-        memoryLockService.lock(2, "a", tenantId);
+        memoryLockService.lock(2, "a");
         final LockThread lockThread = new LockThread(2, "a");
         lockThread.start();
         lockThread.join(1200);
@@ -183,9 +179,9 @@ public class MemoryLockServiceTest {
         final Semaphore s1 = new Semaphore(1);
         final Semaphore s2 = new Semaphore(1);
         final Semaphore s3 = new Semaphore(1);
-        final TryLockThread t1 = new TryLockThread("t1", rd, "t", s1);
-        final TryLockThread t2 = new TryLockThread("t2", rd, "t", s2);
-        final TryLockThread t3 = new TryLockThread("t3", rd, "t", s3);
+        final TryLockThread t1 = new TryLockThread(rd, "t", s1);
+        final TryLockThread t2 = new TryLockThread(rd, "t", s2);
+        final TryLockThread t3 = new TryLockThread(rd, "t", s3);
         s1.acquire();
         s2.acquire();
         s3.acquire();

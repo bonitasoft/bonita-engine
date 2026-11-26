@@ -15,7 +15,6 @@ package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -39,9 +38,9 @@ import javax.persistence.criteria.Selection;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +79,7 @@ class JPABusinessDataRepositoryImplTest {
     @BeforeEach
     void setUp() {
         realJPABusinessDataRepository = new JPABusinessDataRepositoryImpl(transactionService,
-                businessDataModelRepository, configuration, classLoaderService, 1L);
+                businessDataModelRepository, configuration, classLoaderService);
         repository = spy(
                 realJPABusinessDataRepository);
         doReturn(manager).when(repository).getEntityManager();
@@ -98,7 +97,7 @@ class JPABusinessDataRepositoryImplTest {
     @Test
     void should_constructor_add_listener_on_classloader() {
         //then
-        verify(classLoaderService).addListener(identifier(ScopeType.TENANT, 1L), realJPABusinessDataRepository);
+        verify(classLoaderService).addListener(ClassLoaderIdentifier.TENANT, realJPABusinessDataRepository);
     }
 
     @Test
@@ -333,7 +332,7 @@ class JPABusinessDataRepositoryImplTest {
             throws Exception {
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService, 1L));
+                        businessDataModelRepository, configuration, classLoaderService));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         // Inject the stale EM into the private ThreadLocal
@@ -425,7 +424,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService, 1L));
+                        businessDataModelRepository, configuration, classLoaderService));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         // Inject the active EM
@@ -458,7 +457,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService, 1L));
+                        businessDataModelRepository, configuration, classLoaderService));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         doThrow(new STransactionNotFoundException("no active transaction"))
@@ -485,7 +484,7 @@ class JPABusinessDataRepositoryImplTest {
 
         JPABusinessDataRepositoryImpl repo = spy(
                 new JPABusinessDataRepositoryImpl(transactionService,
-                        businessDataModelRepository, configuration, classLoaderService, 1L));
+                        businessDataModelRepository, configuration, classLoaderService));
         doReturn(emf).when(repo).getEntityManagerFactory();
 
         //when + then

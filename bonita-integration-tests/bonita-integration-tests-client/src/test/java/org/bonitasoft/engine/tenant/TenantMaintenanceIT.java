@@ -43,7 +43,7 @@ public class TenantMaintenanceIT extends TestWithUser {
             assertCanLoginOnTenant();
         } finally {
             //when
-            loginOnDefaultTenantWithDefaultTechnicalUser();
+            loginWithTechnicalUser();
             resumeTenant();
         }
 
@@ -51,16 +51,16 @@ public class TenantMaintenanceIT extends TestWithUser {
         assertCanLoginOnTenantAndStartProcess(processDefinition);
 
         // cleanup
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         disableAndDeleteProcess(processDefinition.getId());
     }
 
     private void assertCanLoginOnTenant() throws Exception {
         try {
             loginOnDefaultTenantWith(USERNAME, PASSWORD);
-            logoutOnTenant();
+            logout();
         } catch (LoginException e) {
-            fail("Expected that user is able to log in, but he is not");
+            fail("Expected that user is able to log in, but is not");
         }
     }
 
@@ -68,7 +68,7 @@ public class TenantMaintenanceIT extends TestWithUser {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step1");
-        logoutOnTenant();
+        logout();
     }
 
     private ProcessDefinition createProcessOnTenant() throws Exception {

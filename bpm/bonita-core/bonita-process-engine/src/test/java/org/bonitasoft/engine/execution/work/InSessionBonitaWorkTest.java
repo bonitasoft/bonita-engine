@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,8 +35,6 @@ public class InSessionBonitaWorkTest {
     private BonitaWork wrappedWork;
     @Mock
     private ServiceAccessor serviceAccessor;
-    @Mock
-    private SessionAccessor sessionAccessor;
 
     private InSessionBonitaWork txBonitaWork;
 
@@ -45,7 +42,6 @@ public class InSessionBonitaWorkTest {
     public void before() {
         txBonitaWork = spy(new InSessionBonitaWork(wrappedWork));
 
-        when(serviceAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
         doReturn(serviceAccessor).when(txBonitaWork).getServiceAccessor();
     }
 
@@ -102,18 +98,6 @@ public class InSessionBonitaWorkTest {
         };
         txBonitaWork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
-    }
-
-    @Test
-    public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12L);
-        assertEquals(12, txBonitaWork.getTenantId());
-    }
-
-    @Test
-    public void setTenantId() {
-        txBonitaWork.setTenantId(12L);
-        verify(wrappedWork).setTenantId(12L);
     }
 
     @Test

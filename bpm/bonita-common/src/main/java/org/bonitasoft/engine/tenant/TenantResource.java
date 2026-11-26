@@ -17,21 +17,23 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import lombok.Getter;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Getter
 public class TenantResource implements BonitaObject {
 
     public static final TenantResource NONE = new TenantResource(0, "", null, 0, 0, null);
 
-    private long id;
-    private String name;
-    private TenantResourceType type;
-    private OffsetDateTime lastUpdateDate;
-    private long lastUpdatedBy;
-    private TenantResourceState state;
+    private final long id;
+    private final String name;
+    private final TenantResourceType type;
+    private final OffsetDateTime lastUpdateDate;
+    private final long lastUpdatedBy;
+    private final TenantResourceState state;
 
     public TenantResource(long id, String name, TenantResourceType type, long lastUpdateDate, long lastUpdatedBy,
             TenantResourceState state) {
@@ -43,27 +45,4 @@ public class TenantResource implements BonitaObject {
         this.state = state;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public TenantResourceType getType() {
-        return type;
-    }
-
-    public TenantResourceState getState() {
-        return state;
-    }
-
-    public OffsetDateTime getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public long getLastUpdatedBy() {
-        return lastUpdatedBy;
-    }
 }

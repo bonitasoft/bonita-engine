@@ -52,7 +52,6 @@ public class SearchCommentsDescriptor {
      */
     public static final String POSTDATE = "postdate";
 
-    // FIXME : What is this ??
     /**
      * The name of the field corresponding to the kind of the comment
      */

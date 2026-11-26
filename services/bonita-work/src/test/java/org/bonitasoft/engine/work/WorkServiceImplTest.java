@@ -43,8 +43,7 @@ public class WorkServiceImplTest {
     private EngineClock engineClock;
 
     @Before
-    public void before() throws Exception {
-        doReturn(1L).when(sessionAccessor).getTenantId();
+    public void before() {
         workService = new WorkServiceImpl(transactionService, sessionAccessor, workExecutorService,
                 engineClock, 0);
     }

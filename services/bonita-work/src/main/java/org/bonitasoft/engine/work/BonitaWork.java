@@ -25,7 +25,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public abstract class BonitaWork {
 
-    private String uuid = UUID.randomUUID().toString();
+    private final String uuid = UUID.randomUUID().toString();
 
     protected long tenantId;
 
@@ -63,20 +63,6 @@ public abstract class BonitaWork {
         return false;
     }
 
-    public long getTenantId() {
-        if (tenantId <= 0) {
-            throw new IllegalStateException("TenantId is not set !!");
-        }
-        return tenantId;
-    }
-
-    public void setTenantId(final long tenantId) {
-        if (tenantId <= 0) {
-            throw new IllegalStateException("Invalid tenantId=" + tenantId);
-        }
-        this.tenantId = tenantId;
-    }
-
     public void setParent(final BonitaWork parentWork) {
         this.parentWork = parentWork;
     }
@@ -101,7 +87,6 @@ public abstract class BonitaWork {
             return false;
         BonitaWork work = (BonitaWork) o;
         return new EqualsBuilder()
-                .append(tenantId, work.tenantId)
                 .append(uuid, work.uuid)
                 .append(parentWork, work.parentWork)
                 .isEquals();
@@ -111,7 +96,6 @@ public abstract class BonitaWork {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(uuid)
-                .append(tenantId)
                 .append(parentWork)
                 .toHashCode();
     }

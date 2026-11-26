@@ -84,7 +84,8 @@ public abstract class SearchEntityDescriptor {
     }
 
     public FilterOption constructFilterOption(final SearchFilter filter, final FieldDescriptor fieldDescriptor) {
-        final Class<? extends PersistentObject> clazz = fieldDescriptor != null ? fieldDescriptor.getPersistentClass()
+        final Class<? extends PersistentObject> clazz = fieldDescriptor != null
+                ? fieldDescriptor.getPersistentClass()
                 : null;
         final String fieldName = fieldDescriptor != null ? fieldDescriptor.getValue() : null;
         final Serializable value = convertFilterValue(filter.getField(), filter.getValue());

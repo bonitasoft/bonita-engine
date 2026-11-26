@@ -30,7 +30,8 @@ public class SearchPageDescriptorTest {
         SearchPageDescriptor searchPageDescriptor = new SearchPageDescriptor();
 
         //when
-        final Map<Class<? extends PersistentObject>, Set<String>> allFields = searchPageDescriptor.getAllFields();
+        final Map<Class<? extends PersistentObject>, Set<String>> allFields = searchPageDescriptor
+                .getAllFields();
 
         //then
         final Set<String> fields = allFields.get(SPage.class);

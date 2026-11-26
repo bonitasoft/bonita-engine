@@ -124,14 +124,13 @@ class ConfigurationServiceIT {
 
     private void insertConfiguration(ConfigurationType type, String resourceName) {
         jdbcTemplate.update(
-                "INSERT INTO configuration(tenant_id, content_type, resource_name, resource_content) VALUES (?, ?, ?, ?)",
-                0L, type.name(), resourceName, "content".getBytes(StandardCharsets.UTF_8));
+                "INSERT INTO configuration(content_type, resource_name, resource_content) VALUES (?, ?, ?)",
+                type.name(), resourceName, "content".getBytes(StandardCharsets.UTF_8));
     }
 
     private List<String> allRows() {
         return jdbcTemplate.queryForList(
-                "SELECT tenant_id, content_type, resource_name FROM configuration "
-                        + "ORDER BY tenant_id, content_type, resource_name")
+                "SELECT content_type, resource_name FROM configuration ORDER BY content_type, resource_name")
                 .stream().map(row -> row.values().toString()).toList();
     }
 

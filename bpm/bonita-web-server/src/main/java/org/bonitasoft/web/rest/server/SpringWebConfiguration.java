@@ -26,7 +26,7 @@ import org.springframework.web.servlet.resource.ResourceUrlProvider;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan({ "org.bonitasoft.web.rest.server.api" })
+@ComponentScan({ "org.bonitasoft.web.rest.server.api", "com.bonitasoft.web.rest.server.api" })
 public class SpringWebConfiguration extends WebMvcConfigurationSupport {
 
     @Bean

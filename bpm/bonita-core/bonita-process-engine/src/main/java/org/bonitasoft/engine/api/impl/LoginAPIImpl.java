@@ -25,12 +25,11 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.login.SLoginException;
-import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -38,7 +37,6 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.springframework.util.CollectionUtils;
 
@@ -99,29 +97,21 @@ public class LoginAPIImpl implements LoginAPI {
 
     protected APISession loginInternal(final Map<String, Serializable> credentials)
             throws Exception {
-        final String userName = credentials.get(AuthenticationConstants.BASIC_USERNAME) != null
-                ? String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME)) : null;
         final ServiceAccessor serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
-        final STenant sTenant = getTenant(serviceAccessor);
 
-        checkThatWeCanLogin(userName, sTenant, serviceAccessor.getTechnicalUser());
         final LoginService loginService = serviceAccessor.getLoginService();
         final TransactionService transactionService = serviceAccessor.getTransactionService();
-        SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
 
-        final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<>(credentials);
-        credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
-        sessionAccessor.setTenantId(sTenant.getId());
         final SSession sSession = transactionService
-                .executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
-        return ModelConvertor.toAPISession(sSession, sTenant.getName());
+                .executeInTransaction(() -> loginService.login(credentials));
+        return ModelConvertor.toAPISession(sSession);
     }
 
-    private STenant getTenant(final ServiceAccessor serviceAccessor)
+    private SPlatform getPlatform(final ServiceAccessor serviceAccessor)
             throws SBonitaException {
         final PlatformService platformService = serviceAccessor.getPlatformService();
         try {
-            return serviceAccessor.getTransactionService().executeInTransaction(platformService::getDefaultTenant);
+            return serviceAccessor.getTransactionService().executeInTransaction(platformService::getPlatform);
         } catch (SBonitaException | RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -142,13 +132,6 @@ public class LoginAPIImpl implements LoginAPI {
             throws LoginException {
         if (CollectionUtils.isEmpty(credentials)) {
             throw new LoginException("Credentials are null or empty !!");
-        }
-    }
-
-    protected void checkThatWeCanLogin(final String userName, final STenant sTenant, TechnicalUser technicalUser)
-            throws LoginException {
-        if (sTenant.isDeactivated()) {
-            throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
         }
     }
 

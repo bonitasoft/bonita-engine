@@ -152,7 +152,7 @@ public class EngineInitializer {
             final SessionAccessor sessionAccessor) throws SSessionException {
         final SPlatformSession createSession = platformSessionService.createSession("SYSTEM");
         final long sessionId = createSession.getId();
-        sessionAccessor.setSessionInfo(sessionId, -1);
+        sessionAccessor.setSessionId(sessionId);
         return sessionId;
     }
 

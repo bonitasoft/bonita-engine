@@ -43,7 +43,7 @@ public class GetBusinessDataByIdsCommand extends RuntimeCommand {
         try {
             return businessDataService.getJsonEntities(entityClassName, identifiers, businessDataURIPattern);
         } catch (final SBusinessDataRepositoryException e) {
-            throw new SCommandExecutionException(e);
+            throw new SCommandExecutionException(e.convertToClientException());
         }
     }
 

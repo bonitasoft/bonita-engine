@@ -20,7 +20,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
+import org.bonitasoft.console.common.server.login.AuthenticationAuditLogger;
 import org.bonitasoft.console.common.server.login.PortalCookies;
 import org.bonitasoft.console.common.server.login.filter.TokenGenerator;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
@@ -30,6 +32,7 @@ import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.platform.InvalidPlatformCredentialsException;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.web.server.login.AuthenticationAuditLoggerAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,12 +98,19 @@ public class PlatformLoginServlet extends HttpServlet {
             request.getSession().setAttribute(PLATFORM_SESSION_PARAM_KEY, platformSession);
             String csrfToken = tokenGenerator.createOrLoadToken(request.getSession());
             portalCookies.addCSRFTokenCookieToResponse(request, response, csrfToken);
+            getAuthenticationAuditLogger(request).loginSucceeded(request, platformSession.getUserName(),
+                    AuthenticationAuditLogger.METHOD_PLATFORM, platformSession.getId());
 
             if (redirectAfterLogin) {
                 response.sendRedirect(PLATFORM_PAGE);
             }
         } catch (final InvalidPlatformCredentialsException e) {
             LOGGER.trace("Wrong username or password", e);
+            // Without any username, the request is anonymous, not a failed login
+            if (StringUtils.isNotEmpty(username)) {
+                getAuthenticationAuditLogger(request).loginFailed(request, username,
+                        AuthenticationAuditLogger.METHOD_PLATFORM, null);
+            }
             if (redirectAfterLogin) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Wrong username or password");
             } else {
@@ -126,6 +136,10 @@ public class PlatformLoginServlet extends HttpServlet {
     PlatformLoginAPI getPlatformLoginAPI()
             throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return PlatformAPIAccessor.getPlatformLoginAPI();
+    }
+
+    AuthenticationAuditLogger getAuthenticationAuditLogger(final HttpServletRequest request) {
+        return AuthenticationAuditLoggerAccessor.getAuthenticationAuditLogger(request.getServletContext());
     }
 
 }

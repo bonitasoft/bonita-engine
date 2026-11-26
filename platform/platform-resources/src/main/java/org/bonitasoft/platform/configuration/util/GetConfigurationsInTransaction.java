@@ -15,11 +15,10 @@ package org.bonitasoft.platform.configuration.util;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.platform.configuration.impl.BonitaConfigurationRowMapper;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -27,30 +26,27 @@ import org.springframework.transaction.support.TransactionCallback;
 /**
  * @author Laurent Leseigneur
  */
+@Slf4j
 public class GetConfigurationsInTransaction implements TransactionCallback<List<BonitaConfiguration>> {
 
     private final JdbcTemplate jdbcTemplate;
-    private final long tenantId;
     private final ConfigurationType type;
 
-    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
-
-    public GetConfigurationsInTransaction(JdbcTemplate jdbcTemplate, long tenantId, ConfigurationType type) {
+    public GetConfigurationsInTransaction(JdbcTemplate jdbcTemplate, ConfigurationType type) {
         this.jdbcTemplate = jdbcTemplate;
-        this.tenantId = tenantId;
         this.type = type;
     }
 
     @Override
     public List<BonitaConfiguration> doInTransaction(TransactionStatus status) {
-        LOGGER.debug("get configurations for type:" + type.name() + " and tenant id:" + tenantId);
+        log.debug("get configurations for type:{}", type.name());
 
         final List<BonitaConfiguration> bonitaConfigurations = jdbcTemplate.query(
                 BonitaConfigurationRowMapper.SELECT_CONFIGURATION_FOR_TYPE,
-                new Object[] { tenantId, type.name() },
+                new Object[] { type.name() },
                 new BonitaConfigurationRowMapper());
 
-        LOGGER.debug("configurations found:" + bonitaConfigurations);
+        log.debug("configurations found:{}", bonitaConfigurations);
 
         return bonitaConfigurations;
     }

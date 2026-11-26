@@ -98,12 +98,11 @@ public class SchedulerQueryTest {
         Long numberOfSJobDescriptor = jobRepository.selectCount("getNumberOfSJobDescriptor");
         PersistentObject searchSJobDescriptor = jobRepository.selectOne("searchSJobDescriptor");
         Map<String, Object> jobDescriptorAsMap = jdbcTemplate.queryForObject("SELECT * FROM job_desc",
-                new JdbcRowMapper("TENANTID", "ID"));
+                new JdbcRowMapper("ID"));
 
         assertThat(numberOfSJobDescriptor).isEqualTo(1);
         assertThat(searchSJobDescriptor).isEqualTo(jobDescriptor);
         assertThat(jobDescriptorAsMap).containsOnly(
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", jobDescriptor.getId()),
                 entry("JOBCLASSNAME", "com.bonitasoft.JobClass"),
                 entry("JOBNAME", "job name"),
@@ -122,13 +121,12 @@ public class SchedulerQueryTest {
         PersistentObject jobParameterFromQuery = jobRepository.selectOne("getJobParameters",
                 pair("jobDescriptorId", 1234L));
         Map<String, Object> jobParameterAsMap = jdbcTemplate.queryForObject("SELECT * FROM job_param",
-                new JdbcRowMapper("TENANTID", "ID", "JOBDESCRIPTORID"));
+                new JdbcRowMapper("ID", "JOBDESCRIPTORID"));
 
         assertThat(numberOfSJobParameters).isEqualTo(1);
         assertThat(jobParameterFromQuery).isEqualTo(jobParameter);
 
         assertThat(jobParameterAsMap).containsOnly(
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", jobParameter.getId()),
                 entry("JOBDESCRIPTORID", 1234L),
                 entry("KEY_", "paramKeyName"),
@@ -147,12 +145,11 @@ public class SchedulerQueryTest {
         Long numberOfSJobLog = jobRepository.selectCount("getNumberOfSJobLog");
         PersistentObject jobLogFromQuery = jobRepository.selectOne("searchSJobLog");
         Map<String, Object> jobLogAsMap = jdbcTemplate.queryForObject("SELECT * FROM job_log",
-                new JdbcRowMapper("TENANTID", "ID", "JOBDESCRIPTORID", "RETRYNUMBER", "LASTUPDATEDATE"));
+                new JdbcRowMapper("ID", "JOBDESCRIPTORID", "RETRYNUMBER", "LASTUPDATEDATE"));
 
         assertThat(numberOfSJobLog).isEqualTo(1);
         assertThat(jobLogFromQuery).isEqualTo(jobLog);
         assertThat(jobLogAsMap).containsOnly(
-                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", jobLog.getId()),
                 entry("JOBDESCRIPTORID", 1234L),
                 entry("RETRYNUMBER", 13L),

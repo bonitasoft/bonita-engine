@@ -19,9 +19,8 @@ import static org.mockito.Mockito.*;
 import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatform;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
@@ -39,7 +38,7 @@ public class MaintenanceAPIImplTest {
     public static final long TENANT_ID = 56423L;
 
     @Mock
-    private TenantServiceAccessor serviceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private PlatformService platformService;
     @Mock
@@ -61,13 +60,12 @@ public class MaintenanceAPIImplTest {
     @Test
     public void get_maintenance_info_should_retrieve_from_platform_service() throws Exception {
         //given
-        STenant tenant = STenant.builder().status(STenant.PAUSED).build();
         SPlatform platform = SPlatform.builder()
                 .maintenanceMessage("maintenance msg")
                 .maintenanceMessageActive(true)
+                .maintenanceEnabled(true)
                 .build();
 
-        doReturn(tenant).when(platformService).getDefaultTenant();
         doReturn(platform).when(platformService).getPlatform();
         //when
         MaintenanceDetails info = maintenanceAPI.getMaintenanceDetails();
@@ -107,7 +105,7 @@ public class MaintenanceAPIImplTest {
         //then
         ArgumentCaptor<EntityUpdateDescriptor> captor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);;
         verify(platformService).updatePlatform(captor.capture());
-        assertThat(captor.getValue().getFields().containsValue(msg));
+        assertThat(captor.getValue().getFields()).containsValue(msg);
     }
 
     @Test
@@ -119,7 +117,7 @@ public class MaintenanceAPIImplTest {
         //then
         ArgumentCaptor<EntityUpdateDescriptor> captor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);;
         verify(platformService).updatePlatform(captor.capture());
-        assertThat(captor.getValue().getFields().containsValue(true));
+        assertThat(captor.getValue().getFields()).containsValue(true);
     }
 
     @Test
@@ -131,6 +129,6 @@ public class MaintenanceAPIImplTest {
         //then
         ArgumentCaptor<EntityUpdateDescriptor> captor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);;
         verify(platformService).updatePlatform(captor.capture());
-        assertThat(captor.getValue().getFields().containsValue(false));
+        assertThat(captor.getValue().getFields()).containsValue(false);
     }
 }

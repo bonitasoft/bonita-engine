@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -42,8 +41,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.mdc.MDCTransmitingThreadPoolExecutor;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -62,40 +61,33 @@ public class MessagesHandlingService implements TenantLifecycleService {
     public static final String NUMBER_OF_MESSAGES_POTENTIAL_MATCHED = "bonita.bpmengine.message.potential";
     public static final String NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS = "bonita.bpmengine.message.retriggeredtasks";
     private ThreadPoolExecutor threadPoolExecutor;
-    private EventInstanceService eventInstanceService;
-    private WorkService workService;
-    private LockService lockService;
-    private Long tenantId;
-    private UserTransactionService userTransactionService;
-    private SessionAccessor sessionAccessor;
-    private BPMWorkFactory workFactory;
+    private final EventInstanceService eventInstanceService;
+    private final WorkService workService;
+    private final LockService lockService;
+    private final UserTransactionService userTransactionService;
+    private final BPMWorkFactory workFactory;
 
     private final Counter executedMessagesCounter;
     private final Counter matchedPotentialMessagesCounter;
     private final Counter retriggeredMatchingTasksCounter;
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService,
-            LockService lockService, Long tenantId, UserTransactionService userTransactionService,
-            SessionAccessor sessionAccessor, BPMWorkFactory workFactory, MeterRegistry meterRegistry) {
+            LockService lockService, UserTransactionService userTransactionService, BPMWorkFactory workFactory,
+            MeterRegistry meterRegistry) {
         this.eventInstanceService = eventInstanceService;
         this.workService = workService;
         this.lockService = lockService;
-        this.tenantId = tenantId;
         this.userTransactionService = userTransactionService;
-        this.sessionAccessor = sessionAccessor;
         this.workFactory = workFactory;
         executedMessagesCounter = Counter.builder(NUMBER_OF_MESSAGES_EXECUTED)
-                .tags(Tags.of("tenant", String.valueOf(tenantId)))
                 .baseUnit("messages")
                 .description("BPMN message couples executed")
                 .register(meterRegistry);
         matchedPotentialMessagesCounter = Counter.builder(NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)
-                .tags(Tags.of("tenant", String.valueOf(tenantId)))
                 .baseUnit("messages")
                 .description("BPMN message couples potentially matched")
                 .register(meterRegistry);
         retriggeredMatchingTasksCounter = Counter.builder(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)
-                .tags(Tags.of("tenant", String.valueOf(tenantId)))
                 .baseUnit("messages matching tasks")
                 .description("BPMN message matching tasks retriggered")
                 .register(meterRegistry);
@@ -104,11 +96,11 @@ public class MessagesHandlingService implements TenantLifecycleService {
     @Override
     public void start() {
         log.info("Starting BPMN messages matcher thread");
-        threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1L, TimeUnit.HOURS,
+        threadPoolExecutor = new MDCTransmitingThreadPoolExecutor(1, 1, 1L, TimeUnit.HOURS,
                 new ArrayBlockingQueue<>(5),
                 r -> new Thread(r, "Bonita-Message-Matching"),
                 (r, executor) -> log.debug("Message matching queue capacity reached"));
-        log.info("Thread that handle messages matching successfully started");
+        log.debug("Thread pool that handle messages matching successfully started");
     }
 
     @Override
@@ -277,7 +269,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
             throws SWaitingEventModificationException, SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
         if (waitingMsg == null) {
-            log.warn("Unable to reset waiting event because it is not found", waitingMessageId);
+            log.warn("Unable to reset waiting event because it is not found: {}", waitingMessageId);
             return;
         }
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -293,7 +285,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
             try {
                 log.debug("Starting messages matching");
                 // we use a lock in order to have only one execution at a time even in cluster
-                BonitaLock eventLock = lockService.tryLock(1L, LOCK_TYPE, 1L, TimeUnit.MILLISECONDS, tenantId);
+                BonitaLock eventLock = lockService.tryLock(1L, LOCK_TYPE, 1L, TimeUnit.MILLISECONDS);
                 if (eventLock == null) {
                     // It could happen that some messages were still not triggered because the work that is currently
                     // executing was started after the last message execution
@@ -302,10 +294,9 @@ public class MessagesHandlingService implements TenantLifecycleService {
                     return null;
                 }
                 try {
-                    sessionAccessor.setTenantId(tenantId);
                     matchEventCoupleAndTriggerExecution();
                 } finally {
-                    lockService.unlock(eventLock, tenantId);
+                    lockService.unlock(eventLock);
                 }
                 log.debug("Messages matching completed");
             } catch (Exception e) {

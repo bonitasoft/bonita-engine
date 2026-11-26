@@ -13,19 +13,21 @@
  **/
 package org.bonitasoft.engine.bpm.comment.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.comment.Comment;
 
 /**
  * @author Hongwen Zang
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
 public class CommentImpl implements Comment {
 
     private static final long serialVersionUID = 2599025748483260550L;
 
     private long id;
-
-    private long tenantId;
 
     private Long userId;
 
@@ -34,126 +36,5 @@ public class CommentImpl implements Comment {
     private long postDate;
 
     private String content;
-
-    public CommentImpl() {
-        super();
-    }
-
-    @Override
-    public Long getUserId() {
-        return userId;
-    }
-
-    @Override
-    public long getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    @Override
-    public long getPostDate() {
-        return postDate;
-    }
-
-    @Override
-    public String getContent() {
-        return content;
-    }
-
-    public void setProcessInstanceId(final long processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public void setPostDate(final long postDate) {
-        this.postDate = postDate;
-    }
-
-    public void setContent(final String content) {
-        this.content = content;
-    }
-
-    public void setUserId(final Long userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    @Deprecated
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    @Deprecated
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (content == null ? 0 : content.hashCode());
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (int) (postDate ^ postDate >>> 32);
-        result = prime * result + (int) (processInstanceId ^ processInstanceId >>> 32);
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        result = prime * result + (userId == null ? 0 : userId.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final CommentImpl other = (CommentImpl) obj;
-        if (content == null) {
-            if (other.content != null) {
-                return false;
-            }
-        } else if (!content.equals(other.content)) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        if (postDate != other.postDate) {
-            return false;
-        }
-        if (processInstanceId != other.processInstanceId) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        if (userId == null) {
-            if (other.userId != null) {
-                return false;
-            }
-        } else if (!userId.equals(other.userId)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "CommentImpl [id=" + id + ", tenantId=" + tenantId + ", userId=" + userId + ", processInstanceId="
-                + processInstanceId + ", postDate="
-                + postDate + ", content=" + content + "]";
-    }
 
 }

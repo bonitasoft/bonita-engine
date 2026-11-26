@@ -23,8 +23,6 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
 
     private final ThreadLocal<Long> sessionData = new ThreadLocal<>();
 
-    private final ThreadLocal<Long> tenantData = new ThreadLocal<>();
-
     @Override
     public long getSessionId() throws SessionIdNotSetException {
         Long sessionId = sessionData.get();
@@ -35,42 +33,16 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
     }
 
     @Override
-    public void setSessionInfo(final long sessionId, final long tenantId) {
+    public void setSessionId(long sessionId) {
         if (sessionId <= 0) {
             throw new IllegalArgumentException("Session id is invalid: " + sessionId);
         }
         sessionData.set(sessionId);
-        tenantData.set(tenantId);
-    }
-
-    @Override
-    public void setTenantId(final long tenantId) {
-        tenantData.set(tenantId);
     }
 
     @Override
     public void deleteSessionId() {
         sessionData.remove();
-    }
-
-    @Override
-    public void deleteTenantId() {
-        tenantData.remove();
-    }
-
-    @Override
-    public boolean isTenantSession() {
-        Long tenantId = tenantData.get();
-        return tenantId != null && tenantId > 0;
-    }
-
-    @Override
-    public long getTenantId() throws STenantIdNotSetException {
-        final Long tenantId = tenantData.get();
-        if (tenantId == null) {
-            throw new STenantIdNotSetException("No tenantId set.");
-        }
-        return tenantId;
     }
 
 }

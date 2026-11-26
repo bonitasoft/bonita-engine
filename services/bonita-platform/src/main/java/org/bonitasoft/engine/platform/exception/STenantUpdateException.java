@@ -24,14 +24,6 @@ public class STenantUpdateException extends SBonitaException {
 
     private static final long serialVersionUID = 7615655279956204016L;
 
-    public STenantUpdateException(final String message) {
-        super(message);
-    }
-
-    public STenantUpdateException(final Throwable e) {
-        super(e);
-    }
-
     public STenantUpdateException(final String message, final Throwable e) {
         super(message, e);
     }

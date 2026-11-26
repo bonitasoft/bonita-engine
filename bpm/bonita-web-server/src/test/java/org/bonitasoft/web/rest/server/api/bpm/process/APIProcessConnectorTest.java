@@ -103,7 +103,7 @@ class APIProcessConnectorTest {
 
         doThrow(new APIItemNotFoundException("process", deletedProcessId,
                 new ProcessDefinitionNotFoundException("process deleted")))
-                        .when(processDatastore).get(deletedProcessId);
+                .when(processDatastore).get(deletedProcessId);
 
         // When the unresolvable process must not fail the whole connector list
         assertThatCode(() -> apiProcessConnector.fillDeploys(item, deploys)).doesNotThrowAnyException();

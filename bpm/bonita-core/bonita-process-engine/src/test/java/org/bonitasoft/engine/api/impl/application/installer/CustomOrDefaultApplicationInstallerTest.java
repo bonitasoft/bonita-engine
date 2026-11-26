@@ -68,7 +68,7 @@ class CustomOrDefaultApplicationInstallerTest {
     @BeforeEach
     void before() throws Exception {
         doAnswer(inv -> callableCaptor.getValue().call()).when(tenantServicesManager)
-                .inTenantSessionTransaction(callableCaptor.capture());
+                .inSessionTransaction(callableCaptor.capture());
     }
 
     @Test

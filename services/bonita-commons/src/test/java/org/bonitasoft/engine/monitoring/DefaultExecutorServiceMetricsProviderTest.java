@@ -32,16 +32,16 @@ public class DefaultExecutorServiceMetricsProviderTest {
 
     @Test
     public void should_register_metrics_when_binding_the_threadpool() {
-        defaultExecutorServiceMetricsProvider.bind(meterRegistry, executorService, "my-executor", 14L);
+        defaultExecutorServiceMetricsProvider.bind(meterRegistry, executorService, "my-executor");
 
         assertThat(meterRegistry.getMeters()).hasSize(9);
     }
 
     @Test
     public void should_have_no_more_metrics_when_we_unbind_the_executor() {
-        defaultExecutorServiceMetricsProvider.bind(meterRegistry, executorService, "my-executor", 14L);
+        defaultExecutorServiceMetricsProvider.bind(meterRegistry, executorService, "my-executor");
 
-        defaultExecutorServiceMetricsProvider.unbind(meterRegistry, "my-executor", 14L);
+        defaultExecutorServiceMetricsProvider.unbind(meterRegistry, "my-executor");
 
         assertThat(meterRegistry.getMeters()).hasSize(0);
     }

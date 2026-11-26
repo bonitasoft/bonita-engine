@@ -92,7 +92,7 @@ public class BusinessObjectValidationRuleTest {
     }
 
     @Test
-    public void shoudCheckRule_returns_valid_status() {
+    public void shouldCheckRule_returns_valid_status() {
         final BusinessObject bo = aValidBusinesObject();
 
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);

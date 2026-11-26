@@ -43,9 +43,8 @@ public class XAResourceRetriever {
         try {
             return Optional.of(transaction.getClass().getMethod("getResources"));
         } catch (Exception e) {
-            log.warn(
-                    "Unable to find method to retrieve resources attached to the current transaction, we will not try to reattempts to find the methode until next restart of the server ",
-                    e);
+            log.warn("Unable to find method to retrieve resources attached to the current transaction, " +
+                    "we will not try to reattempt to find the method until next restart of the server", e);
             return Optional.empty();
         }
     }
@@ -54,9 +53,8 @@ public class XAResourceRetriever {
         try {
             return ((Map) getResources.invoke(transaction)).keySet();
         } catch (Exception e) {
-            log.warn(
-                    "Unable to retrieve resources attached to the current transaction, we will not try to reattempts to retrieve those resources until next restart of the server ",
-                    e);
+            log.warn("Unable to retrieve resources attached to the current transaction, " +
+                    "we will not try to reattempt to retrieve those resources until next restart of the server", e);
             cache.put(transaction.getClass().getName(), Optional.empty());
             return Collections.emptySet();
 

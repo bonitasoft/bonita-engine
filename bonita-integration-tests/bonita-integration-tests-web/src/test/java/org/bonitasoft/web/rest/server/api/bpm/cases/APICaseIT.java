@@ -30,10 +30,7 @@ import java.util.Map;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
-import org.bonitasoft.test.toolkit.bpm.ProcessVariable;
-import org.bonitasoft.test.toolkit.bpm.TestCase;
-import org.bonitasoft.test.toolkit.bpm.TestProcess;
-import org.bonitasoft.test.toolkit.bpm.TestProcessFactory;
+import org.bonitasoft.test.toolkit.bpm.*;
 import org.bonitasoft.test.toolkit.organization.TestUser;
 import org.bonitasoft.test.toolkit.organization.TestUserFactory;
 import org.bonitasoft.web.rest.model.bpm.cases.CaseItem;
@@ -78,9 +75,12 @@ public class APICaseIT extends AbstractConsoleTest {
         Assert.assertEquals(message, engineItem.getLastUpdate(), consoleItem.getLastUpdateDate());
         Assert.assertEquals(message, engineItem.getState(), consoleItem.getState());
         Assert.assertEquals(message, engineItem.getStartDate(), consoleItem.getStartDate());
-        Assert.assertEquals(message, engineItem.getStartedBy(), (long) consoleItem.getStartedByUserId().toLong());
+        Assert.assertEquals(message, engineItem.getStartedBy(),
+                (long) consoleItem.getStartedByUserId().getPartAsLong(0).longValue());
         Assert.assertEquals(message, engineItem.getEndDate(), consoleItem.getEndDate());
         Assert.assertEquals(message, engineItem.getProcessDefinitionId(), (long) consoleItem.getProcessId().toLong());
+        Assert.assertEquals(message, engineItem.getCallerId(),
+                (long) consoleItem.getCallerId().getPartAsLong(0).longValue());
     }
 
     @Test
@@ -92,6 +92,29 @@ public class APICaseIT extends AbstractConsoleTest {
 
         Assert.assertNotNull("Case not found", caseItem);
         assertEquals("Wrong case found", testCase.getProcessInstance(), caseItem);
+    }
+
+    @Test
+    public void should_get_child_process_with_callerId() throws Exception {
+        final TestProcess childProcess = TestProcessFactory.getDefaultHumanTaskProcess().addActor(getInitiator())
+                .enable();
+        TestProcess parentProcess = TestProcessFactory.getCallActivityProcess(childProcess.getProcessDefinition())
+                .addActor(getInitiator()).enable();
+        try {
+            final TestCase parentCase = parentProcess.startCase();
+
+            TestHumanTask humanTask = parentCase.getNextHumanTask();
+
+            final CaseItem childCaseItem = apiCase.runGet(
+                    APIID.makeAPIID(humanTask.getHumanTaskInstance().getParentProcessInstanceId()), new ArrayList<>(),
+                    new ArrayList<>());
+
+            Assert.assertNotNull("Case not found", childCaseItem);
+            assertEquals("Wrong case found", getProcessInstance(childCaseItem.getId()), childCaseItem);
+        } finally {
+            TestProcessFactory.getInstance().delete(parentProcess);
+            TestProcessFactory.getInstance().delete(childProcess);
+        }
     }
 
     @Test

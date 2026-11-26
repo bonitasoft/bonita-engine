@@ -68,7 +68,6 @@ public class ProcessConfigurationPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 
     @Test
@@ -97,7 +96,6 @@ public class ProcessConfigurationPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
-
     }
 
     @Test

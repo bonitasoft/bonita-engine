@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.events.model;
 
 /**
- * represent the deletion of an persisted element
+ * Represent the deletion of a persisted element
  */
 public class SDeleteEvent extends SEvent {
 

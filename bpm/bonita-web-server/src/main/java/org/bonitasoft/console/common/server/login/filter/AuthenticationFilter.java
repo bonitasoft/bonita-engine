@@ -15,6 +15,9 @@ package org.bonitasoft.console.common.server.login.filter;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -38,6 +41,10 @@ import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.mdc.MDCHelper;
+import org.bonitasoft.engine.mdc.MDCHelper.CheckedCallable4;
+import org.bonitasoft.engine.mdc.UserIdMDC;
+import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.web.server.login.LoginFailureTracker;
 import org.bonitasoft.web.server.login.LoginFailureTrackerAccessor;
 import org.slf4j.Logger;
@@ -151,9 +158,18 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
 
         for (final AuthenticationRule rule : getRules()) {
             if (rule.doAuthorize(requestAccessor, response)) {
-                checkPlatformMaintenanceState(requestAccessor);
-                rule.proceedWithRequest(chain, requestAccessor.asHttpServletRequest(), response);
-                return true;
+                // only when proceeding, log the authenticated user id in context
+                var userId = Optional.ofNullable(requestAccessor).map(HttpServletRequestAccessor::getApiSession)
+                        .filter(Objects::nonNull).map(Session::getUserId).filter(id -> id >= 0L);
+                Supplier<UserIdMDC> withAuthenticatedUser = UserIdMDC.supplierFromOptionalId(userId);
+
+                CheckedCallable4<Boolean, ServletException, IOException, PlatformUnderMaintenanceException, BonitaException> call = () -> {
+                    checkPlatformMaintenanceState(requestAccessor);
+                    rule.proceedWithRequest(chain, requestAccessor.asHttpServletRequest(), response);
+                    return true;
+                };
+                return MDCHelper.tryWithMDC(withAuthenticatedUser, call);
+
             }
         }
         return false;

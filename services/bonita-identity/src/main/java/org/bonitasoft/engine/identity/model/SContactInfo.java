@@ -17,7 +17,6 @@ import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +24,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * User contact info: can be personal or professional contact information.
@@ -38,7 +36,6 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "user_contactinfo")
-@IdClass(PersistentObjectId.class)
 @Cacheable(false)
 public class SContactInfo implements PersistentObject {
 
@@ -58,8 +55,6 @@ public class SContactInfo implements PersistentObject {
     public static final String IS_PERSONAL = "personal";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     @Column
     private Long userId;
     @Column

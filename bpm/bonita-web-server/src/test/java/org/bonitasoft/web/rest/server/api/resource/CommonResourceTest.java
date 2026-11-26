@@ -20,10 +20,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -100,7 +97,7 @@ public class CommonResourceTest extends RestletTest {
     @Test
     public void getSearchPageNumberMustRetrieveProperParameter() {
         final CommonResource spy = spy(new CommonResource());
-        doReturn(new Integer(88)).when(spy).getIntegerParameter(anyString(), anyBoolean());
+        doReturn(88).when(spy).getIntegerParameter(anyString(), anyBoolean());
         spy.getSearchPageNumber();
 
         verify(spy).getIntegerParameter(APIServletCall.PARAMETER_PAGE, true);
@@ -109,7 +106,7 @@ public class CommonResourceTest extends RestletTest {
     @Test
     public void getSearchPageSizeMustRetrieveProperParameter() {
         final CommonResource spy = spy(new CommonResource());
-        doReturn(new Integer(77)).when(spy).getIntegerParameter(anyString(), anyBoolean());
+        doReturn(77).when(spy).getIntegerParameter(anyString(), anyBoolean());
         spy.getSearchPageSize();
 
         verify(spy).getIntegerParameter(APIServletCall.PARAMETER_LIMIT, true);
@@ -149,55 +146,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void parseFilterShoulReturnNullIfListIsNull() {
-        assertThat(new CommonResource().parseFilters(null)).isNull();
-    }
-
-    @Test
-    public void parseFilterShouldBuildExpectedMap() {
-        // given:
-        final List<String> filters = Arrays.asList("toto=17", "titi='EN_ECHEC'", "task=task=with=equal=in=name");
-
-        // when:
-        final Map<String, String> parseFilters = new CommonResource().parseFilters(filters);
-
-        // then:
-        assertThat(parseFilters.size()).isEqualTo(3);
-        assertThat(parseFilters.get("toto")).isEqualTo("17");
-        assertThat(parseFilters.get("titi")).isEqualTo("'EN_ECHEC'");
-        assertThat(parseFilters.get("task")).isEqualTo("task=with=equal=in=name");
-    }
-
-    @Test
-    public void parseFilterWithSpecialCharactersShouldBuildExpectedMap() {
-        // given:
-        final List<String> filters = Arrays.asList("a=b", "c=/d/d,e");
-
-        // when:
-        final Map<String, String> parseFilters = new CommonResource().parseFilters(filters);
-
-        // then:
-        assertThat(parseFilters.size()).isEqualTo(2);
-        assertThat(parseFilters.get("a")).isEqualTo("b");
-        assertThat(parseFilters.get("c")).isEqualTo("/d/d,e");
-    }
-
-    @Test
-    public void parseFilterShouldBuildMapEvenIfNoValueForParam() {
-        // given:
-        final List<String> filters = new ArrayList<>(2);
-        filters.add("nomatchingvalue=");
-
-        // when:
-        final Map<String, String> parseFilters = new CommonResource().parseFilters(filters);
-
-        // then:
-        assertThat(parseFilters.size()).isEqualTo(1);
-        assertThat(parseFilters.get("nomatchingvalue")).isNull();
-    }
-
-    @Test
-    public void getIntegerParameterShouldReturnNullIfgetParameterReturnsNull() {
+    public void getIntegerParameterShouldReturnNullIfGetParameterReturnsNull() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         doReturn(null).when(spy).getParameter(anyString(), anyBoolean());

@@ -18,7 +18,11 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.archive.model.TestLogBuilder;
@@ -28,7 +32,11 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
@@ -715,7 +723,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         assertTrue(getProcessAPI().getProcessResolutionProblems(processDefinition.getId()).isEmpty());
 
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-        sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId());
+        sessionAccessor.setSessionId(getSession().getId());
 
         final CacheService cacheservice = getServiceAccessor().getCacheService();
         cacheservice.clearAll();

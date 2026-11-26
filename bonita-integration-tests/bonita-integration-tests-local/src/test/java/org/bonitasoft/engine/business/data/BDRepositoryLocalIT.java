@@ -18,7 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.CommonAPIIT;
@@ -33,7 +37,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl;
+import org.bonitasoft.engine.business.data.impl.EntityManagerFactoryAware;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
@@ -44,7 +48,11 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.platform.setup.PlatformSetup;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class BDRepositoryLocalIT extends CommonAPIIT {
@@ -107,7 +115,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
     @Before
     public void setUp() throws Exception {
         clientFolder = temporaryFolder.newFolder();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
         matti = createUser("matti", "bpm");
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
@@ -129,7 +137,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         resumeClassloader();
 
         deleteUser(matti);
-        logoutOnTenant();
+        logout();
     }
 
     private void resumeClassloader() {
@@ -488,7 +496,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
             case "oracle":
                 assertThat(((List<BigDecimal>) execute_native_sql(
                         "SELECT COUNT(*) FROM user_sequences WHERE sequence_name = 'HIBERNATE_SEQUENCE'")).get(0)
-                                .intValue()).isEqualTo(1);
+                        .intValue()).isEqualTo(1);
                 break;
             case "mysql":
                 assertThat(Arrays.toString((Object[]) execute_native_sql("describe EMPLOYEE").get(0)))
@@ -504,7 +512,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
     private List execute_native_sql(String query) throws Exception {
         ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
         return serviceAccessor.getUserTransactionService().executeInTransaction(
-                () -> ((JPABusinessDataRepositoryImpl) (serviceAccessor.getBusinessDataRepository()))
+                () -> ((EntityManagerFactoryAware) serviceAccessor.getBusinessDataRepository())
                         .getEntityManagerFactory().createEntityManager().createNativeQuery(query).getResultList());
     }
 

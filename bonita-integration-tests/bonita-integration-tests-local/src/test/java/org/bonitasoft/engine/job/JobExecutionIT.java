@@ -46,10 +46,10 @@ public class JobExecutionIT extends CommonAPILocalIT {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginWithTechnicalUser();
 
         createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
+        logout();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         setSessionInfo(getSession());
     }
@@ -58,7 +58,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
     public void after() throws Exception {
         VariableStorage.clearAll();
         deleteUser(USERNAME);
-        logoutOnTenant();
+        logout();
         cleanSession();
     }
 
