@@ -14,9 +14,16 @@
 package org.bonitasoft.console.common.server.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -27,10 +34,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import org.apache.commons.fileupload.FileItem;
+import org.bonitasoft.engine.api.TemporaryContentAPI;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -51,6 +62,39 @@ public class PageUploadServletTest {
     public void setUp() throws Exception {
         pageUploadServlet.pageTmp = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
 
+    }
+
+    @Test
+    public void storeTempFile_should_close_the_stream_of_the_uploaded_part() throws Exception {
+        //given
+        final InputStream partStream = spy(new ByteArrayInputStream("page content".getBytes()));
+        final FileItem item = mock(FileItem.class);
+        doReturn(partStream).when(item).getInputStream();
+        pageUploadServlet.temporaryContentAPI = mock(TemporaryContentAPI.class);
+
+        //when
+        storeTempFileThenDeleteItsCopy(item);
+
+        //then: an open stream keeps the space of the deleted part allocated, and prevents its deletion on Windows
+        verify(partStream).close();
+    }
+
+    @Test
+    public void storeTempFile_should_close_the_stream_it_hands_to_the_engine() throws Exception {
+        //given
+        final FileItem item = mock(FileItem.class);
+        doReturn(new ByteArrayInputStream("page content".getBytes())).when(item).getInputStream();
+        final TemporaryContentAPI temporaryContentAPI = mock(TemporaryContentAPI.class);
+        pageUploadServlet.temporaryContentAPI = temporaryContentAPI;
+
+        //when
+        storeTempFileThenDeleteItsCopy(item);
+
+        //then
+        final ArgumentCaptor<FileContent> storedContent = ArgumentCaptor.forClass(FileContent.class);
+        verify(temporaryContentAPI).storeTempFile(storedContent.capture());
+        final InputStream storedStream = storedContent.getValue().getInputStream();
+        assertThatThrownBy(storedStream::read).isInstanceOf(IOException.class);
     }
 
     @Test
@@ -105,5 +149,20 @@ public class PageUploadServletTest {
         //jackson deserializes array to list by default
         assertThat((List<String>) responseMap.get(PageUploadServlet.PERMISSIONS_RESPONSE_ATTRIBUTE))
                 .containsExactlyInAnyOrder("Organisation visualization", "Organisation management");
+    }
+
+    /**
+     * Calls storeTempFile, then deletes the page copy it made: never the test page that setUp puts in pageTmp, even
+     * when storeTempFile fails before replacing it.
+     */
+    private void storeTempFileThenDeleteItsCopy(final FileItem item) throws Exception {
+        final File testPage = pageUploadServlet.pageTmp;
+        try {
+            pageUploadServlet.storeTempFile("page.zip", item);
+        } finally {
+            if (pageUploadServlet.pageTmp != testPage) {
+                pageUploadServlet.pageTmp.delete();
+            }
+        }
     }
 }
