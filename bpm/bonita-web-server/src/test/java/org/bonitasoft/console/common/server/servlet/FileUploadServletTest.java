@@ -14,6 +14,7 @@
 package org.bonitasoft.console.common.server.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -22,6 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -31,12 +35,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
 import org.bonitasoft.engine.api.TemporaryContentAPI;
@@ -468,12 +475,103 @@ public class FileUploadServletTest {
         verify(multiReadRequest).cleanMultipartTempContent();
     }
 
+    @Test
+    public void doPost_should_delete_the_parsed_parts_once_the_upload_is_stored() throws Exception {
+        //given: a form field and a file part, both parsed to files of the temporary folder
+        doReturn(new String[] { "txt" }).when(fileUploadServlet).getDefaultAllowedExtensions();
+        doReturn("tempKey").when(temporaryContentAPI).storeTempFile(any(FileContent.class));
+        final DiskFileItem formField = diskFileItem("comment", null, null, "a comment".getBytes());
+        final DiskFileItem filePart = diskFileItem("file", "notes.txt", "text/plain", "some notes".getBytes());
+
+        //when
+        uploadParsedItems(List.of(formField, filePart));
+
+        //then
+        verify(temporaryContentAPI).storeTempFile(any(FileContent.class));
+        assertThat(formField.getStoreLocation()).doesNotExist();
+        assertThat(filePart.getStoreLocation()).doesNotExist();
+    }
+
+    @Test
+    public void doPost_should_delete_the_parsed_parts_when_the_extension_is_rejected() throws Exception {
+        //given
+        doReturn(new String[] { "pdf" }).when(fileUploadServlet).getDefaultAllowedExtensions();
+        final DiskFileItem filePart = diskFileItem("file", "script.exe", "application/x-msdownload", "MZ".getBytes());
+
+        //when
+        uploadParsedItems(List.of(filePart));
+
+        //then
+        verify(response).setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertThat(filePart.getStoreLocation()).doesNotExist();
+    }
+
+    @Test
+    public void doPost_should_delete_the_parsed_parts_when_the_content_does_not_match_the_extension()
+            throws Exception {
+        //given
+        doReturn(new String[] { "pdf" }).when(fileUploadServlet).getDefaultAllowedExtensions();
+        final DiskFileItem filePart = diskFileItem("file", "payslip.pdf", "application/pdf",
+                "<html><body>evil</body></html>".getBytes());
+
+        //when
+        uploadParsedItems(List.of(filePart));
+
+        //then
+        verify(response).setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertThat(filePart.getStoreLocation()).doesNotExist();
+    }
+
+    @Test
+    public void doPost_should_delete_the_parsed_parts_when_the_upload_cannot_be_stored() throws Exception {
+        //given
+        doReturn(new String[] { "txt" }).when(fileUploadServlet).getDefaultAllowedExtensions();
+        doThrow(new RuntimeException("database unavailable")).when(temporaryContentAPI)
+                .storeTempFile(any(FileContent.class));
+        final DiskFileItem filePart = diskFileItem("file", "notes.txt", "text/plain", "some notes".getBytes());
+
+        //when
+        assertThatThrownBy(() -> uploadParsedItems(List.of(filePart))).isInstanceOf(ServletException.class);
+
+        //then
+        assertThat(filePart.getStoreLocation()).doesNotExist();
+    }
+
+    @Test
+    public void doPost_should_close_the_stream_it_hands_to_the_engine() throws Exception {
+        //given
+        doReturn(new String[] { "txt" }).when(fileUploadServlet).getDefaultAllowedExtensions();
+        doReturn("tempKey").when(temporaryContentAPI).storeTempFile(any(FileContent.class));
+        final DiskFileItem filePart = diskFileItem("file", "notes.txt", "text/plain", "some notes".getBytes());
+
+        //when
+        uploadParsedItems(List.of(filePart));
+
+        //then: an open stream keeps the space of the deleted part allocated, and prevents its deletion on Windows
+        final ArgumentCaptor<FileContent> storedContent = ArgumentCaptor.forClass(FileContent.class);
+        verify(temporaryContentAPI).storeTempFile(storedContent.capture());
+        final InputStream storedStream = storedContent.getValue().getInputStream();
+        assertThatThrownBy(storedStream::read).isInstanceOf(IOException.class);
+    }
+
     /**
      * Posts one file to the servlet under test and returns the response body.
      */
     private String upload(final String fileName, final String declaredContentType, final byte[] content)
             throws Exception {
         final FileItem fileItem = mock(FileItem.class);
+        // the rejection paths stop before reading the content or storing the file
+        lenient().when(fileItem.getName()).thenReturn(fileName);
+        lenient().when(fileItem.getContentType()).thenReturn(declaredContentType);
+        lenient().when(fileItem.getInputStream()).then(invocation -> new ByteArrayInputStream(content));
+        lenient().when(temporaryContentAPI.storeTempFile(any(FileContent.class))).thenReturn("tempKey");
+        return uploadParsedItems(List.of(fileItem));
+    }
+
+    /**
+     * Posts a request that commons-fileupload parses into the given items, and returns the response body.
+     */
+    private String uploadParsedItems(final List<FileItem> parsedItems) throws Exception {
         final ServletFileUpload serviceFileUpload = mock(ServletFileUpload.class);
         final StringWriter responseBody = new StringWriter();
         fileUploadServlet.uploadDirectoryPath = temporaryFolder.getRoot().getAbsolutePath();
@@ -481,12 +579,7 @@ public class FileUploadServletTest {
         doReturn(serviceFileUpload).when(fileUploadServlet).createServletFileUpload(any(FileItemFactory.class));
         doReturn(temporaryContentAPI).when(fileUploadServlet).getTemporaryContentAPI();
         doReturn(mock(ServletConfig.class)).when(fileUploadServlet).getServletConfig();
-        // the rejection paths stop before reading the content or storing the file
-        lenient().when(fileItem.getName()).thenReturn(fileName);
-        lenient().when(fileItem.getContentType()).thenReturn(declaredContentType);
-        lenient().when(fileItem.getInputStream()).then(invocation -> new ByteArrayInputStream(content));
-        lenient().when(temporaryContentAPI.storeTempFile(any(FileContent.class))).thenReturn("tempKey");
-        when(serviceFileUpload.parseRequest(request)).thenReturn(List.of(fileItem));
+        when(serviceFileUpload.parseRequest(request)).thenReturn(parsedItems);
         when(request.getMethod()).thenReturn("post");
         when(request.getContentType()).thenReturn("multipart/");
         when(response.getWriter()).thenReturn(new PrintWriter(responseBody));
@@ -494,6 +587,21 @@ public class FileUploadServletTest {
         fileUploadServlet.init();
         fileUploadServlet.doPost(request, response);
         return responseBody.toString();
+    }
+
+    /**
+     * A part as commons-fileupload parses it, with its content in a file of the temporary folder (as every part above
+     * the 10 KB threshold of the servlet's DiskFileItemFactory)
+     */
+    private DiskFileItem diskFileItem(final String fieldName, final String fileName, final String contentType,
+            final byte[] content) throws IOException {
+        final DiskFileItem item = (DiskFileItem) new DiskFileItemFactory(0, temporaryFolder.getRoot())
+                .createItem(fieldName, contentType, fileName == null, fileName);
+        try (OutputStream output = item.getOutputStream()) {
+            output.write(content);
+        }
+        assertThat(item.getStoreLocation()).exists();
+        return item;
     }
 
     @SuppressWarnings("unchecked")
