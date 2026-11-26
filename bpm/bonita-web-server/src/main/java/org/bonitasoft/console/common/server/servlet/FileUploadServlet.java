@@ -203,7 +203,7 @@ public abstract class FileUploadServlet extends HttpServlet {
                     }
 
                     // Make unique file name
-                    final String uploadedFileKey = storeTempFile(fileName, item);
+                    final String uploadedFileKey = storeTempFile(request, fileName, item);
 
                     // Response
                     final String responseString;
@@ -272,6 +272,16 @@ public abstract class FileUploadServlet extends HttpServlet {
                 }
             }
         }
+    }
+
+    /**
+     * Stores the uploaded part as temporary content. Override it when the request matters to the upload; the request
+     * is the place for anything to keep until the response is generated, as one servlet instance serves concurrent
+     * requests.
+     */
+    protected String storeTempFile(final HttpServletRequest request, final String fileName, final FileItem item)
+            throws Exception {
+        return storeTempFile(fileName, item);
     }
 
     protected String storeTempFile(final String fileName, final FileItem item)
