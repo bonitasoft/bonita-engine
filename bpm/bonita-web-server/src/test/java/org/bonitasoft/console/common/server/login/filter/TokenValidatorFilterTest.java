@@ -185,6 +185,48 @@ public class TokenValidatorFilterTest {
     }
 
     @Test
+    public void proceedWithFiltering_should_not_read_the_body_when_the_session_has_no_csrf_token()
+            throws Exception {
+        // no login yet: the session holds no token, so no token sent with the request can match
+        MockHttpServletRequest multipartRequest = mockMultipartRequestFor(SESSION_CSRF_TOKEN);
+        multipartRequest.getSession().removeAttribute("api_token");
+        byte[] sentBody = multipartRequest.getContentAsByteArray();
+
+        filter.proceedWithFiltering(multipartRequest, httpResponse, chain);
+
+        verify(httpResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        assertThat(multipartRequest.getInputStream().readAllBytes()).isEqualTo(sentBody);
+    }
+
+    @Test
+    public void proceedWithFiltering_should_not_read_the_multipart_body_of_a_put_request() throws Exception {
+        // ServletFileUpload, MultiReadHttpServletRequest and FileUploadServlet only handle POST requests as
+        // multipart: other methods send the token in the header or as a parameter
+        MockHttpServletRequest multipartRequest = mockMultipartRequestFor(SESSION_CSRF_TOKEN);
+        multipartRequest.setMethod("PUT");
+        byte[] sentBody = multipartRequest.getContentAsByteArray();
+
+        filter.proceedWithFiltering(multipartRequest, httpResponse, chain);
+
+        verify(chain, never()).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+        verify(httpResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        assertThat(multipartRequest.getInputStream().readAllBytes()).isEqualTo(sentBody);
+    }
+
+    @Test
+    public void proceedWithFiltering_should_check_csrf_token_from_header_of_a_put_multipart_request()
+            throws Exception {
+        // the multipart field is ignored (its value is wrong here): the token comes from the header
+        MockHttpServletRequest multipartRequest = mockMultipartRequestFor("notAValidToken");
+        multipartRequest.setMethod("PUT");
+        multipartRequest.addHeader("X-Bonita-API-Token", SESSION_CSRF_TOKEN);
+
+        filter.proceedWithFiltering(multipartRequest, httpResponse, chain);
+
+        verify(chain).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+    }
+
+    @Test
     public void testFilterWithExcludedURL() throws Exception {
         final String url = "test";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(url));
