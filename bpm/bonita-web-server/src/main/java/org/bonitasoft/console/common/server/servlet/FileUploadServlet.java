@@ -38,6 +38,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
@@ -202,52 +203,57 @@ public abstract class FileUploadServlet extends HttpServlet {
                 throw new SizeLimitExceededException("The file exceeds its maximum permitted size.", 0L, 0);
             }
 
-            for (final FileItem item : items) {
-                if (item.isFormField()) {
-                    continue;
-                }
+            try {
+                for (final FileItem item : items) {
+                    if (item.isFormField()) {
+                        continue;
+                    }
 
-                final String fileName = DocumentUtil.sanitizeFilename(item.getName());
+                    final String fileName = DocumentUtil.sanitizeFilename(item.getName());
 
-                // Check if extension is allowed
-                if (!isSupportedExtension(fileName)) {
-                    logRejectedExtension(request, fileName);
-                    outputMediaTypeError(response, responsePW, EXTENSION_NOT_SUPPORTED_MESSAGE);
-                    return;
-                }
-
-                // Check that the declared Content-Type and the actual content match the extension (CVE-68)
-                try (InputStream itemContent = item.getInputStream()) {
-                    if (!DocumentUtil.isContentConsistentWithExtension(fileName, item.getContentType(),
-                            itemContent)) {
-                        LOGGER.warn("Upload of file '{}' to {} rejected: its content or its declared Content-Type "
-                                + "'{}' does not match its extension.", forLog(fileName), request.getRequestURI(),
-                                forLog(item.getContentType()));
-                        outputMediaTypeError(response, responsePW, CONTENT_MISMATCH_MESSAGE);
+                    // Check if extension is allowed
+                    if (!isSupportedExtension(fileName)) {
+                        logRejectedExtension(request, fileName);
+                        outputMediaTypeError(response, responsePW, EXTENSION_NOT_SUPPORTED_MESSAGE);
                         return;
                     }
-                }
 
-                // Make unique file name
-                final String uploadedFileKey = storeTempFile(fileName, item);
+                    // Check that the declared Content-Type and the actual content match the extension (CVE-68)
+                    try (InputStream itemContent = item.getInputStream()) {
+                        if (!DocumentUtil.isContentConsistentWithExtension(fileName, item.getContentType(),
+                                itemContent)) {
+                            LOGGER.warn("Upload of file '{}' to {} rejected: its content or its declared "
+                                    + "Content-Type '{}' does not match its extension.", forLog(fileName),
+                                    request.getRequestURI(), forLog(item.getContentType()));
+                            outputMediaTypeError(response, responsePW, CONTENT_MISMATCH_MESSAGE);
+                            return;
+                        }
+                    }
 
-                // Response
-                final String responseString;
-                if (JSON_CONTENT_TYPE.equals(responseContentType)) {
-                    // just check whether it's a jarless bar to display a warning
-                    boolean isJarlessBar = isJarLessBar(fileName, item);
-                    responseString = generateResponseJson(request, fileName,
-                            DocumentUtil.resolveContentType(fileName, item.getContentType()), uploadedFileKey,
-                            isJarlessBar);
-                } else if (TEXT_CONTENT_TYPE.equals(responseContentType)) {
-                    responseString = generateResponseString(request, fileName, uploadedFileKey);
-                } else {
-                    throw new ServletException(
-                            "Unsupported content type in servlet configuration : " + responseContentType);
+                    // Make unique file name
+                    final String uploadedFileKey = storeTempFile(fileName, item);
+
+                    // Response
+                    final String responseString;
+                    if (JSON_CONTENT_TYPE.equals(responseContentType)) {
+                        // just check whether it's a jarless bar to display a warning
+                        boolean isJarlessBar = isJarLessBar(fileName, item);
+                        responseString = generateResponseJson(request, fileName,
+                                DocumentUtil.resolveContentType(fileName, item.getContentType()), uploadedFileKey,
+                                isJarlessBar);
+                    } else if (TEXT_CONTENT_TYPE.equals(responseContentType)) {
+                        responseString = generateResponseString(request, fileName, uploadedFileKey);
+                    } else {
+                        throw new ServletException(
+                                "Unsupported content type in servlet configuration : " + responseContentType);
+                    }
+                    responsePW.print(responseString);
+                    responsePW.flush();
+                    break;
                 }
-                responsePW.print(responseString);
-                responsePW.flush();
-                break;
+            } finally {
+                // the content is stored (or the upload rejected): the parsed parts are not needed any more
+                deleteTempFiles(items);
             }
         } catch (SessionNotFoundException e) {
             final String message = "Session expired";
@@ -280,11 +286,35 @@ public abstract class FileUploadServlet extends HttpServlet {
         }
     }
 
+    /**
+     * DiskFileItemFactory writes every part above its 10 KB threshold to the JVM temporary folder, and no
+     * FileCleaningTracker is configured: without an explicit deletion, the file stays until the garbage collector
+     * finalizes the item, and for good if the JVM stops first.
+     */
+    private void deleteTempFiles(final List<FileItem> items) {
+        for (final FileItem item : items) {
+            item.delete();
+            // commons-fileupload 1.x does not report a failed deletion
+            if (item instanceof DiskFileItem diskFileItem) {
+                final File storeLocation = diskFileItem.getStoreLocation();
+                if (storeLocation != null && storeLocation.exists()) {
+                    LOGGER.warn("Could not delete the temporary content of the multipart item {}: {}",
+                            forLog(item.getName()), storeLocation);
+                }
+            }
+        }
+    }
+
     protected String storeTempFile(final String fileName, final FileItem item)
             throws Exception {
         temporaryContentAPI = getTemporaryContentAPI();
-        return temporaryContentAPI.storeTempFile(new FileContent(fileName, item.getInputStream(),
-                DocumentUtil.resolveContentType(fileName, item.getContentType())));
+        // the engine stores the content in its own transaction, so it has read the stream when the call returns.
+        // Closing it releases the part's file: an open stream keeps the space of the deleted file allocated, and
+        // prevents its deletion on Windows
+        try (InputStream content = item.getInputStream()) {
+            return temporaryContentAPI.storeTempFile(new FileContent(fileName, content,
+                    DocumentUtil.resolveContentType(fileName, item.getContentType())));
+        }
     }
 
     private void generateFileTooBigError(final HttpServletResponse response, final PrintWriter responsePW,
