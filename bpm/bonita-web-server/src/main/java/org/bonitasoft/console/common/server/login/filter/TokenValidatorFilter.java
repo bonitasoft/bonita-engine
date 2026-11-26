@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.console.common.server.filter.ExcludingPatternFilter;
 import org.bonitasoft.console.common.server.filter.MultiReadHttpServletRequest;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
@@ -61,8 +62,10 @@ public class TokenValidatorFilter extends ExcludingPatternFilter {
             //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the inputstream twice (in the filter and in the API servlet)
             MultiReadHttpServletRequest multiReadHttpServletRequest = new MultiReadHttpServletRequest(
                     httpServletRequest);
-            String headerFromRequest = getCSRFToken(multiReadHttpServletRequest);
             String apiToken = (String) multiReadHttpServletRequest.getSession().getAttribute("api_token");
+            // without a token in the session (no login yet), no token sent with the request can match:
+            // the request is refused without reading its body
+            String headerFromRequest = isBlank(apiToken) ? null : getCSRFToken(multiReadHttpServletRequest);
 
             if (headerFromRequest == null || !headerFromRequest.equals(apiToken)) {
                 if (LOGGER.isDebugEnabled()) {
@@ -97,14 +100,17 @@ public class TokenValidatorFilter extends ExcludingPatternFilter {
      * Get CSRF token from request following order as below
      * - In 'X-Bonita-API-Token' header
      * - In 'CSRFToken' parameter
-     * - In 'CSRFToken' multipart body parameter
+     * - In 'CSRFToken' multipart body parameter, for POST requests only
      */
     private String getCSRFToken(HttpServletRequest httpRequest) {
         String token = httpRequest.getHeader(CSRF_TOKEN_HEADER);
         if (isBlank(token)) {
             token = httpRequest.getParameter(CSRF_TOKEN_PARAM);
         }
-        if (isBlank(token) && isFormData(httpRequest.getContentType())) {
+        // ServletFileUpload, MultiReadHttpServletRequest and FileUploadServlet only handle POST requests as
+        // multipart: other methods send the token in the header or as a parameter
+        if (isBlank(token) && isFormData(httpRequest.getContentType())
+                && ServletFileUpload.isMultipartContent(httpRequest)) {
             CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
             multipartResolver.setResolveLazily(true);
             MultipartHttpServletRequest multiPartRequest = multipartResolver.resolveMultipart(httpRequest);
