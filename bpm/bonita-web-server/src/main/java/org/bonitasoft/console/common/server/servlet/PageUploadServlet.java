@@ -16,6 +16,7 @@ package org.bonitasoft.console.common.server.servlet;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
@@ -109,11 +110,15 @@ public class PageUploadServlet extends TenantFileUploadServlet {
     protected String storeTempFile(final String fileName, final FileItem item)
             throws Exception {
         pageTmp = File.createTempFile("tmp_page", ".tmp");
-        FileUtils.copyToFile(item.getInputStream(), pageTmp);
+        // copyInputStreamToFile closes the stream of the uploaded part, so that its file can be deleted
+        FileUtils.copyInputStreamToFile(item.getInputStream(), pageTmp);
         pageTmp.deleteOnExit();
         final FileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
         String mimeType = mimetypesFileTypeMap.getContentType(pageTmp);
-        return temporaryContentAPI.storeTempFile(new FileContent(fileName, new FileInputStream(pageTmp), mimeType));
+        // the engine stores the content in its own transaction, so it has read the stream when the call returns
+        try (InputStream pageContent = new FileInputStream(pageTmp)) {
+            return temporaryContentAPI.storeTempFile(new FileContent(fileName, pageContent, mimeType));
+        }
     }
 
     protected String[] getPermissions(final HttpServletRequest request)
