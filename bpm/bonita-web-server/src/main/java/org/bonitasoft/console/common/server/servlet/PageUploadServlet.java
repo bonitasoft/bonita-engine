@@ -13,30 +13,23 @@
  **/
 package org.bonitasoft.console.common.server.servlet;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.activation.FileTypeMap;
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.console.common.server.page.CustomPageService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
-import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +56,11 @@ public class PageUploadServlet extends TenantFileUploadServlet {
 
     protected static final String PERMISSIONS_RESPONSE_ATTRIBUTE = "permissions";
 
-    protected File pageTmp;
+    /**
+     * Request attribute holding the uploaded page until the response is generated. One servlet instance serves
+     * concurrent requests: the page must not be kept in a field.
+     */
+    protected static final String UPLOADED_PAGE_ATTRIBUTE = PageUploadServlet.class.getName() + ".uploadedPage";
 
     /**
      * {@inheritDoc}
@@ -107,18 +104,12 @@ public class PageUploadServlet extends TenantFileUploadServlet {
     }
 
     @Override
-    protected String storeTempFile(final String fileName, final FileItem item)
+    protected String storeTempFile(final HttpServletRequest request, final String fileName, final FileItem item)
             throws Exception {
-        pageTmp = File.createTempFile("tmp_page", ".tmp");
-        // copyInputStreamToFile closes the stream of the uploaded part, so that its file can be deleted
-        FileUtils.copyInputStreamToFile(item.getInputStream(), pageTmp);
-        pageTmp.deleteOnExit();
-        final FileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-        String mimeType = mimetypesFileTypeMap.getContentType(pageTmp);
-        // the engine stores the content in its own transaction, so it has read the stream when the call returns
-        try (InputStream pageContent = new FileInputStream(pageTmp)) {
-            return temporaryContentAPI.storeTempFile(new FileContent(fileName, pageContent, mimeType));
-        }
+        // the permissions of the page are read from the uploaded part itself, when the response is generated: the part
+        // stays available until the upload request ends, so no copy of the page is needed
+        request.setAttribute(UPLOADED_PAGE_ATTRIBUTE, item);
+        return super.storeTempFile(request, fileName, item);
     }
 
     protected String[] getPermissions(final HttpServletRequest request)
@@ -139,15 +130,21 @@ public class PageUploadServlet extends TenantFileUploadServlet {
 
     protected Set<String> getPagePermissions(final HttpServletRequest request, final boolean checkIfItAlreadyExists)
             throws BonitaException, IOException {
+        final FileItem uploadedPage = (FileItem) request.getAttribute(UPLOADED_PAGE_ATTRIBUTE);
+        if (uploadedPage == null) {
+            throw new IllegalStateException("No page was uploaded with this request");
+        }
         final APISession apiSession = getAPISession(request);
         final Long processDefinitionId = getProcessDefinitionId(request);
-        final CustomPageService customPageService = new CustomPageService();
-        final Properties properties = customPageService.getPageProperties(apiSession,
-                FileUtils.readFileToByteArray(pageTmp),
+        final CustomPageService customPageService = getCustomPageService();
+        final Properties properties = customPageService.getPageProperties(apiSession, uploadedPage.get(),
                 checkIfItAlreadyExists, processDefinitionId);
-        Set<String> customPagePermissions = customPageService.getCustomPagePermissions(properties, apiSession);
-        pageTmp.delete();
-        return customPagePermissions;
+        return customPageService.getCustomPagePermissions(properties, apiSession);
+    }
+
+    // protected for testing
+    protected CustomPageService getCustomPageService() {
+        return new CustomPageService();
     }
 
     private Long getProcessDefinitionId(final HttpServletRequest request) {
