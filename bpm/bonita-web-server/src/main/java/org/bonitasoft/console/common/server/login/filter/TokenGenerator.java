@@ -42,9 +42,8 @@ public class TokenGenerator {
         if (apiTokenFromClient == null) {
             apiTokenFromClient = new APIToken().getToken();
             session.setAttribute(API_TOKEN, apiTokenFromClient);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Bonita API Token generated: " + apiTokenFromClient);
-            }
+            // the token is a secret: never log its value
+            LOGGER.debug("Bonita API Token generated and stored in the HTTP session");
         }
         return apiTokenFromClient.toString();
     }

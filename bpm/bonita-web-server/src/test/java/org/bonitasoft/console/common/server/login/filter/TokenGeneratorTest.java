@@ -19,6 +19,10 @@ import static org.mockito.Mockito.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.bonitasoft.console.common.server.login.PortalCookies;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,6 +31,7 @@ import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
@@ -76,6 +81,28 @@ public class TokenGeneratorTest {
         final String token = tokenGenerator.createOrLoadToken(session);
         assertThat(token).isNotEmpty();
         assertThat(session.getAttribute(TokenGenerator.API_TOKEN)).isEqualTo(token);
+    }
+
+    @Test
+    public void createOrLoadToken_should_not_log_the_generated_token() {
+        Logger generatorLogger = (Logger) LoggerFactory.getLogger(TokenGenerator.class.getName());
+        ListAppender<ILoggingEvent> logs = new ListAppender<>();
+        logs.start();
+        generatorLogger.addAppender(logs);
+        // the generation is logged at DEBUG: pin the level so that it is emitted, and captured
+        generatorLogger.setLevel(Level.DEBUG);
+        String token;
+        try {
+            token = tokenGenerator.createOrLoadToken(session);
+        } finally {
+            generatorLogger.detachAppender(logs);
+            // back to the level of the test configuration, so that DEBUG does not leak to other tests
+            generatorLogger.setLevel(null);
+        }
+
+        assertThat(logs.list).extracting(ILoggingEvent::getFormattedMessage)
+                .isNotEmpty()
+                .noneMatch(message -> message.contains(token));
     }
 
     @Test

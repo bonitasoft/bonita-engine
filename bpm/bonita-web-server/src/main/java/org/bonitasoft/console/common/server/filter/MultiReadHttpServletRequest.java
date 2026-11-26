@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -37,6 +39,10 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
     private File tempFile;
     private ByteArrayOutputStream readBytes;
     private boolean isMultipart;
+    /**
+     * Streams reading the temporary file, closed by {@link #cleanMultipartTempContent()}
+     */
+    private final List<InputStream> tempFileInputStreams = new ArrayList<>();
 
     public MultiReadHttpServletRequest(final HttpServletRequest request) {
         super(request);
@@ -49,7 +55,11 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
                 || isMultipart && (tempFile == null || !tempFile.exists())) {
             readInputStream();
         }
-        return new CachedServletInputStream();
+        CachedServletInputStream inputStream = new CachedServletInputStream();
+        if (isMultipart) {
+            tempFileInputStreams.add(inputStream);
+        }
+        return inputStream;
     }
 
     @Override
@@ -71,16 +81,21 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
                 tempDir.mkdirs();
             }
             tempFile = File.createTempFile("tmp_", ".part", tempDir);
-            tempFile.deleteOnExit();
             try (FileOutputStream fileOutput = new FileOutputStream(tempFile)) {
                 IOUtils.copy(super.getInputStream(), fileOutput);
             }
         }
     }
 
+    /**
+     * Delete the copy of a multipart body. To be called once the request has been processed.
+     */
     public void cleanMultipartTempContent() {
-        if (tempFile != null && tempFile.exists()) {
-            tempFile.delete();
+        // an open stream keeps the space of a deleted file allocated, and prevents its deletion on Windows
+        tempFileInputStreams.forEach(IOUtils::closeQuietly);
+        tempFileInputStreams.clear();
+        if (tempFile != null && tempFile.exists() && !tempFile.delete()) {
+            tempFile.deleteOnExit();
         }
         // clean recursively if there are several layers of wrapped requests
         if (getRequest() instanceof MultiReadHttpServletRequest) {
