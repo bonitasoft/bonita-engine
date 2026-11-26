@@ -32,6 +32,8 @@
               url="@@ds1.database_connection_url@@"
               dataSourceURL="@@ds1.database_connection_url@@" />
 
+    <!-- The XA pools (bonitaDS and BusinessDataDS) set no validationQuery on purpose: their connections are validated
+         with Connection.isValid(), which leaves no transaction open when the XA transaction starts. -->
     <Resource name="bonitaDS"
               uniqueName="jdbc/bonitaDSXA"
               auth="Container"
@@ -43,7 +45,6 @@
               minIdle="@@ds1_connection_pool_minIdle@@"
               maxIdle="@@ds1_connection_pool_maxIdle@@"
               defaultAutoCommit="false"
-              validationQuery="@@ds1.database_test_query@@"
               removeAbandonedOnBorrow="true"
               removeAbandonedOnMaintenance="true"
               logAbandoned="false"
@@ -112,7 +113,6 @@
             testOnBorrow="true"
             timeBetweenEvictionRunsMillis="60000"
             minEvictableIdleTimeMillis="600000"
-            validationQuery="@@ds2.database_test_query@@"
             xaDataSource="RawBusinessDataDS" />
 
     <Resource name="NotManagedBizDataDS"
